@@ -160,6 +160,32 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .book figure.photo img { width: 100%; height: auto; max-height: 82vh; object-fit: cover; object-position: 50% 50%; }
 .book figure.photo figcaption { max-width: var(--measure); padding-inline: var(--gutter); }
 
+/* In-column images: never cropped, never enlarged past their pixel width. */
+.book figure.inline img { width: min(100%, var(--w, 100%)); height: auto; margin: 0 auto; }
+.book figure.inline figcaption { text-align: start; }
+.book section.chapter.opens-with-photo { padding-top: clamp(1.5rem, 4vw, 3rem); }
+.book section.opens-with-photo > figure.photo:first-of-type { margin-top: 0; }
+
+/* Facsimile appendix: page images as a grid of thumbnails on the web. */
+.book > .doc[data-epub-type~="appendix"] { display: inline-block; vertical-align: top; width: calc(50% - 1rem); max-width: none; margin: 0.5rem; }
+@media (min-width: 48rem) { .book > .doc[data-epub-type~="appendix"] { width: calc(25% - 1rem); } }
+.book section.facsimile-page { padding: 0; }
+.book .fx-nav { display: flex; justify-content: space-between; margin: 0 0 0.35rem; font-family: var(--sans); font-size: 0.75rem; }
+.book .fx-label { color: var(--muted); }
+.book figure.facsimile { margin: 0; }
+.book figure.facsimile img { width: 100%; height: auto; box-shadow: 0 2px 10px rgb(0 0 0 / 0.12); }
+.book section.facsimile-intro { padding-top: clamp(5rem, 14vw, 11rem); }
+
+/* Printed contents: parts with title, author and page. */
+.book ol.contents, .book ol.contents ol { list-style: none; margin: 0; padding: 0; }
+.book ol.contents > li.part { margin: 2rem 0 0; }
+.book ol.contents .part-title { display: block; margin-bottom: 0.5rem; font-family: var(--sans); font-size: 0.85rem; font-weight: 600; letter-spacing: 0.08em; color: var(--accent); }
+.book ol.contents ol li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 0.75rem; padding: 0.45rem 0; border-bottom: 1px solid var(--rule); }
+.book ol.contents a { text-decoration: none; }
+.book ol.contents a:hover { text-decoration: underline; }
+.book ol.contents .author { color: var(--muted); font-size: 0.9em; }
+.book ol.contents .page { margin-inline-start: auto; color: var(--muted); font-family: var(--sans); font-size: 0.8em; font-variant-numeric: tabular-nums; }
+
 /* Artwork is never cropped: shown whole on a mat. */
 .book figure.artwork { width: min(100vw, 62rem); margin-inline: calc(50% - min(50vw, 31rem)); padding: clamp(1.5rem, 6vw, 4.5rem) var(--gutter); box-sizing: border-box; background: var(--mat); }
 .book figure.artwork img { width: min(100%, calc(78vh * var(--ratio, 1))); height: auto; margin: 0 auto; box-shadow: 0 18px 40px rgb(0 0 0 / 0.18); }

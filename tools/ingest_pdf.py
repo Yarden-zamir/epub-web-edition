@@ -183,7 +183,7 @@ def tidy_spaces(s: str) -> str:
     return "".join(out)
 
 
-def merge_fragments(frags: list[Line]) -> list[Line]:
+def merge_fragments(frags: list[Line], max_gap: float | None = 15.0) -> list[Line]:  # 15 pt: a stretched word space; side-by-side captions sit further apart.
     """Join the PDF text fragments of one printed line and order its characters by position.
 
     MuPDF splits a printed line where the direction changes. Fragments that overlap vertically
@@ -193,8 +193,17 @@ def merge_fragments(frags: list[Line]) -> list[Line]:
     groups: list[list[Line]] = []
     for f in frags:
         mid = (f.y0 + f.y1) / 2
+        # Raised reference digits join their line. Otherwise only similar sizes join: text at the same
+        # height in another column (a caption beside body text) is a separate line.
+        is_ref = all(c.style == "sup" or c.text.isspace() for c in f.clusters)
         for g in groups:
-            if min(x.y0 for x in g) <= mid <= max(x.y1 for x in g):
+            same_height = min(x.y0 for x in g) <= mid <= max(x.y1 for x in g)
+            similar = is_ref or any(abs(x.size - f.size) <= 1.2 for x in g)  # Contents: 10 vs 9 pt joins; captions 10.9 vs body 12.5 do not.
+            # Fragments of one printed line touch. Side-by-side captions at the same height stay separate.
+            gap = max(min(x.x0 for x in g) - f.x1, f.x0 - max(x.x1 for x in g), 0.0)
+            # A gap wider than about one character height separates text units (side-by-side captions).
+            near = max_gap is None or gap <= min(max_gap, 1.1 * f.size)
+            if same_height and similar and near:
                 g.append(f)
                 break
         else:
@@ -258,12 +267,27 @@ class Ingest:
         return any(name in font and abs(size - float(sz)) < 0.3 for name, sz in self.layout["running_head_fonts"])
 
     def lines(self, pno: int) -> list[Line]:
+        merged = merge_fragments(self.fragments(pno))
+        page_rtl = hebrew_share(" ".join(ln.text for ln in merged)) >= 0.5
+        for ln in merged:
+            # A line without letters (a year and a bracket on a wrapped line) takes the page direction.
+            if not any(c.isalpha() for c in ln.text) and ln.rtl != page_rtl:
+                ln.rtl = page_rtl
+                ln.text, ln.html = render(visual_to_logical(ln.clusters, page_rtl), ln.size, page_rtl)
         kept = []
-        for ln in merge_fragments(self.fragments(pno)):
+        for ln in merged:
             rule = next((o for o in self.cfg.get("omit", []) if o["page"] == pno and o["contains"] in ln.text), None)
             if rule:
                 self.issue(pno, "intentional-change", f"Omitted {ln.text[:60]!r}: {rule['reason']}")
                 continue
+            fix = next((f for f in self.cfg.get("note_ref_fix", []) if f["page"] == pno and f["contains"] in ln.text), None)
+            if fix:
+                num = str(fix["number"])
+                before = html.escape(fix["contains"], quote=False)
+                if not before.endswith(num) or ln.html.count(before) != 1:
+                    raise IngestError(f"note_ref_fix on page {pno}: {fix['contains']!r} must end with {num} and occur once")
+                ln.html = ln.html.replace(before, before[: -len(num)] + f'<sup class="ref">{num}</sup>')
+                self.issue(pno, "intentional-change", f"Note reference {num} restored: {fix['reason']}")
             kept.append(ln)
         return kept
 
@@ -288,7 +312,7 @@ class Ingest:
                 for s in line["spans"]:
                     digits = "".join(c["c"] for c in s["chars"]).strip()
                     style: Literal["", "b", "sup"] = ""
-                    if digits.isdigit() and s["size"] < size * 0.8:
+                    if digits.isdigit() and len(digits) <= 3 and s["size"] < size * 0.8:  # A 4-digit run is a year.
                         style = "sup"
                     elif s["flags"] & 16 and not main["flags"] & 16:
                         style = "b"
@@ -311,34 +335,99 @@ class Ingest:
         return result
 
     def figures(self, pno: int) -> list[Figure]:
+        """Figures of a page. Unmodified image streams where possible; derived images where print needs more.
+
+        Derived cases, each recorded in assets.csv:
+        - soft mask: the stream with its own transparency mask applied (lossless PNG);
+        - overlay: an inline image printed on top of the figure (a label), so the page region is rendered;
+        - vector QR code: a dense cluster of tiny vector squares, rendered as an image.
+        """
         page = self.doc[pno - 1]
-        figs = []
+        figs: list[Figure] = []
         placed: set[int] = set()
-        for info in page.get_image_info(xrefs=True):
+        infos = page.get_image_info(xrefs=True)
+        inline = [pymupdf.Rect(i["bbox"]) for i in infos if not i["xref"]]
+        for info in infos:
             xref = info["xref"]
             if not xref or xref in placed:
-                continue  # Inline image, or a second placement of the same image on this page.
+                continue  # Inline image (handled as overlay below), or a second placement of the same image.
             placed.add(xref)
             bbox = tuple(info["bbox"])
-            if (bbox[2] - bbox[0]) < 30 or (bbox[3] - bbox[1]) < 30:
+            rect = pymupdf.Rect(bbox)
+            if rect.width < 30 or rect.height < 30:
                 continue  # Rules, bullets and other ornaments.
-            if f"p{pno:03d}-x{xref}" in self.cfg.get("decorative", []):
-                self.issue(pno, "info", f"p{pno:03d}-x{xref}: decorative per book.toml; not in the EPUB")
+            stem = f"p{pno:03d}-x{xref}"
+            if stem in self.cfg.get("decorative", []):
+                self.issue(pno, "info", f"{stem}: decorative per book.toml; not in the EPUB")
                 continue
             if xref in self.seen_xrefs:
                 self.issue(pno, "reuse", f"Image xref {xref} repeats; first file {self.seen_xrefs[xref]}")
             image = self.doc.extract_image(xref)
-            name = f"p{pno:03d}-x{xref}.{image['ext']}"
-            dest = self.out / "OEBPS" / "images" / name
-            dest.write_bytes(image["image"])
+            overlay = any((o & rect).get_area() > 0.8 * o.get_area() and o.get_area() < rect.get_area() for o in inline)
+            if overlay:
+                dpi = max(72, min(300, round(image["width"] / (rect.width / 72))))
+                pix = page.get_pixmap(dpi=dpi, clip=rect)
+                name, data = f"{stem}-render.jpg", pix.tobytes("jpg", jpg_quality=90)
+                derivation = f"page region rendered at {dpi} dpi: an inline image prints on top (label); original stream kept in work/originals"
+                orig_dir = self.content / "work" / "originals"
+                orig_dir.mkdir(parents=True, exist_ok=True)
+                (orig_dir / f"{stem}.{image['ext']}").write_bytes(image["image"])
+                width, height = pix.width, pix.height
+            elif image.get("smask"):
+                base = pymupdf.Pixmap(self.doc, xref)
+                if base.n - base.alpha >= 4:
+                    base = pymupdf.Pixmap(pymupdf.csRGB, base)
+                pix = pymupdf.Pixmap(base, pymupdf.Pixmap(self.doc, image["smask"]))
+                name, data = f"{stem}-masked.png", pix.tobytes("png")
+                derivation = "PDF image stream with its soft mask applied (lossless PNG)"
+                width, height = pix.width, pix.height
+            else:
+                name, data = f"{stem}.{image['ext']}", image["image"]
+                derivation = "unmodified PDF image stream"
+                width, height = image["width"], image["height"]
+            (self.out / "OEBPS" / "images" / name).write_bytes(data)
             self.seen_xrefs.setdefault(xref, name)
-            if image.get("smask"):
-                self.issue(pno, "image", f"{name}: the PDF masks this image; the mask is not applied")
-            figs.append(Figure(pno, bbox, name, image["width"], image["height"], xref))
-            self.assets.append({"file": f"OEBPS/images/{name}", "sha256": hashlib.sha256(image["image"]).hexdigest(),
-                                "pdf_page": str(pno), "pdf_xref": str(xref), "pixels": f"{image['width']}x{image['height']}",
-                                "derivation": "unmodified PDF image stream", "status": "pending"})
+            figs.append(Figure(pno, bbox, name, width, height, xref))
+            self.asset_row(name, data, pno, str(xref), width, height, derivation)
+        figs.extend(self.vector_codes(pno, page))
         return figs
+
+    def vector_codes(self, pno: int, page: "pymupdf.Page") -> list[Figure]:
+        """QR codes drawn as vectors: compact square clusters of at least 100 small filled shapes."""
+        cells = [d["rect"] for d in page.get_drawings() if d.get("fill") is not None
+                 and 0 < d["rect"].width < 6 and 0 < d["rect"].height < 6]
+        if len(cells) < 100:
+            return []
+        clusters: list[pymupdf.Rect] = []  # Union boxes; cells within 4 pt of a box join it.
+        counts: list[int] = []
+        for c in sorted(cells, key=lambda r: (r.x0, r.y0)):
+            for i, box in enumerate(clusters):
+                if (box + (-4, -4, 4, 4)).intersects(c):
+                    clusters[i] = box | c
+                    counts[i] += 1
+                    break
+            else:
+                clusters.append(pymupdf.Rect(c))
+                counts.append(1)
+        figs = []
+        for box, n in zip(clusters, counts):
+            if n < 100:
+                continue
+            if box.width > 150 or abs(box.width - box.height) > 0.2 * box.width:
+                self.issue(pno, "vector", f"{n} small vector shapes in {[round(v) for v in box]}; not a QR shape; check by eye")
+                continue
+            pix = page.get_pixmap(dpi=300, clip=box + (-2, -2, 2, 2))
+            name = f"p{pno:03d}-qr{len(figs) + 1}.png"
+            data = pix.tobytes("png")
+            (self.out / "OEBPS" / "images" / name).write_bytes(data)
+            self.asset_row(name, data, pno, "vector", pix.width, pix.height, "vector QR code rendered at 300 dpi")
+            figs.append(Figure(pno, tuple(box), name, pix.width, pix.height, 0))
+        return figs
+
+    def asset_row(self, name: str, data: bytes, pno: int, xref: str, w: int, h: int, derivation: str) -> None:
+        self.assets.append({"file": f"OEBPS/images/{name}", "sha256": hashlib.sha256(data).hexdigest(),
+                            "pdf_page": str(pno), "pdf_xref": xref, "pixels": f"{w}x{h}",
+                            "derivation": derivation, "status": "pending"})
 
     # ---------- assembly ----------
 
@@ -385,20 +474,42 @@ class Ingest:
         rest = []
         for ln in lines:
             target = None
-            if ln.role == "small":
+            first_word = ln.text.split(" ", 1)[0]
+            is_note_start = first_word.isdigit() and len(first_word) <= 3 and ln.y0 / height >= float(self.layout["footnote_min_y"])
+            if ln.role == "small" and not is_note_start:
                 for f in figs:
                     overlap = min(f.bbox[2], ln.x1) - max(f.bbox[0], ln.x0) > 0
                     near = -2 <= ln.y0 - f.bbox[3] <= gap or -2 <= f.bbox[1] - ln.y1 <= gap
-                    if overlap and near:
+                    inside = f.bbox[0] - 1 <= ln.x0 and ln.x1 <= f.bbox[2] + 1 and f.bbox[1] - 1 <= ln.y0 and ln.y1 <= f.bbox[3] + 1
+                    beside = (f.bbox[1] - 2 <= ln.y0 <= f.bbox[3] + 2
+                              and (0 <= f.bbox[0] - ln.x1 <= 20 or 0 <= ln.x0 - f.bbox[2] <= 20))
+                    if (overlap and near) or inside or beside:  # Below/above, printed on the image, or beside it.
                         target = f
                         break
             if target:
                 ln.role = "caption"
                 target.captions.append(ln)
             else:
-                if ln.role == "small":
-                    ln.role = "footnote" if ln.y0 / height >= float(self.layout["footnote_min_y"]) else "caption"
                 rest.append(ln)
+        # Chain: a small line right under (or over) an attached caption line belongs to the same caption.
+        changed = True
+        while changed:
+            changed = False
+            for ln in list(rest):
+                if ln.role != "small":
+                    continue
+                for f in figs:
+                    if any((abs(ln.y0 - c.y1) < 8 or abs(c.y0 - ln.y1) < 8) and min(c.x1, ln.x1) - max(c.x0, ln.x0) > 0
+                           for c in f.captions):  # Same caption line: right above or below, and overlapping.
+                        ln.role = "caption"
+                        f.captions.append(ln)
+                        f.captions.sort(key=lambda c: c.y0)
+                        rest.remove(ln)
+                        changed = True
+                        break
+        for ln in rest:
+            if ln.role == "small":
+                ln.role = "footnote" if ln.y0 / height >= float(self.layout["footnote_min_y"]) else "caption"
         return rest
 
     def caption_html(self, fig: Figure) -> str:
@@ -409,8 +520,14 @@ class Ingest:
         spans = []
         for para in self.paragraphs(fig.captions):
             text = self.join(para)
-            cls = "credit" if para[0].text.startswith(prefixes) else "caption"
-            spans.append(f'<span class="{cls}">{text}</span>')
+            # A credit can start the line or follow the caption in the same line ("… צילום: name").
+            cut = min((i for pre in prefixes for i in [text.find(pre + ":"), text.find(pre + " ")] if i > 0), default=-1)
+            if text.startswith(prefixes):
+                spans.append(f'<span class="credit">{text}</span>')
+            elif cut > 0:
+                spans.append(f'<span class="caption">{text[:cut].rstrip()}</span> <span class="credit">{text[cut:]}</span>')
+            else:
+                spans.append(f'<span class="caption">{text}</span>')
         return "<figcaption>" + "".join(spans) + "</figcaption>"
 
     def contents_rows(self, pno: int) -> list[tuple[str, list[str]]]:
@@ -423,7 +540,7 @@ class Ingest:
         entry_size = max((f.size for f in frags if f.size < 12.5), default=0)
         author_edge = max((f.x1 for f in frags if f.size < entry_size - 0.5), default=0)
         rows = []
-        for line in merge_fragments(frags):
+        for line in merge_fragments(frags, max_gap=None):  # Contents columns sit far apart.
             kind = "heading" if line.size >= 20 else "part" if line.size >= 12.5 else "entry"
             if kind != "entry":
                 rtl = hebrew_share(line.text) >= 0.5
@@ -505,6 +622,61 @@ class Ingest:
                 n += 1
                 print(f'[[unit]]\nstart = {start}\nid = "a{n:02d}"\nkind = "article"  # {cells[0]}')
 
+    def link_notes(self, unit: Unit, parts: list[str], notes: dict[int, dict[str, object]]) -> list[str]:
+        """Link reference numbers and notes both ways. IDs use the printed note number: {unit}-fn{n}, {unit}-fnref{n}."""
+        referenced: set[int] = set()
+        out = []
+        for part in parts:
+            pieces = part.split('<sup class="ref">')
+            rebuilt = pieces[0]
+            for piece in pieces[1:]:
+                num, _, tail = piece.partition("</sup>")
+                n = int(num) if num.isdigit() else None
+                if n is not None and n in notes and n not in referenced:
+                    referenced.add(n)
+                    rebuilt += (f'<a epub:type="noteref" role="doc-noteref" id="{unit.id}-fnref{n}" '
+                                f'href="#{unit.id}-fn{n}">{n}</a>' + tail)
+                else:
+                    self.issue(unit.start, "note", f"{unit.id}: reference {num!r} has no single matching note; kept as superscript")
+                    rebuilt += f'<sup class="ref">{num}</sup>' + tail
+            out.append(rebuilt)
+        # Starred provenance notes: the title (h2 or display title) ends with "*" in print.
+        src_ids = [x[6:].split("|", 1)[0] for x in out if x.startswith("@@SRC ")]
+        star_linked: str | None = None
+        if src_ids:
+            sid = src_ids[0]
+            for i, part in enumerate(out):
+                if (part.startswith("<h2") or 'class="display-title"' in part.split(">", 1)[0]) and "*" in part:
+                    tag_end = part.index(">") + 1
+                    body = part[tag_end:]
+                    out[i] = part[:tag_end] + body.replace(
+                        "*", f'<a epub:type="noteref" role="doc-noteref" id="{sid}-ref" href="#{sid}">*</a>', 1)
+                    star_linked = sid
+                    break
+        rendered = []
+        for part in out:
+            if part.startswith("@@SRC "):
+                sid, attrs, text = part[6:-2].split("|", 2)
+                if sid == star_linked:
+                    body = text[1:] if text.startswith("*") else text
+                    rendered.append(f'<aside epub:type="footnote" role="doc-footnote" id="{sid}" class="footnote source-note"{attrs}>'
+                                    f'<p><a href="#{sid}-ref" role="doc-backlink">*</a>{body}</p></aside>')
+                else:
+                    self.issue(unit.start, "note", f"{unit.id}: provenance note {sid} has no asterisk in the title; kept as text")
+                    rendered.append(f'<p id="{sid}" class="source-note"{attrs}>{text}</p>')
+                continue
+            if part.startswith("@@NOTE") and part.endswith("@@"):
+                n = int(part[6:-2])
+                note = notes[n]
+                back = (f'<a href="#{unit.id}-fnref{n}" role="doc-backlink">{n}</a>' if n in referenced else str(n))
+                if n not in referenced:
+                    self.issue(int(note["page"]), "note", f"{unit.id}: note {n} has no reference in the text")
+                body = " ".join(str(x) for x in note["parts"] if x)
+                rendered.append(f'<aside epub:type="footnote" role="doc-footnote" id="{unit.id}-fn{n}" class="footnote"{note["attrs"]}><p>{back} {body}</p></aside>')
+            else:
+                rendered.append(part)
+        return rendered
+
     def render_unit(self, unit: Unit) -> tuple[str, list[str], str | None]:
         """Return XHTML body content, the IDs per page, and the unit heading text."""
         if unit.kind == "contents":
@@ -512,6 +684,9 @@ class Ingest:
             self.page_ids.update({p: [unit.id] for p in range(unit.start, unit.end + 1)})
             return body, [], heading
         counters = {"p": 0, "fig": 0, "n": 0}
+        notes: dict[int, dict[str, object]] = {}
+        last_note: int | None = None
+        prev_note_y = -1e9
         parts: list[str] = []
         heading: str | None = None
         page_ids: dict[int, list[str]] = {}
@@ -530,12 +705,33 @@ class Ingest:
                     flow.append((first.y0, f'<h2 id="{unit.id}-h"{attrs}>{text}</h2>'))
                     ids.append(f"{unit.id}-h")
                     continue
-                if role == "footnote":
-                    counters["n"] += 1
-                    nid = f"{unit.id}-n{counters['n']:02d}"
-                    flow.append((10_000 + first.y0, f'<aside epub:type="footnote" role="doc-footnote" id="{nid}" class="footnote"{attrs}><p>{text}</p></aside>'))
-                    ids.append(nid)
-                    continue
+                if role == "footnote" and unit.kind != "bibliography":
+                    plain = " ".join(ln.text for ln in para)
+                    head = plain.split(" ", 1)[0]
+                    if plain.startswith("*"):
+                        counters["src"] = counters.get("src", 0) + 1
+                        sid = f"{unit.id}-src{counters['src']}"
+                        flow.append((10_000 + first.y0, f'@@SRC {sid}|{attrs}|{text}@@'))
+                        ids.append(sid)
+                        continue
+                    expected = 1 if last_note is None else last_note + 1
+                    if head.rstrip(".").isdigit() and int(head.rstrip(".")) == expected:
+                        n = expected
+                        if n in notes:
+                            raise IngestError(f"unit {unit.id}: note {n} appears twice (PDF page {pno})")
+                        rest = text.split(" ", 1)[1] if " " in text else ""
+                        notes[n] = {"attrs": attrs, "parts": [rest], "page": pno}
+                        last_note = n
+                        prev_note_y = para[-1].y1
+                        flow.append((10_000 + first.y0, f"@@NOTE{n}@@"))
+                        ids.append(f"{unit.id}-fn{n}")
+                        continue
+                    if last_note is not None and (not head.rstrip(".").isdigit() or first.y0 - prev_note_y < 14):
+                        notes[last_note]["parts"].append(text)
+                        self.issue(pno, "note-join", f"{unit.id}: unnumbered note text joined to note {last_note} (continued from the previous page)")
+                        continue
+                    self.issue(pno, "note", f"{unit.id}: small print at the page foot without a number; kept as a paragraph")
+                    role = "caption"
                 counters["p"] += 1
                 pid = f"{unit.id}-p{counters['p']:03d}"
                 tag = {"title": "p", "display": "p"}.get(role, "p")
@@ -550,12 +746,24 @@ class Ingest:
                 page_w = self.doc[0].rect.width
                 # "photo": prints edge to edge (bleed). "inline": sits in the text column.
                 kind = "photo" if (fig.bbox[2] - fig.bbox[0]) >= 0.9 * page_w else "inline"
-                flow.append((fig.bbox[1], f'<figure id="{fid}" class="figure {kind}"><img src="../images/{fig.file}" width="{fig.width}" height="{fig.height}" alt=""/>{self.caption_html(fig)}</figure>'))
+                stem = fig.file.rsplit(".", 1)[0]
+                alt = self.cfg.get("alt", {}).get(stem)
+                caption = self.caption_html(fig)
+                flow.append((fig.bbox[1], f'<figure id="{fid}" class="figure {kind}"><img src="../images/{fig.file}" width="{fig.width}" height="{fig.height}" alt="{html.escape(alt or "")}"/>{caption}</figure>'))
                 ids.append(fid)
-                self.issue(pno, "alt-text", f"{fid}: needs alt text written from the image (not in the PDF)")
+                if alt is None:
+                    self.issue(pno, "alt-text", f"{fid} ({stem}): needs alt text written from the image (not in the PDF)")
+                self.figure_log.append({
+                    "figure_id": fid, "image": stem, "pdf_page": str(pno), "printed_page": self.label(pno), "kind": kind,
+                    "bbox": " ".join(f"{v:.0f}" for v in fig.bbox), "pixels": f"{fig.width}x{fig.height}",
+                    "caption_lines": str(len(fig.captions)),
+                    "caption_boxes": ";".join(f"{c.x0:.0f} {c.y0:.0f} {c.x1:.0f} {c.y1:.0f}" for c in fig.captions),
+                    "has_credit": "yes" if 'class="credit"' in caption else "no",
+                    "alt": "decorative" if alt == "" else ("yes" if alt else "missing"), "status": "pending"})
             flow.sort(key=lambda t: t[0])
             parts.extend(h for _, h in flow)
         self.page_ids.update(page_ids)
+        parts = self.link_notes(unit, parts, notes)
         first_content = next((x for x in parts if not x.startswith("<span epub:type")), "")
         self.opens_with_photo[unit.id] = 'class="figure photo"' in first_content
         return "\n".join(parts), [], heading
@@ -578,6 +786,7 @@ class Ingest:
         shutil.copyfile(css, self.out / "OEBPS" / "css" / "book.css")
         self.page_ids: dict[int, list[str]] = {}
         self.opens_with_photo: dict[str, bool] = {}
+        self.figure_log: list[dict[str, str]] = []
         docs: list[tuple[Unit, str, str | None]] = []
         for unit in self.units:
             body, _, heading = self.render_unit(unit)
@@ -590,10 +799,51 @@ class Ingest:
                                body=f'<section id="{unit.id}" class="{unit.kind}{" chapter" if unit.kind == "article" else ""}{" opens-with-photo" if self.opens_with_photo.get(unit.id) else ""}"{type_attr}{labelled}>\n{body}\n</section>')
             (self.out / "OEBPS" / "text" / f"{unit.id}.xhtml").write_text(xhtml, encoding="utf-8")
             docs.append((unit, f"text/{unit.id}.xhtml", heading))
-        self.write_package(docs)
+        self.write_package(docs, self.write_cover(), self.write_facsimile())
         self.write_inventory()
 
-    def write_package(self, docs: list[tuple[Unit, str, str | None]]) -> None:
+    def write_cover(self) -> str | None:
+        """Render the printed cover as the EPUB cover-image. Returns its file name under OEBPS/images."""
+        cfg = self.cfg.get("cover")
+        if not cfg:
+            return None
+        page = self.doc[int(cfg["render_page"]) - 1]
+        dpi = round(int(cfg["height_px"]) / page.rect.height * 72)  # MuPDF takes an integer DPI.
+        (self.out / "OEBPS" / "images" / "cover.jpg").write_bytes(page.get_pixmap(dpi=dpi).tobytes("jpg", jpg_quality=88))
+        return "cover.jpg"
+
+    def write_facsimile(self) -> list[tuple[str, str]]:
+        """One appendix document per PDF page with a page image and a Return link. Returns (id, href) pairs."""
+        cfg = self.cfg.get("facsimile")
+        if not cfg:
+            return []
+        lang = self.cfg["meta"]["language"]
+        (self.out / "OEBPS" / "facsimile").mkdir()
+        unit_of = {p: u for u in self.units for p in range(u.start, u.end + 1)}
+        docs = [("facsimile", "text/facsimile.xhtml")]
+        intro = (f'<section id="facsimile" class="facsimile-intro" epub:type="appendix" aria-labelledby="facsimile-h">\n'
+                 f'<h2 id="facsimile-h">{html.escape(cfg["title"])}</h2>\n'
+                 f'<p id="facsimile-note" class="edition-note">{html.escape(cfg["note"])}</p>\n</section>')
+        (self.out / "OEBPS" / "text" / "facsimile.xhtml").write_text(
+            DOC.format(lang=lang, title=html.escape(cfg["title"]), body=intro), encoding="utf-8")
+        for page in self.doc:
+            pno = page.number + 1
+            pix = page.get_pixmap(dpi=int(cfg["dpi"]))
+            name = f"fx-{pno:03d}"
+            (self.out / "OEBPS" / "facsimile" / f"{name}.jpg").write_bytes(pix.tobytes("jpg", jpg_quality=int(cfg["quality"])))
+            label = html.escape(f'{cfg["page_label"]} {self.label(pno)}')
+            back = f"{unit_of[pno].id}.xhtml#pg-{pno}"
+            body = (f'<section id="{name}" class="facsimile-page" epub:type="appendix" aria-label="{label}">\n'
+                    f'<p class="fx-nav"><a href="{back}">{html.escape(cfg["return_label"])}</a> <span class="fx-label">{label}</span></p>\n'
+                    f'<figure id="{name}-img" class="facsimile"><img src="../facsimile/{name}.jpg" width="{pix.width}" height="{pix.height}" '
+                    f'alt="{label}: תמונת העמוד המודפס"/></figure>\n</section>')
+            page_doc = DOC.format(lang=lang, title=label, body=body).replace("<body>", '<body epub:type="appendix">', 1)
+            (self.out / "OEBPS" / "text" / f"{name}.xhtml").write_text(page_doc, encoding="utf-8")
+            docs.append((name, f"text/{name}.xhtml"))
+        return docs
+
+    def write_package(self, docs: list[tuple[Unit, str, str | None]], cover: str | None,
+                      facsimile: list[tuple[str, str]]) -> None:
         m = self.cfg["meta"]
         images = sorted((self.out / "OEBPS" / "images").iterdir())
         media = {"jpeg": "image/jpeg", "jpg": "image/jpeg", "png": "image/png", "jpx": "image/jp2"}
@@ -602,7 +852,7 @@ class Ingest:
         for f in sorted((self.out / "OEBPS" / "fonts").iterdir()):
             if f.suffix == ".ttf":
                 manifest.append(f'<item id="font-{f.stem}" href="fonts/{f.name}" media-type="font/ttf"/>')
-        cover_file = next((d for d in images if d.name.startswith("p001-")), None)
+        cover_file = next((d for d in images if d.name == cover), None) if cover else None
         for img in images:
             ext = img.suffix.lstrip(".")
             if ext not in media:
@@ -613,6 +863,11 @@ class Ingest:
         for unit, href, _ in docs:
             manifest.append(f'<item id="x-{unit.id}" href="{href}" media-type="application/xhtml+xml"/>')
             spine.append(f'<itemref idref="x-{unit.id}"/>')
+        for fid, href in facsimile:
+            manifest.append(f'<item id="x-{fid}" href="{href}" media-type="application/xhtml+xml"/>')
+            spine.append(f'<itemref idref="x-{fid}"/>')
+            if fid != "facsimile":
+                manifest.append(f'<item id="img-{fid}" href="facsimile/{fid}.jpg" media-type="image/jpeg"/>')
         creators = "\n    ".join(f"<dc:creator>{html.escape(c)}</dc:creator>" for c in m["creators"])
         opf = OPF.format(identifier=m["identifier"], title=html.escape(m["title"]), creators=creators,
                          editor=html.escape(m["editor"]), language=m["language"], source=m["source"],
@@ -620,6 +875,8 @@ class Ingest:
                          manifest="\n    ".join(manifest), spine="\n    ".join(spine))
         (self.out / "OEBPS" / "package.opf").write_text(opf, encoding="utf-8")
         toc = "\n      ".join(f'<li><a href="{href}#{u.id}">{html.escape(h)}</a></li>' for u, href, h in docs if h)
+        if facsimile:
+            toc += f'\n      <li><a href="text/facsimile.xhtml#facsimile">{html.escape(self.cfg["facsimile"]["title"])}</a></li>'
         pages = "\n      ".join(
             f'<li><a href="{href}#pg-{p}">{self.label(p)}</a></li>'
             for u, href, _ in docs for p in u.pages)
@@ -636,7 +893,7 @@ class Ingest:
             for p in sorted(unit_of):
                 u = unit_of[p]
                 w.writerow([p, self.label(p), u.id, u.kind, " ".join(self.page_ids.get(p, [])), "pending", ""])
-        for name, rows in (("assets.csv", self.assets), ("issues.csv", self.issues)):
+        for name, rows in (("assets.csv", self.assets), ("issues.csv", self.issues), ("figures.csv", self.figure_log)):
             with (inv / name).open("w", encoding="utf-8", newline="") as f:
                 if rows:
                     w2 = csv.DictWriter(f, fieldnames=list(rows[0]), lineterminator="\n")
