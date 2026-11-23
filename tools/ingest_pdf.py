@@ -5,6 +5,7 @@
 """Convert a print PDF into an EPUB source tree and a page inventory.
 
 Usage: uv run tools/ingest_pdf.py CONTENT_DIR
+       uv run tools/ingest_pdf.py CONTENT_DIR --print-units FIRST-LAST   (contents PDF pages)
 
 CONTENT_DIR holds book.toml. The script writes CONTENT_DIR/epub-src/ and
 CONTENT_DIR/inventory/{pages,assets,issues}.csv. All book content stays in CONTENT_DIR.
@@ -37,7 +38,8 @@ BOOK_CSS = PIPELINE / "epub-src" / "OEBPS" / "css" / "book.css"
 
 type Role = Literal["body", "display", "title", "byline", "subheading", "small", "caption", "footnote"]
 # "small": small print. attach_captions() turns it into "caption" (next to an image) or "footnote" (low on the page).
-type UnitKind = Literal["cover", "blank", "titlepage", "contents", "frontispiece", "article", "part", "end"]
+type UnitKind = Literal["cover", "blank", "titlepage", "contents", "frontispiece", "article", "part",
+                       "bibliography", "backcover", "end"]
 
 
 @dataclass
@@ -81,6 +83,7 @@ class Unit:
     kind: UnitKind
     start: int
     end: int  # Inclusive PDF page.
+    pages: list[int]  # Reading order of the unit's PDF pages.
 
 
 class IngestError(Exception):
@@ -102,6 +105,8 @@ def role_for(font: str, size: float, rules: list[dict[str, object]]) -> Role:
 
 
 LTR_JOINERS = set(".,:/%+-'– ")
+CLOSERS = set(".,:;!?)]”")  # No space before these. ASCII quotes are ambiguous in Hebrew (geresh, gershayim), so they stay out.
+OPENERS = set("([“")  # No synthetic space after these.
 
 
 def ltr_strong(c: str) -> bool:
@@ -153,7 +158,8 @@ def render(clusters: list[Cluster], size: float, rtl: bool) -> tuple[str, str]:
     for c in clusters:
         if prev is not None:
             gap = (prev.x0 - c.x1) if rtl else (c.x0 - prev.x1)
-            if gap > 0.25 * size and not prev.text.isspace() and not c.text.isspace():
+            if (gap > 0.25 * size and not prev.text.isspace() and not c.text.isspace()
+                    and c.text not in CLOSERS and prev.text not in OPENERS):
                 text.append(" ")
                 buf.append(" ")
         if c.style != style:
@@ -163,7 +169,18 @@ def render(clusters: list[Cluster], size: float, rtl: bool) -> tuple[str, str]:
         buf.append(c.text)
         prev = c
     flush()
-    return " ".join("".join(text).split()), " ".join("".join(parts).split())
+    return tidy_spaces("".join(text)), tidy_spaces("".join(parts))
+
+
+def tidy_spaces(s: str) -> str:
+    """Collapse whitespace; drop spaces before closing punctuation and after opening brackets."""
+    words = " ".join(s.split())
+    out: list[str] = []
+    for i, ch in enumerate(words):
+        if ch == " " and ((i + 1 < len(words) and words[i + 1] in CLOSERS) or (out and out[-1] in OPENERS)):
+            continue
+        out.append(ch)
+    return "".join(out)
 
 
 def merge_fragments(frags: list[Line]) -> list[Line]:
@@ -205,6 +222,7 @@ class Ingest:
         self.doc = pymupdf.open(pdf)
         self.layout = self.cfg["layout"]
         self.rules = self.cfg["role"]
+        self.char_map: dict[str, str] = self.cfg.get("char_map", {})
         self.out = content / "epub-src"
         self.issues: list[dict[str, str]] = []
         self.assets: list[dict[str, str]] = []
@@ -218,7 +236,10 @@ class Ingest:
         units = []
         for i, u in enumerate(raw):
             end = raw[i + 1]["start"] - 1 if i + 1 < len(raw) else self.doc.page_count
-            units.append(Unit(u["id"], u["kind"], u["start"], end))
+            order = u.get("page_order", list(range(u["start"], end + 1)))
+            if sorted(order) != list(range(u["start"], end + 1)):
+                raise IngestError(f"unit {u['id']}: page_order must list PDF pages {u['start']}-{end} once each")
+            units.append(Unit(u["id"], u["kind"], u["start"], end, order))
         if units[0].start != 1:
             raise IngestError("the first unit must start at PDF page 1")
         return [u for u in units if u.kind != "end"]
@@ -233,7 +254,21 @@ class Ingest:
 
     # ---------- page reading ----------
 
+    def is_running_head(self, font: str, size: float) -> bool:
+        return any(name in font and abs(size - float(sz)) < 0.3 for name, sz in self.layout["running_head_fonts"])
+
     def lines(self, pno: int) -> list[Line]:
+        kept = []
+        for ln in merge_fragments(self.fragments(pno)):
+            rule = next((o for o in self.cfg.get("omit", []) if o["page"] == pno and o["contains"] in ln.text), None)
+            if rule:
+                self.issue(pno, "intentional-change", f"Omitted {ln.text[:60]!r}: {rule['reason']}")
+                continue
+            kept.append(ln)
+        return kept
+
+    def fragments(self, pno: int) -> list[Line]:
+        """PDF text fragments of a page with letter clusters, without running heads and folios."""
         page = self.doc[pno - 1]
         height = page.rect.height
         result: list[Line] = []
@@ -245,10 +280,10 @@ class Ingest:
                 if not spans:
                     continue
                 y0, y1 = line["bbox"][1], line["bbox"][3]
-                if y1 / height < float(self.layout["header_max_y"]):
-                    continue  # Running head or folio.
                 main = max(spans, key=lambda s: len(s["chars"]))
                 font, size = main["font"].split("+")[-1], main["size"]
+                if y1 / height < float(self.layout["header_max_y"]) and self.is_running_head(font, size):
+                    continue
                 clusters: list[Cluster] = []
                 for s in line["spans"]:
                     digits = "".join(c["c"] for c in s["chars"]).strip()
@@ -259,6 +294,12 @@ class Ingest:
                         style = "b"
                     for ch in s["chars"]:
                         c = ch["c"].replace("\t", " ")
+                        if c in self.char_map:
+                            if not self.char_map[c].isspace():
+                                self.issue(pno, "char-map", f"U+{ord(c):04X} mapped to U+{ord(self.char_map[c]):04X}; check against print")
+                            c = self.char_map[c]
+                        if ord(c) < 32:
+                            raise IngestError(f"PDF page {pno}: control character U+{ord(c):04X}; add it to [char_map] in book.toml")
                         if unicodedata.combining(c) and clusters:
                             clusters[-1].text += c  # Points stay with their letter.
                             continue
@@ -267,7 +308,7 @@ class Ingest:
                 role = role_for(font, size, self.rules)  # "small" resolves to caption or footnote later.
                 result.append(Line(pno, y0, y1, line["bbox"][0], line["bbox"][2], role, "", plain,
                                    hebrew_share(plain) >= 0.5, size, clusters))
-        return merge_fragments(result)
+        return result
 
     def figures(self, pno: int) -> list[Figure]:
         page = self.doc[pno - 1]
@@ -281,6 +322,9 @@ class Ingest:
             bbox = tuple(info["bbox"])
             if (bbox[2] - bbox[0]) < 30 or (bbox[3] - bbox[1]) < 30:
                 continue  # Rules, bullets and other ornaments.
+            if f"p{pno:03d}-x{xref}" in self.cfg.get("decorative", []):
+                self.issue(pno, "info", f"p{pno:03d}-x{xref}: decorative per book.toml; not in the EPUB")
+                continue
             if xref in self.seen_xrefs:
                 self.issue(pno, "reuse", f"Image xref {xref} repeats; first file {self.seen_xrefs[xref]}")
             image = self.doc.extract_image(xref)
@@ -316,6 +360,9 @@ class Ingest:
             else:
                 starts = cur.x0 > left + indent
                 prev_short = prev.x1 < right - short
+            if cur.role in ("footnote", "caption", "small"):
+                # Notes and sources use hanging indents: only a leading number starts a new entry.
+                starts = cur.text.split(" ", 1)[0].rstrip(".").isdigit()
             if starts or (prev_short and cur.role == "body"):
                 paras.append([cur])
             else:
@@ -366,13 +413,109 @@ class Ingest:
             spans.append(f'<span class="{cls}">{text}</span>')
         return "<figcaption>" + "".join(spans) + "</figcaption>"
 
+    def contents_rows(self, pno: int) -> list[tuple[str, list[str]]]:
+        """Rows of a printed contents page: ("heading" | "part" | "entry", [title, author?, page?]).
+
+        Entries print in columns: title (right), author (right-aligned on one edge), page number (left).
+        The author edge is the largest right edge among the smaller author-size fragments of the page.
+        """
+        frags = self.fragments(pno)
+        entry_size = max((f.size for f in frags if f.size < 12.5), default=0)
+        author_edge = max((f.x1 for f in frags if f.size < entry_size - 0.5), default=0)
+        rows = []
+        for line in merge_fragments(frags):
+            kind = "heading" if line.size >= 20 else "part" if line.size >= 12.5 else "entry"
+            if kind != "entry":
+                rtl = hebrew_share(line.text) >= 0.5
+                rows.append((kind, [render(visual_to_logical(line.clusters, rtl), line.size, rtl)[0]]))
+                continue
+            title = [c for c in line.clusters if (c.x0 + c.x1) / 2 > author_edge + 3]
+            rest = [c for c in line.clusters if (c.x0 + c.x1) / 2 <= author_edge + 3]
+            cells = []
+            for group in (title, rest):
+                if group:
+                    rtl = hebrew_share("".join(c.text for c in group)) >= 0.5
+                    cells.append(render(visual_to_logical(group, rtl), line.size, rtl)[0])
+            if cells and len(cells[-1].split()) > 0 and cells[-1].split()[-1].isdigit():
+                *words, page = cells[-1].split()
+                cells = cells[:-1] + ([" ".join(words)] if words else []) + [page]
+            rows.append((kind, cells))
+        return rows
+
+    def contents_html(self, unit: Unit) -> tuple[str, str | None]:
+        """The printed contents as one nested list. Page markers sit inside the first item of each page."""
+        start_of = {u.start: u for u in self.units}
+        head: list[str] = []
+        items: list[str] = []
+        heading: str | None = None
+        open_part = False
+        for pno in range(unit.start, unit.end + 1):
+            marker = f'<span epub:type="pagebreak" role="doc-pagebreak" id="pg-{pno}" title="{self.label(pno)}"/>'
+            if pno == unit.start:
+                head.append(marker)
+                marker = ""
+            for kind, cells in self.contents_rows(pno):
+                esc = [html.escape(c, quote=False) for c in cells]
+                if kind == "heading":
+                    heading = cells[0]
+                    head.append(f'<h2 id="{unit.id}-h">{esc[0]}</h2>')
+                    continue
+                if kind == "part":
+                    if open_part:
+                        items.append("</ol></li>")
+                    items.append(f'<li class="part">{marker}<span class="part-title">{esc[0]}</span><ol>')
+                    marker, open_part = "", True
+                    continue
+                if not open_part:
+                    items.append('<li class="part front"><ol>')
+                    open_part = True
+                page = cells[-1] if cells and cells[-1].isdigit() else None
+                title = esc[0]
+                author = esc[1] if (len(esc) > 2 or (len(esc) == 2 and page is None)) else ""
+                target = start_of.get(int(page) + int(self.layout["folio_offset"])) if page else None
+                if target is None:
+                    self.issue(pno, "contents", f"Contents entry {cells!r}: no unit starts at its page")
+                lang = ' lang="en" dir="ltr"' if hebrew_share(cells[0]) < 0.5 else ""
+                link = f'<a href="{target.id}.xhtml#{target.id}"{lang}>{title}</a>' if target else f"<span{lang}>{title}</span>"
+                author_html = f' <span class="author">{author}</span>' if author else ""
+                page_html = f' <span class="page">{html.escape(page)}</span>' if page else ""
+                items.append(f"<li>{marker}{link}{author_html}{page_html}</li>")
+                marker = ""
+        if open_part:
+            items.append("</ol></li>")
+        return "\n".join(head + ['<ol class="contents">'] + items + ["</ol>"]), heading
+
+    def print_units(self, pages: list[int]) -> None:
+        """Propose [[unit]] entries from the printed contents. Review them against the PDF."""
+        offset = int(self.layout["folio_offset"])
+        n, s = 0, 0
+        for pno in pages:
+            pending_part = False
+            for kind, cells in self.contents_rows(pno):
+                if kind == "part":
+                    pending_part = True
+                    continue
+                if kind != "entry" or not cells[-1].isdigit():
+                    continue
+                start = int(cells[-1]) + offset
+                if pending_part:
+                    s += 1
+                    print(f'[[unit]]\nstart = {start - 2}\nid = "s{s:02d}"\nkind = "part"  # {cells[0] if False else ""}')
+                    pending_part = False
+                n += 1
+                print(f'[[unit]]\nstart = {start}\nid = "a{n:02d}"\nkind = "article"  # {cells[0]}')
+
     def render_unit(self, unit: Unit) -> tuple[str, list[str], str | None]:
         """Return XHTML body content, the IDs per page, and the unit heading text."""
+        if unit.kind == "contents":
+            body, heading = self.contents_html(unit)
+            self.page_ids.update({p: [unit.id] for p in range(unit.start, unit.end + 1)})
+            return body, [], heading
         counters = {"p": 0, "fig": 0, "n": 0}
         parts: list[str] = []
         heading: str | None = None
         page_ids: dict[int, list[str]] = {}
-        for pno in range(unit.start, unit.end + 1):
+        for pno in unit.pages:
             ids = page_ids.setdefault(pno, [])
             parts.append(f'<span epub:type="pagebreak" role="doc-pagebreak" id="pg-{pno}" title="{self.label(pno)}"/>')
             figs = self.figures(pno)
@@ -404,13 +547,17 @@ class Ingest:
             for fig in figs:
                 counters["fig"] += 1
                 fid = f"fig-{unit.id}-{counters['fig']:02d}"
-                kind = "photo"
+                page_w = self.doc[0].rect.width
+                # "photo": prints edge to edge (bleed). "inline": sits in the text column.
+                kind = "photo" if (fig.bbox[2] - fig.bbox[0]) >= 0.9 * page_w else "inline"
                 flow.append((fig.bbox[1], f'<figure id="{fid}" class="figure {kind}"><img src="../images/{fig.file}" width="{fig.width}" height="{fig.height}" alt=""/>{self.caption_html(fig)}</figure>'))
                 ids.append(fid)
                 self.issue(pno, "alt-text", f"{fid}: needs alt text written from the image (not in the PDF)")
             flow.sort(key=lambda t: t[0])
             parts.extend(h for _, h in flow)
         self.page_ids.update(page_ids)
+        first_content = next((x for x in parts if not x.startswith("<span epub:type")), "")
+        self.opens_with_photo[unit.id] = 'class="figure photo"' in first_content
         return "\n".join(parts), [], heading
 
     # ---------- output ----------
@@ -430,15 +577,17 @@ class Ingest:
             shutil.copyfile(f, self.out / "OEBPS" / "fonts" / f.name)
         shutil.copyfile(css, self.out / "OEBPS" / "css" / "book.css")
         self.page_ids: dict[int, list[str]] = {}
+        self.opens_with_photo: dict[str, bool] = {}
         docs: list[tuple[Unit, str, str | None]] = []
         for unit in self.units:
             body, _, heading = self.render_unit(unit)
             epub_type = {"cover": "cover", "titlepage": "titlepage", "contents": "toc", "part": "part",
-                         "article": "chapter", "frontispiece": "frontispiece", "blank": ""}[unit.kind]
+                         "article": "chapter", "frontispiece": "frontispiece", "blank": "",
+                         "bibliography": "bibliography", "backcover": ""}[unit.kind]
             type_attr = f' epub:type="{epub_type}"' if epub_type else ""
             labelled = f' aria-labelledby="{unit.id}-h"' if heading else ""
             xhtml = DOC.format(lang=self.cfg["meta"]["language"], title=html.escape(heading or unit.id),
-                               body=f'<section id="{unit.id}" class="{unit.kind}{" chapter" if unit.kind == "article" else ""}"{type_attr}{labelled}>\n{body}\n</section>')
+                               body=f'<section id="{unit.id}" class="{unit.kind}{" chapter" if unit.kind == "article" else ""}{" opens-with-photo" if self.opens_with_photo.get(unit.id) else ""}"{type_attr}{labelled}>\n{body}\n</section>')
             (self.out / "OEBPS" / "text" / f"{unit.id}.xhtml").write_text(xhtml, encoding="utf-8")
             docs.append((unit, f"text/{unit.id}.xhtml", heading))
         self.write_package(docs)
@@ -473,7 +622,7 @@ class Ingest:
         toc = "\n      ".join(f'<li><a href="{href}#{u.id}">{html.escape(h)}</a></li>' for u, href, h in docs if h)
         pages = "\n      ".join(
             f'<li><a href="{href}#pg-{p}">{self.label(p)}</a></li>'
-            for u, href, _ in docs for p in range(u.start, u.end + 1))
+            for u, href, _ in docs for p in u.pages)
         nav = NAV.format(lang=m["language"], toc=toc, pages=pages)
         (self.out / "OEBPS" / "nav.xhtml").write_text(nav, encoding="utf-8")
 
@@ -567,6 +716,11 @@ NAV = """<?xml version="1.0" encoding="UTF-8"?>
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
+    if len(sys.argv) == 4 and sys.argv[2] == "--print-units":
+        first, last = (int(x) for x in sys.argv[3].split("-"))
+        ing = Ingest(Path(sys.argv[1]).resolve())
+        ing.print_units(list(range(first, last + 1)))
+    elif len(sys.argv) == 2:
+        Ingest(Path(sys.argv[1]).resolve()).run()
+    else:
         raise SystemExit(__doc__)
-    Ingest(Path(sys.argv[1]).resolve()).run()

@@ -199,7 +199,7 @@ class Converter:
                 if not (width and height and width.isdigit() and height.isdigit() and int(height) > 0):
                     raise BookError(f"{item.path}: img {el.get('src')} needs numeric width and height to prevent layout shift")
                 # CSS sizes artwork from this ratio, so the box is final before the image loads.
-                el.set("style", f"--ratio: {int(width) / int(height):.4f}")
+                el.set("style", f"--ratio: {int(width) / int(height):.4f}; --w: {int(width)}px")
             if el.get("data-epub-type") == "pagebreak":
                 # Page markers carry the printed number in title. axe 4.14 rejects aria-label on doc-pagebreak.
                 page = el.get("title")
