@@ -1,0 +1,67 @@
+/* Book typography for the EPUB and the web edition.
+   Font stacks list the fonts of the print edition first (names as embedded in the source PDF).
+   A reader device that has them installed uses them. Others use the bundled Noto Sans Hebrew (SIL OFL).
+   Limit: the print fonts are not bundled. The PDF holds only unusable subsets, and bundling needs a licence.
+   Revisit when licensed font files for web and ebook use are available.
+   Keep to CSS that Kindle supports: no grid, no flex, no custom properties, no "direction". */
+
+@font-face { font-family: "Book Sans"; src: url("../fonts/NotoSansHebrew-Regular.ttf"); font-weight: normal; font-style: normal; }
+@font-face { font-family: "Book Sans"; src: url("../fonts/NotoSansHebrew-Bold.ttf"); font-weight: bold; font-style: normal; }
+@font-face { font-family: "Book Sans Light"; src: url("../fonts/NotoSansHebrew-Light.ttf"); font-weight: normal; font-style: normal; }
+
+/* Body: Narkisim (print: NarkisimMF 12.5 pt). */
+body {
+  font-family: "NarkisimMF", "Narkisim MF", "Narkisim", "Book Sans", "Arial", sans-serif;
+  line-height: 1.65;
+  margin: 0;
+  text-align: right;
+  hyphens: manual;
+  widows: 2;
+  orphans: 2;
+}
+/* English text: Times New Roman, as in print. */
+[lang="en"] { font-family: "Times New Roman", "Times", "Liberation Serif", serif; text-align: left; }
+
+/* Titles: Extrim, light grey display (print: Extrim 24-41 pt, colour #6d6e71). */
+h1, h2, h3, .display-title, .byline {
+  font-family: "Extrim", "FbExtrim", "Book Sans Light", "Book Sans", sans-serif;
+  font-weight: normal;
+  line-height: 1.2;
+  page-break-after: avoid;
+  break-after: avoid;
+}
+h2[lang="en"], .byline[lang="en"], .subheading[lang="en"] { font-family: "FbMonopoly", "Fb Monopoly", "Helvetica Neue", "Arial", sans-serif; }
+h2 { font-size: 1.9em; margin: 1.2em 0 0.4em; color: #555659; }
+.display-title { font-size: 2.2em; margin: 0.6em 0; color: #555659; }
+.byline { font-size: 1.1em; margin: 0 0 1.8em; color: #555659; text-indent: 0; }
+.subheading { font-weight: bold; margin: 1.4em 0 0.4em; text-indent: 0; }
+
+section.article, section.part { page-break-before: always; break-before: page; }
+
+p { margin: 0 0 0.5em; text-indent: 0; }
+
+/* Captions, credits, notes and small print: Almoni (print: AlmoniDLAAA 9-11 pt). */
+figcaption, aside.footnote, .small, section.titlepage p {
+  font-family: "AlmoniDLAAA", "Almoni DL AAA", "Almoni", "Book Sans", "Arial", sans-serif;
+}
+
+figure { margin: 1.6em 0; page-break-inside: avoid; break-inside: avoid; text-align: center; }
+figure img { max-width: 100%; height: auto; }
+figcaption { font-size: 0.82em; line-height: 1.45; margin-top: 0.5em; text-align: right; }
+figcaption .caption { display: block; }
+figcaption .credit { display: block; font-size: 0.92em; color: #555659; margin-top: 0.15em; }
+.small { font-size: 0.85em; }
+
+sup.ref { font-size: 0.7em; line-height: 0; }
+aside.footnote { font-size: 0.8em; line-height: 1.45; margin-top: 1.5em; border-top: 1px solid #999; padding-top: 0.4em; }
+
+table { border-collapse: collapse; margin: 1.4em auto; font-size: 0.9em; }
+th, td { border-bottom: 1px solid #999; padding: 0.3em 0.7em; text-align: right; }
+
+section.cover { text-align: center; margin: 0; padding: 0; }
+section.cover img { max-width: 100%; }
+section.titlepage { text-align: center; }
+section.titlepage p { text-align: center; }
+
+nav#toc ol { list-style: none; padding: 0; }
+nav#toc li { margin: 0.35em 0; }

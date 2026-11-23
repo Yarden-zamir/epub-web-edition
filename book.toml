@@ -25,8 +25,6 @@ indent_tolerance = 6.0   # Points. A line this far in from the column edge start
 short_tolerance = 20.0   # Points. A line that ends this far short of the far edge ends a paragraph.
 caption_gap = 30.0       # Points between an image edge and a caption line.
 credit_prefixes = ["צילום", "צלם", "צילומים", "באדיבות", "Photo", "Courtesy", "Source", "מקור"]
-# These fonts come out of the PDF in visual order: punctuation lands at the wrong end of the line.
-visual_order_fonts = ["Extrim", "FbTubic"]
 
 # Text roles by font. The first rule that matches the font name part and size range wins.
 [[role]]
@@ -109,3 +107,7 @@ kind = "article"
 start = 21
 id = "slice-end"
 kind = "end"
+
+[assets]
+css = "book.css"     # Font stacks name the print fonts first; see the comment in the file.
+fonts = "fonts"      # Noto Sans Hebrew (SIL OFL) as the bundled fallback.
