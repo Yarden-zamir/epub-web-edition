@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="book-id" xml:lang="he" dir="rtl">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <dc:identifier id="book-id">urn:uuid:6f1c2d3e-0000-4000-8000-5a3e7b1c0001</dc:identifier>
+    <dc:title>ספר לדוגמה</dc:title>
+    <dc:creator>מחבר לדוגמה</dc:creator>
+    <dc:language>he</dc:language>
+    <dc:description>Synthetic placeholder book. It contains no material from the real source.</dc:description>
+    <meta property="dcterms:modified">2026-11-23T00:00:00Z</meta>
+    <meta name="cover" content="cover-image"/>
+    <meta property="schema:accessMode">textual</meta>
+    <meta property="schema:accessMode">visual</meta>
+    <meta property="schema:accessModeSufficient">textual,visual</meta>
+    <meta property="schema:accessibilityFeature">alternativeText</meta>
+    <meta property="schema:accessibilityFeature">printPageNumbers</meta>
+    <meta property="schema:accessibilityFeature">pageNavigation</meta>
+    <meta property="schema:accessibilityFeature">tableOfContents</meta>
+    <meta property="schema:accessibilityFeature">readingOrder</meta>
+    <meta property="schema:accessibilityFeature">structuralNavigation</meta>
+    <meta property="schema:accessibilityHazard">none</meta>
+    <meta property="schema:accessibilitySummary">Reflowable text with semantic headings, described images, and print page markers from the source PDF.</meta>
+    <meta property="pageBreakSource">urn:x-private:source.pdf</meta>
+  </metadata>
+  <manifest>
+    <item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>
+    <item id="css" href="css/book.css" media-type="text/css"/>
+    <item id="font-regular" href="fonts/NotoSerifHebrew-Regular.ttf" media-type="font/ttf"/>
+    <item id="font-bold" href="fonts/NotoSerifHebrew-Bold.ttf" media-type="font/ttf"/>
+    <item id="cover-image" href="images/cover.jpg" media-type="image/jpeg" properties="cover-image"/>
+    <item id="img-fig-01-01" href="images/fig-01-01.jpg" media-type="image/jpeg"/>
+    <item id="img-fig-02-01" href="images/fig-02-01.jpg" media-type="image/jpeg"/>
+    <item id="x-cover" href="text/cover.xhtml" media-type="application/xhtml+xml"/>
+    <item id="x-title" href="text/title.xhtml" media-type="application/xhtml+xml"/>
+    <item id="x-ch-01" href="text/ch-01.xhtml" media-type="application/xhtml+xml"/>
+    <item id="x-ch-02" href="text/ch-02.xhtml" media-type="application/xhtml+xml"/>
+    <item id="x-credits" href="text/credits.xhtml" media-type="application/xhtml+xml"/>
+  </manifest>
+  <spine page-progression-direction="rtl">
+    <itemref idref="x-cover"/>
+    <itemref idref="x-title"/>
+    <itemref idref="nav"/>
+    <itemref idref="x-ch-01"/>
+    <itemref idref="x-ch-02"/>
+    <itemref idref="x-credits"/>
+  </spine>
+</package>

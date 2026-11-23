@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="{{lang}}" dir="{{dir}}" data-book-id="{{book_id}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>{{title}}</title>
+<link rel="stylesheet" href="{{book_css}}">
+<link rel="stylesheet" href="reader.css">
+<script src="reader.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#reading">דלגו לטקסט</a>
+<header class="bar">
+  <div class="bar-inner">
+    <a class="bar-title" href="#top">{{title}}</a>
+    <span class="bar-page" id="current-page"></span>
+    <nav class="bar-actions" aria-label="כלי קריאה">
+      <button type="button" data-open="toc-dialog" aria-haspopup="dialog">תוכן</button>
+      <button type="button" data-open="search-dialog" aria-haspopup="dialog" aria-keyshortcuts="/">חיפוש</button>
+    </nav>
+  </div>
+</header>
+
+<main id="reading" class="reading" tabindex="-1">
+<span id="top"></span>
+{{book}}
+</main>
+
+<div class="resume" id="resume" hidden>
+  <button type="button" id="resume-go"></button>
+  <button type="button" id="resume-close" aria-label="סגירה">×</button>
+</div>
+
+<dialog id="toc-dialog" class="panel" aria-labelledby="toc-title">
+  <div class="panel-head"><h2 id="toc-title">תוכן העניינים</h2><button type="button" data-close aria-label="סגירה">×</button></div>
+  <nav class="panel-toc" aria-labelledby="toc-title">
+{{toc}}
+  </nav>
+</dialog>
+
+<dialog id="search-dialog" class="panel" aria-labelledby="search-title">
+  <div class="panel-head"><h2 id="search-title">חיפוש בספר</h2><button type="button" data-close aria-label="סגירה">×</button></div>
+  <form role="search" id="search-form">
+    <label for="search-input" class="visually-hidden">מילות חיפוש</label>
+    <input id="search-input" type="search" autocomplete="off" placeholder="חיפוש…">
+  </form>
+  <p id="search-status" class="search-status" aria-live="polite"></p>
+  <ol id="search-results" class="search-results"></ol>
+</dialog>
+
+<dialog id="figure-dialog" class="figure-viewer" aria-label="תצוגת תמונה">
+  <button type="button" data-close class="viewer-close" aria-label="סגירה">×</button>
+  <img id="viewer-img" alt="">
+  <div id="viewer-caption" class="viewer-caption"></div>
+  <a id="viewer-original" class="viewer-original" href="" target="_blank" rel="noopener">פתיחת הקובץ המקורי</a>
+</dialog>
+</body>
+</html>

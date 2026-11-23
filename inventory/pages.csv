@@ -1,0 +1,9 @@
+page,kind,target_ids,status,notes
+1,cover,cover,verified,Cover image.
+2,blank,,verified,Blank inside cover. Page marker only.
+3,titlepage,title,verified,
+4,copyright,copyright,verified,Rights line copied as printed.
+5,chapter,ch-01-h p-01-001 p-01-002 q-01-001 p-01-004,verified,
+6,body,fig-01-01 p-01-005,verified,
+7,chapter,ch-02-h p-02-001 tbl-02-01 fig-02-01 p-02-002 note-02-01,verified,Footnote moved to chapter end. See issue I-001.
+8,credits,credits-h credits-p001 credits-p002,verified,

@@ -1,0 +1,101 @@
+/* Web-only presentation. Book typography comes from the EPUB stylesheet, loaded first. */
+
+:root {
+  --paper: #fcfbf8;
+  --ink: #1f1e1c;
+  --muted: #76736d;
+  --rule: #e7e4de;
+  --tint: #f2efe8;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #171716; --ink: #e6e3dd; --muted: #96928a; --rule: #2d2c2a; --tint: #23221f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #171716; --ink: #e6e3dd; --muted: #96928a; --rule: #2d2c2a; --tint: #23221f;
+  color-scheme: dark;
+}
+
+html { scroll-padding-top: 4rem; -webkit-text-size-adjust: 100%; }
+body { background: var(--paper); color: var(--ink); font-size: 1.1875rem; }
+[dir="ltr"], [dir="rtl"] { unicode-bidi: isolate; }
+a { color: inherit; text-decoration-color: var(--muted); text-underline-offset: 0.2em; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.skip-link { position: absolute; inset-inline-start: 1rem; top: -3rem; background: var(--ink); color: var(--paper); padding: 0.4rem 0.8rem; z-index: 10; }
+.skip-link:focus { top: 0.5rem; }
+
+/* Top bar: one quiet line. */
+.bar { position: sticky; top: 0; z-index: 5; background: var(--paper); border-bottom: 1px solid var(--rule); font-size: 0.95rem; }
+.bar-inner { display: flex; align-items: center; gap: 1rem; max-width: 34em; margin: 0 auto; padding: 0.6rem 1rem; }
+.bar-title { text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.bar-page { color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; margin-inline-start: auto; }
+.bar-actions { display: flex; gap: 0.25rem; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0.35rem 0.5rem; min-height: 2.25rem; }
+button:hover { color: var(--muted); }
+
+/* Reading column */
+.reading { max-width: 34em; margin: 0 auto; padding: 2rem 1.25rem 8rem; outline: none; }
+.reading p { line-height: 1.75; }
+.doc + .doc { margin-top: 5rem; }
+.reading section.chapter > h2 { margin: 0 0 2rem; font-size: 1.75em; }
+.reading .chapter-number { color: var(--muted); opacity: 1; font-size: 0.55em; }
+.reading h1.book-title { margin-top: 4rem; }
+.reading section.copyright { margin-top: 3rem; color: var(--muted); }
+.reading section.cover img { max-height: 70vh; width: auto; }
+.reading p { text-wrap: pretty; }
+.reading blockquote.epigraph { border-right-width: 1px; border-color: var(--rule); color: var(--muted); }
+.reading th, .reading td { border-bottom-color: var(--rule); }
+.reading aside.footnote { border-top-color: var(--rule); color: var(--muted); }
+.reading nav#toc { display: none; } /* The contents panel shows the same nav. */
+.reading [data-epub-type="pagebreak"] { display: block; height: 0; }
+
+.reading figure { margin: 2.5rem 0; }
+.reading figure img { display: block; margin: 0 auto; cursor: zoom-in; background: var(--tint); }
+.reading figcaption { color: var(--ink); }
+.reading figcaption .credit { color: var(--muted); opacity: 1; }
+
+/* Deep links: visible on hover or focus only. */
+.deep-link { font-size: 0.7rem; color: var(--muted); padding: 0 0.4rem; min-height: 0; opacity: 0; vertical-align: middle; }
+:is(h2, figcaption):hover .deep-link, .deep-link:focus-visible, .deep-link[data-copied] { opacity: 1; }
+@media (hover: none) { .deep-link { display: none; } }
+.flash { animation: flash 2s ease-out; }
+@keyframes flash { from { background: var(--tint); } to { background: transparent; } }
+@media (prefers-reduced-motion: reduce) { .flash { animation: none; } }
+
+/* Panels */
+dialog { color: var(--ink); background: var(--paper); }
+dialog::backdrop { background: rgb(0 0 0 / 0.35); }
+.panel { width: min(30rem, calc(100vw - 2rem)); max-height: min(80vh, 40rem); border: 1px solid var(--rule); border-radius: 8px; padding: 0; }
+.panel-head { display: flex; align-items: center; justify-content: space-between; padding-block: 0.5rem; padding-inline: 1rem 0.5rem; }
+.panel-head h2 { font-size: 1rem; font-weight: normal; color: var(--muted); margin: 0; }
+.panel ol { list-style: none; margin: 0; padding: 0 0 0.5rem; }
+.panel li a { display: block; padding: 0.6rem 1rem; text-decoration: none; }
+.panel li a:hover, .panel li a:focus-visible { background: var(--tint); outline: none; }
+#search-form { padding: 0 1rem; }
+#search-input { width: 100%; box-sizing: border-box; font: inherit; padding: 0.5rem 0; border: 0; border-bottom: 1px solid var(--rule); background: none; color: inherit; outline: none; }
+#search-input:focus { border-bottom-color: var(--ink); }
+.search-status { color: var(--muted); font-size: 0.85rem; margin: 0.5rem 1rem; text-indent: 0; }
+.search-results .where { display: block; font-size: 0.8rem; color: var(--muted); }
+.search-results mark { background: var(--tint); color: inherit; font-weight: bold; }
+
+/* Figure viewer */
+.figure-viewer { width: 100vw; height: 100vh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; }
+.figure-viewer[open] { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; }
+.figure-viewer img { max-width: calc(100vw - 2rem); max-height: calc(100vh - 8rem); object-fit: contain; }
+.viewer-caption { max-width: 34em; padding: 0 1rem; font-size: 0.95rem; }
+.viewer-caption .credit { display: block; color: var(--muted); font-size: 0.9em; }
+.viewer-caption .deep-link { display: none; }
+.viewer-original { font-size: 0.85rem; color: var(--muted); }
+.viewer-close { position: absolute; top: 0.5rem; inset-inline-end: 0.5rem; font-size: 1.4rem; }
+
+/* Resume: one quiet line at the bottom. */
+.resume { position: fixed; bottom: 0; inset-inline: 0; display: flex; justify-content: center; gap: 0.5rem; background: var(--paper); border-top: 1px solid var(--rule); padding: 0.25rem 1rem; font-size: 0.95rem; z-index: 4; }
+.resume[hidden] { display: none; }
+.resume #resume-go { text-decoration: underline; text-decoration-color: var(--muted); text-underline-offset: 0.2em; }
+.resume #resume-close { color: var(--muted); }
+
+@media print { .bar, .resume, .deep-link, .skip-link { display: none; } }

@@ -1,0 +1,68 @@
+# Book rebuild: EPUB and web edition
+
+Pipeline that turns a book into a reflowable EPUB 3 and a continuous web edition built from that EPUB.
+
+> **All book content in this repository is synthetic placeholder.**
+> Never commit real book text, images or source files here. This repository is public.
+> Real content enters as a private input at build time.
+
+## Pipeline
+
+```
+source.pdf ──(recovery, not built yet)──▶ epub-src/ ──tools/build_epub.py──▶ dist/book.epub ──tools/build_web.py──▶ dist/web/
+                                              ▲                                     │                        ▲
+                                  inventory/ (page-by-page reconciliation)          └── canonical input ─────┘
+                                                                         site/ (template, reader.css, reader.js, enhancements.json)
+```
+
+1. `epub-src/` holds the EPUB 3 source tree. It is the only editable book content.
+2. `tools/build_epub.py` packs it into `dist/book.epub`. The output is byte-reproducible.
+3. `tools/build_web.py` reads **only** `dist/book.epub`: container, OPF manifest and spine, nav, XHTML and assets. It writes one continuous static page to `dist/web/`.
+4. `site/` adds web-only presentation and features. `site/enhancements.json` attaches features by stable element ID. The build fails if an ID does not exist in the EPUB.
+5. `tools/verify.py` runs all checks and writes `dist/verify/report.json` and screenshots.
+
+## Commands
+
+```sh
+uv run tools/build_epub.py   # epub-src/ -> dist/book.epub
+uv run tools/build_web.py    # dist/book.epub -> dist/web/
+uv run tools/verify.py       # build both, then run all checks
+```
+
+`verify.py` needs `.tools/` (local, not tracked): EPUBCheck 5.4.0, Temurin JRE 21, and axe-core 4.14.0.
+It uses the cached Playwright Chromium build 1255.
+
+## Stable IDs
+
+IDs never change after first assignment. A new element gets a new ID. Do not renumber.
+
+| Pattern | Element |
+|---|---|
+| `ch-NN`, `ch-NN-h` | Chapter section and its heading |
+| `p-NN-NNN` | Paragraph in chapter NN |
+| `fig-NN-NN` | Figure (image, caption, credit) |
+| `tbl-NN-NN` | Table |
+| `note-NN-NN`, `nref-NN-NN` | Footnote and its reference |
+| `pg-N` | Print page marker. N is the source PDF page number |
+
+## Inventory
+
+- `inventory/source.json`: source PDF page count and checksum.
+- `inventory/pages.csv`: one row per source page, with the EPUB IDs that hold its content, and a status (`verified`, `pending` or `ambiguous`).
+- `inventory/assets.csv`: one row per image. It records the EPUB file, the unmodified original, both checksums, the source page, the derivation, and the credit line as printed.
+- `inventory/issues.csv`: OCR doubts, reading-order questions and intentional changes.
+
+The whole-book reconciliation is complete only when `source.json` is not synthetic, all pages are `verified`, and no issue is open. `verify.py` reports this as `OPEN` or `DONE`.
+
+## Decisions
+
+- Page markers use `title`, not `aria-label`. axe-core 4.14.0 rejects `aria-label` on `doc-pagebreak`.
+- EPUB CSS sets no `direction`. EPUB forbids it. Direction comes from `dir` attributes only.
+- Book font: Noto Serif Hebrew 2.004, static TTF, SIL OFL. Kindle handles variable fonts poorly. Replace with the fonts from the recovered bundle if their licence allows embedding.
+- Site-only originals (`originals/`) are full-resolution files. The EPUB carries 1600 px derivatives.
+- The web page has `noindex`, because the content is placeholder.
+
+## Deploy
+
+`kitshn.config.ts` deploys `dist/web/` as a static site with kitshn 2 on each push to `main`.
+Each pull request gets a preview.

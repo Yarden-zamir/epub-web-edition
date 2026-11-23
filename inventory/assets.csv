@@ -1,0 +1,4 @@
+asset_id,epub_path,epub_sha256,original_path,original_sha256,source_page,derivation,credit_as_printed,rights_status
+cover,OEBPS/images/cover.jpg,b54f7fc5c7303e2a5ca4d0855dded36ee6398e75eedcd0c68e7bf7783fdcb52f,originals/cover.png,226eb9a222ba05b153d3841929c4829e42d6637debb11d4b44e40794f7178997,1,resized to 1600 px long edge; JPEG q88,,synthetic
+fig-01-01,OEBPS/images/fig-01-01.jpg,253f6d4402af82478ad584346803a3539f8ed6862809ba7088b7e77185e4ea38,originals/fig-01-01.png,1013ea7b5a0073205a2695129cea07ea39a3af8173c295587e14d6b96ec28a3e,6,resized to 1600 px long edge; JPEG q88,צילום: קרדיט לדוגמה,synthetic
+fig-02-01,OEBPS/images/fig-02-01.jpg,9271de23e46364633920fb0ed9cb008ddecc6553d2e606355ca19d147b27d21c,originals/fig-02-01.png,5077c65b722401555ee939129886698ce41a4dc2ce19940049a6dd950a6be6b8,7,resized to 1600 px long edge; JPEG q88,"יצירה: קרדיט לדוגמה. שמן על בד, מידות לדוגמה.",synthetic

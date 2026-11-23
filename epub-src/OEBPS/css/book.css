@@ -1,0 +1,74 @@
+/* Book typography. The EPUB and the web edition both use this file.
+   Keep to CSS that Kindle (KF8/KFX) and reflowable readers support: no grid, no flex, no custom properties. */
+
+@font-face {
+  font-family: "Book Serif";
+  src: url("../fonts/NotoSerifHebrew-Regular.ttf");
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Book Serif";
+  src: url("../fonts/NotoSerifHebrew-Bold.ttf");
+  font-weight: bold;
+  font-style: normal;
+}
+
+/* EPUB forbids "direction" and "unicode-bidi" in CSS. Set direction only with dir attributes in markup. */
+body {
+  font-family: "Book Serif", serif;
+  line-height: 1.6;
+  margin: 0;
+  text-align: right;
+  hyphens: manual;
+  widows: 2;
+  orphans: 2;
+}
+
+h1, h2, h3 {
+  font-weight: bold;
+  line-height: 1.25;
+  page-break-after: avoid;
+  break-after: avoid;
+}
+h1.book-title { font-size: 2.2em; margin: 30% 0 0.5em; text-align: center; }
+p.book-author { font-size: 1.25em; text-align: center; text-indent: 0; margin: 0; }
+
+section.chapter { page-break-before: always; break-before: page; }
+section.chapter > h2 { font-size: 1.6em; margin: 2.5em 0 1.4em; }
+.chapter-number { display: block; font-size: 0.6em; font-weight: normal; letter-spacing: 0.04em; margin-bottom: 0.4em; opacity: 0.75; }
+
+p { margin: 0; text-indent: 1.4em; }
+p.first, h2 + p, blockquote + p, figure + p, table + p { text-indent: 0; }
+
+blockquote { margin: 1.4em 1.6em; font-size: 0.95em; }
+blockquote p { text-indent: 0; }
+blockquote.epigraph { font-style: normal; border-right: 2px solid currentColor; padding-right: 0.9em; }
+
+figure {
+  margin: 1.8em 0;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  text-align: center;
+}
+figure img { max-width: 100%; height: auto; }
+figcaption { font-size: 0.85em; line-height: 1.45; margin-top: 0.6em; text-align: right; }
+figcaption .caption { display: block; }
+figcaption .credit { display: block; font-size: 0.9em; opacity: 0.75; margin-top: 0.2em; }
+
+table { border-collapse: collapse; margin: 1.6em auto; font-size: 0.9em; }
+caption { font-weight: bold; margin-bottom: 0.4em; }
+th, td { border-bottom: 1px solid #888; padding: 0.3em 0.8em; text-align: right; }
+
+a[role="doc-noteref"] { font-size: 0.75em; vertical-align: super; line-height: 0; text-decoration: none; padding: 0 0.1em; }
+aside.footnote { font-size: 0.85em; margin-top: 2em; border-top: 1px solid #888; padding-top: 0.6em; }
+aside.footnote p { text-indent: 0; }
+
+section.cover { text-align: center; margin: 0; padding: 0; }
+section.cover img { max-width: 100%; max-height: 100%; }
+section.copyright { page-break-before: always; break-before: page; margin-top: 60%; font-size: 0.85em; }
+section.copyright p { text-indent: 0; margin-bottom: 0.6em; }
+section.credits p { text-indent: 0; margin-bottom: 0.4em; }
+
+nav#toc ol { list-style: none; padding: 0; }
+nav#toc li { margin: 0.4em 0; }
