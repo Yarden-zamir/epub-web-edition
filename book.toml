@@ -9,6 +9,13 @@ decorative = ["p006-x17", "p007-x21"]
 # Wrong code points in the PDF text layer, mapped to what the print shows.
 # U+0007: InDesign "indent to here" after note and source numbers (130 cases). Prints as a space.
 # U+001A: a zero-width glyph under ayin in "מעין" (PDF pages 210, 211). The render shows a shva.
+# Note references that print as full-size digits. Each one is restored as a reference and logged.
+[[note_ref_fix]]
+page = 23
+contains = "1.42 meters.3"
+number = 3
+reason = "Print sets reference 3 as a full-size digit (typesetting slip). Note 3 exists at the page foot."
+
 # Text left out on purpose. Each entry is logged as an intentional change.
 [[omit]]
 page = 22
@@ -285,6 +292,22 @@ start = 316
 id = "backcover"
 kind = "backcover"
 
+
+[cover]
+# The EPUB cover-image (library thumbnail) is a render of the full printed cover: photo plus typography.
+# Derived image. The cover page in the spine keeps the real cover text and the original photo.
+render_page = 1
+height_px = 1600
+
+[facsimile]
+# Appendix with a page image of every PDF page, one document per page, with a Return link to the text.
+# Derived images, rendered from source.pdf. They are not scans of paper.
+dpi = 64  # 428x604 px per page, about v3 size. Keeps the EPUB under the 25 MB per-file limit of the web host.
+quality = 60
+title = "עמודי המקור"
+note = "תוספת של מהדורה זו: תמונות של כל עמודי הספר המודפס, כפי שהם מופיעים בקובץ הדפוס. הן נועדו להשוואה עם הטקסט. בכל עמוד יש קישור חזרה למקום המתאים בטקסט."
+return_label = "חזרה לטקסט"
+page_label = "עמוד"
 
 [assets]
 css = "book.css"     # Font stacks name the print fonts first; see the comment in the file.
