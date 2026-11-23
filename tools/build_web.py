@@ -3,7 +3,10 @@
 The EPUB is the only source of book content. The site layer (site/) adds
 presentation and site-only features, attached by stable element IDs.
 
-Usage: uv run tools/build_web.py [BOOK_EPUB] [OUT_DIR]
+Usage: uv run tools/build_web.py [BOOK_EPUB] [OUT_DIR] [ENHANCEMENTS_JSON | none]
+
+ENHANCEMENTS_JSON defaults to site/enhancements.json. Its "original" paths resolve
+against the folder above the file's folder (the content root). "none" uses no enhancements.
 """
 
 import hashlib
@@ -255,14 +258,17 @@ def toc_html(z: zipfile.ZipFile, book: Book, conv: Converter) -> str:
     return "\n".join(lines)
 
 
-def load_enhancements(out: Path, conv: Converter) -> dict[str, dict[str, str]]:
-    """Validate site/enhancements.json against the EPUB and copy referenced site-only assets."""
-    data = json.loads((SITE / "enhancements.json").read_text(encoding="utf-8"))
+def load_enhancements(out: Path, conv: Converter, path: Path | None) -> dict[str, dict[str, str]]:
+    """Validate the enhancements file against the EPUB and copy referenced site-only assets."""
+    if path is None:
+        return {}
+    content_root = path.resolve().parent.parent
+    data = json.loads(path.read_text(encoding="utf-8"))
     result: dict[str, dict[str, str]] = {}
     for fig_id, fig in data["figures"].items():
         if conv.tags.get(fig_id) != "figure":
             raise BookError(f"enhancements.json: {fig_id!r} is not a figure in the EPUB")
-        original = ROOT / fig["original"]
+        original = content_root / fig["original"]
         if not original.is_file():
             raise BookError(f"enhancements.json: {fig_id}: {original} does not exist")
         dest = out / "originals" / original.name
@@ -287,7 +293,7 @@ def fill(template: str, values: dict[str, str]) -> str:
     return "".join(out)
 
 
-def build(epub: Path, out: Path) -> dict[str, object]:
+def build(epub: Path, out: Path, enhancements_file: Path | None = SITE / "enhancements.json") -> dict[str, object]:
     if out.exists():
         shutil.rmtree(out)
     out.mkdir(parents=True)
@@ -296,7 +302,7 @@ def build(epub: Path, out: Path) -> dict[str, object]:
         book = read_book(z)
         conv = Converter(z, book)
         conv.load()
-        enhancements = load_enhancements(out, conv)
+        enhancements = load_enhancements(out, conv, enhancements_file)
         docs = [conv.convert(item, body, enhancements) for item, body in conv.bodies]
         toc = toc_html(z, book, conv)
         conv.check_links()
@@ -356,4 +362,7 @@ def build(epub: Path, out: Path) -> dict[str, object]:
 if __name__ == "__main__":
     epub = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "dist" / "book.epub"
     out = Path(sys.argv[2]) if len(sys.argv) > 2 else ROOT / "dist" / "web"
-    print(json.dumps(build(epub, out), ensure_ascii=False, indent=2))
+    enh: Path | None = SITE / "enhancements.json"
+    if len(sys.argv) > 3:
+        enh = None if sys.argv[3] == "none" else Path(sys.argv[3])
+    print(json.dumps(build(epub, out, enh), ensure_ascii=False, indent=2))
