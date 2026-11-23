@@ -1,0 +1,111 @@
+# Private book configuration for tools/ingest_pdf.py in the epub-web-edition pipeline.
+# Every value here comes from the source PDF. The comments name where.
+
+pdf = "~/private-inputs/eli-raz/source-2026-11-23/source.pdf"
+pdf_sha256 = "c7efc94efd4cbd42bf9d479a20ff1af763e017ec0ce1cfab75d2be7e3560e994"
+
+[meta]
+# As printed on the title page (PDF page 5) and the cover (PDF page 1).
+identifier = "urn:uuid:9b1e6f8a-5c3d-4e2a-9f71-2d4b8c6a1e05"  # New identifier for this edition.
+title = "אלי רז חוקר הבולענים"  # Two lines on the title page, joined with a space. No punctuation in print.
+creators = ["אלי רז"]
+editor = "יאיר גלעדי"
+description = "מאמרים, חוויות וסיפורים מהמקצוע ומהחיים"  # Cover text layer, PDF page 1, two lines joined.
+language = "he"
+source = "urn:isbn:978-965-596-043-3"  # Title page, PDF page 5.
+rights = "© כל הזכויות שמורות"  # Title page, PDF page 5. Full rights text stays in the book body.
+
+[layout]
+# Printed page number = PDF page - 4 (PDF page 14 prints "10", PDF page 22 prints "18").
+folio_offset = 4
+folio_font = "Extrim"
+header_max_y = 0.15      # Running heads and folios sit above this share of the page height.
+footnote_min_y = 0.62    # Small notes below this share of the height are footnotes.
+indent_tolerance = 6.0   # Points. A line this far in from the column edge starts a paragraph.
+short_tolerance = 20.0   # Points. A line that ends this far short of the far edge ends a paragraph.
+caption_gap = 30.0       # Points between an image edge and a caption line.
+credit_prefixes = ["צילום", "צלם", "צילומים", "באדיבות", "Photo", "Courtesy", "Source", "מקור"]
+# These fonts come out of the PDF in visual order: punctuation lands at the wrong end of the line.
+visual_order_fonts = ["Extrim", "FbTubic"]
+
+# Text roles by font. The first rule that matches the font name part and size range wins.
+[[role]]
+font = "Extrim"
+min = 33.0
+role = "display"
+[[role]]
+font = "Extrim"
+min = 19.0
+role = "title"
+[[role]]
+font = "FbMonopoly-Regular"
+min = 19.0
+role = "title"
+[[role]]
+font = "Extrim"
+min = 13.5
+max = 15.5
+role = "byline"
+[[role]]
+font = "FbMonopoly-Regular"
+min = 13.5
+max = 15.5
+role = "byline"
+[[role]]
+font = "FbMonopoly-Medium"
+role = "subheading"
+[[role]]
+font = "AlmoniDLAAA"
+max = 11.6
+role = "small"
+
+# Book structure. Each unit starts at a PDF page and runs until the next unit.
+# Article starts come from the printed contents (PDF pages 6-7) plus the folio offset.
+[[unit]]
+start = 1
+id = "cover"
+kind = "cover"
+[[unit]]
+start = 2
+id = "blank-front"
+kind = "blank"
+[[unit]]
+start = 5
+id = "titlepage"
+kind = "titlepage"
+[[unit]]
+start = 6
+id = "contents"
+kind = "contents"
+[[unit]]
+start = 8
+id = "frontispiece"
+kind = "frontispiece"
+[[unit]]
+start = 9
+id = "a01"
+kind = "article"
+[[unit]]
+start = 11
+id = "a02"
+kind = "article"
+[[unit]]
+start = 13
+id = "a03"
+kind = "article"
+[[unit]]
+start = 15
+id = "a04"
+kind = "article"
+[[unit]]
+start = 17
+id = "s01"
+kind = "part"
+[[unit]]
+start = 19
+id = "a05"
+kind = "article"
+[[unit]]
+start = 21
+id = "slice-end"
+kind = "end"
