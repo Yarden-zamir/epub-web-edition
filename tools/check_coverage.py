@@ -37,14 +37,23 @@ def epub_words_by_page(text_dir: Path) -> dict[int, list[str]]:
         body = ET.parse(f).getroot().find(f"{XHTML}body")
         assert body is not None, f
         current = 0
-        for event_el in body.iter():
-            el_id = event_el.attrib.get("id", "")
-            if event_el.attrib.get(f"{OPS}type") == "pagebreak" and el_id.startswith("pg-"):
+
+        def walk(el: ET.Element, pinned: int | None) -> None:
+            """Notes and figures carry data-pdf-page: they may follow a paragraph that crosses a page break."""
+            nonlocal current
+            pin = el.attrib.get("data-pdf-page")
+            pinned = int(pin) if pin else pinned
+            el_id = el.attrib.get("id", "")
+            if el.attrib.get(f"{OPS}type") == "pagebreak" and el_id.startswith("pg-"):
                 current = int(el_id[3:])
-            if event_el.text:
-                pages[current].extend(norm_words(event_el.text))
-            if event_el.tail:
-                pages[current].extend(norm_words(event_el.tail))
+            if el.text:
+                pages[pinned or current].extend(norm_words(el.text))
+            for child in el:
+                walk(child, pinned)
+                if child.tail:
+                    pages[pinned or current].extend(norm_words(child.tail))
+
+        walk(body, None)
     return pages
 
 

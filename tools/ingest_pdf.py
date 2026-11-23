@@ -1,6 +1,6 @@
 # /// script
 # requires-python = ">=3.13"
-# dependencies = ["pymupdf==1.28.2"]
+# dependencies = ["pymupdf==1.28.2", "python-bidi==0.6.12"]
 # ///
 """Convert a print PDF into an EPUB source tree and a page inventory.
 
@@ -31,6 +31,7 @@ from pathlib import Path
 from typing import Literal
 
 import pymupdf
+from bidi import get_display
 
 PIPELINE = Path(__file__).resolve().parent.parent
 FONT_DIR = PIPELINE / "epub-src" / "OEBPS" / "fonts"
@@ -49,6 +50,10 @@ class Cluster:
     x1: float
     text: str
     style: Literal["", "b", "sup"]
+    bracket_font: Literal["", "hebrew", "latin"] = ""  # Hebrew fonts store a bracket's logical code, Latin fonts its shape.
+
+
+MIRROR = {"(": ")", ")": "("}
 
 
 @dataclass
@@ -104,7 +109,7 @@ def role_for(font: str, size: float, rules: list[dict[str, object]]) -> Role:
     return "body"
 
 
-LTR_JOINERS = set(".,:/%+-'– ")
+LTR_JOINERS = set("().,:/%+-@_&'– ")  # Brackets join only when a left-to-right run goes on after them.
 CLOSERS = set(".,:;!?)]”")  # No space before these. ASCII quotes are ambiguous in Hebrew (geresh, gershayim), so they stay out.
 OPENERS = set("([“")  # No synthetic space after these.
 
@@ -113,34 +118,166 @@ def ltr_strong(c: str) -> bool:
     return c.isascii() and c.isalnum()
 
 
-def visual_to_logical(clusters: list[Cluster], rtl: bool) -> list[Cluster]:
-    """Order clusters by printed position, then restore left-to-right runs inside Hebrew lines.
+def is_hebrew(c: str) -> bool:
+    return "\u0590" <= c <= "\u05ff"
+
+
+NUMBER_SEPARATORS = set(".,:/+-")  # Unicode bidi ES and CS: join two numbers only when alone between them.
+NUMBER_SIGNS = set("%$€₪")  # Unicode bidi ET: belong to the number next to them.
+
+
+def ltr_run_end(ordered: list[Cluster], i: int) -> int:
+    """Last index of the left-to-right run that starts at i, in a right-to-left line (Unicode bidi W4–W7, N1)."""
+    j = i
+    has_letter = ordered[i].text[:1].isascii() and ordered[i].text[:1].isalpha()
+    while True:
+        k = j + 1
+        while k < len(ordered) and not ltr_strong(ordered[k].text[:1]) and not is_hebrew(ordered[k].text[:1]):
+            k += 1
+        if k >= len(ordered) or not ltr_strong(ordered[k].text[:1]):
+            return j
+        between = "".join(c.text for c in ordered[j + 1:k])
+        # The PDF often has no space glyph: a visible gap between glyphs is a space.
+        chain = ordered[j:k + 1]
+        if any(max(a.x0 - b.x1, b.x0 - a.x1) > 2.0 for a, b in zip(chain, chain[1:])):
+            between += " "
+        nxt = ordered[k].text[:1]
+        if has_letter:
+            ok = True  # After a Latin letter, digits turn left to right and neutrals between two L join (W7, N1).
+        elif nxt.isdigit():
+            ok = between == "" or (len(between) == 1 and between in NUMBER_SEPARATORS) or set(between) <= NUMBER_SIGNS
+        else:
+            ok = between == ""  # A Latin letter after a number in Hebrew text starts a new run.
+        if not ok:
+            return j
+        has_letter = has_letter or (nxt.isascii() and nxt.isalpha())
+        j = k
+
+
+def loose_run_end(ordered: list[Cluster], i: int) -> int:
+    """Last index of a left-to-right run that joins through spaces, brackets and punctuation."""
+    j = i
+    while j + 1 < len(ordered):
+        k = j + 1
+        while k < len(ordered) and ordered[k].text[:1] in LTR_JOINERS and not ltr_strong(ordered[k].text[:1]):
+            k += 1
+        if k < len(ordered) and ltr_strong(ordered[k].text[:1]):
+            j = k
+        else:
+            break
+    return j
+
+
+def order_key(s: str) -> str:
+    """Compare display order: brackets as one symbol, no spaces, no combining marks."""
+    return "".join("|" if c in "()[]" else c for c in s if not c.isspace() and not unicodedata.combining(c))
+
+
+def visual_to_logical(clusters: list[Cluster], rtl: bool, loose: bool = False) -> list[Cluster]:
+    """Order clusters by printed position, then restore embedded runs of the other direction.
 
     The PDF content-stream order is not reliable: MuPDF can return a Hebrew line starting mid-line.
-    Printed positions are reliable. Right to left by position is the logical order of Hebrew text.
-    Runs of digits and Latin letters print left to right, so they come out reversed and flip back.
-    Limit: brackets keep the character the PDF stores. Revisit if a mirrored bracket shows up in review.
+    Printed positions are reliable. In a right-to-left line, left-to-right runs (Latin words, numbers)
+    come out reversed and flip back; the run rules follow the Unicode bidi algorithm, so the logical
+    text displays like the print (tools/check_bidi.py checks this line by line).
+    In a left-to-right line, Hebrew runs flip back.
+    Limit: brackets keep the character the PDF stores, which differs between Hebrew and Latin fonts.
+    book.toml [[text_fix]] corrects the remaining cases one by one. Revisit with a full bidi inverse.
     """
     ordered = sorted(clusters, key=lambda c: -(c.x0 + c.x1) if rtl else (c.x0 + c.x1))
-    if not rtl:
-        return ordered
     out: list[Cluster] = []
     i = 0
     while i < len(ordered):
-        if not ltr_strong(ordered[i].text[:1]):
+        ch = ordered[i].text[:1]
+        if rtl and ltr_strong(ch):
+            j = loose_run_end(ordered, i) if loose else ltr_run_end(ordered, i)
+        elif not rtl and is_hebrew(ch):
+            j = i
+            while j + 1 < len(ordered):
+                k = j + 1
+                while k < len(ordered) and ordered[k].text[:1] in " '\"\u05be-" and not is_hebrew(ordered[k].text[:1]):
+                    k += 1
+                if k < len(ordered) and is_hebrew(ordered[k].text[:1]):
+                    j = k
+                else:
+                    break
+        else:
             out.append(ordered[i])
             i += 1
             continue
-        j = i
-        while j + 1 < len(ordered):
-            nxt = ordered[j + 1].text[:1]
-            if ltr_strong(nxt) or (nxt in LTR_JOINERS and j + 2 < len(ordered) and ltr_strong(ordered[j + 2].text[:1])):
-                j += 1
-            else:
-                break
-        out.extend(reversed(ordered[i:j + 1]))
+        run = ordered[i:j + 1]
+        text = "".join(c.text for c in run)
+        # A number sign printed next to the number belongs to it (W5).
+        while rtl and out and out[-1].text in NUMBER_SIGNS and run[0].text[:1].isdigit():
+            run.insert(0, out.pop())
+        # A bracket at either edge belongs to the run when its partner is inside the run.
+        if text.count("(") > text.count(")") and out and out[-1].text == ")":
+            run.insert(0, out.pop())
+        if text.count(")") > text.count("(") and j + 1 < len(ordered) and ordered[j + 1].text == "(":
+            run.append(ordered[j + 1])
+            j += 1
+        out.extend(reversed(run))
         i = j + 1
     return out
+
+
+def displayed_brackets(text: str, rtl: bool) -> list[tuple[str, str]]:
+    """Brackets left to right as displayed: (logical code, shape a reader sees). A bracket keeps its code
+    inside a run of the other direction only with letters of that script on both sides (Unicode bidi N0)."""
+    shown = get_display(text, base_dir="R" if rtl else "L")
+    out = []
+    for i, c in enumerate(shown):
+        if c not in MIRROR:
+            continue
+        left = next((x for x in reversed(shown[:i]) if x.isalpha()), "")
+        right = next((x for x in shown[i + 1:] if x.isalpha()), "")
+        if rtl:
+            keeps = left != "" and right != "" and left.isascii() and right.isascii()
+        else:
+            keeps = not (is_hebrew(left) and is_hebrew(right))
+        out.append((c, c if keeps else MIRROR[c]))
+    return out
+
+
+def fix_brackets(text: str, markup: str, clusters: list[Cluster], rtl: bool) -> tuple[str, str]:
+    """Choose "(" or ")" for each bracket: a Hebrew-font bracket keeps its stored logical code; a Latin-font
+    bracket must display with its stored shape."""
+    printed = [c for c in sorted(clusters, key=lambda c: c.x0 + c.x1) if c.bracket_font]
+    spots = [i for i, c in enumerate(text) if c in MIRROR]
+
+    def fits(candidate: str) -> bool:
+        shown = displayed_brackets(candidate, rtl)
+        return len(shown) == len(printed) and all(
+            (code if p.bracket_font == "hebrew" else shape) == p.text for (code, shape), p in zip(shown, printed))
+
+    # Disabled: guessing each bracket's display level (N0) without a full bidi engine made results worse
+    # (26 bracket defects against 22). Revisit with a bidi library that reports embedding levels.
+    return text, markup
+    if not spots or len(spots) != len(printed) or len(spots) > 8 or fits(text):
+        return text, markup
+    for mask in range(1 << len(spots)):
+        chars = list(text)
+        for b, i in enumerate(spots):
+            chars[i] = "(" if mask >> b & 1 else ")"
+        candidate = "".join(chars)
+        if fits(candidate):
+            it = iter(candidate[i] for i in spots)
+            return candidate, "".join(next(it) if c in MIRROR else c for c in markup)
+    return text, markup
+
+
+def render_best(clusters: list[Cluster], size: float, rtl: bool) -> tuple[str, str]:
+    """Logical text for a printed line. Prefer runs joined through spaces and brackets (a citation stays one
+    run for search and screen readers) when that text displays like the print; else the strict Unicode runs."""
+    if not rtl:
+        return fix_brackets(*render(visual_to_logical(clusters, rtl), size, rtl), clusters, rtl)
+    printed = order_key("".join(c.text for c in sorted(clusters, key=lambda c: c.x0 + c.x1)))
+    strict = render(visual_to_logical(clusters, rtl), size, rtl)
+    loose = render(visual_to_logical(clusters, rtl, loose=True), size, rtl)
+    for text, markup in (loose, strict):
+        if order_key(get_display(text, base_dir="R")) == printed:
+            return fix_brackets(text, markup, clusters, rtl)
+    return fix_brackets(*loose, clusters, rtl)
 
 
 def render(clusters: list[Cluster], size: float, rtl: bool) -> tuple[str, str]:
@@ -157,7 +294,8 @@ def render(clusters: list[Cluster], size: float, rtl: bool) -> tuple[str, str]:
 
     for c in clusters:
         if prev is not None:
-            gap = (prev.x0 - c.x1) if rtl else (c.x0 - prev.x1)
+            # Distance between the two glyph boxes in either direction (digit runs inside Hebrew read left to right).
+            gap = max(prev.x0 - c.x1, c.x0 - prev.x1)
             if (gap > 0.25 * size and not prev.text.isspace() and not c.text.isspace()
                     and c.text not in CLOSERS and prev.text not in OPENERS):
                 text.append(" ")
@@ -181,6 +319,35 @@ def tidy_spaces(s: str) -> str:
             continue
         out.append(ch)
     return "".join(out)
+
+
+def swap_reversed_pairs(markup: str) -> tuple[str, list[str]]:
+    """Turn ") X (" into "(X)" when X holds Latin letters or digits and no Hebrew and no markup.
+
+    Mixed-font lines store brackets around an embedded left-to-right run in the wrong order.
+    """
+    out, fixed, i = [], [], 0
+    while i < len(markup):
+        if markup[i] == ")":
+            j = markup.find("(", i + 1)
+            inner = markup[i + 1:j] if j > 0 else ""
+            if (j > 0 and j - i < 80 and "<" not in inner and ")" not in inner and not any(is_hebrew(c) for c in inner)
+                    and any(c.isascii() and c.isalnum() for c in inner)):
+                out.append("(" + inner.strip() + ")")
+                fixed.append(markup[i:j + 1])
+                i = j + 1
+                continue
+        out.append(markup[i])
+        i += 1
+    return "".join(out), fixed
+
+
+def figs_above(figs: list["Figure"], line: Line) -> bool:
+    return any(f.bbox[3] <= line.y0 + 2 for f in figs)
+
+
+def first_rtl(markup: str) -> bool:
+    return 'dir="ltr"' not in markup.split(">", 1)[0]
 
 
 def merge_fragments(frags: list[Line], max_gap: float | None = 15.0) -> list[Line]:  # 15 pt: a stretched word space; side-by-side captions sit further apart.
@@ -213,7 +380,7 @@ def merge_fragments(frags: list[Line], max_gap: float | None = 15.0) -> list[Lin
         main = max(g, key=lambda f: len(f.clusters))
         clusters = [c for f in g for c in f.clusters]
         rtl = hebrew_share("".join(c.text for c in clusters)) >= 0.5
-        text, markup = render(visual_to_logical(clusters, rtl), main.size, rtl)
+        text, markup = render_best(clusters, main.size, rtl)
         merged.append(Line(main.page, min(f.y0 for f in g), max(f.y1 for f in g), min(f.x0 for f in g),
                            max(f.x1 for f in g), main.role, markup, text, rtl, main.size, clusters))
     merged.sort(key=lambda ln: ln.y0)
@@ -232,6 +399,10 @@ class Ingest:
         self.layout = self.cfg["layout"]
         self.rules = self.cfg["role"]
         self.char_map: dict[str, str] = self.cfg.get("char_map", {})
+        self.text_fixes_used: set[tuple[int, str]] = set()
+        for key, url in self.cfg.get("qr_links", {}).items():
+            if not url.startswith(("https://", "http://")):
+                raise IngestError(f"book.toml [qr_links] {key}: {url[:40]!r} is not a URL (a misplaced entry?)")
         self.out = content / "epub-src"
         self.issues: list[dict[str, str]] = []
         self.assets: list[dict[str, str]] = []
@@ -270,16 +441,28 @@ class Ingest:
         merged = merge_fragments(self.fragments(pno))
         page_rtl = hebrew_share(" ".join(ln.text for ln in merged)) >= 0.5
         for ln in merged:
-            # A line without letters (a year and a bracket on a wrapped line) takes the page direction.
-            if not any(c.isalpha() for c in ln.text) and ln.rtl != page_rtl:
-                ln.rtl = page_rtl
-                ln.text, ln.html = render(visual_to_logical(ln.clusters, page_rtl), ln.size, page_rtl)
+            # Line direction: without letters, the page direction; on a Hebrew page, any Hebrew letter makes
+            # the line right to left (a mostly Latin reference line inside a Hebrew paragraph).
+            has_hebrew = any(is_hebrew(c) for c in ln.text)
+            wanted = page_rtl if not any(c.isalpha() for c in ln.text) else (
+                has_hebrew if page_rtl else hebrew_share(ln.text) >= 0.5)
+            if wanted != ln.rtl:
+                ln.rtl = wanted
+                ln.text, ln.html = render_best(ln.clusters, ln.size, wanted)
         kept = []
         for ln in merged:
             rule = next((o for o in self.cfg.get("omit", []) if o["page"] == pno and o["contains"] in ln.text), None)
             if rule:
                 self.issue(pno, "intentional-change", f"Omitted {ln.text[:60]!r}: {rule['reason']}")
                 continue
+            for tf in self.cfg.get("text_fix", []):
+                if tf["page"] == pno and tf["find"] in ln.text:
+                    if sorted(c for c in tf["find"] if c.isalnum()) != sorted(c for c in tf["replace"] if c.isalnum()):
+                        raise IngestError(f"text_fix on page {pno}: find and replace must hold the same letters")
+                    ln.text = ln.text.replace(tf["find"], tf["replace"])
+                    ln.html = ln.html.replace(html.escape(tf["find"], quote=False), html.escape(tf["replace"], quote=False))
+                    self.text_fixes_used.add((pno, tf["find"]))
+                    self.issue(pno, "intentional-change", f"Bracket order {tf['find']!r} -> {tf['replace']!r}, checked against print")
             fix = next((f for f in self.cfg.get("note_ref_fix", []) if f["page"] == pno and f["contains"] in ln.text), None)
             if fix:
                 num = str(fix["number"])
@@ -310,6 +493,7 @@ class Ingest:
                     continue
                 clusters: list[Cluster] = []
                 for s in line["spans"]:
+                    font = s["font"].split("+")[-1]
                     digits = "".join(c["c"] for c in s["chars"]).strip()
                     style: Literal["", "b", "sup"] = ""
                     if digits.isdigit() and len(digits) <= 3 and s["size"] < size * 0.8:  # A 4-digit run is a year.
@@ -327,7 +511,10 @@ class Ingest:
                         if unicodedata.combining(c) and clusters:
                             clusters[-1].text += c  # Points stay with their letter.
                             continue
-                        clusters.append(Cluster(ch["bbox"][0], ch["bbox"][2], c, style))
+                        kind: Literal["", "hebrew", "latin"] = ""
+                        if c in MIRROR:
+                            kind = "hebrew" if any(h in font for h in self.layout["hebrew_fonts"]) else "latin"
+                        clusters.append(Cluster(ch["bbox"][0], ch["bbox"][2], c, style, kind))
                 plain = "".join(c.text for c in clusters)
                 role = role_for(font, size, self.rules)  # "small" resolves to caption or footnote later.
                 result.append(Line(pno, y0, y1, line["bbox"][0], line["bbox"][2], role, "", plain,
@@ -364,11 +551,16 @@ class Ingest:
                 self.issue(pno, "reuse", f"Image xref {xref} repeats; first file {self.seen_xrefs[xref]}")
             image = self.doc.extract_image(xref)
             overlay = any((o & rect).get_area() > 0.8 * o.get_area() and o.get_area() < rect.get_area() for o in inline)
-            if overlay:
+            a, b, c, d = info["transform"][:4]
+            # Placed rotated by 90° or mirrored: the stream alone shows sideways or reversed.
+            # Limit: small skews (1–2°) keep the raw stream. Revisit if one looks tilted in review.
+            turned = abs(b) > abs(a) or (abs(b) < 1e-3 and (a < 0 or d < 0))
+            if overlay or turned:
                 dpi = max(72, min(300, round(image["width"] / (rect.width / 72))))
                 pix = page.get_pixmap(dpi=dpi, clip=rect)
                 name, data = f"{stem}-render.jpg", pix.tobytes("jpg", jpg_quality=90)
-                derivation = f"page region rendered at {dpi} dpi: an inline image prints on top (label); original stream kept in work/originals"
+                why = "an inline image prints on top (label)" if overlay else "placed rotated or mirrored in print"
+                derivation = f"page region rendered at {dpi} dpi: {why}; original stream kept in work/originals"
                 orig_dir = self.content / "work" / "originals"
                 orig_dir.mkdir(parents=True, exist_ok=True)
                 (orig_dir / f"{stem}.{image['ext']}").write_bytes(image["image"])
@@ -438,17 +630,20 @@ class Ingest:
         left, right = min(ln.x0 for ln in body), max(ln.x1 for ln in body)
         indent, short = float(self.layout["indent_tolerance"]), float(self.layout["short_tolerance"])
         paras: list[list[Line]] = [[lines[0]]]
-        for prev, cur in zip(lines, lines[1:]):
+        for n, (prev, cur) in enumerate(zip(lines, lines[1:])):
             gap = cur.y0 - prev.y1
             if cur.role != prev.role or gap > max(cur.y1 - cur.y0, 6) * 0.9 or gap < -2:
                 paras.append([cur])
                 continue
+            # The column edge near these lines: a figure beside the text narrows the column locally.
+            near = [ln for ln in lines[max(0, n - 1):n + 3] if ln.role == cur.role]
+            col_left, col_right = min(ln.x0 for ln in near), max(ln.x1 for ln in near)
             if cur.rtl:
-                starts = cur.x1 < right - indent
-                prev_short = prev.x0 > left + short
+                starts = cur.x1 < min(right, col_right) - indent
+                prev_short = prev.x0 > max(left, col_left) + short
             else:
-                starts = cur.x0 > left + indent
-                prev_short = prev.x1 < right - short
+                starts = cur.x0 > max(left, col_left) + indent
+                prev_short = prev.x1 < min(right, col_right) - short
             if cur.role in ("footnote", "caption", "small"):
                 # Notes and sources use hanging indents: only a leading number starts a new entry.
                 starts = cur.text.split(" ", 1)[0].rstrip(".").isdigit()
@@ -459,6 +654,15 @@ class Ingest:
         return paras
 
     def join(self, para: list[Line]) -> str:
+        joined = self.join_lines(para)
+        if not para[0].rtl:
+            return joined
+        fixed_markup, fixed = swap_reversed_pairs(joined)
+        for f in fixed:
+            self.issue(para[0].page, "auto-fix", f"Bracket pair {f!r} reordered around a left-to-right run; check against print")
+        return fixed_markup
+
+    def join_lines(self, para: list[Line]) -> str:
         out = para[0].html
         for prev, cur in zip(para, para[1:]):
             if not prev.rtl and prev.text.endswith("-") and cur.text[:1].islower():
@@ -473,19 +677,28 @@ class Ingest:
         height = self.doc[0].rect.height
         rest = []
         for ln in lines:
-            target = None
+            target, best = None, -1.0
             first_word = ln.text.split(" ", 1)[0]
             is_note_start = first_word.isdigit() and len(first_word) <= 3 and ln.y0 / height >= float(self.layout["footnote_min_y"])
             if ln.role == "small" and not is_note_start:
+                # First: the next line of a caption already attached (lines arrive top to bottom).
+                for f in figs:
+                    if any(0 <= ln.y0 - c.y1 < 8 and min(c.x1, ln.x1) - max(c.x0, ln.x0) > 0 for c in f.captions):
+                        target, best = f, float("inf")
+                        break
+            if ln.role == "small" and not is_note_start and target is None:
                 for f in figs:
                     overlap = min(f.bbox[2], ln.x1) - max(f.bbox[0], ln.x0) > 0
-                    near = -2 <= ln.y0 - f.bbox[3] <= gap or -2 <= f.bbox[1] - ln.y1 <= gap
+                    near = -8 <= ln.y0 - f.bbox[3] <= gap or -2 <= f.bbox[1] - ln.y1 <= gap  # Captions may tuck 8 pt into the image bottom.
                     inside = f.bbox[0] - 1 <= ln.x0 and ln.x1 <= f.bbox[2] + 1 and f.bbox[1] - 1 <= ln.y0 and ln.y1 <= f.bbox[3] + 1
                     beside = (f.bbox[1] - 2 <= ln.y0 <= f.bbox[3] + 2
                               and (0 <= f.bbox[0] - ln.x1 <= 20 or 0 <= ln.x0 - f.bbox[2] <= 20))
                     if (overlap and near) or inside or beside:  # Below/above, printed on the image, or beside it.
-                        target = f
-                        break
+                        share = max(min(f.bbox[2], ln.x1) - max(f.bbox[0], ln.x0), 0.0)
+                        if -8 <= ln.y0 - f.bbox[3] <= gap:
+                            share += 10_000  # A caption under an image wins over one above the next image.
+                        if target is None or share > best:  # The image the caption overlaps most.
+                            target, best = f, share
             if target:
                 ln.role = "caption"
                 target.captions.append(ln)
@@ -622,6 +835,26 @@ class Ingest:
                 n += 1
                 print(f'[[unit]]\nstart = {start}\nid = "a{n:02d}"\nkind = "article"  # {cells[0]}')
 
+    def continues(self, para: list[Line], body: list[list[Line]]) -> bool:
+        """The page's first body paragraph starts without an indent, so it continues the previous page."""
+        first = para[0]
+        edge_lines = [ln for pa in body for ln in pa[1:]] or [ln for pa in body for ln in pa]
+        indent = float(self.layout["indent_tolerance"])
+        if first.rtl:
+            return first.x1 >= max(ln.x1 for ln in edge_lines) - indent
+        return first.x0 <= min(ln.x0 for ln in edge_lines) + indent
+
+    def ends_full(self, para: list[Line], body: list[list[Line]]) -> bool:
+        """The paragraph's last line reaches the far column edge, so the sentence may go on."""
+        last = para[-1]
+        edge_lines = [ln for pa in body for ln in pa[:-1]] or [ln for pa in body for ln in pa]
+        short = float(self.layout["short_tolerance"])
+        if last.text.rstrip().endswith((".", "?", "!", ":")):
+            return False
+        if last.rtl:
+            return last.x0 <= min(ln.x0 for ln in edge_lines) + short
+        return last.x1 >= max(ln.x1 for ln in edge_lines) - short
+
     def link_notes(self, unit: Unit, parts: list[str], notes: dict[int, dict[str, object]]) -> list[str]:
         """Link reference numbers and notes both ways. IDs use the printed note number: {unit}-fn{n}, {unit}-fnref{n}."""
         referenced: set[int] = set()
@@ -690,15 +923,25 @@ class Ingest:
         parts: list[str] = []
         heading: str | None = None
         page_ids: dict[int, list[str]] = {}
+        open_para: str | None = None  # ID of the previous page's last body paragraph when its last line is full.
         for pno in unit.pages:
             ids = page_ids.setdefault(pno, [])
             parts.append(f'<span epub:type="pagebreak" role="doc-pagebreak" id="pg-{pno}" title="{self.label(pno)}"/>')
             figs = self.figures(pno)
             lines = self.attach_captions(figs, self.lines(pno))
             flow: list[tuple[float, str]] = []
-            for para in self.paragraphs(lines):
+            paras = self.paragraphs(lines)
+            body_paras = [pa for pa in paras if pa[0].role == "body"]
+            top_body = body_paras[0] if body_paras else None
+            next_open: str | None = None
+            for para in paras:
                 role, first = para[0].role, para[0]
                 text = self.join(para)
+                if para is top_body and open_para and self.continues(para, body_paras) and not figs_above(figs, first):
+                    flow.append((first.y0, f"@@CONT {open_para}|{text}"))
+                    if para is body_paras[-1]:
+                        next_open = open_para if self.ends_full(para, body_paras) else None
+                    continue
                 attrs = "" if first.rtl else ' lang="en" dir="ltr"'
                 if role in ("title", "display") and heading is None and unit.kind in ("article", "part"):
                     heading = " ".join(ln.text for ln in para)
@@ -711,7 +954,7 @@ class Ingest:
                     if plain.startswith("*"):
                         counters["src"] = counters.get("src", 0) + 1
                         sid = f"{unit.id}-src{counters['src']}"
-                        flow.append((10_000 + first.y0, f'@@SRC {sid}|{attrs}|{text}@@'))
+                        flow.append((10_000 + first.y0, f'@@SRC {sid}|{attrs} data-pdf-page="{pno}"|{text}@@'))
                         ids.append(sid)
                         continue
                     expected = 1 if last_note is None else last_note + 1
@@ -720,7 +963,7 @@ class Ingest:
                         if n in notes:
                             raise IngestError(f"unit {unit.id}: note {n} appears twice (PDF page {pno})")
                         rest = text.split(" ", 1)[1] if " " in text else ""
-                        notes[n] = {"attrs": attrs, "parts": [rest], "page": pno}
+                        notes[n] = {"attrs": f'{attrs} data-pdf-page="{pno}"', "parts": [rest], "page": pno}
                         last_note = n
                         prev_note_y = para[-1].y1
                         flow.append((10_000 + first.y0, f"@@NOTE{n}@@"))
@@ -740,6 +983,8 @@ class Ingest:
                 cls_attr = f' class="{cls}"' if cls else ""
                 flow.append((first.y0, f'<{tag} id="{pid}"{cls_attr}{attrs}>{text}</{tag}>'))
                 ids.append(pid)
+                if role == "body" and para is body_paras[-1]:
+                    next_open = pid if self.ends_full(para, body_paras) else None
             for fig in figs:
                 counters["fig"] += 1
                 fid = f"fig-{unit.id}-{counters['fig']:02d}"
@@ -747,9 +992,17 @@ class Ingest:
                 # "photo": prints edge to edge (bleed). "inline": sits in the text column.
                 kind = "photo" if (fig.bbox[2] - fig.bbox[0]) >= 0.9 * page_w else "inline"
                 stem = fig.file.rsplit(".", 1)[0]
-                alt = self.cfg.get("alt", {}).get(stem)
+                base = stem.removesuffix("-render").removesuffix("-masked")
+                alts = self.cfg.get("alt", {})
+                alt = alts.get(stem, alts.get(base))
+                self.used_alt.update({stem, base})
                 caption = self.caption_html(fig)
-                flow.append((fig.bbox[1], f'<figure id="{fid}" class="figure {kind}"><img src="../images/{fig.file}" width="{fig.width}" height="{fig.height}" alt="{html.escape(alt or "")}"/>{caption}</figure>'))
+                img = f'<img src="../images/{fig.file}" width="{fig.width}" height="{fig.height}" alt="{html.escape(alt or "")}"/>'
+                link = self.cfg.get("qr_links", {}).get(stem)
+                if link:
+                    img = f'<a href="{html.escape(link)}" class="qr-link">{img}</a>'
+                    self.issue(pno, "intentional-change", f"{fid}: QR code image links to its decoded target")
+                flow.append((fig.bbox[1], f'<figure id="{fid}" class="figure {kind}" data-pdf-page="{pno}">{img}{caption}</figure>'))
                 ids.append(fid)
                 if alt is None:
                     self.issue(pno, "alt-text", f"{fid} ({stem}): needs alt text written from the image (not in the PDF)")
@@ -761,7 +1014,18 @@ class Ingest:
                     "has_credit": "yes" if 'class="credit"' in caption else "no",
                     "alt": "decorative" if alt == "" else ("yes" if alt else "missing"), "status": "pending"})
             flow.sort(key=lambda t: t[0])
-            parts.extend(h for _, h in flow)
+            for _, h in flow:
+                if h.startswith("@@CONT "):
+                    pid, text = h[7:].split("|", 1)
+                    marker = parts.pop(parts.index(next(x for x in reversed(parts) if x.startswith('<span epub:type="pagebreak"'))))
+                    k = max(i for i, x in enumerate(parts) if x.startswith(f'<p id="{pid}"'))
+                    sep = "" if parts[k].endswith("-</p>") and not first_rtl(parts[k]) else " "
+                    parts[k] = parts[k][:-4] + sep + marker + text + "</p>"
+                    ids.append(pid)
+                    self.issue(pno, "info", f"{pid}: paragraph continues across the page break (marker kept inside)")
+                else:
+                    parts.append(h)
+            open_para = next_open
         self.page_ids.update(page_ids)
         parts = self.link_notes(unit, parts, notes)
         first_content = next((x for x in parts if not x.startswith("<span epub:type")), "")
@@ -787,6 +1051,7 @@ class Ingest:
         self.page_ids: dict[int, list[str]] = {}
         self.opens_with_photo: dict[str, bool] = {}
         self.figure_log: list[dict[str, str]] = []
+        self.used_alt: set[str] = set()
         docs: list[tuple[Unit, str, str | None]] = []
         for unit in self.units:
             body, _, heading = self.render_unit(unit)
@@ -800,6 +1065,12 @@ class Ingest:
             (self.out / "OEBPS" / "text" / f"{unit.id}.xhtml").write_text(xhtml, encoding="utf-8")
             docs.append((unit, f"text/{unit.id}.xhtml", heading))
         self.write_package(docs, self.write_cover(), self.write_facsimile())
+        stale = [(f["page"], f["find"]) for f in self.cfg.get("text_fix", []) if (f["page"], f["find"]) not in self.text_fixes_used]
+        if stale:
+            raise IngestError(f"book.toml [[text_fix]] entries match no text: {stale}")
+        unused = sorted(set(self.cfg.get("alt", {})) - self.used_alt)
+        if unused:
+            raise IngestError(f"book.toml [alt] keys match no image: {unused}")
         self.write_inventory()
 
     def write_cover(self) -> str | None:
