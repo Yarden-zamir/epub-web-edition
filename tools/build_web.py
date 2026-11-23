@@ -52,11 +52,14 @@ class Item:
 class Book:
     identifier: str
     title: str
+    creator: str
+    description: str
     language: str
     direction: Direction
     items: dict[str, Item]
     spine: list[Item]
     nav: Item
+    cover: Item
 
 
 @dataclass(frozen=True)
@@ -85,8 +88,11 @@ def read_book(z: zipfile.ZipFile) -> Book:
     package = ET.fromstring(z.read(opf_path))
     meta = required(package.find(f"{{{OPF}}}metadata"), "OPF metadata")
 
-    def dc(name: str) -> str:
-        return (required(meta.find(f"{{{DC}}}{name}"), f"dc:{name}").text or "").strip()
+    def dc(name: str, optional: bool = False) -> str:
+        el = meta.find(f"{{{DC}}}{name}")
+        if el is None and optional:
+            return ""
+        return (required(el, f"dc:{name}").text or "").strip()
 
     direction = package.attrib.get("dir", "ltr")
     if direction not in ("rtl", "ltr"):
@@ -108,7 +114,13 @@ def read_book(z: zipfile.ZipFile) -> Book:
     navs = [i for i in items.values() if "nav" in i.properties]
     if len(navs) != 1:
         raise BookError(f"expected one nav document, found {len(navs)}")
-    return Book(dc("identifier"), dc("title"), dc("language"), direction, items, spine, navs[0])
+    covers = [i for i in items.values() if "cover-image" in i.properties]
+    if len(covers) != 1:
+        raise BookError(f"expected one cover-image item, found {len(covers)}")
+    return Book(
+        dc("identifier"), dc("title"), dc("creator"), dc("description", optional=True),
+        dc("language"), direction, items, spine, navs[0], covers[0],
+    )
 
 
 def is_relative(url: str) -> bool:
@@ -128,6 +140,7 @@ class Converter:
         self.links: list[tuple[str, str]] = []  # (source document, target ID) to check after all documents load.
         self.search: list[SearchEntry] = []
         self.bodies: list[tuple[Item, ET.Element]] = []
+        self.colophon: list[str] = []  # Copyright-page sections. The site shows them in the footer.
 
     def load(self) -> None:
         for item in self.book.spine:
@@ -179,8 +192,11 @@ class Converter:
             if el.tag == "img" and "cover" not in body.attrib.get("data-epub-type", ""):
                 el.set("loading", "lazy")
                 el.set("decoding", "async")
-                if not (el.get("width") and el.get("height")):
-                    raise BookError(f"{item.path}: img {el.get('src')} needs width and height to prevent layout shift")
+                width, height = el.get("width"), el.get("height")
+                if not (width and height and width.isdigit() and height.isdigit() and int(height) > 0):
+                    raise BookError(f"{item.path}: img {el.get('src')} needs numeric width and height to prevent layout shift")
+                # CSS sizes artwork from this ratio, so the box is final before the image loads.
+                el.set("style", f"--ratio: {int(width) / int(height):.4f}")
             if el.get("data-epub-type") == "pagebreak":
                 # Page markers carry the printed number in title. axe 4.14 rejects aria-label on doc-pagebreak.
                 page = el.get("title")
@@ -193,6 +209,12 @@ class Converter:
                     el.set(f"data-{key}", value)
             if el_id and el.tag in INDEXED_TAGS and (text := clean_text(el)):
                 self.search.append(SearchEntry(el_id, page, section, text))
+        for parent in list(body.iter()):
+            for child in list(parent):
+                if "copyright-page" in child.get("data-epub-type", "").split():
+                    parent.remove(child)
+                    child.tail = None
+                    self.colophon.append(ET.tostring(child, encoding="unicode", method="html"))
         body.tag = "div"
         epub_type = body.get("data-epub-type", "")
         body.attrib.clear()
@@ -218,6 +240,7 @@ def normalize(text: str) -> str:
 
 
 def toc_html(z: zipfile.ZipFile, book: Book, conv: Converter) -> str:
+    """The EPUB toc nav as a plain list of in-page links."""
     nav_root = ET.fromstring(z.read(book.nav.path))
     toc = next(
         (n for n in nav_root.iter(f"{{{XHTML}}}nav") if n.attrib.get(f"{{{OPS}}}type") == "toc"),
@@ -283,15 +306,30 @@ def build(epub: Path, out: Path) -> dict[str, object]:
             dest.parent.mkdir(parents=True, exist_ok=True)
             dest.write_bytes(z.read(path))
     css = next(p for p in assets if p.endswith(".css"))
+    # The Kindle download is the canonical EPUB itself. Send to Kindle accepts EPUB.
+    download = out / "download" / epub.name
+    download.parent.mkdir()
+    download.write_bytes(epub_bytes)
     page = fill(
         (SITE / "index.html").read_text(encoding="utf-8"),
         {
             "lang": html.escape(book.language),
             "dir": book.direction,
             "title": html.escape(book.title),
+            "creator": html.escape(book.creator),
+            "description": html.escape(book.description),
+            "cover": html.escape(f"book/{book.cover.path}"),
+            "epub_href": html.escape(f"download/{epub.name}"),
+            "epub_size": f"{len(epub_bytes) / 1_000_000:.1f} MB",
             "book_id": html.escape(book.identifier),
             "book_css": html.escape(f"book/{css}"),
             "toc": toc,
+            "font_preload": "\n".join(
+                f'<link rel="preload" href="{html.escape("book/" + i.path)}" as="font" type="{i.media_type}" crossorigin>'
+                for i in sorted(book.items.values(), key=lambda i: i.path)
+                if i.media_type.startswith("font/")
+            ),
+            "colophon": "\n".join(conv.colophon),
             "book": "\n".join(docs),
         },
     )

@@ -61,6 +61,12 @@ The whole-book reconciliation is complete only when `source.json` is not synthet
 - Book font: Noto Serif Hebrew 2.004, static TTF, SIL OFL. Kindle handles variable fonts poorly. Replace with the fonts from the recovered bundle if their licence allows embedding.
 - Site-only originals (`originals/`) are full-resolution files. The EPUB carries 1600 px derivatives.
 - The web page has `noindex`, because the content is placeholder.
+- The site is an editorial page, not an e-reader. Its hero uses the EPUB title, author, description and cover image.
+- The Kindle download is the canonical `dist/book.epub`, copied byte for byte. Send to Kindle accepts EPUB.
+- The site hides the EPUB cover page, title page and in-book contents list, because the hero and the "פרקים" panel show the same content.
+- The build moves the EPUB copyright-page section into the site footer.
+- Photos run full width and pan with scroll. Artwork is never cropped; it shows whole on a mat.
+- Motion uses CSS scroll-driven animations. Browsers without support, and readers who ask for reduced motion, get a static page.
 
 ## Deploy
 

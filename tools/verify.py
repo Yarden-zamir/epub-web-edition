@@ -41,6 +41,7 @@ WEB = DIST / "web"
 CHROMIUM = Path.home() / ".cache/ms-playwright/chromium-1255/chrome-linux64/chrome"
 WEB_WIDTHS = (360, 768, 1280)
 EPUB_WIDTHS = (320, 600, 1024)  # Phone reader app, 6-inch e-reader, tablet.
+SCREENSHOT_STOPS = ("top", "ch-01", "fig-01-01", "fig-02-01", "q-03-001", "fig-03-01", "credits")
 INITIAL_LOAD_BUDGET = 1_500_000  # Bytes before lazy images load.
 PAGE_STATUSES = {"verified", "pending", "ambiguous"}
 
@@ -190,7 +191,7 @@ def check_parity(browser: Browser, url: str, texts: dict[str, str]) -> None:
     page = ctx.new_page()
     page.goto(url)
     web: dict[str, str] = page.evaluate(
-        """() => Object.fromEntries([...document.querySelectorAll('#reading [id]')]
+        """() => Object.fromEntries([...document.querySelectorAll('#read [id], .footer [id]')]
              .map(e => [e.id, e.textContent.split(/\\s+/).filter(Boolean).join(' ')]))"""
     )
     ctx.close()
@@ -219,15 +220,15 @@ def check_web(browser: Browser, url: str) -> None:
             page.on("console", lambda m: errors.append(m.text) if m.type == "error" else None)
             page.on("pageerror", lambda e: errors.append(str(e)))
             page.goto(url)
-            page.wait_for_load_state("networkidle")
+            page.wait_for_load_state("load"); page.wait_for_timeout(500)
             if page.evaluate("document.documentElement.scrollWidth > innerWidth"):
                 overflow.append(f"{scheme}@{width}")
             if v := axe(page):
                 violations[f"{scheme}@{width}"] = v
-            page.screenshot(path=OUT / f"web-{scheme}-{width}.png")
-            page.goto(url + "#fig-01-01")
-            page.wait_for_timeout(300)
-            page.screenshot(path=OUT / f"web-{scheme}-{width}-figure.png")
+            for stop in SCREENSHOT_STOPS:
+                page.evaluate(f"document.getElementById('{stop}').scrollIntoView({{block: 'start', behavior: 'instant'}})" if stop != "top" else "scrollTo({top: 0, behavior: 'instant'})")
+                page.wait_for_timeout(250)
+                page.screenshot(path=OUT / f"web-{scheme}-{width}-{stop}.png")
             ctx.close()
     record(f"web: no horizontal scroll at {WEB_WIDTHS} in light and dark", not overflow, overflow)
     record("web: axe-core 4.14.0 finds no violations", not violations, violations)
@@ -235,13 +236,13 @@ def check_web(browser: Browser, url: str) -> None:
 
 
 def check_interaction(browser: Browser, url: str) -> None:
-    ctx = browser.new_context(viewport={"width": 1280, "height": 860})
+    ctx = browser.new_context(viewport={"width": 1280, "height": 860}, reduced_motion="reduce")
     page = ctx.new_page()
     page.goto(url)
     page.keyboard.press("Tab")
     record("keyboard: first Tab focuses the skip link", page.evaluate("document.activeElement.className") == "skip-link")
     page.keyboard.press("Enter")
-    record("keyboard: skip link moves focus to the text", page.evaluate("document.activeElement.id") == "reading")
+    record("keyboard: skip link moves focus to the text", page.evaluate("document.activeElement.id") == "read")
 
     page.keyboard.press("/")
     page.keyboard.type("טבלה")
@@ -258,7 +259,7 @@ def check_interaction(browser: Browser, url: str) -> None:
     open_ = page.is_visible("#figure-dialog")
     page.keyboard.press("Escape")
     record("figure viewer opens the site-only original and closes with Escape",
-           open_ and src.endswith("originals/fig-01-01.png") and not page.is_visible("#figure-dialog"), src)
+           open_ and src.endswith("originals/fig-01-01.jpg") and not page.is_visible("#figure-dialog"), src)
 
     page.click("[data-open='toc-dialog']")
     page.click("#toc-dialog a[href='#ch-02']")
@@ -267,25 +268,16 @@ def check_interaction(browser: Browser, url: str) -> None:
     record("contents panel link goes to the chapter", page.evaluate("location.hash") == "#ch-02" and 0 <= top < 200, top)
     ctx.close()
 
-    ctx = browser.new_context(viewport={"width": 360, "height": 740})
+    ctx = browser.new_context(viewport={"width": 360, "height": 740}, reduced_motion="reduce")
     page = ctx.new_page()
     page.goto(url + "#fig-02-01")
     page.wait_for_timeout(300)
     top = page.evaluate("document.getElementById('fig-02-01').getBoundingClientRect().top")
     record("deep link opens at the figure", 0 <= top < 200, top)
-    label = page.text_content("#current-page")
-    record("current printed page follows the source PDF page markers", label == "עמוד 7", label)
-
-    page.goto(url + "#p-02-002")
-    page.wait_for_timeout(300)
-    page.mouse.wheel(0, 10)
-    page.wait_for_timeout(300)
-    saved = page.evaluate("localStorage.getItem('position:' + document.documentElement.dataset.bookId)")
-    page.goto(url)
-    page.wait_for_timeout(300)
-    record("reading position: return visit offers to continue at the saved place",
-           saved is not None and page.is_visible("#resume") and "עמוד" in (page.text_content("#resume-go") or ""),
-           {"saved": saved, "label": page.text_content("#resume-go")})
+    href = page.get_attribute(".hero-actions a[download]", "href") or ""
+    response = page.request.get(url + href)
+    record("Kindle download serves the canonical EPUB byte for byte",
+           response.ok and hashlib.sha256(response.body()).hexdigest() == sha(EPUB), href)
     ctx.close()
 
 
@@ -293,7 +285,7 @@ def check_performance(browser: Browser, url: str) -> None:
     ctx = browser.new_context(viewport={"width": 360, "height": 740})
     page = ctx.new_page()
     page.goto(url)
-    page.wait_for_load_state("networkidle")
+    page.wait_for_load_state("load"); page.wait_for_timeout(500)
     perf = page.evaluate(
         """() => {
           const nav = performance.getEntriesByType('navigation')[0];

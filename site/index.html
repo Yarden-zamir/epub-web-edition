@@ -4,37 +4,67 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>{{title}}</title>
+<meta name="description" content="{{description}}">
+<meta name="theme-color" content="#191715">
+<title>{{title}} · {{creator}}</title>
+<link rel="preload" href="{{cover}}" as="image">
+{{font_preload}}
 <link rel="stylesheet" href="{{book_css}}">
 <link rel="stylesheet" href="reader.css">
 <script src="reader.js" defer></script>
 </head>
 <body>
-<a class="skip-link" href="#reading">דלגו לטקסט</a>
-<header class="bar">
-  <div class="bar-inner">
-    <a class="bar-title" href="#top">{{title}}</a>
-    <span class="bar-page" id="current-page"></span>
-    <nav class="bar-actions" aria-label="כלי קריאה">
-      <button type="button" data-open="toc-dialog" aria-haspopup="dialog">תוכן</button>
+<a class="skip-link" href="#read">דלגו לקריאה</a>
+
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a class="nav-title" href="#top">{{title}}</a>
+    <div class="nav-actions">
+      <button type="button" data-open="toc-dialog" aria-haspopup="dialog">פרקים</button>
       <button type="button" data-open="search-dialog" aria-haspopup="dialog" aria-keyshortcuts="/">חיפוש</button>
-    </nav>
+      <a class="btn btn-small" href="{{epub_href}}" download>הורדה</a>
+    </div>
   </div>
+  <div class="progress" aria-hidden="true"></div>
 </header>
 
-<main id="reading" class="reading" tabindex="-1">
-<span id="top"></span>
+<section class="hero" id="top" aria-labelledby="hero-title">
+  <div class="hero-backdrop" aria-hidden="true"><img src="{{cover}}" alt=""></div>
+  <div class="hero-inner">
+    <div class="hero-text">
+      <p class="hero-author">{{creator}}</p>
+      <h1 class="hero-title" id="hero-title">{{title}}</h1>
+      <p class="hero-lede">{{description}}</p>
+      <div class="hero-actions">
+        <a class="btn btn-light" href="#read">קריאה באתר</a>
+        <a class="btn btn-outline" href="{{epub_href}}" download>הורדה לקינדל <span class="btn-meta">EPUB · {{epub_size}}</span></a>
+      </div>
+      <p class="hero-note">הקובץ עובד עם Send to Kindle ועם כל קורא ספרים דיגיטלי.</p>
+    </div>
+    <img class="hero-cover" src="{{cover}}" alt="כריכת הספר">
+  </div>
+  <a class="hero-cue" href="#read" aria-label="לתחילת הקריאה">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 4v16m0 0-6-6m6 6 6-6"/></svg>
+  </a>
+</section>
+
+<main id="read" class="book" tabindex="-1">
 {{book}}
 </main>
 
-<div class="resume" id="resume" hidden>
-  <button type="button" id="resume-go"></button>
-  <button type="button" id="resume-close" aria-label="סגירה">×</button>
-</div>
+<footer class="footer">
+  <div class="footer-inner">
+    <p class="footer-title">{{title}}</p>
+    <p class="footer-author">{{creator}}</p>
+    <a class="btn" href="{{epub_href}}" download>הורדה לקינדל <span class="btn-meta">EPUB · {{epub_size}}</span></a>
+    <a class="footer-top" href="#top">חזרה למעלה</a>
+{{colophon}}
+  </div>
+</footer>
 
 <dialog id="toc-dialog" class="panel" aria-labelledby="toc-title">
-  <div class="panel-head"><h2 id="toc-title">תוכן העניינים</h2><button type="button" data-close aria-label="סגירה">×</button></div>
-  <nav class="panel-toc" aria-labelledby="toc-title">
+  <div class="panel-head"><h2 id="toc-title">פרקים</h2><button type="button" data-close aria-label="סגירה">×</button></div>
+  <nav class="panel-list" aria-labelledby="toc-title">
 {{toc}}
   </nav>
 </dialog>
@@ -43,10 +73,10 @@
   <div class="panel-head"><h2 id="search-title">חיפוש בספר</h2><button type="button" data-close aria-label="סגירה">×</button></div>
   <form role="search" id="search-form">
     <label for="search-input" class="visually-hidden">מילות חיפוש</label>
-    <input id="search-input" type="search" autocomplete="off" placeholder="חיפוש…">
+    <input id="search-input" type="search" autocomplete="off" placeholder="מה לחפש?">
   </form>
   <p id="search-status" class="search-status" aria-live="polite"></p>
-  <ol id="search-results" class="search-results"></ol>
+  <ol id="search-results" class="panel-list search-results"></ol>
 </dialog>
 
 <dialog id="figure-dialog" class="figure-viewer" aria-label="תצוגת תמונה">

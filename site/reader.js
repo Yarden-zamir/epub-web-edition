@@ -1,16 +1,7 @@
-// Web-only reading features. Each feature works on the EPUB-derived DOM and its stable IDs.
-// The book reads fully without this script.
+// Web edition features. Each one works on the EPUB-derived DOM and its stable IDs.
+// The page reads fully without this script.
 
-const root = document.documentElement;
-const reading = document.getElementById("reading");
-const bookId = root.dataset.bookId ?? "book";
-const POSITION_KEY = `position:${bookId}`;
-
-// Browser storage can be absent or throw (private mode, blocked site data). Features degrade to off.
-const store = {
-  get(key) { try { return localStorage.getItem(key); } catch { return null; } },
-  set(key, value) { try { localStorage.setItem(key, value); } catch { /* Storage blocked: skip. */ } },
-};
+const reading = document.getElementById("read");
 
 function byId(id) {
   const el = document.getElementById(id);
@@ -28,17 +19,6 @@ function normalize(text) {
   return out.toLowerCase();
 }
 
-function pageOf(el) {
-  // The printed page is the label of the last page marker before the element.
-  const markers = reading.querySelectorAll('[data-epub-type="pagebreak"]');
-  let page = null;
-  for (const m of markers) {
-    if (m.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_PRECEDING) break;
-    page = m.getAttribute("title");
-  }
-  return page;
-}
-
 function goTo(id) {
   const el = document.getElementById(id);
   if (!el) return;
@@ -50,6 +30,12 @@ function goTo(id) {
   if (!el.matches("a, button, input, [tabindex]")) el.setAttribute("tabindex", "-1");
   el.focus({ preventScroll: true });
 }
+
+// Navigation bar: solid once the hero leaves the viewport.
+const nav = byId("nav");
+new IntersectionObserver(([entry]) => {
+  nav.toggleAttribute("data-solid", !entry.isIntersecting);
+}, { rootMargin: "-96px 0px 0px 0px" }).observe(byId("top")); // Solid before the hero shrinks under the bar.
 
 // Dialogs
 for (const button of document.querySelectorAll("[data-open]")) {
@@ -143,7 +129,7 @@ async function runSearch() {
     a.href = `#${hit.id}`;
     const where = document.createElement("span");
     where.className = "where";
-    where.textContent = [hit.section, hit.page && `עמוד ${hit.page}`].filter(Boolean).join(" · ");
+    where.textContent = hit.section ?? "";
     a.append(where, snippet(hit.text, terms[0]));
     a.addEventListener("click", (e) => { e.preventDefault(); byId("search-dialog").close(); goTo(hit.id); });
     li.append(a);
@@ -160,45 +146,3 @@ document.addEventListener("keydown", (e) => {
     input.focus();
   }
 });
-
-// Reading position and current printed page
-// Only rendered elements: hidden ones (the in-book nav) report top 0 and break the ordered search below.
-const tracked = [...reading.querySelectorAll('p[id], h1[id], h2[id], figure[id], table[id], [data-epub-type="pagebreak"]')]
-  .filter((el) => el.getClientRects().length > 0);
-const pageLabel = byId("current-page");
-function topVisible() {
-  const line = 80;
-  // Binary search: tracked elements are in document order.
-  let lo = 0, hi = tracked.length - 1, best = tracked[0];
-  while (lo <= hi) {
-    const mid = (lo + hi) >> 1;
-    if (tracked[mid].getBoundingClientRect().top <= line) { best = tracked[mid]; lo = mid + 1; } else hi = mid - 1;
-  }
-  return best;
-}
-let ticking = false;
-function onScroll() {
-  if (ticking) return;
-  ticking = true;
-  requestAnimationFrame(() => {
-    ticking = false;
-    const el = topVisible();
-    if (!el) return;
-    const page = pageOf(el);
-    pageLabel.textContent = page ? `עמוד ${page}` : "";
-    if (scrollY > 200) store.set(POSITION_KEY, el.id);
-  });
-}
-addEventListener("scroll", onScroll, { passive: true });
-onScroll();
-
-const saved = store.get(POSITION_KEY);
-const savedEl = saved && document.getElementById(saved);
-if (!location.hash && savedEl) {
-  const resume = byId("resume");
-  const page = pageOf(savedEl);
-  byId("resume-go").textContent = page ? `המשך קריאה מעמוד ${page}` : "המשך קריאה";
-  byId("resume-go").addEventListener("click", () => { resume.hidden = true; goTo(saved); });
-  byId("resume-close").addEventListener("click", () => { resume.hidden = true; });
-  resume.hidden = false;
-}
