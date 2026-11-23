@@ -126,6 +126,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .book section.chapter > h2::after { content: ""; display: block; width: 3rem; height: 2px; margin-top: 1.75rem; background: var(--accent); }
 .book .chapter-number { display: block; margin-bottom: 1rem; font-family: var(--sans); font-size: 0.85rem; font-weight: 600; letter-spacing: 0.12em; color: var(--accent); opacity: 1; }
 .book section.chapter > h2 + p { font-size: 1.12em; line-height: 1.7; }
+/* The book stylesheet may colour titles for print; the site uses its own tokens so dark mode stays readable. */
+.book h2, .book .display-title { color: var(--ink); }
+.book .byline { color: var(--muted); }
 
 .book blockquote.epigraph { margin: 2.5rem 0; padding: 0; padding-inline-start: 1.25rem; border: 0; border-inline-start: 2px solid var(--accent); color: var(--soft); font-size: 1.02em; }
 .book blockquote.pullquote { margin: clamp(3rem, 8vw, 5.5rem) 0; text-align: center; font-size: clamp(1.5rem, 1.1rem + 1.7vw, 2.35rem); line-height: 1.35; color: var(--ink); }
@@ -191,7 +194,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* Footer */
 .footer { background: var(--night); color: var(--on-night); font-family: var(--sans); }
 .footer-inner { max-width: var(--measure); margin: 0 auto; padding: clamp(4rem, 10vw, 7rem) var(--gutter); display: grid; justify-items: start; gap: 0.5rem; }
-.footer-title { margin: 0; font-family: "Book Serif", serif; font-size: clamp(1.8rem, 1.3rem + 2vw, 2.6rem); font-weight: bold; line-height: 1.15; }
+.footer-title { margin: 0; font-size: clamp(1.8rem, 1.3rem + 2vw, 2.6rem); font-weight: bold; line-height: 1.15; }
 .footer-author { margin: 0 0 1.5rem; color: var(--on-night-soft); }
 .footer .btn { background: var(--on-night); color: var(--night); }
 .footer-top { margin-top: 2rem; font-size: 0.9rem; color: var(--on-night-soft); }

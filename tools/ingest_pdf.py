@@ -14,7 +14,8 @@ Rules:
 - Images are copied byte for byte from the PDF streams (extract_image).
 - Every page gets a page marker and an inventory row with status "pending".
   A person sets "verified" after a visual check against the PDF.
-- Each automatic text change (punctuation order, hyphen joins) is an issue row.
+- Each automatic text change (hyphen joins) is an issue row.
+- Line text is ordered by printed glyph position, not by PDF stream order (see visual_to_logical).
 """
 
 import csv
@@ -23,6 +24,7 @@ import html
 import shutil
 import sys
 import tomllib
+import unicodedata
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal
@@ -32,11 +34,19 @@ import pymupdf
 PIPELINE = Path(__file__).resolve().parent.parent
 FONT_DIR = PIPELINE / "epub-src" / "OEBPS" / "fonts"
 BOOK_CSS = PIPELINE / "epub-src" / "OEBPS" / "css" / "book.css"
-PUNCT = set("?!.,:;")
 
 type Role = Literal["body", "display", "title", "byline", "subheading", "small", "caption", "footnote"]
 # "small": small print. attach_captions() turns it into "caption" (next to an image) or "footnote" (low on the page).
 type UnitKind = Literal["cover", "blank", "titlepage", "contents", "frontispiece", "article", "part", "end"]
+
+
+@dataclass
+class Cluster:
+    """One base character with its combining marks (Hebrew points), at its printed position."""
+    x0: float
+    x1: float
+    text: str
+    style: Literal["", "b", "sup"]
 
 
 @dataclass
@@ -51,6 +61,7 @@ class Line:
     text: str  # Plain text.
     rtl: bool
     size: float
+    clusters: list[Cluster] = field(default_factory=list)
 
 
 @dataclass
@@ -88,6 +99,99 @@ def role_for(font: str, size: float, rules: list[dict[str, object]]) -> Role:
         if str(rule["font"]) in font and float(rule.get("min", 0)) <= size <= float(rule.get("max", 999)):
             return rule["role"]  # type: ignore[return-value]
     return "body"
+
+
+LTR_JOINERS = set(".,:/%+-'– ")
+
+
+def ltr_strong(c: str) -> bool:
+    return c.isascii() and c.isalnum()
+
+
+def visual_to_logical(clusters: list[Cluster], rtl: bool) -> list[Cluster]:
+    """Order clusters by printed position, then restore left-to-right runs inside Hebrew lines.
+
+    The PDF content-stream order is not reliable: MuPDF can return a Hebrew line starting mid-line.
+    Printed positions are reliable. Right to left by position is the logical order of Hebrew text.
+    Runs of digits and Latin letters print left to right, so they come out reversed and flip back.
+    Limit: brackets keep the character the PDF stores. Revisit if a mirrored bracket shows up in review.
+    """
+    ordered = sorted(clusters, key=lambda c: -(c.x0 + c.x1) if rtl else (c.x0 + c.x1))
+    if not rtl:
+        return ordered
+    out: list[Cluster] = []
+    i = 0
+    while i < len(ordered):
+        if not ltr_strong(ordered[i].text[:1]):
+            out.append(ordered[i])
+            i += 1
+            continue
+        j = i
+        while j + 1 < len(ordered):
+            nxt = ordered[j + 1].text[:1]
+            if ltr_strong(nxt) or (nxt in LTR_JOINERS and j + 2 < len(ordered) and ltr_strong(ordered[j + 2].text[:1])):
+                j += 1
+            else:
+                break
+        out.extend(reversed(ordered[i:j + 1]))
+        i = j + 1
+    return out
+
+
+def render(clusters: list[Cluster], size: float, rtl: bool) -> tuple[str, str]:
+    """Plain text and escaped markup. Adds a space where printed glyphs have a word-sized gap."""
+    text, parts, style, buf = [], [], "", []
+    prev: Cluster | None = None
+
+    def flush() -> None:
+        if not buf:
+            return
+        chunk = html.escape("".join(buf), quote=False)
+        parts.append({"b": f"<b>{chunk}</b>", "sup": f'<sup class="ref">{chunk}</sup>'}.get(style, chunk))
+        buf.clear()
+
+    for c in clusters:
+        if prev is not None:
+            gap = (prev.x0 - c.x1) if rtl else (c.x0 - prev.x1)
+            if gap > 0.25 * size and not prev.text.isspace() and not c.text.isspace():
+                text.append(" ")
+                buf.append(" ")
+        if c.style != style:
+            flush()
+            style = c.style
+        text.append(c.text)
+        buf.append(c.text)
+        prev = c
+    flush()
+    return " ".join("".join(text).split()), " ".join("".join(parts).split())
+
+
+def merge_fragments(frags: list[Line]) -> list[Line]:
+    """Join the PDF text fragments of one printed line and order its characters by position.
+
+    MuPDF splits a printed line where the direction changes. Fragments that overlap vertically
+    belong to one line, including raised footnote digits.
+    """
+    frags = sorted(frags, key=lambda f: f.y0)
+    groups: list[list[Line]] = []
+    for f in frags:
+        mid = (f.y0 + f.y1) / 2
+        for g in groups:
+            if min(x.y0 for x in g) <= mid <= max(x.y1 for x in g):
+                g.append(f)
+                break
+        else:
+            groups.append([f])
+    merged: list[Line] = []
+    for g in groups:
+        main = max(g, key=lambda f: len(f.clusters))
+        clusters = [c for f in g for c in f.clusters]
+        rtl = hebrew_share("".join(c.text for c in clusters)) >= 0.5
+        text, markup = render(visual_to_logical(clusters, rtl), main.size, rtl)
+        merged.append(Line(main.page, min(f.y0 for f in g), max(f.y1 for f in g), min(f.x0 for f in g),
+                           max(f.x1 for f in g), main.role, markup, text, rtl, main.size, clusters))
+    merged.sort(key=lambda ln: ln.y0)
+    return merged
 
 
 class Ingest:
@@ -133,42 +237,37 @@ class Ingest:
         page = self.doc[pno - 1]
         height = page.rect.height
         result: list[Line] = []
-        for block in page.get_text("dict", flags=pymupdf.TEXT_PRESERVE_WHITESPACE)["blocks"]:
+        for block in page.get_text("rawdict", flags=pymupdf.TEXT_PRESERVE_WHITESPACE)["blocks"]:
             if block["type"] != 0:
                 continue
             for line in block["lines"]:
-                spans = [s for s in line["spans"] if s["text"].strip()]
+                spans = [s for s in line["spans"] if "".join(c["c"] for c in s["chars"]).strip()]
                 if not spans:
                     continue
                 y0, y1 = line["bbox"][1], line["bbox"][3]
                 if y1 / height < float(self.layout["header_max_y"]):
                     continue  # Running head or folio.
-                main = max(spans, key=lambda s: len(s["text"]))
+                main = max(spans, key=lambda s: len(s["chars"]))
                 font, size = main["font"].split("+")[-1], main["size"]
-                parts, plain = [], []
+                clusters: list[Cluster] = []
                 for s in line["spans"]:
-                    t = s["text"].replace("\t", " ")
-                    plain.append(t)
-                    esc = html.escape(t, quote=False)
-                    if t.strip().isdigit() and s["size"] < size * 0.8 and font not in ("AlmoniDLAAA",):
-                        parts.append(f'<sup class="ref">{esc.strip()}</sup>')
+                    digits = "".join(c["c"] for c in s["chars"]).strip()
+                    style: Literal["", "b", "sup"] = ""
+                    if digits.isdigit() and s["size"] < size * 0.8:
+                        style = "sup"
                     elif s["flags"] & 16 and not main["flags"] & 16:
-                        parts.append(f"<b>{esc}</b>")
-                    else:
-                        parts.append(esc)
-                text = "".join(plain).strip()
-                markup = "".join(parts).strip()
-                rtl = hebrew_share(text) >= 0.5
-                if rtl and any(v in font for v in self.layout["visual_order_fonts"]) and text[:1] in PUNCT:
-                    lead = len(text) - len(text.lstrip("".join(PUNCT)))
-                    moved = text[:lead]
-                    self.issue(pno, "auto-fix", f"Visual-order punctuation moved to line end ({font}): {moved!r}")
-                    text = text[lead:].strip() + moved
-                    markup = html.escape(text, quote=False)
+                        style = "b"
+                    for ch in s["chars"]:
+                        c = ch["c"].replace("\t", " ")
+                        if unicodedata.combining(c) and clusters:
+                            clusters[-1].text += c  # Points stay with their letter.
+                            continue
+                        clusters.append(Cluster(ch["bbox"][0], ch["bbox"][2], c, style))
+                plain = "".join(c.text for c in clusters)
                 role = role_for(font, size, self.rules)  # "small" resolves to caption or footnote later.
-                result.append(Line(pno, y0, y1, line["bbox"][0], line["bbox"][2], role, markup, text, rtl, size))
-        result.sort(key=lambda ln: (round(ln.y0), -ln.x1 if ln.rtl else ln.x0))
-        return result
+                result.append(Line(pno, y0, y1, line["bbox"][0], line["bbox"][2], role, "", plain,
+                                   hebrew_share(plain) >= 0.5, size, clusters))
+        return merge_fragments(result)
 
     def figures(self, pno: int) -> list[Figure]:
         page = self.doc[pno - 1]
@@ -324,9 +423,12 @@ class Ingest:
             (self.out / "OEBPS" / sub).mkdir(parents=True)
         (self.out / "mimetype").write_text("application/epub+zip", encoding="ascii")
         (self.out / "META-INF" / "container.xml").write_text(CONTAINER, encoding="utf-8")
-        for f in FONT_DIR.iterdir():
+        assets = self.cfg.get("assets", {})
+        font_dir = self.content / assets["fonts"] if "fonts" in assets else FONT_DIR
+        css = self.content / assets["css"] if "css" in assets else BOOK_CSS
+        for f in sorted(font_dir.iterdir()):
             shutil.copyfile(f, self.out / "OEBPS" / "fonts" / f.name)
-        shutil.copyfile(BOOK_CSS, self.out / "OEBPS" / "css" / "book.css")
+        shutil.copyfile(css, self.out / "OEBPS" / "css" / "book.css")
         self.page_ids: dict[int, list[str]] = {}
         docs: list[tuple[Unit, str, str | None]] = []
         for unit in self.units:
@@ -336,7 +438,7 @@ class Ingest:
             type_attr = f' epub:type="{epub_type}"' if epub_type else ""
             labelled = f' aria-labelledby="{unit.id}-h"' if heading else ""
             xhtml = DOC.format(lang=self.cfg["meta"]["language"], title=html.escape(heading or unit.id),
-                               body=f'<section id="{unit.id}" class="{unit.kind}"{type_attr}{labelled}>\n{body}\n</section>')
+                               body=f'<section id="{unit.id}" class="{unit.kind}{" chapter" if unit.kind == "article" else ""}"{type_attr}{labelled}>\n{body}\n</section>')
             (self.out / "OEBPS" / "text" / f"{unit.id}.xhtml").write_text(xhtml, encoding="utf-8")
             docs.append((unit, f"text/{unit.id}.xhtml", heading))
         self.write_package(docs)
