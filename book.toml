@@ -3,6 +3,21 @@
 
 pdf = "~/private-inputs/eli-raz/source-2026-11-23/source.pdf"
 pdf_sha256 = "c7efc94efd4cbd42bf9d479a20ff1af763e017ec0ce1cfab75d2be7e3560e994"
+# Ornaments that are not book content. Checked visually on PDF pages 6-7.
+decorative = ["p006-x17", "p007-x21"]
+
+# Wrong code points in the PDF text layer, mapped to what the print shows.
+# U+0007: InDesign "indent to here" after note and source numbers (130 cases). Prints as a space.
+# U+001A: a zero-width glyph under ayin in "מעין" (PDF pages 210, 211). The render shows a shva.
+# Text left out on purpose. Each entry is logged as an intentional change.
+[[omit]]
+page = 22
+contains = "The English text continues from the left page"
+reason = "Print-only reading note for the two-page spreads. The EPUB puts the English pages in reading order, so the note would mislead."
+
+[char_map]
+"\u0007" = " "
+"\u001a" = "\u05b0"
 
 [meta]
 # As printed on the title page (PDF page 5) and the cover (PDF page 1).
@@ -20,6 +35,8 @@ rights = "© כל הזכויות שמורות"  # Title page, PDF page 5. Full r
 folio_offset = 4
 folio_font = "Extrim"
 header_max_y = 0.15      # Running heads and folios sit above this share of the page height.
+# Only these fonts count as running heads or folios in that band. Other text there is content (PDF page 308 has a title there).
+running_head_fonts = [["Extrim", 12.0], ["FbTubic", 9.8]]
 footnote_min_y = 0.62    # Small notes below this share of the height are footnotes.
 indent_tolerance = 6.0   # Points. A line this far in from the column edge starts a paragraph.
 short_tolerance = 20.0   # Points. A line that ends this far short of the far edge ends a paragraph.
@@ -58,55 +75,216 @@ max = 11.6
 role = "small"
 
 # Book structure. Each unit starts at a PDF page and runs until the next unit.
-# Article starts come from the printed contents (PDF pages 6-7) plus the folio offset.
-[[unit]]
+# Generated from the printed contents (PDF pages 6-7): article start = printed page + 4.
+# Part dividers sit 2 pages before their first article (the next page is blank). Checked against near-empty pages.
+
+[[unit]]  # Cover
 start = 1
 id = "cover"
 kind = "cover"
-[[unit]]
+[[unit]]  # Blank pages before the title page
 start = 2
 id = "blank-front"
 kind = "blank"
-[[unit]]
+[[unit]]  # Title page and credits
 start = 5
 id = "titlepage"
 kind = "titlepage"
-[[unit]]
+[[unit]]  # Printed contents, PDF pages 6-7
 start = 6
 id = "contents"
 kind = "contents"
-[[unit]]
+[[unit]]  # Portrait page
 start = 8
 id = "frontispiece"
 kind = "frontispiece"
-[[unit]]
+[[unit]]  # צרור תודות (no author line)
 start = 9
 id = "a01"
 kind = "article"
-[[unit]]
+[[unit]]  # פתח דבר (יאיר גלעדי)
 start = 11
 id = "a02"
 kind = "article"
-[[unit]]
+[[unit]]  # אלי רז איש המדבר (עמיר אידלמן)
 start = 13
 id = "a03"
 kind = "article"
-[[unit]]
+[[unit]]  # הצטלבויות (יונתן ארז)
 start = 15
 id = "a04"
 kind = "article"
-[[unit]]
+[[unit]]  # Part divider: ים המוות - האומנם?
 start = 17
 id = "s01"
 kind = "part"
-[[unit]]
+[[unit]]  # ים המלח - מקור השראה: על סיגלית לנדאו (יאיר גלעדי)
 start = 19
 id = "a05"
 kind = "article"
-[[unit]]
+[[unit]]  # The Life Story of the Dead Sea (אלי רז)
 start = 21
-id = "slice-end"
-kind = "end"
+id = "a06"
+kind = "article"
+# Two-page spreads read left page first. Checked by sentence continuity across every page break.
+page_order = [21, 23, 22, 25, 24, 27, 26, 29, 28, 31, 30, 33, 32, 35, 34, 37, 36, 38]
+[[unit]]  # תולדות מחקר ים המלח (אלי רז)
+start = 39
+id = "a07"
+kind = "article"
+[[unit]]  # Part divider: טיפוס ונפילה, איתור וחילוץ
+start = 51
+id = "s02"
+kind = "part"
+[[unit]]  # אלי רז ויחידת אית"ן (נרי אראלי)
+start = 53
+id = "a08"
+kind = "article"
+[[unit]]  # חזור למדבר ממנו באת (אלי רז)
+start = 57
+id = "a09"
+kind = "article"
+[[unit]]  # אסון הר פאמיר (אלי רז)
+start = 65
+id = "a10"
+kind = "article"
+[[unit]]  # חבר מעולם אחר (אלי רז)
+start = 79
+id = "a11"
+kind = "article"
+[[unit]]  # תעלומת גרשון נדיבי (יאיר גלעדי)
+start = 89
+id = "a12"
+kind = "article"
+[[unit]]  # מורל, עט ונייר טואלט – יומן הבולען (אלי רז)
+start = 93
+id = "a13"
+kind = "article"
+[[unit]]  # בולענים ואמצעי מניעה (אלי רז)
+start = 107
+id = "a14"
+kind = "article"
+[[unit]]  # Part divider: אדם וים המלח בימי קדם
+start = 125
+id = "s03"
+kind = "part"
+[[unit]]  # אדם וסביבה בנווה עין גדי (אלי רז)
+start = 127
+id = "a15"
+kind = "article"
+[[unit]]  # ספנות בים המלח (אלי רז)
+start = 135
+id = "a16"
+kind = "article"
+[[unit]]  # סלע אֱדום (אלי וטל רז, אלכסנדר אוצ'יטל)
+start = 145
+id = "a17"
+kind = "article"
+[[unit]]  # פונון: מנגד לערבה התיכונה (אלי רז, ארז בן יוסף)
+start = 167
+id = "a18"
+kind = "article"
+[[unit]]  # תריאק: המוצר היוקרתי של ים המלח (אלי רז)
+start = 183
+id = "a19"
+kind = "article"
+[[unit]]  # Part divider: יוזמות
+start = 187
+id = "s04"
+kind = "part"
+[[unit]]  # הקמת מצוקי דרגות (יוחאי רוס)
+start = 189
+id = "a20"
+kind = "article"
+[[unit]]  # בקיבוץ עין גדי ובתנועה הקיבוצית (אלי רז)
+start = 191
+id = "a21"
+kind = "article"
+[[unit]]  # הקמת צוות איתור וחילוץ (יאיר גלעדי, ערן חופש)
+start = 195
+id = "a22"
+kind = "article"
+[[unit]]  # Part divider: אישי בהחלט
+start = 201
+id = "s05"
+kind = "part"
+[[unit]]  # זכיתי (חגית (בלבן) לביא)
+start = 203
+id = "a23"
+kind = "article"
+[[unit]]  # טיול בלתי נשכח (אפרת אנגרס-אוולד)
+start = 205
+id = "a24"
+kind = "article"
+[[unit]]  # עם אלי בעבר הירדן (חנוך פלסר)
+start = 209
+id = "a25"
+kind = "article"
+[[unit]]  # שמעו, שמעו בני מואב (משה מזר)
+start = 213
+id = "a26"
+kind = "article"
+[[unit]]  # מעלילות עבר הירדן (אלי וטל רז)
+start = 215
+id = "a27"
+kind = "article"
+[[unit]]  # סיור מודרך בחוג הסרטן (אלי רז)
+start = 229
+id = "a28"
+kind = "article"
+[[unit]]  # אלי ואליהוא (משה שנקר)
+start = 233
+id = "a29"
+kind = "article"
+[[unit]]  # Part divider: מבט גיאוגרפי
+start = 237
+id = "s06"
+kind = "part"
+[[unit]]  # בין הר חברון לעין גדי (אלי רז)
+start = 239
+id = "a30"
+kind = "article"
+[[unit]]  # השתוללות איתני הטבע וקריסת גשר ערוגות (אלי רז)
+start = 245
+id = "a31"
+kind = "article"
+[[unit]]  # החור באוזון (אלי רז)
+start = 251
+id = "a32"
+kind = "article"
+[[unit]]  # Part divider: מבט מדעי
+start = 255
+id = "s07"
+kind = "part"
+[[unit]]  # מהו בולבוס (אלי רז)
+start = 257
+id = "a33"
+kind = "article"
+[[unit]]  # אגם הלשון נגד הר סדום (אלי רז)
+start = 259
+id = "a34"
+kind = "article"
+[[unit]]  # המערכת האקולוגית של ים המלח (אלי רז)
+start = 275
+id = "a35"
+kind = "article"
+[[unit]]  # ים המלח - לאן? (אלי רז)
+start = 291
+id = "a36"
+kind = "article"
+[[unit]]  # מקורות
+start = 309
+id = "sources"
+kind = "bibliography"
+[[unit]]  # Blank pages before the back cover
+start = 313
+id = "blank-back"
+kind = "blank"
+[[unit]]  # Back cover
+start = 316
+id = "backcover"
+kind = "backcover"
+
 
 [assets]
 css = "book.css"     # Font stacks name the print fonts first; see the comment in the file.
