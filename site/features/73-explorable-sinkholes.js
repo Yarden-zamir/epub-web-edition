@@ -125,9 +125,9 @@ function create(spec) {
   const peaks = cols.filter((col, i) => col.atBottom !== null && sum(col) >= sum(cols[i - 1]) && sum(col) >= sum(cols[i + 1]) && sum(col) > 0.7);
   const sites = [];
   for (const col of [...peaks].sort((c1, c2) => sum(c2) - sum(c1))) if (sites.length < GAPS && sites.every((site) => Math.abs(site.x - col.x) >= GAP_SPACING)) sites.push(col);
-  for (const site of sites) site.size = 0.6 + rand(); // Sinkholes of different sizes: wider gap, funnel and pit.
+  for (const site of sites) site.size = 0.8 + rand(); // Sinkholes of different sizes: wider gap and crater.
   for (const col of cols) {
-    const near = Math.max(0, ...sites.map((site) => 1 - Math.abs(site.x - col.x) / (4 + 7 * site.size)));
+    const near = Math.max(0, ...sites.map((site) => 1 - Math.abs(site.x - col.x) / (6 + 9 * site.size)));
     col.topMost = 0.12 + 0.38 * col.rt + 0.6 * near;
     col.bottomMost = 0.1 + 0.3 * col.rb + 0.6 * near;
   }
@@ -139,7 +139,7 @@ function create(spec) {
     if (spots.length < SPOTS && spots.every((spot) => Math.abs(spot.col.x - col.x) > 30)) spots.push({ col, size: 0.8 + 0.5 * rand(), radii: grid.slice(0, 10).map(() => 0.7 + 0.6 * rand()) });
   // A collapse at each gap site: the ground above the gap moves down into the space the salt left. Half width at the
   // surface: w; it narrows toward the gap.
-  const holes = sites.sort((c1, c2) => c1.x - c2.x).map((col) => ({ x: col.x, col, size: col.size, w: 11 * col.size, surface: (dx) => Y(ground(col.x + dx)) }));
+  const holes = sites.sort((c1, c2) => c1.x - c2.x).map((col) => ({ x: col.x, col, size: col.size, w: 16 * col.size, surface: (dx) => Y(ground(col.x + dx)) }));
   let pores = null, poresColor = "";
   const poreTile = (ctx, env) => { // Small dots: water in the pores of the ground. One tile per theme.
     const color = env.color("--xp-fresh-ink");
@@ -188,7 +188,7 @@ function create(spec) {
       if (h.p !== target) env.wantsFrame = true;
       if (target) fallen++;
       h.closing = target === 0;
-      h.crater = 9 * h.size * easeOut(ramp(h.p, 0.1, 0.55));
+      h.crater = 16 * h.size * easeOut(ramp(h.p, 0.1, 0.55));
       h.deep = thickPx * easeOut(ramp(h.p, 0.15, 0.85));
     }
     const active = holes.filter((h) => h.p > 0);
@@ -197,7 +197,7 @@ function create(spec) {
     const sagAt = (x, f) => {
       let amount = 0;
       for (const h of active) {
-        const half = h.w * (1 - 0.55 * f) + 3, q = (x - h.x) / half;
+        const half = h.w * (1 - 0.45 * f) + 4, q = (x - h.x) / half;
         if (Math.abs(q) < 1) amount += (h.crater * (1 - f) + h.deep * f) * (1 + Math.cos(Math.PI * q)) / 2;
       }
       return amount;
@@ -257,7 +257,7 @@ function create(spec) {
       const left = [], right = [];
       for (let k = 0; k <= 8; k++) {
         const f = k / 8, g = h.surface(0), y = g + f * (h.col.top - g) + h.crater * (1 - f) + h.deep * f;
-        const half = (h.w * (1 - 0.55 * f) + 3) * 0.55;
+        const half = (h.w * (1 - 0.45 * f) + 4) * 0.55;
         left.push([h.x - half, y]);
         right.unshift([h.x + half, y]);
       }
