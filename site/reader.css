@@ -34,7 +34,7 @@
 
 /* Base. The root size grows with the window, so a desktop reads like a 150% zoom and a phone keeps 16px.
    Every rem in this file scales with it. Media queries in rem still use the browser default size. */
-html { font-size: clamp(100%, 0.5rem + 1vw, 162.5%); scroll-padding-top: 5rem; -webkit-text-size-adjust: 100%; }
+html { font-size: clamp(100%, 0.5rem + 1vw, 162.5%); scroll-padding-top: max(22vh, 7.75rem); /* Matches jumpOffset() in reader.js: the bar plus 4rem. */ -webkit-text-size-adjust: 100%; }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 body {
   margin: 0;
@@ -86,8 +86,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .nav[data-solid] { background: color-mix(in srgb, var(--paper) 72%, transparent); color: var(--ink); box-shadow: 0 1px 0 color-mix(in srgb, var(--rule) 80%, transparent); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); }
 .nav[data-solid] .nav-title { opacity: 1; }
 /* The bar's download button appears only after the hero's download button scrolls away. */
-.nav-download { opacity: 0; visibility: hidden; transition: opacity 200ms ease, visibility 200ms; }
-.nav[data-download] .nav-download { opacity: 1; visibility: visible; }
+/* Hidden, it takes no room: width and the gap before it are 0, so search and chapters sit at the end edge.
+   It grows in with the bar's 200 ms transition and pushes them to their places. */
+.nav-download { width: 0; min-width: 0; margin-inline-start: -0.25rem; overflow: hidden; opacity: 0; visibility: hidden; transition: width 200ms ease, margin 200ms ease, opacity 200ms ease, visibility 200ms; }
+.nav[data-download] .nav-download { width: 2.5rem; margin-inline-start: 0; opacity: 1; visibility: visible; }
+@media (prefers-reduced-motion: reduce) { .nav-download { transition: none; } }
 .nav .nav-download { background: var(--accent); color: var(--on-accent); }
 .nav .nav-download:hover { background: color-mix(in srgb, var(--accent) 85%, var(--ink)); }
 
@@ -120,6 +123,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hero-backdrop { position: absolute; inset: -12% 0; z-index: -1; }
 .hero-backdrop img { width: 100%; height: 100%; object-fit: cover; filter: blur(36px) saturate(1.15) brightness(0.5); transform: scale(1.2); }
 .hero-backdrop::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 55%, var(--night)); }
+/* A credited hero photograph shows sharp; a gradient keeps the title readable over it. */
+.hero-photo { margin: 0; }
+.hero-photo img { filter: none; transform: none; }
+.hero-photo::after { background: linear-gradient(to bottom, rgb(14 12 10 / 0.55), rgb(14 12 10 / 0.35) 35%, rgb(14 12 10 / 0.6) 70%, var(--night)); }
+[dir="rtl"] .hero-photo::after, .hero-photo::after { z-index: 0; }
+.hero-credit { position: absolute; z-index: 1; bottom: calc(12% + 4.5rem); inset-inline-end: var(--gutter); max-width: calc(100% - 2 * var(--gutter)); margin: 0; font-family: var(--sans); font-size: 0.75rem; color: rgb(243 237 227 / 0.78); text-shadow: 0 1px 3px rgb(0 0 0 / 0.6); }
 .hero-inner { display: grid; gap: clamp(2.5rem, 6vw, 5rem); align-items: center; width: 100%; max-width: 72rem; margin: 0 auto; padding: 6rem var(--gutter) 6rem; box-sizing: border-box; }
 .hero-cover { order: -1; justify-self: center; width: min(52vw, 15rem); height: auto; border-radius: 3px; box-shadow: 0 30px 70px rgb(0 0 0 / 0.5), 0 0 0 1px rgb(255 255 255 / 0.06); }
 .hero-author { margin: 0 0 1rem; font-family: var(--sans); font-size: 0.95rem; font-weight: 600; letter-spacing: 0.08em; color: var(--on-night-soft); }
@@ -140,6 +149,18 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* Book */
 .book { padding: 0 var(--gutter) clamp(5rem, 12vw, 9rem); outline: none; }
 .book > .doc { width: 100%; max-width: var(--measure); margin-inline: auto; }
+
+/* Colour guard: book.css colours text for print. On the web every book element takes the site's text token,
+   so a new print colour can never break dark mode. The class rules below (muted text, accents) are more specific
+   and still apply. Keep this rule before them. */
+.book :is(h1, h2, h3, h4, h5, h6, p, span, div, section, aside, figcaption, caption, th, td, li, dt, dd, blockquote, em, strong, small, cite, sup, sub) { color: inherit; }
+.book figure .withheld { background: var(--mat); border-color: var(--rule); }
+.book table.text-table th { border-bottom-color: var(--muted); }
+/* Tables printed as text fit the column: fixed layout, and long cells wrap anywhere on a phone. */
+.book table.text-table { table-layout: fixed; width: 100%; }
+.book table.text-table :is(th, td) { overflow-wrap: anywhere; }
+@media (max-width: 40rem) { .book table.text-table { font-size: 0.8rem; } .book table.text-table :is(th, td) { padding: 0.4rem 0.3rem; } }
+.book :is(aside.footnote, th, td) { border-color: var(--rule); }
 
 /* The hero shows the cover, title and author, so the printed cover, blank pages and back cover stay out of the flow.
    The title page moves to the footer credits at build time. */
@@ -166,7 +187,17 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .book h2, .book .display-title { color: var(--ink); }
 .book .edition-note, .book .fx-label, .book .byline, .book figcaption .credit, .book figcaption .edition-credit, .book .source-note { color: var(--muted); }
 .book figcaption .edition-credit a { color: inherit; }
-.book .poem-title, .book .poem-author { color: var(--muted); } /* book.css colours them for print; dark mode needs tokens. */
+/* Poems and songs: a centred block with its own narrow measure, lines aligned to the start, a soft mat and
+   a small ornament. A long line wraps with a hanging indent, so it still reads as one verse. */
+.book section.poem { width: fit-content; max-width: min(30rem, 100%); box-sizing: border-box; margin: clamp(2.5rem, 7vw, 4.5rem) auto; padding: clamp(1.75rem, 5vw, 2.75rem) clamp(1.25rem, 5vw, 3rem); border-radius: 6px; background: var(--mat); text-align: start; }
+.book section.poem::before { content: ""; display: block; width: 2.25rem; height: 1px; margin: 0 auto 1.5rem; background: var(--accent); box-shadow: 0 4px 0 -0.5px color-mix(in srgb, var(--accent) 45%, transparent); }
+.book .poem-title { margin: 0 0 0.35rem; font-size: 1.2em; font-weight: 600; line-height: 1.35; letter-spacing: 0.01em; color: var(--ink); text-wrap: balance; }
+.book .poem-author { margin: 0 0 1.5rem; font-family: var(--sans); font-size: 0.78em; letter-spacing: 0.04em; color: var(--muted); }
+.book .poem-author::before { content: "— "; }
+.book .poem-body p.stanza { margin: 0 0 1.4em; line-height: 1.9; text-indent: 0; }
+.book .poem-body p.stanza:last-child { margin-bottom: 0; }
+.book .poem-body .line { display: block; padding-inline-start: 1.25em; text-indent: -1.25em; }
+.book .poem-body br { display: none; } /* Each line is a block; the EPUB's line breaks are for e-readers. */
 .book .byline { color: var(--muted); }
 
 .book blockquote.epigraph { margin: 2.5rem 0; padding: 0; padding-inline-start: 1.25rem; border: 0; border-inline-start: 2px solid var(--accent); color: var(--soft); font-size: 1.02em; }

@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#191715">
 <title>{{title}} · {{creator}}</title>
 {{icons}}
-<link rel="preload" href="{{cover}}" as="image">
+{{hero_preload}}
 {{font_preload}}
 <link rel="stylesheet" href="{{book_css}}">
 <link rel="stylesheet" href="reader.css">
@@ -34,7 +34,7 @@
 </header>
 
 <section class="hero" id="top" aria-labelledby="hero-title">
-  <div class="hero-backdrop" aria-hidden="true"><img src="{{cover}}" alt=""></div>
+  {{hero_backdrop}}
   <div class="hero-inner">
     <div class="hero-text">
       <p class="hero-author">{{creator}}</p>

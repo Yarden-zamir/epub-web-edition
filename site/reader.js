@@ -57,22 +57,42 @@ function highlight(el, marks = []) {
   const ranges = registry && marks.length ? marks.flatMap((m) => textRanges(el, m)) : [];
   if (ranges.length) {
     const steps = reduceMotion.matches ? [["jump-1", 0], [null, 1000]] : [["jump-1", 0], ["jump-2", 900], ["jump-3", 1050], [null, 1200]];
+    const show = (name) => {
+      for (const n of ["jump-1", "jump-2", "jump-3"]) registry.delete(n);
+      if (name) registry.set(name, new Highlight(...ranges));
+    };
     for (const [name, at] of steps) {
-      highlightTimers.push(setTimeout(() => {
-        for (const n of ["jump-1", "jump-2", "jump-3"]) registry.delete(n);
-        if (name) registry.set(name, new Highlight(...ranges));
-      }, at));
+      if (at === 0) show(name); // At once, so a busy page cannot delay the first frame of the highlight.
+      else highlightTimers.push(setTimeout(() => show(name), at));
     }
     return;
   }
+  for (const n of ["jump-1", "jump-2", "jump-3"]) registry?.delete(n);
   el.classList.remove("flash");
   void el.offsetWidth; // Restart the highlight animation.
   el.classList.add("flash");
   highlightTimers.push(setTimeout(() => el.classList.remove("flash"), 1200));
 }
+// Every jump lands its target about 22% down the screen, so the lines before it give context,
+// and never less than the fixed bar's height plus 4rem from the top (short phones).
+function jumpOffset() {
+  const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+  return Math.max(innerHeight * 0.22, byId("nav").offsetHeight + 4 * rem);
+}
+// A reading position: the scroll offset plus the block at the jump line and its distance from it. Restoring by
+// that block stays exact when content above it changes height later (a chart or the map drawing).
+function position() {
+  const line = jumpOffset();
+  const block = document.elementFromPoint(innerWidth / 2, line)?.closest(".book [id], #places");
+  return { y: scrollY, anchor: block?.id ?? null, dy: block ? block.getBoundingClientRect().top - line : 0 };
+}
+function restorePosition(state) {
+  const block = state.anchor && document.getElementById(state.anchor);
+  if (block) scrollTo({ top: block.getBoundingClientRect().top + scrollY - jumpOffset() - state.dy, behavior: "instant" });
+  else scrollTo({ top: state.y, behavior: "instant" });
+}
 function scrollToElement(el) {
-  // Small inline targets (a note mark, a verse line) sit in the middle of the screen; blocks start at the top.
-  el.scrollIntoView({ block: el.getBoundingClientRect().height < 60 && el.matches("a, span, sup, li") ? "center" : "start" });
+  scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + scrollY - jumpOffset()), behavior: "instant" });
 }
 
 // Jump to an element: one new history entry. From inside overlays, the jump replaces the top overlay's entry,
@@ -90,14 +110,14 @@ function goTo(id, options = {}) {
     for (const oid of open.toReversed()) closeOverlayElement(byId(oid));
     history.replaceState(entry, "", `#${id}`);
   } else {
-    history.replaceState({ ...history.state, y: scrollY, back }, "");
+    history.replaceState({ ...history.state, ...position(), back }, "");
     history.pushState(entry, "", `#${id}`);
   }
   scrollToElement(el);
   highlight(el, entry.marks);
   if (!el.matches("a, button, input, [tabindex]")) el.setAttribute("tabindex", "-1");
   el.focus({ preventScroll: true });
-  history.replaceState({ ...history.state, y: scrollY }, "");
+  history.replaceState({ ...history.state, ...position() }, "");
 }
 
 // Overlays: dialogs and popovers that Back closes. Opening one pushes an entry; closing it any other way
@@ -111,7 +131,7 @@ function openOverlay(el, show) {
   show();
   if (overlayStack.includes(el.id)) return;
   overlayStack = [...overlayStack, el.id];
-  history.replaceState({ ...history.state, y: scrollY }, "");
+  history.replaceState({ ...history.state, ...position() }, "");
   history.pushState({ ...history.state, overlays: overlayStack, target: null, marks: [], back: null }, "");
 }
 function overlayClosed(el) {
@@ -132,7 +152,7 @@ addEventListener("popstate", (e) => {
   for (const id of want) if (!before.includes(id)) overlayOpeners[id]?.();
   if (changed) return; // Opening or closing an overlay leaves the page where it is.
   const target = state.target && document.getElementById(state.target);
-  if (typeof state.y === "number") scrollTo(0, state.y);
+  if (typeof state.y === "number") restorePosition(state);
   else if (target) scrollToElement(target);
   const mark = state.back?.id ? { el: document.getElementById(state.back.id), marks: state.back.marks } : target ? { el: target, marks: state.marks ?? [] } : null;
   if (mark?.el) highlight(mark.el, mark.marks);
@@ -141,18 +161,18 @@ addEventListener("popstate", (e) => {
 let positionSave = 0;
 addEventListener("scroll", () => {
   clearTimeout(positionSave);
-  positionSave = setTimeout(() => history.replaceState({ ...history.state, y: scrollY }, ""), 200);
+  positionSave = setTimeout(() => history.replaceState({ ...history.state, ...position() }, ""), 200);
 }, { passive: true });
 // Arrival: a reload returns to its saved position; a deep link from outside lands on and highlights its element.
 {
   const state = history.state;
-  if (typeof state?.y === "number") scrollTo(0, state.y);
+  if (typeof state?.y === "number") restorePosition(state);
   else if (location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1)))) {
     const el = document.getElementById(decodeURIComponent(location.hash.slice(1)));
     scrollToElement(el);
     highlight(el);
   }
-  history.replaceState({ overlays: [], target: null, marks: [], back: null, ...state, y: scrollY }, "");
+  history.replaceState({ overlays: [], target: null, marks: [], back: null, ...state, ...position() }, "");
   if (state?.overlays?.length) history.replaceState({ ...history.state, overlays: [] }, ""); // Overlays do not survive a reload.
 }
 // Any other in-page link (printed contents, cross-links, note back links, bibliography, hero and footer links).

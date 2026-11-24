@@ -294,7 +294,8 @@ class Converter:
             if el_id in enhancements:
                 for key, value in enhancements[el_id].items():
                     el.set(f"data-{key}", value)
-            if el_id and el.tag in INDEXED_TAGS and (text := clean_text(el)):
+            indexed = el.tag in INDEXED_TAGS or (el.tag == "span" and "line" in (el.get("class") or "").split())  # Poem lines.
+            if el_id and indexed and (text := clean_text(el)):
                 self.search.append(SearchEntry(el_id, page, section, text))
         images = {fig.get("id"): img.get("src") for fig in body.iter("figure")
                   if fig.get("id") and (img := fig.find(".//img")) is not None}
@@ -746,6 +747,34 @@ def load_enhancements(out: Path, conv: Converter, path: Path | None) -> dict[str
     return result
 
 
+HERO_WIDTHS = (960, 1920)
+
+
+def hero_html(enhancements_file: Path | None, out: Path, cover: str) -> tuple[str, str]:
+    """Hero backdrop and its preload. With an enhancements "hero" block {image, alt, credit, caption, source}
+    the photograph shows sharp and credited, as WebP at two widths; without one, a blurred copy of the cover."""
+    hero = json.loads(enhancements_file.read_text(encoding="utf-8")).get("hero") if enhancements_file else None
+    if not hero:
+        return (f'<div class="hero-backdrop" aria-hidden="true"><img src="{html.escape(cover)}" alt=""></div>',
+                f'<link rel="preload" href="{html.escape(cover)}" as="image">')
+    if not (hero["alt"] and hero["credit"] and hero["source"]):
+        raise BookError("enhancements.json: hero needs alt, credit and source")
+    src = enhancements_file.resolve().parent.parent / hero["image"]
+    (out / "media").mkdir(exist_ok=True)
+    with Image.open(src) as im:
+        for width in HERO_WIDTHS:
+            copy = im.convert("RGB")
+            copy.thumbnail((width, width * 4))
+            copy.save(out / "media" / f"hero-{width}.webp", "WEBP", quality=80, method=6)
+    srcset = ", ".join(f"media/hero-{w}.webp {w}w" for w in HERO_WIDTHS)
+    caption = " · ".join(html.escape(x) for x in (hero.get("caption"), hero["credit"]) if x)
+    backdrop = (f'<figure class="hero-backdrop hero-photo"><img src="media/hero-{HERO_WIDTHS[-1]}.webp" srcset="{srcset}" '
+                f'sizes="100vw" alt="{html.escape(hero["alt"])}" fetchpriority="high">'
+                f'<figcaption class="hero-credit">{caption}</figcaption></figure>')
+    preload = f'<link rel="preload" as="image" imagesrcset="{srcset}" imagesizes="100vw">'
+    return backdrop, preload
+
+
 def related_html(path: Path | None) -> str:
     """Footer list of outbound links from the enhancements file. Empty when the file has none."""
     related = json.loads(path.read_text(encoding="utf-8")).get("related") if path else None
@@ -952,6 +981,7 @@ def build(epub: Path, out: Path, enhancements_file: Path | None = SITE / "enhanc
         timeline = timeline_html(data_dir, conv)
         conv.check_links()
     css = next(p for p in assets if p.endswith(".css"))
+    hero = hero_html(enhancements_file, out, f"book/{book.cover.path}")
     # The Kindle download is the canonical EPUB itself. Send to Kindle accepts EPUB.
     download = out / "download" / epub.name
     download.parent.mkdir()
@@ -980,6 +1010,8 @@ def build(epub: Path, out: Path, enhancements_file: Path | None = SITE / "enhanc
             ),
             "colophon": "\n".join(conv.colophon),
             "related": related_html(enhancements_file),
+            "hero_backdrop": hero[0],
+            "hero_preload": hero[1],
             "icons": ICON_LINKS if brand_files(enhancements_file) else "",
             "short_title": html.escape(book.creator),  # The bar shows the author's name when the title does not fit.
             "book": "\n".join(docs),
