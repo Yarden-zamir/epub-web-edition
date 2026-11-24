@@ -57,6 +57,15 @@
 }
 .explorable[data-kind="transform"] .xp-stage { max-width: 22rem; margin-inline: auto; }
 .xp-canvas { display: block; width: 100%; height: 100%; }
+.xp-legend { display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; margin: 0.6rem 0 0; padding: 0; list-style: none; font-size: 0.78rem; color: var(--soft); }
+.xp-legend li { display: inline-flex; align-items: center; gap: 0.4rem; }
+.xp-swatch { width: 1.1rem; height: 0.8rem; border-radius: 3px; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 18%, transparent); }
+/* The same mixes as the drawing: ground with water in its pores (a tint and dots), salt, open lake water. */
+.xp-swatch-fresh-ground { background: radial-gradient(circle, color-mix(in srgb, var(--xp-fresh-ink) 45%, transparent) 0.7px, transparent 1px) 0 0 / 4px 4px, color-mix(in srgb, var(--xp-fresh) 62%, var(--xp-land)); }
+.xp-swatch-brine-ground { background: radial-gradient(circle, color-mix(in srgb, var(--xp-fresh-ink) 45%, transparent) 0.7px, transparent 1px) 0 0 / 4px 4px, color-mix(in srgb, var(--xp-brine) 72%, var(--xp-land)); }
+.xp-swatch-dry-ground { background: var(--xp-land); }
+.xp-swatch-salt { background: var(--xp-salt); }
+.xp-swatch-lake { background: var(--xp-lake); }
 /* Overlays: pre-drawn canvases and labels that move by transform and opacity only (compositor work, no repaint). */
 .xp-layer { position: absolute; left: 0; top: 0; pointer-events: none; will-change: transform; }
 .xp-tag {

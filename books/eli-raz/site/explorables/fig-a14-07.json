@@ -90,5 +90,27 @@
   },
   "label_notes": {
     "fresh_dissolves": "Plain wording of the printed figure: the salt layer is exposed to dissolution by the undersaturated groundwater (fig-a14-07), while the saturated Dead Sea water cannot dissolve salt."
-  }
+  },
+  "legend": [
+    {
+      "swatch": "dry-ground",
+      "label": "קרקע יבשה"
+    },
+    {
+      "swatch": "fresh-ground",
+      "label": "קרקע ספוגה במי תהום מתוקים"
+    },
+    {
+      "swatch": "brine-ground",
+      "label": "קרקע ספוגה במי ים המלח הרוויים"
+    },
+    {
+      "swatch": "salt",
+      "label": "שכבת המלח"
+    },
+    {
+      "swatch": "lake",
+      "label": "ים המלח"
+    }
+  ]
 }

@@ -96,8 +96,7 @@ function create(spec) {
   const below = shape([...line, [W, H + 40], [0, H + 40]]);
   const above = shape([[0, -40], [W, -40], ...[...line].reverse()]);
   const groundPath = shape(line, false);
-  const beds = new Path2D();
-  for (let i = 1; i <= 5; i++) polyline(beds, line.map(([x, y]) => [x, y + 26 * i + (x / W) * 8])); // Texture only.
+  const BEDS = [12, 26, 42, 60, 82, 108, 136]; // Bedding lines: depth below the surface, in drawing units.
   const saltAngle = Math.atan(SALT.dip * SCALE);
   const rand = random(SEED);
   const thickPx = SALT.thick * SCALE;
@@ -138,17 +137,24 @@ function create(spec) {
   const spots = [];
   for (const col of cols.filter((c) => c.atBottom !== null && sites.every((site) => Math.abs(site.x - c.x) > 18)).sort((c1, c2) => c2.rt - c1.rt))
     if (spots.length < SPOTS && spots.every((spot) => Math.abs(spot.col.x - col.x) > 30)) spots.push({ col, size: 0.8 + 0.5 * rand(), radii: grid.slice(0, 10).map(() => 0.7 + 0.6 * rand()) });
-  // A collapse at each gap site: a funnel straight above the gap, from the sloping surface down through the gap,
-  // and a pit at the surface. Its top follows the ground, so nothing sticks out of the slope.
-  const holes = sites.sort((c1, c2) => c1.x - c2.x).map((col) => {
-    const x = col.x, size = col.size, w = 8 * size;
-    const surface = (dx) => Y(ground(x + dx));
-    const funnel = shape([
-      [x - w * 1.6, surface(-w * 1.6) - 2], [x - w * 1.5, surface(-w * 1.5) + 3], [x - 3 * size, col.top], [x - 2 * size, col.bottom],
-      [x + 2 * size, col.bottom], [x + 3 * size, col.top], [x + w * 1.5, surface(w * 1.5) + 3], [x + w * 1.6, surface(w * 1.6) - 2],
-    ]);
-    return { x, col, size, w, surface, funnel };
-  });
+  // A collapse at each gap site: the ground above the gap moves down into the space the salt left. Half width at the
+  // surface: w; it narrows toward the gap.
+  const holes = sites.sort((c1, c2) => c1.x - c2.x).map((col) => ({ x: col.x, col, size: col.size, w: 11 * col.size, surface: (dx) => Y(ground(col.x + dx)) }));
+  let pores = null, poresColor = "";
+  const poreTile = (ctx, env) => { // Small dots: water in the pores of the ground. One tile per theme.
+    const color = env.color("--xp-fresh-ink");
+    if (color !== poresColor) {
+      const tile = document.createElement("canvas");
+      tile.width = tile.height = 7;
+      const tc = tile.getContext("2d");
+      tc.fillStyle = color;
+      tc.globalAlpha = 0.35;
+      tc.beginPath(); tc.arc(1.5, 1.5, 0.7, 0, Math.PI * 2); tc.arc(5, 4.5, 0.6, 0, Math.PI * 2); tc.fill();
+      pores = ctx.createPattern(tile, "repeat");
+      poresColor = color;
+    }
+    return pores;
+  };
   const arrowRight = new Path2D("M-12 0 H9 M3 -5 L10 0 L3 5");
   const arrowLeft = new Path2D("M12 0 H-9 M-3 -5 L-10 0 L-3 5");
 
@@ -163,24 +169,103 @@ function create(spec) {
     const u = env.unit;
 
     const small = u > 1.3; // Phones: fewer labels.
-    // Fixed parts come from cached bitmaps; only water, salt dissolving, cavities, arrows and moving labels are drawn.
+    const easeOut = (q) => 1 - (1 - q) ** 3;
+    const flowing = !reduceMotion.matches;
+
+    // Collapse state first: each hole runs toward open (its gap is open) or closed (COLLAPSE_S to open, REFILL_S to
+    // refill; at once under reduced motion). From it: how far the surface has sunk (crater) and how far the ground
+    // above the gap has moved down into it (deep, up to the removed salt).
+    let fallen = 0;
+    for (const h of holes) {
+      const [t, b] = eatenAt(h.col, level);
+      const target = t + b >= 1 ? 1 : 0;
+      const dt = h.last === undefined ? 0 : Math.min(0.1, Math.max(0, env.time - h.last));
+      h.last = env.time;
+      h.p ??= 0;
+      if (reduceMotion.matches) h.p = target;
+      else if (h.p < target) h.p = Math.min(target, h.p + dt / COLLAPSE_S);
+      else if (h.p > target) h.p = Math.max(target, h.p - dt / REFILL_S);
+      if (h.p !== target) env.wantsFrame = true;
+      if (target) fallen++;
+      h.closing = target === 0;
+      h.crater = 9 * h.size * easeOut(ramp(h.p, 0.1, 0.55));
+      h.deep = thickPx * easeOut(ramp(h.p, 0.15, 0.85));
+    }
+    const active = holes.filter((h) => h.p > 0);
+    // How far the ground at x moves down, at depth fraction f between the surface (0) and the top of the salt (1):
+    // the crater at the surface, the removed salt at the gap, in a bell that narrows with depth.
+    const sagAt = (x, f) => {
+      let amount = 0;
+      for (const h of active) {
+        const half = h.w * (1 - 0.55 * f) + 3, q = (x - h.x) / half;
+        if (Math.abs(q) < 1) amount += (h.crater * (1 - f) + h.deep * f) * (1 + Math.cos(Math.PI * q)) / 2;
+      }
+      return amount;
+    };
+    const STEP = 3;
+    const surfacePts = [];
+    for (let x = 0; x <= W; x += STEP) surfacePts.push([x, Y(ground(x)) + (active.length ? sagAt(x, 0) : 0)]);
+    const belowNow = active.length ? shape([...surfacePts, [W, H + 40], [0, H + 40]]) : below;
+
     ctx.drawImage(env.layer("back", [0, 0, W, H], (c) => {
       c.fillStyle = env.gradient("sky", 0, 0, 0, H, [[0, "--xp-sky-top"], [1, "--xp-sky"]]);
       c.fillRect(0, 0, W, H);
       c.clip(below);
       c.fillStyle = env.gradient("land", 0, 0, 0, H, [[0, "--xp-land"], [1, "--xp-land-deep"]]);
       c.fillRect(0, 0, W, H);
-      c.globalAlpha = 0.16;
-      c.strokeStyle = env.color("--xp-land-edge");
-      c.lineWidth = 1;
-      c.stroke(beds);
     }), 0, 0, W, H);
+    if (active.length) { // The sunken surface: sky between the old surface and the new one.
+      ctx.save();
+      ctx.clip(below);
+      ctx.fillStyle = env.gradient("sky", 0, 0, 0, H, [[0, "--xp-sky-top"], [1, "--xp-sky"]]);
+      ctx.fill(shape([...surfacePts, [W, -40], [0, -40]]));
+      ctx.restore();
+    }
+
+    // Water in the ground: a tint and pore dots over the sediment. Fresh groundwater between the water table and the
+    // interface, saturated Dead Sea water below the interface. The ground stays ground; only the lake is open water.
     ctx.save();
-    ctx.clip(below);
+    ctx.clip(belowNow);
+    const freshZone = shape([[0, wt0], [xs, yL], [0, yI0]]);
+    const brineZone = shape([[0, yI0], [W, yI(W)], [W, H], [0, H]]);
+    ctx.globalAlpha = 0.62;
     ctx.fillStyle = env.color("--xp-fresh");
-    ctx.fill(shape([[0, wt0], [W, wt(W)], [W, H], [0, H]]));
+    ctx.fill(freshZone);
+    ctx.globalAlpha = 0.72;
     ctx.fillStyle = env.color("--xp-brine");
-    ctx.fill(shape([[0, yI0], [W, yI(W)], [W, H], [0, H]]));
+    ctx.fill(brineZone);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = poreTile(ctx, env);
+    ctx.fill(freshZone);
+    ctx.fill(brineZone);
+    // Bedding lines of the ground; over a collapse they bend down into the space the salt left.
+    ctx.strokeStyle = env.color("--xp-land-edge");
+    ctx.globalAlpha = 0.3;
+    ctx.lineWidth = 1;
+    for (const d of BEDS) {
+      ctx.beginPath();
+      for (let x = 0; x <= W; x += STEP) {
+        const g = Y(ground(x)), span = Y(saltTop(x)) - g, f = d / span;
+        const y = g + d + (active.length && f > 0 && f <= 1.05 && x >= SALT.from - 20 && x <= SALT.to ? sagAt(x, Math.min(1, f)) : 0);
+        x ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+      }
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+    // Disturbed ground over each collapse: a soft darker column from the sunken surface down into the gap.
+    for (const h of active) {
+      const left = [], right = [];
+      for (let k = 0; k <= 8; k++) {
+        const f = k / 8, g = h.surface(0), y = g + f * (h.col.top - g) + h.crater * (1 - f) + h.deep * f;
+        const half = (h.w * (1 - 0.55 * f) + 3) * 0.55;
+        left.push([h.x - half, y]);
+        right.unshift([h.x + half, y]);
+      }
+      ctx.globalAlpha = 0.18 * easeOut(ramp(h.p, 0.15, 0.85));
+      ctx.fillStyle = env.color("--xp-land-edge");
+      ctx.fill(shape([...left, ...right]));
+    }
+    ctx.globalAlpha = 1;
     ctx.strokeStyle = env.color("--xp-fresh-ink");
     ctx.lineWidth = 1.5;
     ctx.setLineDash([6, 4]);
@@ -193,7 +278,6 @@ function create(spec) {
     ctx.restore();
 
     // Fresh groundwater flows east under, over and through the exposed salt; under reduced motion, still arrows (below).
-    const flowing = !reduceMotion.matches;
     const streaks = () => {
       ctx.strokeStyle = env.color("--xp-fresh-ink");
       ctx.globalAlpha = 0.6;
@@ -210,11 +294,10 @@ function create(spec) {
     };
     if (flowing) {
       ctx.save();
-      ctx.clip(below);
+      ctx.clip(belowNow);
       streaks();
       ctx.restore();
     }
-
     // The salt that is left: pieces between the gaps, each with an eaten top and bottom edge (drawn over the streaks,
     // which so show only around the pieces and through the gaps).
     let deepest = 0, frontEnd = SALT.from;
@@ -298,85 +381,27 @@ function create(spec) {
       ctx.globalAlpha = 1;
     }
 
-    let fallen = 0;
-    // Each hole runs toward open (its gap is open) or closed. Opening (COLLAPSE_S): cracks, the roof breaks and the pit
-    // opens, the funnel tears down to the gap, soil falls into it, dust rises. Closing when the level rises again
-    // (REFILL_S): the same in reverse, without soil and dust. Under reduced motion it changes at once.
-    const easeOut = (q) => 1 - (1 - q) ** 3;
-    for (const h of holes) {
-      const [t, b] = eatenAt(h.col, level);
-      const target = t + b >= 1 ? 1 : 0;
-      const dt = h.last === undefined ? 0 : Math.min(0.1, Math.max(0, env.time - h.last));
-      h.last = env.time;
-      h.p ??= 0;
-      if (reduceMotion.matches) h.p = target;
-      else if (h.p < target) h.p = Math.min(target, h.p + dt / COLLAPSE_S);
-      else if (h.p > target) h.p = Math.max(target, h.p - dt / REFILL_S);
-      if (h.p !== target) env.wantsFrame = true;
-      if (target) fallen++;
-      if (h.p <= 0) continue;
-      const p = h.p, closing = target === 0;
-      const top = h.surface(0), bottom = h.col.bottom;
-      const tear = easeOut(ramp(p, 0.18, 0.8)), sag = easeOut(ramp(p, 0.15, 0.55));
-      // Cracks in the surface, before the roof gives way.
-      const crack = ramp(p, 0, 0.15) * (1 - ramp(p, 0.45, 0.7));
+    // Cracks at the surface before the roof gives way, and dust over the new crater.
+    for (const h of active) {
+      const top = h.surface(0), p = h.p;
+      const crack = ramp(p, 0, 0.12) * (1 - ramp(p, 0.35, 0.6));
       if (crack > 0.01) {
         ctx.globalAlpha = crack;
         ctx.strokeStyle = env.color("--xp-void");
         ctx.lineWidth = 1;
         for (const [dx, dy] of [[-6, 7], [-1, 9], [5, 6]]) ctx.stroke(shape([[h.x, top + 1], [h.x + dx * h.size, top + dy * h.size]], false));
-        ctx.globalAlpha = 1;
       }
-      if (tear > 0.01) { // The funnel, from the surface down as far as it has torn.
-        ctx.save();
-        ctx.clip(below);
-        ctx.beginPath();
-        ctx.rect(0, 0, W, top + (bottom - top) * tear);
-        ctx.clip();
-        ctx.fillStyle = env.color("--xp-land-edge");
-        ctx.globalAlpha = 0.32;
-        ctx.fill(h.funnel);
-        ctx.globalAlpha = 1;
-        ctx.strokeStyle = env.color("--xp-land-edge");
-        ctx.lineWidth = 0.8;
-        ctx.setLineDash([2, 2]);
-        ctx.stroke(h.funnel);
-        ctx.setLineDash([]);
-        ctx.restore();
-      }
-      if (sag > 0.01) { // The pit: both ends on the ground line, its middle as deep as the collapse has gone.
-        const left = h.x - h.w * 1.7, right = h.x + h.w * 1.7;
-        const yl = h.surface(-h.w * 1.7), yr = h.surface(h.w * 1.7), mid = top + 10 * h.size * sag;
-        ctx.fillStyle = env.color("--xp-void");
-        ctx.beginPath();
-        ctx.moveTo(left, yl);
-        ctx.quadraticCurveTo(h.x, 2 * mid - (yl + yr) / 2, right, yr); // The curve's middle lands at `mid`.
-        ctx.closePath();
-        ctx.fill();
-      }
-      if (p < 1 && !closing) {
-        // Soil falls down the funnel into the gap (accelerating), and dust rises over the pit.
-        ctx.fillStyle = env.color("--xp-land-edge");
-        for (let k = 0; k < 6; k++) {
-          const q = ramp(p, 0.22 + k * 0.06, 0.62 + k * 0.06);
-          if (q <= 0 || q >= 1) continue;
-          ctx.globalAlpha = 1 - ramp(q, 0.75, 1);
+      const puff = ramp(p, 0.2, 0.75);
+      if (!h.closing && puff > 0 && puff < 1) {
+        ctx.fillStyle = env.color("--xp-land");
+        ctx.globalAlpha = 0.45 * (1 - puff);
+        for (const [dx, r] of [[-5, 1], [0, 1.3], [5, 0.9]]) {
           ctx.beginPath();
-          ctx.arc(h.x + (k - 2.5) * 1.8 * (1 - q), top + 3 + (bottom - top - 3) * q * q, 1.2 + (k % 3) * 0.4, 0, Math.PI * 2);
+          ctx.arc(h.x + dx * h.size * (0.6 + puff), top - 3 - 7 * puff, (2 + 6 * puff) * r, 0, Math.PI * 2);
           ctx.fill();
         }
-        const puff = ramp(p, 0.2, 0.75);
-        if (puff > 0 && puff < 1) {
-          ctx.fillStyle = env.color("--xp-land");
-          ctx.globalAlpha = 0.45 * (1 - puff);
-          for (const [dx, r] of [[-5, 1], [0, 1.3], [5, 0.9]]) {
-            ctx.beginPath();
-            ctx.arc(h.x + dx * h.size * (0.6 + puff), top - 3 - 7 * puff, (2 + 6 * puff) * r, 0, Math.PI * 2);
-            ctx.fill();
-          }
-        }
-        ctx.globalAlpha = 1;
       }
+      ctx.globalAlpha = 1;
     }
     const open = deepest > 0.05 ? 1 : 0;
 
@@ -396,19 +421,21 @@ function create(spec) {
       if (y < Y(ground(x)) - 3) ctx.stroke(shape([[x - 6, y], [x + 6, y]], false));
     }
     ctx.restore();
+    // The ground surface, with its craters.
+    const surfaceLine = active.length ? shape(surfacePts, false) : groundPath;
+    ctx.save();
+    ctx.translate(0, 2);
+    ctx.globalAlpha = 0.5;
+    ctx.strokeStyle = env.color("--xp-shadow");
+    ctx.lineWidth = 5;
+    ctx.lineJoin = "round";
+    ctx.stroke(surfaceLine);
+    ctx.restore();
+    ctx.strokeStyle = env.color("--xp-land-edge");
+    ctx.lineWidth = 2;
+    ctx.lineJoin = "round";
+    ctx.stroke(surfaceLine);
     ctx.drawImage(env.layer("top", [0, 0, W, H], (c) => {
-      c.save();
-      c.translate(0, 2);
-      c.globalAlpha = 0.5;
-      c.strokeStyle = env.color("--xp-shadow");
-      c.lineWidth = 5;
-      c.lineJoin = "round";
-      c.stroke(groundPath);
-      c.restore();
-      c.strokeStyle = env.color("--xp-land-edge");
-      c.lineWidth = 2;
-      c.lineJoin = "round";
-      c.stroke(groundPath);
       env.label(c, L.west, 6, 14, { align: "left", size: 12, weight: 500, color: "--muted" });
       env.label(c, L.east, W - 6, 14, { align: "right", size: 12, weight: 500, color: "--muted" });
       if (!small) env.label(c, L.slope, 70, Y(ground(70)) - 9);

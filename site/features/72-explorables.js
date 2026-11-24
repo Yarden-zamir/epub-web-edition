@@ -220,7 +220,14 @@ async function setUp(figure, box) {
   // Screen readers hear the summary when a move ends, not on every frame of a drag.
   const live = el("p", "visually-hidden");
   live.setAttribute("aria-live", "polite");
-  box.prepend(head, stage, controls, readout, live);
+  // Optional legend under the drawing: [{swatch, label}], each swatch a class in 72-explorables.css.
+  const legend = el("ul", "xp-legend");
+  for (const item of spec.legend ?? []) {
+    const li = el("li");
+    li.append(el("span", `xp-swatch xp-swatch-${item.swatch}`), item.label);
+    legend.append(li);
+  }
+  box.prepend(head, stage, ...(legend.childElementCount ? [legend] : []), controls, readout, live);
   box.hidden = false;
 
   // Slot widths: measured at set-up and again once the site font has loaded (it may load after set-up).
