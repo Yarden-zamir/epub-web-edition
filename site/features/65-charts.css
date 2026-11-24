@@ -45,3 +45,6 @@
 .chart-tip { position: absolute; transform: translate(-50%, calc(-100% - 12px)); padding: 0.3rem 0.55rem; border-radius: var(--radius-s); background: var(--ink); color: var(--paper); font-family: var(--sans); font-size: 0.8rem; white-space: nowrap; pointer-events: none; }
 .colophon :is(section, p) { text-align: start; }
 
+/* A chart's lines draw in once, the first time it is drawn (html.motion only). Paint only, no layout. */
+@keyframes draw-line { from { stroke-dashoffset: 1; } }
+.motion .chart .line.draw-in { stroke-dasharray: 1; animation: draw-line var(--dur-slow) var(--ease-out) both; }

@@ -16,6 +16,7 @@ function selectTab(tab) {
     t.tabIndex = on ? 0 : -1;
     byId(t.getAttribute("aria-controls")).hidden = !on;
   }
+  placeTabPill(tab);
   const filter = FILTER_TEXT[tab.id];
   byId("toc-filter-form").hidden = !filter;
   if (filter) {
@@ -24,6 +25,15 @@ function selectTab(tab) {
   if (tab.id === "tab-places") renderPlacesIndex();
   applyFilter();
   try { localStorage.setItem(TAB_KEY, tab.id); } catch { /* Storage blocked: the chapters tab opens first. */ }
+}
+
+// The ink pill under the selected tab slides to it (68-navigator.css).
+function placeTabPill(tab) {
+  const list = tab.parentElement;
+  list.style.setProperty("--tab-x", `${tab.offsetLeft}px`);
+  list.style.setProperty("--tab-w", `${tab.offsetWidth}px`);
+  list.style.setProperty("--tab-h", `${tab.offsetHeight}px`);
+  list.style.setProperty("--tab-top", `${tab.offsetTop}px`);
 }
 
 // Places index: every place with its colour dot, a one-line description and the chapters that mention it.
@@ -139,6 +149,7 @@ function applyFilter() {
 }
 tocFilter.addEventListener("input", applyFilter);
 onDialogOpen["toc-dialog"] = () => {
+  placeTabPill(tabs.find((t) => t.getAttribute("aria-selected") === "true") ?? tabs[0]); // Sizes are known once open.
   let saved = null;
   try { saved = localStorage.getItem(TAB_KEY); } catch { /* Storage blocked: keep the current tab. */ }
   const tab = saved && tabs.find((t) => t.id === saved);

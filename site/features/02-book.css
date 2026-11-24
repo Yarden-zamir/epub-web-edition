@@ -238,3 +238,13 @@
    so a document's child margins stay inside it and the measured height equals its rendered height. */
 [data-sizing] .book > :is(.doc, .fx-set) { content-visibility: visible; contain: layout style paint; }
 @media print { .book > :is(.doc, .fx-set) { content-visibility: visible; } }
+
+/* Motion (html.motion only): the hero eases in on load; a chapter's accent rule draws in on first view; poem lines
+   rise in a short stagger once. Text that is already on screen never fades. */
+.motion .hero-text { animation: rise-in var(--dur-slow) var(--ease-out) both; }
+.motion .hero-cover { animation: rise-in var(--dur-slow) var(--ease-out) 80ms both; }
+.motion .book section.chapter > h2::after { transform: scaleX(0); transform-origin: right; transition: transform var(--dur-slow) var(--ease-out); }
+[dir="ltr"] .motion .book section.chapter > h2::after { transform-origin: left; }
+.motion .book section.chapter > h2.seen::after { transform: none; }
+.motion .book section.poem:not(.seen) .line { opacity: 0; }
+.motion .book section.poem.seen .line { animation: rise-in var(--dur-base) var(--ease-out) both; animation-delay: calc(min(var(--i, 0), 12) * 45ms); }

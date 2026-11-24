@@ -19,20 +19,21 @@
   --radius-s: 0.5rem;     /* inputs, chips, thumbnails, small tips */
   --radius-m: 0.875rem;   /* cards, popovers, dialogs, menus, video */
   --radius-pill: 999px;   /* pill buttons and toggles */
-  /* Motion: three durations and one easing for every transition. Reduced motion sets them to zero (instant). */
-  --dur-fast: 150ms;      /* hover and press feedback */
-  --dur: 200ms;           /* the bar, menus, fades */
-  --dur-slow: 300ms;      /* things that leave the screen */
-  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --measure: 38rem; /* About 34em of body text: 60-70 Hebrew characters a line. */
   --gutter: clamp(1.25rem, 5vw, 3rem);
   /* "Book Sans" is the book's bundled Noto Sans Hebrew (Hebrew letters only); Latin letters fall through to the system sans. */
-  /* Motion: every transition and animation takes its timing from these. Reduced motion sets the durations to 0. */
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-  --dur-quick: 140ms;
-  --dur-base: 220ms;
-  --dur-slow: 340ms;
+  /* Motion: the one set of timings for every transition and animation (site/features/README.md). Transform and
+     opacity only, 140-340 ms. Reduced motion sets the durations to 0, so everything is instant. */
+  --dur-quick: 140ms;     /* hover and press feedback */
+  --dur-base: 220ms;      /* menus, popovers, fades, the bar */
+  --dur-slow: 340ms;      /* entrances, things that leave the screen */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);       /* most motion: fast start, soft landing */
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);    /* moves between two places */
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);  /* a small overshoot, for pills and toggles */
+  /* Older names, kept as aliases of the set above. */
+  --dur-fast: var(--dur-quick);
+  --dur: var(--dur-base);
+  --ease: var(--ease-out);
   --sans: "Book Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif;
   color-scheme: light;
 }
@@ -88,4 +89,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .btn-outline:hover { background: color-mix(in srgb, var(--on-night) 10%, transparent); }
 .btn-small { min-height: 2.25rem; padding: 0.4rem 1rem; font-size: 0.9rem; }
 
-@media (prefers-reduced-motion: reduce) { :root { --dur-fast: 0ms; --dur: 0ms; --dur-slow: 0ms; } }
+
+/* Entrance motion, once per element. Only with the script and without reduced motion: the script adds html.motion,
+   so without it every element shows in its final state. Transform and opacity only. */
+@keyframes rise-in { from { opacity: 0; transform: translateY(0.4rem); } }
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes pop-in { from { opacity: 0; transform: scale(0.97); } }
+/* Press feedback on controls. */
+:is(.btn, .icon-btn, .nav-text, .view-toggle button, .tabs [role="tab"], .back-chip, .resume a, .split-more):active { transform: scale(0.97); }
+:is(.icon-btn, .nav-text, .view-toggle button, .tabs [role="tab"], .back-chip, .resume a, .split-more) { transition: transform var(--dur-quick) var(--ease-out), background-color var(--dur-quick) var(--ease-out); }
