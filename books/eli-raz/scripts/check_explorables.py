@@ -332,6 +332,34 @@ with sync_playwright() as p:
                 context.close()
                 shutil.move(video.path(), videos / f"{fig_id}-{name}.webm")
                 shutil.rmtree(tmp, ignore_errors=True)
+        # PR media: the sinkhole explainer at phone width, light and dark: the level drops from 400 to 430 m while
+        # the water flows (video), and stills at 400, 415 and 430 m.
+        if "fig-a14-07" in ids:
+            for scheme in ("light", "dark"):
+                tmp = videos / "tmp"
+                size = {"width": 393, "height": 852}
+                context = browser.new_context(viewport=size, record_video_dir=str(tmp), record_video_size=size, color_scheme=scheme,
+                                              reduced_motion="no-preference", has_touch=True, is_mobile=True)
+                page = context.new_page()
+                page.goto(URL, wait_until="load", timeout=90000)
+                fig, slider = open_explainer(page, "fig-a14-07")
+                page.evaluate("el => el.scrollIntoView({block: 'center'})", fig.locator(".xp-stage").element_handle())
+                page.wait_for_timeout(2600)  # The first-view hint plays and ends.
+                set_level = "(el, v) => { el.value = String(v); el.dispatchEvent(new Event('input')); el.dispatchEvent(new Event('change')); }"
+                slider.evaluate(set_level, 400)
+                page.wait_for_timeout(1500)
+                for level in range(400, 431):
+                    slider.evaluate(set_level, level)
+                    page.wait_for_timeout(110)
+                page.wait_for_timeout(2000)
+                for level in (400, 415, 430):
+                    slider.evaluate(set_level, level)
+                    page.wait_for_timeout(700)
+                    shot(page, fig.locator(".explorable"), videos / f"pr-sinkholes-phone-{scheme}-{level}.png")
+                video = page.video
+                context.close()
+                shutil.move(video.path(), videos / f"pr-sinkholes-phone-{scheme}.webm")
+                shutil.rmtree(tmp, ignore_errors=True)
     browser.close()
 srv.shutdown()
 print("\n".join(problems) or "explorables ok")
