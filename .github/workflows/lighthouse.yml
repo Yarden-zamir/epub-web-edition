@@ -85,3 +85,10 @@ jobs:
           path: dist/lighthouse/*.report.*
           if-no-files-found: warn
           retention-days: 14
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: lighthouse-traces
+          path: dist/lighthouse/runs/*-0-*
+          if-no-files-found: warn
+          retention-days: 3

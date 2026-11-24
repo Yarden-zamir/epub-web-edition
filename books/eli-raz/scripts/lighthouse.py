@@ -13,7 +13,8 @@ SITE is a web folder (served with `serve`, which compresses with gzip) or an htt
 
 Runners differ in speed by up to 2x, so compare sites only within one run: the runs of all sites take turns.
 Each page and device runs RUNS times per site; the run with the median Performance score is kept as
-OUT_DIR/<name>-<page>-<device>.report.{html,json}. Prints a Markdown summary (scores, LCP, CLS, TBT, total bytes,
+OUT_DIR/<name>-<page>-<device>.report.{html,json}. The first mobile run of each page and site also keeps its Chrome
+trace and DevTools log in OUT_DIR/runs (Lighthouse --save-assets), to find what a long task does. Prints a Markdown summary (scores, LCP, CLS, TBT, total bytes,
 audits below 0.9) and appends it to $GITHUB_STEP_SUMMARY when that is set.
 Needs `lighthouse` (13.6.0) and `serve` (14.2.7) on PATH and a Chrome that Lighthouse finds.
 Exit code 0 when every run produced a report. Low scores do not fail the run: .github/workflows/lighthouse.yml is
@@ -54,13 +55,15 @@ def wait_for(url: str) -> None:
     raise SystemExit(f"server at {url} did not start")
 
 
-def lighthouse(url: str, device: str, out_base: Path) -> dict:
+def lighthouse(url: str, device: str, out_base: Path, trace: bool) -> dict:
     cmd = [
         "lighthouse", url, "--quiet", "--output=json", "--output=html", f"--output-path={out_base}",
         "--chrome-flags=--headless=new --no-sandbox",
     ]
     if device == "desktop":
         cmd.append("--preset=desktop")
+    if trace:
+        cmd.append("--save-assets")
     subprocess.run(cmd, check=True)
     return json.loads(out_base.with_suffix(".report.json").read_text(encoding="utf-8"))
 
@@ -131,7 +134,7 @@ def main() -> None:
                 for n in range(RUNS):
                     for name, base in bases.items():  # Sites take turns, so a slow minute hits all of them.
                         out_base = out_dir / "runs" / f"{name}-{page}-{device}-{n}"
-                        report = lighthouse(base + path, device, out_base)
+                        report = lighthouse(base + path, device, out_base, trace=n == 0 and device == "mobile")
                         runs.setdefault((name, page, device), []).append((report, out_base))
     finally:
         for server in servers:
