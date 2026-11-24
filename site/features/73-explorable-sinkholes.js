@@ -20,7 +20,7 @@ const WATER_TABLE_WEST = -382; // Groundwater table at the west edge.
 // side is eaten deeper with every metre of level drop after that (EAT metres for the full eaten share, scaled by seeded
 // noise), up to half of the layer or less, so chunky pieces stay. At a few sites the two fronts meet: there the salt
 // is gone, the layer breaks into separate jagged pieces, and above each gap the ground collapses.
-const EAT = 9, GRID = 2.5, SEED = 7, GAPS = 7, GAP_SPACING = 26; // Any fixed seed: it fixes the shapes only.
+const EAT = 9, GRID = 2.5, SEED = 7, GAPS = 4, GAP_SPACING = 34, SPOTS = 2; // Any fixed seed: it fixes the shapes only.
 const COLLAPSE_S = 1.1, REFILL_S = 0.6; // Collapse when a gap opens; refill when the level rises again.
 const STREAKS = [0.15, 0.35, 0.55, 0.75, 0.92]; // Fresh-water flow lines, as fractions between water table and interface.
 
@@ -126,17 +126,22 @@ function create(spec) {
   const peaks = cols.filter((col, i) => col.atBottom !== null && sum(col) >= sum(cols[i - 1]) && sum(col) >= sum(cols[i + 1]) && sum(col) > 0.7);
   const sites = [];
   for (const col of [...peaks].sort((c1, c2) => sum(c2) - sum(c1))) if (sites.length < GAPS && sites.every((site) => Math.abs(site.x - col.x) >= GAP_SPACING)) sites.push(col);
+  for (const site of sites) site.size = 0.6 + rand(); // Sinkholes of different sizes: wider gap, funnel and pit.
   for (const col of cols) {
-    const near = Math.max(0, ...sites.map((site) => 1 - Math.abs(site.x - col.x) / 8));
+    const near = Math.max(0, ...sites.map((site) => 1 - Math.abs(site.x - col.x) / (4 + 7 * site.size)));
     col.topMost = 0.12 + 0.38 * col.rt + 0.6 * near;
     col.bottomMost = 0.1 + 0.3 * col.rb + 0.6 * near;
   }
   // The eaten share from the top and from the bottom at a level; their sum of 1 or more means a gap.
   const eatenAt = (col, level) => [bite(col.atTop, level, col.rt, col.topMost), bite(col.atBottom, level, col.rb, col.bottomMost)];
+  // Spots: up to SPOTS holes inside the salt that is left, away from the gaps, like the closed loop in the print.
+  const spots = [];
+  for (const col of cols.filter((c) => c.atBottom !== null && sites.every((site) => Math.abs(site.x - c.x) > 18)).sort((c1, c2) => c2.rt - c1.rt))
+    if (spots.length < SPOTS && spots.every((spot) => Math.abs(spot.col.x - col.x) > 30)) spots.push({ col, size: 0.8 + 0.5 * rand(), radii: grid.slice(0, 10).map(() => 0.7 + 0.6 * rand()) });
   // A collapse at each gap site: a funnel straight above the gap, from the sloping surface down through the gap,
   // and a pit at the surface. Its top follows the ground, so nothing sticks out of the slope.
   const holes = sites.sort((c1, c2) => c1.x - c2.x).map((col) => {
-    const x = col.x, size = 0.9 + 0.2 * col.rt, w = 8 * size;
+    const x = col.x, size = col.size, w = 8 * size;
     const surface = (dx) => Y(ground(x + dx));
     const funnel = shape([
       [x - w * 1.6, surface(-w * 1.6) - 2], [x - w * 1.5, surface(-w * 1.5) + 3], [x - 3 * size, col.top], [x - 2 * size, col.bottom],
@@ -189,9 +194,7 @@ function create(spec) {
 
     // Fresh groundwater flows east under, over and through the exposed salt; under reduced motion, still arrows (below).
     const flowing = !reduceMotion.matches;
-    if (flowing) {
-      ctx.save();
-      ctx.clip(below);
+    const streaks = () => {
       ctx.strokeStyle = env.color("--xp-fresh-ink");
       ctx.globalAlpha = 0.6;
       ctx.lineWidth = 1.3;
@@ -202,6 +205,13 @@ function create(spec) {
         ctx.lineDashOffset = -env.time * 14 - i * 5;
         ctx.stroke(shape([[0, wt0 + f * (yI0 - wt0)], [end, wt(end) + f * (yI(end) - wt(end))]], false));
       });
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
+    };
+    if (flowing) {
+      ctx.save();
+      ctx.clip(below);
+      streaks();
       ctx.restore();
     }
 
@@ -242,6 +252,34 @@ function create(spec) {
     ctx.lineWidth = 1.2;
     ctx.lineJoin = "round";
     ctx.stroke(pieces);
+    // Spots: holes inside the salt that is left, growing as the salt around them dissolves; the flow shows through.
+    for (const spot of spots) {
+      const [t, b] = eatenAt(spot.col, level);
+      const grow = ramp(t + b, 0.3, 0.8);
+      if (grow < 0.05 || t + b >= 0.97) continue;
+      const left = (1 - t - b) * thickPx, cx = spot.col.x, cy = spot.col.top + t * thickPx + left / 2;
+      const rx = 7 * spot.size * grow, ry = Math.min(left * 0.3, 4 * spot.size) * grow;
+      const ring = spot.radii.map((r, i) => {
+        const a = (i / spot.radii.length) * Math.PI * 2;
+        return [cx + Math.cos(a) * rx * r, cy + Math.sin(a) * ry * r];
+      });
+      const blob = new Path2D(); // A smooth closed outline through the midpoints of the ring.
+      const mid = (k) => [(ring[k % ring.length][0] + ring[(k + 1) % ring.length][0]) / 2, (ring[k % ring.length][1] + ring[(k + 1) % ring.length][1]) / 2];
+      blob.moveTo(...mid(0));
+      for (let k = 1; k <= ring.length; k++) blob.quadraticCurveTo(...ring[k % ring.length], ...mid(k));
+      blob.closePath();
+      ctx.fillStyle = env.color("--xp-fresh");
+      ctx.fill(blob);
+      ctx.strokeStyle = env.color("--xp-salt-edge");
+      ctx.lineWidth = 1.2;
+      ctx.stroke(blob);
+      if (flowing) {
+        ctx.save();
+        ctx.clip(blob);
+        streaks();
+        ctx.restore();
+      }
+    }
     if (flowing && deepest > 0.2) { // Grains of salt leave the eaten edges with the flow and fade.
       ctx.fillStyle = env.color("--xp-salt");
       cols.forEach((col, i) => {
