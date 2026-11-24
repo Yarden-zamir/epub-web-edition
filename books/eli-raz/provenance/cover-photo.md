@@ -2,7 +2,7 @@
 
 Printed credit (title page, PDF page 5): "צילום תמונת הכריכה: פטריית סחף שטפונית על נחל קדם, משה ברנשטיין."
 
-Files: "נחל קדם 1.jpg" and "נחל קדם 2.jpg", received from Yarden in chat (from Eli's Drive share). Stored read-only with SHA256SUMS in ~/private-inputs/eli-raz/received-2026-11-24/ (not in git).
+Files: "נחל קדם 1.jpg" and "נחל קדם 2.jpg", received from Yarden in chat (from Eli's Drive share). Stored read-only with SHA256SUMS on the build machine, outside the repo (not in git).
 
 | Check | Result |
 |---|---|

@@ -3,7 +3,7 @@
 Log of every change to the book's content, and of every addition that the editions show next to it.
 Add an entry in the same change that makes it. Newest first within each section.
 
-- Print source: ~/private-inputs/eli-raz/source-2026-11-23/source.pdf (sha256 c7efc94e…), never modified.
+- Print source: source/source.pdf (sha256 c7efc94e…), never modified.
 - Complete edition: `ingest_pdf.py CONTENT` → dist/eli-raz.epub. Every printed image and the printed text.
 - Release edition (public site and download): `ingest_pdf.py CONTENT --release` → dist/release/.
 - Machine log of automatic text handling: inventory/issues.csv and inventory-release/issues.csv.

@@ -14,7 +14,7 @@ Clearance evidence: scratchpad clearance record of 2026-11-24, summarized in boo
    - PDF page 35 Kochva photo (p035-x151): Commons record only; the PikiWiki page is not reachable.
    - PDF page 183 Wellcome jar (p183-x713): Commons record only; no live Wellcome catalogue record found.
    - PDF page 275 CSIRO image (p275-x1087): licence from an archived CSIRO page (Wayback 2023-04-16).
-6. Cover photo (Moshe Bernstein, Nahal Kedem): compare with the Drive originals "Kedem 1" and "Kedem 2". Blocked: no signed-in Google Drive tool on the build machine. Fix: download both into ~/private-inputs/eli-raz/received-2026-11-24/.
+6. Cover photo (Moshe Bernstein, Nahal Kedem): compare with the Drive originals "Kedem 1" and "Kedem 2". Blocked: no signed-in Google Drive tool on the build machine. Fix: download both into the private input folder on the build machine (outside the repo).
 7. The complete edition (with all print images) was public for a short time before the release replaced it on 2026-11-24. Accepted by Yarden; no action.
 
 ## Quality

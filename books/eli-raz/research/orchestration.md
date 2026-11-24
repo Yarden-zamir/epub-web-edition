@@ -1,11 +1,11 @@
 # Orchestration: parallel site agents and a merge queue
 
-Date: 2026-11-24. Research agent for the orchestrator (Claude Code session 41ff45a6-ddb4-4aa9-bf41-66329c7bcc61).
+Date: 2026-11-24. Research agent for the orchestrator.
 Status: proposal. Nothing in this file is applied yet. The orchestrator applies the steps after the user approves.
 
 ## 1. Sources
 
-- T3 thread "Cosmotier Hot Cargo" on the Mac (environment fd5b6bfd-…, thread 555b8fde-…). Read only.
+- The T3 thread of the Hot Cargo coordinator. Read only.
 - Repo [game-design-driven/cosmoteer-hot-cargo](https://github.com/game-design-driven/cosmoteer-hot-cargo) at commit `cefc746`, read with `gh api`:
   - `docs/WORKFLOW.md`: the whole workflow, split into generic and project parts.
   - `CLAUDE.md` (Git, Agents), `CONTRIBUTING.md` (Git).

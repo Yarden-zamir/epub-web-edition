@@ -1,6 +1,6 @@
 # Shared brief for agents working on the Eli Raz web edition
 
-Parent session: Claude Code session 41ff45a6-ddb4-4aa9-bf41-66329c7bcc61 (orchestrator). Date: 2026-11-24.
+The orchestrator thread briefs each agent. Date: 2026-11-24.
 Read this file fully before you start. Your own task message names your part.
 
 ## The project
@@ -8,7 +8,7 @@ Read this file fully before you start. Your own task message names your part.
 - Book: "אלי רז חוקר הבולענים" (Eli Raz, geologist and sinkhole researcher, Ein Gedi). 316-page Hebrew PDF rebuilt into an EPUB and a web edition.
 - Repo (private, GitHub Yarden-zamir/epub-web-edition, container ~/Github/epub-web-edition with .bare/ and one folder per worktree). It holds the pipeline at the root (tools/ingest_pdf.py, tools/build_epub.py, tools/build_web.py, tools/check_release.py, tools/verify.py; site layer: site/index.html and site/features/ with one .js and .css per feature, plus build modules in tools/web/; see site/features/README.md) and this book in books/eli-raz/ (book.toml, book.css, site/ for web-only data, scripts/, work/ for scratch, OPEN-POINTS.md, CONTENT-CHANGES.md). The root sample edition (epub-src/, inventory/, originals/) stays synthetic.
 - The old private repo Yarden-zamir/eli-raz-edition is archived. Its full history is in books/eli-raz/ (git subtree, 2026-11-24).
-- Source PDF (never modify): books/eli-raz/source/source.pdf, with source/SHA256SUMS and source/PROVENANCE.txt. book.toml names it relative to the book folder. The original stays read-only in ~/private-inputs/eli-raz/source-2026-11-23/.
+- Source PDF (never modify): books/eli-raz/source/source.pdf, with source/SHA256SUMS and source/PROVENANCE.txt. book.toml names it relative to the book folder. The original copy stays read-only, outside the repo, on the build machine.
 - Rights: books/eli-raz/NOTICE.md. The MIT licence covers only the pipeline code and the sample. The repo history holds the source PDF and the withheld print images, so the repo must not go public without a history rewrite.
 - Release EPUB source tree (the public edition text): books/eli-raz/epub-src-release/OEBPS/text/*.xhtml (built, ignored by git). Element IDs there are stable; all web additions attach by these IDs.
 - Live site (public, approved by the family): https://eli-raz.yarden-zamir.com. GitHub Actions builds and deploys it on each push to main (see "Deploy" below). Do not change access. Do not contact anyone.
