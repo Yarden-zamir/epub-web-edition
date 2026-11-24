@@ -27,7 +27,11 @@
 }
 
 /* Book */
-.book { padding: 0 var(--gutter) clamp(5rem, 12vw, 9rem); outline: none; }
+.book { padding: 0 var(--gutter) clamp(5rem, 12vw, 9rem); outline: none; container-type: inline-size; }
+/* Full-bleed width: the page without the scrollbar (100vw includes a classic scrollbar, so a 100vw block
+   overhangs and the chapter scrolls sideways). .book is the size container; its padding is the gutter.
+   Use it as width: var(--page); margin-inline: var(--bleed). Fixed parts live outside .book (on body). */
+.book { --page: calc(100cqw + 2 * var(--gutter)); --bleed: calc(50% - 50cqw - var(--gutter)); }
 .book > .doc { width: 100%; max-width: var(--measure); margin-inline: auto; }
 
 /* Colour guard: book.css colours text for print, and it loads in the "book" cascade layer (index.html), so any
@@ -121,7 +125,7 @@
 .book figcaption .credit { margin-top: 0.25rem; color: var(--muted); opacity: 1; font-size: 0.9em; }
 
 /* Photos run full width and always show whole: at most 88vh tall, never cropped, never moving. */
-.book figure.photo { width: 100vw; margin-inline: calc(50% - 50vw); }
+.book figure.photo { width: var(--page); margin-inline: var(--bleed); }
 .book figure.photo img { width: min(100%, calc(88vh * var(--ratio, 1))); height: auto; margin: 0 auto; }
 .book figure.photo figcaption { max-width: var(--measure); padding-inline: var(--gutter); }
 
@@ -135,7 +139,7 @@
 }
 @media (min-width: 48rem) {
   .book figure.inline > img[data-shape="landscape"] {
-    --big: min(calc(var(--w) * 1.5), calc(100vw - 2 * var(--gutter)), 60rem);
+    --big: min(calc(var(--w) * 1.5), 100cqw, 60rem);
     width: var(--big); max-width: none; margin-inline: calc((100% - var(--big)) / 2);
   }
 }
@@ -168,7 +172,7 @@
 .book ol.contents .page { margin-inline-start: auto; color: var(--muted); font-family: var(--sans); font-size: 0.8em; font-variant-numeric: tabular-nums; }
 
 /* Artwork is never cropped: shown whole on a mat. */
-.book figure.artwork { width: min(100vw, 62rem); margin-inline: calc(50% - min(50vw, 31rem)); padding: clamp(1.5rem, 6vw, 4.5rem) var(--gutter); box-sizing: border-box; background: var(--mat); }
+.book figure.artwork { width: min(var(--page), 62rem); margin-inline: calc(50% - min(50cqw + var(--gutter), 31rem)); padding: clamp(1.5rem, 6vw, 4.5rem) var(--gutter); box-sizing: border-box; background: var(--mat); }
 .book figure.artwork img { width: min(100%, calc(78vh * var(--ratio, 1))); height: auto; margin: 0 auto; box-shadow: 0 18px 40px rgb(0 0 0 / 0.18); }
 .book figure.artwork figcaption { max-width: var(--measure); text-align: center; }
 
