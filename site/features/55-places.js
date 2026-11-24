@@ -118,6 +118,9 @@ if (placesMap) {
     map.on("popupclose", () => { if (!phone()) deselect(); });
     map.on("click", deselect);
     const pins = addPins(map, places.map((p) => ({ ...p, weight: p.chapters.length })), { className: "place-pin", onSelect: select });
+    // Each place keeps its own colour on the map: its pin dot and selection ring take --place-N (70_places.py).
+    // Figure maps without places keep the one --pin colour of 50-maps.css.
+    for (const p of places) pins.markers.get(p.id).getElement().style.setProperty("--pin", `var(--place-${p.n})`);
     // Places outside the first view stay in reach: one button shows every place except those marked "far",
     // and each "far" place (abroad) gets a chip that flies there.
     const all = L.latLngBounds(near.map((p) => [p.lat, p.lon])).pad(0.05);
@@ -149,7 +152,7 @@ if (placesMap) {
             if (mapMotion()) map.once("moveend", () => select(p));
             fly([p.lat, p.lon], 9);
             if (!mapMotion()) select(p);
-          }, true);
+          }, true).style.setProperty("--pin", `var(--place-${p.n})`);
         }
         box.append(back);
         return box;
