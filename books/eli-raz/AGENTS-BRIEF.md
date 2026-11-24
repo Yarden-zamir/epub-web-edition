@@ -41,6 +41,7 @@ Full release build with every check (the same steps as CI): `uv run books/eli-ra
 - .github/workflows/kitshn.yml: the job "book" runs books/eli-raz/scripts/build_release.py and passes books/eli-raz/dist/release/web as an artifact. The kitshn job then deploys both apps of kitshn.config.ts: the sample ("app") and this book ("book", https://eli-raz.yarden-zamir.com).
 - Read the run log: `gh run list -R Yarden-zamir/epub-web-edition -w kitshn.yml`. Build and deploy by hand: `gh workflow run kitshn.yml -R Yarden-zamir/epub-web-edition`.
 - The repo is private, so Actions minutes count against the account quota.
+- Speed: a push that changes nothing the book build reads restores the last checked build (about 1 min from push to live). build_release.py skips both ingests when the hash of INGEST_INPUTS is unchanged. Whoever makes tools/ingest_pdf.py read a new file or folder adds it to INGEST_INPUTS in books/eli-raz/scripts/build_release.py, in the same commit.
 
 ## User rules (Yarden; follow exactly)
 
