@@ -90,7 +90,7 @@ function position() {
 // height is only an estimate until they come near: scrollIntoView renders the target first (scroll-padding-top in
 // 00-base.css equals jumpOffset()), and a second pass on the next frames corrects any shift that rendering caused.
 function placeAtJumpLine(el, dy = 0) {
-  finishSizing();
+  finishSizing(el);
   el.scrollIntoView({ block: "start", behavior: "instant" });
   if (dy) scrollBy({ top: -dy, behavior: "instant" });
   const correct = () => {
@@ -241,10 +241,10 @@ addEventListener("scroll", () => {
 // find-in-page, test tools). So render every document once, measure it, and keep that height as its estimate.
 // Again after fonts load and when the width changes. Later changes near the reader (a chart drawing) update by
 // themselves, because the estimate is "auto" (the last rendered size).
-// One pass over the whole page is a long task on a phone (about 300 ms). So a load that opens at the hero measures in
-// slices of about 30 ms, one task each, while the reader looks at the hero. A load that lands on a target (a deep
-// link, a reload) measures at once, and every jump first measures what is left (finishSizing), so jumps always land
-// by exact sizes.
+// One pass over the whole page is a long task (about 365 ms on a fast desktop CPU, more than a second on a phone). So
+// the load measures in slices of about 10 ms, one task each, after the task of this script: a 60 fps frame still fits
+// around each slice. Only the documents above an element move it, so a jump first measures the ones above its target
+// that are left (finishSizing). Jumps, the arrival on a deep link and a reload land by exact sizes, as before.
 let unsized = []; // Documents that the slices did not measure yet, first to last.
 function measure(docs) {
   for (const d of docs) d.setAttribute("data-sizing", "");
@@ -256,19 +256,20 @@ function sizeDocuments() {
   unsized = [];
   measure(allDocuments());
 }
-function finishSizing() {
-  measure(unsized.splice(0));
+// Measure the documents that are left above `el` and the one that holds it; without `el`, all that are left.
+function finishSizing(el = null) {
+  const below = el ? unsized.findIndex((d) => !d.contains(el) && d.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_PRECEDING) : -1;
+  measure(unsized.splice(0, below === -1 ? unsized.length : below));
 }
 async function sizeDocumentsInSlices() {
   unsized = allDocuments();
   while (unsized.length) {
-    const start = performance.now();
-    while (unsized.length && performance.now() - start < 30) measure([unsized.shift()]);
     await new Promise((resolve) => setTimeout(resolve));
+    const start = performance.now();
+    while (unsized.length && performance.now() - start < 10) measure([unsized.shift()]);
   }
 }
-if (typeof history.state?.y === "number" || location.hash) sizeDocuments();
-else sizeDocumentsInSlices();
+sizeDocumentsInSlices();
 // The fonts are preloaded and usually loaded before this deferred script runs. Then the first measure is final, and a
 // second one would only repeat a full-page layout (the costliest task of a load on a phone).
 if (document.fonts.status !== "loaded") document.fonts.ready.then(sizeDocuments);
