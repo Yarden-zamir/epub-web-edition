@@ -6,7 +6,7 @@ const translationIndex = JSON.parse(document.getElementById("translations-data")
 const LANG_KEY = `reader-lang:${document.documentElement.dataset.bookId}`;
 const LANG_NAME = { he: "עברית", en: "English" };
 const LANG_DIR = { he: "rtl", en: "ltr" };
-const MACHINE_NOTE = { he: "תרגום מכונה, לא נבדק", en: "Machine translation, not reviewed" };
+const MACHINE_NOTE = { he: "תרגום בבינה מלאכותית, לא נבדק בידי אדם", en: "AI translation, not reviewed by a person" };
 const pageLang = document.documentElement.lang;
 // Children that other features add inside book elements; a swap keeps them.
 const SITE_PARTS = ".deep-link";
@@ -273,8 +273,8 @@ function chapterCount(lang) {
 }
 const MODES = [
   { mode: "", title: "כפי שנדפס", meta: "כל פרק בשפה שבה נכתב" },
-  { mode: "he", title: "עברית", meta: "פרקים באנגלית, בתרגום מכונה" },
-  { mode: "en", title: "English", meta: "Machine translation, not reviewed", lang: "en" },
+  { mode: "he", title: "עברית", meta: "פרקים באנגלית: תרגום בבינה מלאכותית, לא נבדק בידי אדם" },
+  { mode: "en", title: "English", meta: "AI translation, not reviewed by a person", lang: "en" },
 ].filter((m) => !m.mode || chapterCount(m.mode) > 0);
 function buildLangMenu() {
   const head = document.createElement("p");
