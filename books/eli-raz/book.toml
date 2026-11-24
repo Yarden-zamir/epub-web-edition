@@ -822,7 +822,7 @@ source_link = "במקום בספר"
 [facsimile]
 # Appendix with a page image of every PDF page, one document per page, with a Return link to the text.
 # Derived images, rendered from source.pdf. They are not scans of paper.
-dpi = 56  # 375x529 px per page; 316 pages take about 8.8 MB. The release EPUB must stay at most 24 MB (tools/check_size.py).
+dpi = 50  # 335x473 px per page, about 6.9 MB for 316 pages; body text stays legible (checked 2026-11-24), small print is not at any size kept here. The release EPUB must stay at most 24 MB (tools/check_size.py).
 quality = 55
 title = "עמודי המקור"
 note = "תוספת של מהדורה זו: תמונות של כל עמודי הספר המודפס, כפי שהם מופיעים בקובץ הדפוס. הן נועדו להשוואה עם הטקסט. בכל עמוד יש קישור חזרה למקום המתאים בטקסט."
@@ -1119,6 +1119,24 @@ mask = false  # Same photograph, credited in the printed caption; the facsimile 
 alt = "מבט מגובה על מפרץ ים המלח: כתם מים חום־כתום עגול בתוך המים הטורקיזיים, בין מצוקים."
 note = "במהדורה זו: הקובץ של הצלם, ברזולוציה גבוהה יותר, של אותו תצלום. המסגרת צרה מעט בצד ימין, כי הקובץ נגמר שם."
 reason = "Photographer's file (Moshe Bernstein, received 2026-11-24; provenance/cover-photo.md), 1942 x 1019, about 2.1x the printed 1009 x 477; SIFT 703 of 713 inliers. About 10% narrower on the right than the print."
+
+[[release.change]]
+image = "p043-x181"
+action = "replace"
+file = "replacements/p043-x181-nli.jpg"
+mask = false  # Public domain by date; the facsimile page keeps the printed map.
+alt = "מפה חרוטה וצפופה של ארץ יהודה. ים המלח בצד ימין כגוף מים מוארך וכהה עם הכיתוב MARE MORTUUM, MARE SALSUM, LACUS ASPHALTITIS, וציורי ערים בוערות בתוכו: צבויים, סדום, עמורה ואדמה."
+note = "במהדורה זו: סריקה ברזולוציה גבוהה יותר של אותה מפה, מהדפוס המקורי. Thomas Fuller, A Pisgah-Sight of Palestine, London 1650, Iuda; הספרייה הלאומית, אוסף ערן לאור (FL199985442). נחלת הכלל לפי תאריך: נדפסה ב-1650, פולר נפטר ב-1661. commons.wikimedia.org/wiki/File:Thomas_Fuller,_Iuda_(FL199985442_2368566).jpg"
+reason = "Better original: NLI scan of the 1650 sheet via Commons (6526 x 4926, sha1 2d5852e8...), 2245 SIFT inliers; warped to the printed crop, 1600 px, quality 80. Public domain by date (approved by the orchestrator 2026-11-24); the NLI record was not readable (403)."
+
+[[release.change]]
+image = "p047-x195"
+action = "replace"
+file = "replacements/p047-x195-internet-archive.jpg"
+mask = false  # Public domain by date; the facsimile page keeps the printed engraving.
+alt = "תחריט: שיירת גמלים גוררת סירה על עגלה במישור, ולפניה פרש על סוס ואנשים בגלימות."
+note = "במהדורה זו: סריקה ברזולוציה גבוהה יותר של אותו תחריט, מתוך Lynch, Narrative of the United States' Expedition to the River Jordan and the Dead Sea, Philadelphia 1849 (עותק אוניברסיטת טורונטו). הכתם בשוליים הוא בעותק הסרוק. נחלת הכלל לפי תאריך: נדפס ב-1849, לינץ' נפטר ב-1865. archive.org/details/narrativeofunit00lync"
+reason = "Better original: Internet Archive narrativeofunit00lync leaf 171 (500 ppi, 2408 x 4018; the record states no licence), 335 SIFT inliers; the plate is printed sideways, warped upright to the printed crop, 1600 px, quality 80. Public domain by date (approved by the orchestrator 2026-11-24)."
 
 [[release.change]]
 image = "p044-x185"
