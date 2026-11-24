@@ -61,4 +61,4 @@ A module defines any of these functions. Each one receives `site` (`build_web.Si
 ## Check a change
 
 - A refactor must keep the built site byte-identical. Hash every file of a sample and a release build before and after the change, and compare.
-- Before each push, run `uv run tools/verify.py` and `uv run books/eli-raz/scripts/build_release.py`. The second one includes the smoke test.
+- Land a change with `uv run books/eli-raz/scripts/lane_push.py <your-name>` (books/eli-raz/AGENTS-BRIEF.md, "Git flow"). GitHub Actions runs `tools/verify.py`, the smoke and axe checks, explainers and videos; this machine runs only `uv run books/eli-raz/scripts/check.py` (light).

@@ -1,0 +1,32 @@
+# Nightly and on demand: every check of books/eli-raz/scripts/check.py, including the slow ones: axe on the whole page
+# with a fresh load at every width and scheme, tools/verify.py on the sample edition (widths, interaction, speed),
+# both ingests again, EPUBCheck again. It deploys nothing and blocks nothing: a red run is a finding to fix.
+# Run it by hand: gh workflow run slow-checks.yml -R Yarden-zamir/epub-web-edition
+name: slow checks
+on:
+  schedule:
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  full:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      # Sections that pass the full-page axe here count as checked for the quick test of each push.
+      - name: Restore check cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/eli-raz
+          key: eli-raz-cache-${{ github.run_id }}
+          restore-keys: eli-raz-cache-
+      - name: Tools
+        uses: ./.github/actions/book-tools
+      - name: Every check
+        env:
+          ELI_RAZ_INGEST_KEEP: "2"
+        run: uv run books/eli-raz/scripts/check.py --full

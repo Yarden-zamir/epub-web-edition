@@ -18,7 +18,10 @@ Read this file fully before you start. Your own task message names your part.
 - Commit and push while you work (standing approval from the user, 2026-11-24). Conventional commits, short bodies, no AI or tool credit lines. Commit after each verified step.
 - Each agent works in its own worktree, never in another agent's folder. Make one once: `cd ~/Github/epub-web-edition/main && $DOTFILES/bin/wt-new <your-name> origin/main`. It is the folder ~/Github/epub-web-edition/<your-name>.
 - Commit only your own paths: `git commit -m "..." -- <paths>`. Never `git add -A`.
-- To push: `git pull --rebase origin main`, then `git push origin HEAD:main`. No pull requests, no merge queue.
+- This machine has 4 cores and is shared by every lane. Run no heavy check here: no Playwright, no EPUBCheck, no videos, no ingest. GitHub Actions runs them.
+- Before you land: `uv run books/eli-raz/scripts/check.py` (light: ingest outputs from the shared cache, build, check_release, preview.html; see "Checks").
+- To land: commit by path, then `uv run books/eli-raz/scripts/lane_push.py <your-name>`. It rebases on origin/main, pushes to lane/<your-name>, waits for every check in .github/workflows/checks.yml (build, EPUBCheck, axe on the whole page at every width and scheme, explainers, videos and traces, the sample edition), prints the run address and the artifact download command, and pushes to main when the checks pass. Do not push to main by hand. No pull requests, no merge queue.
+- Read a failed check: `gh run view <run id> --log-failed`. Download videos, traces and screenshots: the `gh run download` line that lane_push.py prints.
 - A push to main deploys both sites. A failed build or check deploys nothing, and both sites stay as they were.
 
 ## Build commands (release edition)
@@ -34,14 +37,23 @@ uv run tools/check_release.py $B $B/dist/release/eli-raz.epub $B/dist/release/we
 ```
 Serve dist/release/web with a local http.server for browser tests. Playwright 1.64.1 with its own Chromium: `uv run --with playwright==1.64.1 playwright install --only-shell chromium`. axe-core is at .tools/axe/package/axe.min.js (.tools/ is not tracked; copy or link ~/Github/epub-web-edition/main/.tools into your worktree). Test with reduced_motion="reduce" for axe (scroll animations cause false contrast hits).
 
-Full release build with every check (the same steps as CI): `uv run books/eli-raz/scripts/build_release.py`. It runs both ingests, build_epub, build_web, check_release (with check_size), EPUBCheck 5.4.0 and scripts/smoke_site.py.
+## Checks
+
+`uv run books/eli-raz/scripts/check.py` (default, light, for this machine): ingest outputs from the shared cache ~/.cache/eli-raz/ingest/ (no ingest runs here; when the inputs changed, the build uses the last ingest and CI ingests the change), build_epub, build_web, check_release (withheld images, credits, the EPUB size budget), and books/eli-raz/dist/release/web/preview.html with chapter a06 (`--preview a06,a14` picks the units). Serve the folder and open preview.html for UI work.
+
+Heavy flags, for GitHub Actions (each one also works here, but only when a task needs it on this machine): `--ingest`, `--compare-ingest`, `--epubcheck`, `--smoke` (quick: errors, overflow, axe on a sample), `--axe-full` (fresh load at every width and scheme, axe on the whole page), `--explorables`, `--record` (videos, traces, screenshots, load timings), `--sample` (tools/verify.py), `--gate` (what main's deploy runs), `--full` (all), `--no-build`. `check.py --help` explains each.
+
+Where each check runs:
+- Every push to lane/<name> (checks.yml, parallel jobs, deploys nothing): ingest with the INGEST_INPUTS comparison, build, check_release; EPUBCheck; axe on the whole page at every width and scheme; explainers plus videos, traces and timings; tools/verify.py on the sample edition.
+- Every push to main (kitshn.yml, the deploy gate): ingest, build, check_release, EPUBCheck, the quick smoke test. A failure deploys nothing.
+- Nightly on main (slow-checks.yml): `--full`. It reports and blocks nothing.
 
 ## Deploy
 
-- .github/workflows/kitshn.yml: the job "book" runs books/eli-raz/scripts/build_release.py and passes books/eli-raz/dist/release/web as an artifact. The kitshn job then deploys both apps of kitshn.config.ts: the sample ("app") and this book ("book", https://eli-raz.yarden-zamir.com).
+- .github/workflows/kitshn.yml: the job "book" runs `books/eli-raz/scripts/check.py --gate` and passes books/eli-raz/dist/release/web as an artifact. The kitshn job then deploys both apps of kitshn.config.ts: the sample ("app") and this book ("book", https://eli-raz.yarden-zamir.com).
 - Read the run log: `gh run list -R Yarden-zamir/epub-web-edition -w kitshn.yml`. Build and deploy by hand: `gh workflow run kitshn.yml -R Yarden-zamir/epub-web-edition`.
 - The repo is private, so Actions minutes count against the account quota.
-- Speed: a push that changes nothing the book build reads restores the last checked build (about 1 min from push to live). build_release.py skips both ingests when the hash of INGEST_INPUTS is unchanged. Whoever makes tools/ingest_pdf.py read a new file or folder adds it to INGEST_INPUTS in books/eli-raz/scripts/build_release.py, in the same commit.
+- Speed: a push that changes nothing the book build reads restores the last checked build (about 1 min from push to live). check.py skips both ingests when the hash of INGEST_INPUTS is unchanged. Whoever makes tools/ingest_pdf.py read a new file or folder adds it to INGEST_INPUTS in books/eli-raz/scripts/check.py, in the same commit. The lane checks (`--compare-ingest`, whenever the ingests run) and the nightly `--full` run fail when one is missing.
 
 ## User rules (Yarden; follow exactly)
 
@@ -79,7 +91,7 @@ Each file has one owner. Others only read it.
 | site/then-now.json | maps agent (from 2026-11-24) | then-and-now spec: fitted old maps, today layer, levels |
 | site/data/*.json, site/media/* | as created | data files and public-domain media referenced by the files above |
 
-Pipeline ownership (repo root): UI agent owns tools/build_web.py, tools/verify.py, site/*; the orchestrator owns kitshn.config.ts, .github/workflows/kitshn.yml, books/eli-raz/scripts/build_release.py and books/eli-raz/scripts/smoke_site.py; the EPUB/Kindle quality agent owns tools/ingest_pdf.py, tools/build_epub.py, tools/check_*.py, tools/calibre_view.py, tools/figure_sheets.py.
+Pipeline ownership (repo root): UI agent owns tools/build_web.py, tools/verify.py, site/*; the orchestrator owns kitshn.config.ts, .github/workflows/kitshn.yml, books/eli-raz/scripts/check.py, smoke_site.py, record_site.py, lane_push.py, .github/workflows/checks.yml, slow-checks.yml and .github/actions/book-tools; the EPUB/Kindle quality agent owns tools/ingest_pdf.py, tools/build_epub.py, tools/check_*.py, tools/calibre_view.py, tools/figure_sheets.py.
 
 The UI agent makes tools/build_web.py read these files from the folder that holds enhancements.json, validate them (every element ID must exist in the EPUB), and render them.
 

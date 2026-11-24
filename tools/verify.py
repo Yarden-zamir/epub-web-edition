@@ -38,7 +38,6 @@ EPUB = DIST / "book.epub"
 WEB = DIST / "web"
 # Limit: Playwright 1.64.1 expects Chromium build 1248. The cache holds 1255, which works over CDP.
 # Revisit when Playwright is upgraded or when a launch fails.
-CHROMIUM = Path.home() / ".cache/ms-playwright/chromium-1255/chrome-linux64/chrome"
 WEB_WIDTHS = (360, 768, 1280)
 EPUB_WIDTHS = (320, 600, 1024)  # Phone reader app, 6-inch e-reader, tablet.
 SCREENSHOT_STOPS = ("top", "ch-01", "fig-01-01", "fig-02-01", "q-03-001", "fig-03-01", "credits")
@@ -344,7 +343,7 @@ def main() -> None:
     server, url = serve(WEB)
     try:
         with sync_playwright() as p:
-            browser = p.chromium.launch(executable_path=str(CHROMIUM))
+            browser = p.chromium.launch()  # The Chromium of Playwright 1.64.1, as in CI.
             check_epub_render(browser)
             check_parity(browser, url, texts)
             check_web(browser, url)

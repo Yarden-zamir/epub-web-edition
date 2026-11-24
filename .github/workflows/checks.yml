@@ -1,0 +1,115 @@
+# Every check of the Eli Raz edition, on GitHub's machines, for a lane branch before it lands on main. It deploys
+# nothing; main's kitshn.yml stays the deploy gate. A lane pushes here with books/eli-raz/scripts/lane_push.py.
+# The jobs run on the runner that the repo variable CHECKS_RUNNER names (default ubuntu-latest), so a self-hosted
+# runner can take them without a change here.
+name: checks
+on:
+  push:
+    branches: ["lane/**"]
+  workflow_dispatch:
+permissions:
+  contents: read
+# A newer push to the same lane makes the running checks obsolete.
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  ELI_RAZ_INGEST_KEEP: "2"
+jobs:
+  build:
+    runs-on: ${{ vars.CHECKS_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      # Ingest outputs by input hash, EPUBs that passed EPUBCheck, sections that passed axe (main's runs save it too).
+      - name: Restore check cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/eli-raz
+          key: eli-raz-cache-${{ github.run_id }}
+          restore-keys: eli-raz-cache-
+      - uses: ./.github/actions/book-tools
+      - name: Ingest, build, check_release (withheld images, credits, size budget)
+        run: uv run books/eli-raz/scripts/check.py --ingest --compare-ingest
+      - uses: actions/upload-artifact@v7
+        with:
+          name: book-build
+          path: books/eli-raz/dist/release
+          if-no-files-found: error
+          retention-days: 2
+
+  epubcheck:
+    needs: build
+    runs-on: ${{ vars.CHECKS_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: book-build
+          path: books/eli-raz/dist/release
+      - uses: ./.github/actions/book-tools
+      - run: uv run books/eli-raz/scripts/check.py --no-build --epubcheck
+
+  axe:
+    needs: build
+    runs-on: ${{ vars.CHECKS_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: book-build
+          path: books/eli-raz/dist/release
+      - uses: ./.github/actions/book-tools
+      - name: Fresh load at every width and scheme, axe on the whole page
+        run: uv run books/eli-raz/scripts/check.py --no-build --axe-full
+
+  review:
+    needs: build
+    runs-on: ${{ vars.CHECKS_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: book-build
+          path: books/eli-raz/dist/release
+      - uses: ./.github/actions/book-tools
+      - name: Interactive explainers; videos, traces, screenshots and load timings
+        run: uv run books/eli-raz/scripts/check.py --no-build --explorables --record
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: book-review
+          path: |
+            books/eli-raz/dist/record
+            books/eli-raz/dist/explorables
+          if-no-files-found: warn
+          retention-days: 2
+
+  sample:
+    runs-on: ${{ vars.CHECKS_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/book-tools
+      - name: tools/verify.py on the sample edition (widths, interaction, speed)
+        run: uv run books/eli-raz/scripts/check.py --no-build --sample
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: sample-verify
+          path: dist/verify
+          if-no-files-found: warn
+          retention-days: 2

@@ -21,7 +21,7 @@ jobs:
         with:
           persist-credentials: false
 
-      # A web build that passed every check is kept under the hash of everything the book build reads. A push that
+      # A web build that passed the checks is kept under the hash of everything the book build reads. A push that
       # changes none of it (a sample-only change) restores that build and skips the rest. The cache saves only after
       # all steps passed. Known limit: the list of inputs is kept by hand; revisit it when the build reads new files.
       - name: Restore checked web build
@@ -29,76 +29,26 @@ jobs:
         uses: actions/cache@v6
         with:
           path: books/eli-raz/dist/release/web
-          key: book-web-${{ hashFiles('books/eli-raz/**', 'tools/**', 'site/**', 'epub-src/OEBPS/fonts/**', 'epub-src/OEBPS/css/**', '.github/workflows/kitshn.yml') }}
-      # Ingest outputs; build_release.py runs ingest only when work/ingest-key differs from the hash of its inputs.
-      - name: Restore ingest output
+          key: book-web-${{ hashFiles('books/eli-raz/**', 'tools/**', 'site/**', 'epub-src/OEBPS/fonts/**', 'epub-src/OEBPS/css/**', '.github/workflows/kitshn.yml', '.github/actions/book-tools/action.yml') }}
+      # The shared cache of check.py: ingest outputs by input hash, EPUBs that passed EPUBCheck, sections that
+      # passed axe. The nightly slow-checks.yml saves into it too.
+      - name: Restore check cache
         if: steps.web.outputs.cache-hit != 'true'
         uses: actions/cache@v6
         with:
-          path: |
-            books/eli-raz/epub-src
-            books/eli-raz/epub-src-release
-            books/eli-raz/work/ingest-key
-          key: ingest-${{ github.sha }}
-          restore-keys: ingest-
-
-      # The layout of .tools is the one that books/eli-raz/scripts/build_release.py reads.
-      - name: Restore tool downloads
+          path: ~/.cache/eli-raz
+          key: eli-raz-cache-${{ github.run_id }}
+          restore-keys: eli-raz-cache-
+      - name: Tools
         if: steps.web.outputs.cache-hit != 'true'
-        id: tools
-        uses: actions/cache@v6
-        with:
-          path: .tools
-          key: tools-jre-21.0.13.1+2-epubcheck-5.4.0-axe-4.14.0
-      - name: Download tools
-        if: steps.web.outputs.cache-hit != 'true' && steps.tools.outputs.cache-hit != 'true'
-        run: |
-          set -euo pipefail
-          mkdir -p .tools/dl
-          cd .tools
-          curl -fsSL -o dl/jre.tgz https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.13.1%2B2/OpenJDK21U-jre_x64_linux_hotspot_21.0.13.1_2.tar.gz
-          curl -fsSL -o dl/epubcheck.zip https://github.com/w3c/epubcheck/releases/download/v5.4.0/epubcheck-5.4.0.zip
-          curl -fsSL -o dl/axe.tgz https://registry.npmjs.org/axe-core/-/axe-core-4.14.0.tgz
-          sha256sum -c - <<'SUMS'
-          18f44fab9065217f3ba61d0eef8a7b5f3c3713aa7293001b0d4ac10ede3850f0  dl/jre.tgz
-          33350c61038e71dfb3d45a76aed04bf5481e6d5500cb780f6e98db8bbd15a28c  dl/epubcheck.zip
-          2277b0a3ef47af9b52497faa3e71598e86e0a0e5e6eb295207a5657ede4709af  dl/axe.tgz
-          SUMS
-          tar -xzf dl/jre.tgz
-          unzip -q dl/epubcheck.zip
-          mkdir axe
-          tar -xzf dl/axe.tgz -C axe
-          rm -r dl
-
-      - name: Install uv 0.13.6
-        if: steps.web.outputs.cache-hit != 'true'
-        run: |
-          curl -LsSf https://astral.sh/uv/0.13.6/install.sh | sh
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-      - name: Restore uv cache
-        if: steps.web.outputs.cache-hit != 'true'
-        uses: actions/cache@v6
-        with:
-          path: |
-            ~/.cache/uv
-            ~/.local/share/uv/python
-          key: uv-0.13.6-${{ hashFiles('tools/*.py', 'books/eli-raz/scripts/*.py') }}
-          restore-keys: uv-0.13.6-
-      - name: Restore Playwright browser
-        if: steps.web.outputs.cache-hit != 'true'
-        uses: actions/cache@v6
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-1.64.1-chromium-headless-shell
-      - name: Install Playwright browser
-        if: steps.web.outputs.cache-hit != 'true'
-        # No --with-deps (about 10 s of apt): the runner image ships Chrome and its libraries. A missing library fails
-        # the smoke test loudly; then add --with-deps back.
-        run: uv run --with playwright==1.64.1 playwright install --only-shell chromium
-
+        uses: ./.github/actions/book-tools
+      # The deploy gate (check.py --gate): ingest, build, check_release with the size budget, EPUBCheck, and the quick
+      # smoke test. Lanes run every check in checks.yml before they land; slow-checks.yml runs them nightly on main.
       - name: Build and check
         if: steps.web.outputs.cache-hit != 'true'
-        run: uv run books/eli-raz/scripts/build_release.py
+        env:
+          ELI_RAZ_INGEST_KEEP: "2"
+        run: uv run books/eli-raz/scripts/check.py --gate
       - name: Shrink uv cache
         if: steps.web.outputs.cache-hit != 'true'
         run: uv cache prune --ci

@@ -16,7 +16,7 @@ export default defineApps({
       { on: "pull_request", name: "pr-{pr}", ephemeral: true },
     ],
   },
-  // The Eli Raz edition. The "book" job of .github/workflows/kitshn.yml runs books/eli-raz/scripts/build_release.py
+  // The Eli Raz edition. The "book" job of .github/workflows/kitshn.yml runs books/eli-raz/scripts/check.py
   // and passes this folder as an artifact.
   book: {
     static: { output: "books/eli-raz/dist/release/web" },
