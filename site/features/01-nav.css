@@ -1,0 +1,53 @@
+/* Navigation: transparent over the hero, translucent over the text. */
+/* Over the hero the bar is transparent; a soft dark scrim behind it keeps its text readable on any photo. */
+.nav::before { content: ""; position: absolute; inset: 0 0 -1.5rem; z-index: -1; background: linear-gradient(rgb(14 12 10 / 0.6), rgb(14 12 10 / 0)); transition: opacity 200ms ease; pointer-events: none; }
+.nav[data-solid]::before { opacity: 0; }
+.nav { position: fixed; inset: 0 0 auto; z-index: 1000; isolation: isolate; color: var(--on-night); font-family: var(--sans); font-size: 0.95rem; transition: background-color 200ms ease, color 200ms ease, box-shadow 200ms ease; }
+.nav-inner { display: flex; align-items: center; gap: 0.75rem; max-width: 72rem; margin: 0 auto; padding: 0.6rem var(--gutter); }
+.nav-title { flex: 1 1 0; min-width: 0; overflow: hidden; font-weight: 600; text-decoration: none; white-space: nowrap; opacity: 0; transition: opacity 200ms ease; }
+.nav-title-full { display: inline-block; }
+.nav-title-short { display: none; }
+.nav-title[data-short] .nav-title-full { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.nav-title[data-short] .nav-title-short { display: inline; }
+.nav-actions { display: flex; align-items: center; gap: 0.25rem; flex: none; }
+.nav-text { padding: 0.45rem 0.8rem; min-height: 2.5rem; border-radius: 999px; }
+.nav-text:hover, .nav .icon-btn:hover { background: color-mix(in srgb, currentColor 12%, transparent); }
+.icon-btn { display: inline-grid; place-items: center; width: 2.5rem; height: 2.5rem; padding: 0; border-radius: 999px; color: inherit; }
+.icon-btn svg, .split-more svg { width: 1.35rem; height: 1.35rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.nav[data-solid] { background: color-mix(in srgb, var(--paper) 72%, transparent); color: var(--ink); box-shadow: 0 1px 0 color-mix(in srgb, var(--rule) 80%, transparent); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); }
+.nav[data-solid] .nav-title { opacity: 1; }
+/* The bar's download button appears only after the hero's download button scrolls away. */
+/* Hidden, it takes no room: width and the gap before it are 0, so search and chapters sit at the end edge.
+   It grows in with the bar's 200 ms transition and pushes them to their places. */
+.nav-download { width: 0; min-width: 0; margin-inline-start: -0.25rem; overflow: hidden; opacity: 0; visibility: hidden; transition: width 200ms ease, margin 200ms ease, opacity 200ms ease, visibility 200ms; }
+.nav[data-download] .nav-download { width: 2.5rem; margin-inline-start: 0; opacity: 1; visibility: visible; }
+@media (prefers-reduced-motion: reduce) { .nav-download { transition: none; } }
+.nav .nav-download { background: var(--accent); color: var(--on-accent); }
+.nav .nav-download:hover { background: color-mix(in srgb, var(--accent) 85%, var(--ink)); }
+
+/* Split button: the main action and a chevron that opens the e-reader menu. */
+.split { display: inline-flex; align-items: stretch; }
+.split .split-main { border-start-end-radius: 0; border-end-end-radius: 0; border-inline-end-width: 0; }
+/* The divider is subtler than the outer border: thinner in tone and inset from the top and bottom edges. */
+.split .split-more { position: relative; display: inline-grid; place-items: center; padding: 0 0.55rem; min-width: 2rem; border-start-start-radius: 0; border-end-start-radius: 0; border-inline-start-width: 0; }
+.split .split-more::before { content: ""; position: absolute; inset-block: 26%; inset-inline-start: 0; width: 1px; background: currentColor; opacity: 0.3; }
+.split .btn.split-more { gap: 0; padding-inline: 0.7rem; }
+.split-more { border-radius: 999px; }
+.split-more svg { width: 1.1rem; height: 1.1rem; }
+
+/* E-reader menu (a popover, so the browser handles light dismiss and Escape). */
+.menu { position: fixed; inset: auto; margin: 0; box-sizing: border-box; width: min(20rem, calc(100vw - 2rem)); padding: 0.75rem; border: 1px solid var(--rule); border-radius: 12px; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 0.9rem; box-shadow: 0 18px 48px rgb(0 0 0 / 0.22); }
+.menu-note { margin: 0 0.5rem 0.5rem; color: var(--muted); font-size: 0.85em; line-height: 1.45; }
+.menu ul { margin: 0.25rem 0 0; padding: 0.25rem 0 0; list-style: none; border-top: 1px solid var(--rule); }
+.menu a { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: 0.55rem 0.5rem; border-radius: 8px; text-decoration: none; }
+.menu a:hover, .menu a:focus-visible { background: var(--mat); outline: none; }
+.menu-download { font-weight: 600; }
+.menu-meta { color: var(--muted); font-size: 0.85em; }
+.progress { position: absolute; inset-inline: 0; bottom: 0; height: 2px; background: var(--accent); transform: scaleX(0); transform-origin: right; opacity: 0; }
+[dir="ltr"] .progress { transform-origin: left; }
+.nav[data-solid] .progress { opacity: 1; }
+@supports (animation-timeline: scroll()) {
+  .progress { animation: progress linear both; animation-timeline: scroll(root); }
+  @keyframes progress { to { transform: scaleX(1); } }
+}
+

@@ -1,0 +1,30 @@
+/* Panels */
+dialog { color: var(--ink); background: var(--paper); font-family: var(--sans); }
+dialog::backdrop { background: rgb(10 9 8 / 0.5); backdrop-filter: blur(2px); }
+.panel { width: min(32rem, calc(100vw - 2rem)); max-height: min(85vh, 46rem); padding: 0; border: 0; border-radius: 14px; box-shadow: 0 24px 60px rgb(0 0 0 / 0.25); }
+.panel-head { position: sticky; top: 0; display: flex; align-items: center; justify-content: space-between; padding-block: 0.75rem; padding-inline: 1.25rem 0.75rem; background: var(--paper); }
+.panel-head h2 { margin: 0; font-size: 0.95rem; font-weight: 600; color: var(--muted); }
+.panel-head button { width: 2.5rem; height: 2.5rem; border-radius: 999px; font-size: 1.3rem; }
+.panel-head button:hover { background: var(--mat); }
+.panel-list ol, ol.panel-list { list-style: none; margin: 0; padding: 0 0.5rem 0.75rem; }
+.panel-list li a { display: block; padding: 0.75rem; border-radius: 10px; text-decoration: none; line-height: 1.45; }
+.panel-list li a:hover, .panel-list li a:focus-visible { background: var(--mat); outline: none; }
+#search-form { padding: 0 1.25rem; }
+#search-input { width: 100%; box-sizing: border-box; padding: 0.8rem 1rem; border: 1px solid var(--rule); border-radius: 10px; background: var(--mat); color: inherit; font: inherit; font-size: 1rem; }
+#search-input:focus { outline: 2px solid var(--accent); outline-offset: 0; }
+.search-status { margin: 0.75rem 1.25rem 0.25rem; font-size: 0.85rem; color: var(--muted); }
+.search-results li a { display: flex; gap: 0.75rem; align-items: flex-start; }
+.search-results .result-text { flex: 1; min-width: 0; }
+.search-results .where { display: block; margin-bottom: 0.2rem; font-size: 0.8rem; color: var(--muted); }
+.result-thumb, .result-tile { flex: none; width: 3rem; height: 3rem; border-radius: 6px; object-fit: cover; background: var(--mat); }
+.result-tile { display: grid; place-items: center; }
+.result-tile svg { width: 1.6rem; height: 1.6rem; fill: var(--place); stroke: var(--paper); stroke-width: 1.2; }
+#search-dialog { height: min(80vh, 42rem); }
+#search-dialog[open] { display: flex; flex-direction: column; }
+#search-dialog .search-results { flex: 1; overflow-y: auto; }
+/* Phones: the search panel takes nearly the whole screen, above the keyboard. */
+@media (max-width: 40rem) {
+  #search-dialog { width: calc(100vw - 1rem); height: calc(100dvh - 1rem); max-height: none; margin: 0.5rem auto auto; }
+}
+.search-results mark { background: color-mix(in srgb, var(--accent) 22%, transparent); color: inherit; border-radius: 2px; }
+

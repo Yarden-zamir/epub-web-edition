@@ -27,7 +27,7 @@ The book deploys first. Three things keep a deploy short:
 source.pdf ──(recovery, not built yet)──▶ epub-src/ ──tools/build_epub.py──▶ dist/book.epub ──tools/build_web.py──▶ dist/web/
                                               ▲                                     │                        ▲
                                   inventory/ (page-by-page reconciliation)          └── canonical input ─────┘
-                                                                         site/ (template, reader.css, reader.js, enhancements.json)
+                                                                         site/ (template, features/*.js and *.css, enhancements.json)
 ```
 
 1. `epub-src/` holds the EPUB 3 source tree. It is the only editable book content.

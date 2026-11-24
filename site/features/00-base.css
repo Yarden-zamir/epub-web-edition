@@ -1,0 +1,72 @@
+/* Web edition presentation. Book typography comes from the EPUB stylesheet, loaded first.
+   This file only adds site layout: hero, navigation, spacing, figures and motion. */
+
+:root {
+  --paper: #f7f3ec;
+  --ink: #1c1a17;
+  --soft: #4f4a43;
+  --muted: #625c53;
+  --rule: #e2dbce;
+  --mat: #ece6db;
+  --accent: #8f3f22;
+  --series: #8f3f22; /* Chart line; validated for the light paper. */
+  --on-accent: #ffffff;
+  --night: #191715;
+  --on-night: #f3ede3;
+  --on-night-soft: #cbbfac;
+  --measure: 38rem; /* About 34em of body text: 60-70 Hebrew characters a line. */
+  --gutter: clamp(1.25rem, 5vw, 3rem);
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Hebrew", Arial, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #141312; --ink: #ece6dc; --soft: #c2bbaf; --muted: #948d82; --rule: #2c2a27;
+    --mat: #1d1c1a; --accent: #e3a07c; --on-accent: #1a120c; --series: #cf6f3f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #141312; --ink: #ece6dc; --soft: #c2bbaf; --muted: #948d82; --rule: #2c2a27;
+  --mat: #1d1c1a; --accent: #e3a07c; --on-accent: #1a120c; --series: #cf6f3f;
+  color-scheme: dark;
+}
+
+/* Base. The root size grows with the window, so a desktop reads like a 150% zoom and a phone keeps 16px.
+   Every rem in this file scales with it. Media queries in rem still use the browser default size. */
+html { font-size: clamp(100%, 0.5rem + 1vw, 162.5%); scroll-padding-top: max(22vh, 7.75rem); /* Matches jumpOffset() in reader.js: the bar plus 4rem. */ -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 1.125rem;
+  line-height: 1.75;
+  overflow-x: clip;
+}
+[dir="ltr"], [dir="rtl"] { unicode-bidi: isolate; }
+a { color: inherit; text-decoration-color: color-mix(in srgb, currentColor 40%, transparent); text-underline-offset: 0.22em; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+img { max-width: 100%; }
+p { text-indent: 0; } /* The book stylesheet indents paragraphs; site chrome must not inherit that. */
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.skip-link { position: absolute; inset-inline-start: 1rem; top: -4rem; z-index: 20; background: var(--ink); color: var(--paper); padding: 0.5rem 1rem; font-family: var(--sans); }
+.skip-link:focus { top: 1rem; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+[hidden] { display: none !important; } /* Site rules such as figure img { display: block } must not undo hidden. */
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 0.6rem; min-height: 2.9rem; box-sizing: border-box;
+  padding: 0.7rem 1.4rem; border-radius: 999px; border: 1px solid transparent;
+  font-family: var(--sans); font-size: 1rem; font-weight: 600; line-height: 1.2; text-decoration: none;
+  background: var(--accent); color: var(--on-accent);
+  transition: transform 150ms ease, background-color 150ms ease;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn-meta { font-weight: 400; opacity: 0.75; font-size: 0.85em; }
+.btn-light { background: var(--on-night); color: var(--night); }
+.btn-outline { background: transparent; color: var(--on-night); border-color: color-mix(in srgb, var(--on-night) 45%, transparent); }
+.btn-outline:hover { background: color-mix(in srgb, var(--on-night) 10%, transparent); }
+.btn-small { min-height: 2.25rem; padding: 0.4rem 1rem; font-size: 0.9rem; }
+

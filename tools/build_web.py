@@ -4,41 +4,33 @@
 # ///
 """Build the static web edition from the finished EPUB file.
 
-The EPUB is the only source of book content. The site layer (site/) adds
-presentation and site-only features, attached by stable element IDs.
+The EPUB is the only source of book content. The site layer adds presentation and site-only features,
+attached by stable element IDs. This file is the core: it reads the EPUB, converts the spine into one page,
+fills site/index.html and joins site/features/*.js and *.css into reader.js and reader.css.
+Each feature (search, places, charts, glossary, …) is a module in tools/web/, found by name; the hooks are
+described in site/features/README.md.
 
 Usage: uv run tools/build_web.py [BOOK_EPUB] [OUT_DIR] [ENHANCEMENTS_JSON | none]
 
-ENHANCEMENTS_JSON defaults to site/enhancements.json. Its "original" paths resolve
-against the folder above the file's folder (the content root). "none" uses no enhancements.
-Its optional "related" block adds plain outbound links (title, links: label, href, note) to the footer.
-An optional places.json next to the enhancements file adds a map section after the printed contents
-(format in places_html). The list works without JavaScript; reader.js draws the map with Leaflet.
-Its optional "tables" block turns a figure that prints a table as an image into a real table:
-{figure ID: {columns, rows, bar (column index drawn as bars), ltr (column indices), source}}.
-The printed image stays inside the figure, in a collapsed <details>.
-Its optional "charts" block adds a live measured series to a printed figure:
-{figure ID: {data (JSON file under the content root with source and [date, value] points), title, unit}}.
-Files charts/<figure ID>.json next to it add digitized or dataset charts (format in chart_panel).
-A figure with charts gets the interactive chart and a toggle back to the printed image. All panels of one
-figure share the x axis (small multiples). Each figure carries data tables and a CSV file, so it reads without JavaScript.
-The site links out only: it never embeds or copies the linked media.
+ENHANCEMENTS_JSON defaults to site/enhancements.json. The other site data files (places.json, timeline.json,
+charts/, …) sit in the same folder. "none" uses no site data.
 """
 
 import csv
+import functools
 import hashlib
-import math
+import importlib.util
 import html
 import json
 import posixpath
 import shutil
 import sys
-import unicodedata
 import xml.etree.ElementTree as ET
 import zipfile
 from dataclasses import dataclass, replace
 from pathlib import Path
-from typing import Literal
+from types import ModuleType
+from typing import Callable, Literal
 from urllib.parse import unquote, urlsplit
 
 from PIL import Image, ImageOps
@@ -55,8 +47,6 @@ XML = "http://www.w3.org/XML/1998/namespace"
 
 EPUB_ONLY = "epub-only"
 INDEXED_TAGS = {"p", "h1", "h2", "h3", "figure", "table", "li"}
-SEARCH_KIND = {"h1": "heading", "h2": "heading", "h3": "heading", "figure": "figure"}  # Others are "text".
-
 type Direction = Literal["rtl", "ltr"]
 
 
@@ -183,11 +173,7 @@ class Converter:
         self.ids: dict[str, str] = {}  # Element ID -> source document path.
         self.doc_anchor: dict[str, str] = {}  # Source document path -> first ID in that document.
         self.tags: dict[str, str] = {}  # Element ID -> tag name.
-        self.tables: dict[str, dict] = {}  # Figure ID -> data table spec from the enhancements file.
-        self.charts: dict[str, ET.Element] = {}  # Printed figure ID -> chart box placed inside it.
         self.skipped_docs: set[str] = set()  # Spine documents marked epub-only.
-        self.crosslinks: dict[str, list[dict]] = {}  # Element ID -> crosslinks.json entries inside it.
-        self.glossary: list[dict] = []  # glossary.json terms, in file order.
         self.links: list[tuple[str, str]] = []  # (source document, target ID) to check after all documents load.
         self.search: list[SearchEntry] = []
         self.bodies: list[tuple[Item, ET.Element]] = []
@@ -242,7 +228,8 @@ class Converter:
         self.links.append((doc, target))
         return f"#{target}"
 
-    def convert(self, item: Item, body: ET.Element, enhancements: dict[str, dict[str, str]]) -> str:
+    def convert(self, item: Item, body: ET.Element, transforms: list[Callable[[ET.Element, ET.Element | None, str], None]]) -> str:
+        """One spine document as HTML. Each feature transform then changes the document (body, top section, kind)."""
         page: str | None = None
         section: str | None = None
         first_entry = len(self.search)
@@ -291,9 +278,6 @@ class Converter:
             if el.tag == "section" and el_id:
                 heading = next((h for h in el if local(h.tag) in ("h1", "h2", "h3")), None)
                 section = clean_text(heading) if heading is not None else section
-            if el_id in enhancements:
-                for key, value in enhancements[el_id].items():
-                    el.set(f"data-{key}", value)
             indexed = el.tag in INDEXED_TAGS or (el.tag == "span" and "line" in (el.get("class") or "").split())  # Poem lines.
             if el_id and indexed and (text := clean_text(el)):
                 self.search.append(SearchEntry(el_id, page, section, text))
@@ -302,20 +286,8 @@ class Converter:
         self.figure_img |= {fig.get("id"): (img.get("src"), img.get("alt") or "") for fig in body.iter("figure")
                             if fig.get("id") and (img := fig.find(".//img")) is not None}
         self.search[first_entry:] = [replace(e, chapter=chapter, img=images.get(e.id)) for e in self.search[first_entry:]]
-        if top is not None:
-            for el in list(top.iter()):
-                for link in self.crosslinks.get(el.get("id", ""), []):
-                    add_crosslink(el, link)
-            if kind == "article":
-                mark_terms(top, self.glossary)
-        for fig in list(body.iter("figure")):
-            if (spec := self.tables.get(fig.get("id", ""))):
-                attach_table(fig, spec)
-        for fig in list(body.iter("figure")):
-            if (box := self.charts.get(fig.get("id", ""))) is not None:
-                caption = fig.find("figcaption")
-                fig.insert(list(fig).index(caption) if caption is not None else len(fig), box)
-                fig.set("class", (fig.get("class", "") + " has-chart").strip())
+        for transform in transforms:
+            transform(body, top, kind)
         for parent in list(body.iter()):
             for child in list(parent):
                 if "copyright-page" in child.get("data-epub-type", "").split():
@@ -370,93 +342,6 @@ def wrap_text(root: ET.Element, owner: ET.Element, slot: str, start: int, end: i
     return new
 
 
-def add_crosslink(el: ET.Element, link: dict) -> None:
-    """Link the exact text that names a chapter. A match that is already inside a link (the EPUB has it) stays as is."""
-    for owner, slot in text_slots(el):
-        if (at := (getattr(owner, slot) or "").find(link["text"])) >= 0:
-            wrap_text(el, owner, slot, at, at + len(link["text"]),
-                      ET.Element("a", {"class": "crosslink", "href": f"#{link['target']}"}))
-            return
-    if link["text"] not in "".join(el.itertext()):  # Present but not found above: it sits inside a link already.
-        raise BookError(f"crosslinks.json: {link['text'][:40]!r} is not in {el.get('id')}")
-
-
-HEBREW_PREFIXES = "ובלמשכה"
-SAFE_PREFIXES = "ובלה"  # A short form takes only these, so "בצר" never matches inside "מבצר".
-
-
-def is_word_char(c: str) -> bool:
-    return c.isalnum() or unicodedata.category(c).startswith("M")
-
-
-def find_form(text: str, form: str) -> tuple[int, int] | None:
-    """First whole-word match of a glossary form, allowing up to two one-letter prefixes before it."""
-    allowed = SAFE_PREFIXES if len(form) <= 3 else HEBREW_PREFIXES
-    at = text.find(form)
-    while at >= 0:
-        end = at + len(form)
-        if end == len(text) or not is_word_char(text[end]):
-            for begin in range(at, max(at - 2, 0) - 1, -1):
-                if all(c in allowed for c in text[begin:at]) and (begin == 0 or not is_word_char(text[begin - 1])):
-                    return begin, end
-        at = text.find(form, at + 1)
-    return None
-
-
-def mark_terms(top: ET.Element, glossary: list[dict]) -> None:
-    """Mark the first use of each glossary term in a chapter, in body paragraphs and list items."""
-    left = set(range(len(glossary)))
-    skip_classes = {"byline", "display-title", "small", "caption", "credit"}
-    for el in list(top.iter()):
-        if not left:
-            return
-        if el.tag not in ("p", "li") or skip_classes & set((el.get("class") or "").split()):
-            continue
-        for owner, slot in text_slots(el):
-            while left:
-                text = getattr(owner, slot) or ""
-                found = [(m, i) for i in left for f in glossary[i]["forms"] if (m := find_form(text, f))]
-                if not found:
-                    break
-                (start, end), i = min(found, key=lambda x: (x[0][0], -x[0][1]))
-                term = ET.Element("button", {"type": "button", "class": "term", "data-term": str(i),
-                                             "popovertarget": "term-popover"})
-                owner, slot = wrap_text(top, owner, slot, start, end, term), "tail"
-                left.discard(i)
-
-
-def load_glossary(data_dir: Path | None, conv: "Converter") -> list[dict]:
-    path = data_dir / "glossary.json" if data_dir else None
-    if path is None or not path.is_file():
-        return []
-    terms = json.loads(path.read_text(encoding="utf-8"))["terms"]
-    for t in terms:
-        if t["source"] not in conv.ids:
-            raise missing_id(f"glossary.json: term {t['term']!r}", t["source"])
-        if not t["forms"] or not t["definition"]:
-            raise BookError(f"glossary.json: term {t['term']!r}: needs forms and a definition")
-    return terms
-
-
-def load_crosslinks(data_dir: Path | None, conv: "Converter") -> dict[str, list[dict]]:
-    path = data_dir / "crosslinks.json" if data_dir else None
-    if path is None or not path.is_file():
-        return {}
-    result: dict[str, list[dict]] = {}
-    for link in json.loads(path.read_text(encoding="utf-8"))["links"]:
-        for ref in (link["element"], link["target"]):
-            if ref not in conv.ids:
-                raise missing_id(f"crosslinks.json: {link['element']} -> {link['target']}", ref)
-        result.setdefault(link["element"], []).append(link)
-    return result
-
-
-def glossary_data(glossary: list[dict]) -> str:
-    """Term definitions for the popover. reader.js reads them by the data-term index."""
-    data = [{"term": t["term"], "definition": t["definition"], "source": f"#{t['source']}"} for t in glossary]
-    return f'<script type="application/json" id="glossary-data">{json.dumps(data, ensure_ascii=False).replace("</", "<\\/")}</script>'
-
-
 def title_and_byline(top: ET.Element, kind: str) -> tuple[str, tuple[str, str | None] | None]:
     """Heading text of a top-level section, and its first byline paragraph (text, lang) if it has one.
     A part title continues in the display-title paragraphs right after its heading (print splits it in two)."""
@@ -477,330 +362,12 @@ def title_and_byline(top: ET.Element, kind: str) -> tuple[str, tuple[str, str | 
     return title, ((clean_text(byline), lang) if byline is not None else None)
 
 
-def toc_html(z: zipfile.ZipFile, book: Book, conv: Converter) -> str:
-    """The EPUB toc nav as a list of in-page links. Articles after a part sit inside that part; the title
-    comes from the chapter heading when the nav label is cut short, and the byline shows as the author."""
-    nav_root = ET.fromstring(z.read(book.nav.path))
-    toc = next(
-        (n for n in nav_root.iter(f"{{{XHTML}}}nav") if n.attrib.get(f"{{{OPS}}}type") == "toc"),
-        None,
-    )
-    toc = required(toc, "toc nav")
-
-    def item(chapter: str, label: str) -> str:
-        byline = conv.byline.get(chapter)
-        author = ""
-        if byline:
-            lang = f' lang="{html.escape(byline[1])}"' if byline[1] else ""
-            author = f'<span class="toc-author"{lang}>{html.escape(byline[0])}</span>'
-        return (f'<li class="toc-item" data-chapter="{html.escape(chapter)}"><a href="#{html.escape(chapter)}">'
-                f'<span class="toc-name">{html.escape(label)}</span>{author}</a></li>')
-
-    lines, in_part = ['<ol class="toc">'], False
-    for a in toc.iter(f"{{{XHTML}}}a"):
-        if (href := conv.resolve_href(book.nav.path, a.attrib["href"])) is None:
-            continue  # An epub-only document.
-        target = href[1:]
-        chapter = conv.chapter_of.get(target, target)
-        kind = conv.kind_of.get(chapter, "")
-        label = conv.chapter_title.get(chapter) or clean_text(a)
-        if kind == "part":
-            lines.append("</ol></li>" if in_part else "")
-            lines.append(f'<li class="toc-part" data-chapter="{html.escape(chapter)}">'
-                         f'<a class="toc-part-title" href="#{html.escape(chapter)}">{html.escape(label)}</a><ol>')
-            in_part = True
-            continue
-        if in_part and kind != "article":
-            lines.append("</ol></li>")
-            in_part = False
-        lines.append(item(chapter, label))
-    lines.append("</ol></li></ol>" if in_part else "</ol>")
-    return "\n".join(line for line in lines if line)
-
-
-def timeline_html(data_dir: Path | None, conv: Converter) -> tuple[str, str]:
-    """Tab button and panel for timeline.json: {"events": [{date, label, text, quote, target, major,
-    date_source?}]}. Each event links to its quoted paragraph. Empty strings when the file is absent."""
-    path = data_dir / "timeline.json" if data_dir else None
-    if path is None or not path.is_file():
-        return "", ""
-    events = json.loads(path.read_text(encoding="utf-8"))["events"]
-    items = []
-    for i, ev in enumerate(events):
-        for ref in (ev["target"], ev.get("date_source", ev["target"])):
-            if ref not in conv.ids:
-                raise missing_id(f"timeline.json: event {i} ({ev['label']})", ref)
-        if not isinstance(ev["major"], bool):
-            raise BookError(f"timeline.json: event {i}: major must be true or false")
-        cls = "tl-event tl-major" if ev["major"] else "tl-event"
-        items.append(f'<li class="{cls}"><a href="#{html.escape(ev["target"])}" data-quote="{html.escape(ev["quote"])}">'
-                     f'<span class="tl-date">{html.escape(ev["label"])}</span>'
-                     f'<span class="tl-text">{html.escape(ev["text"])}</span></a></li>')
-    tab = '<button type="button" role="tab" id="tab-timeline" aria-selected="false" aria-controls="toc-timeline" tabindex="-1">ציר זמן</button>'
-    panel = (f'<div id="toc-timeline" class="panel-body" role="tabpanel" aria-labelledby="tab-timeline" hidden>'
-             f'<ol class="timeline">{"".join(items)}</ol></div>')
-    return tab, panel
-
-
-def leading_number(cell: str) -> float | None:
-    """First number in a printed cell, for example 3630 in "3630 (700%)" or 9010 in "9,010"."""
-    token = cell.strip().split(" ", 1)[0].replace(",", "")
-    try:
-        return float(token)
-    except ValueError:
-        return None
-
-
-def table_element(fig_id: str, spec: dict) -> ET.Element:
-    columns, rows, bar = spec["columns"], spec["rows"], spec.get("bar")
-    ltr = set(spec.get("ltr", []))
-    if any(len(r) != len(columns) for r in rows):
-        raise BookError(f"enhancements.json: table {fig_id}: every row needs {len(columns)} cells")
-    peak = max((leading_number(r[bar]) or 0) for r in rows) if bar is not None else 0
-    table = ET.Element("table", {"class": "data-table"})
-    head = ET.SubElement(ET.SubElement(table, "thead"), "tr")
-    for i, name in enumerate(columns):
-        th = ET.SubElement(head, "th", {"scope": "col"})
-        ET.SubElement(th, "button", {"type": "button", "data-sort": str(i)}).text = name
-    tbody = ET.SubElement(table, "tbody")
-    for row in rows:
-        tr = ET.SubElement(tbody, "tr")
-        for i, cell in enumerate(row):
-            attrs = {"dir": "ltr"} if i in ltr else {}
-            value = leading_number(cell)
-            if value is not None:
-                attrs["data-value"] = f"{value:g}"
-            if i == bar and value is not None and peak:
-                attrs["class"] = "bar"
-                attrs["style"] = f"--v: {value / peak:.3f}"
-            td = ET.SubElement(tr, "th" if i == 0 else "td", attrs | ({"scope": "row"} if i == 0 else {}))
-            ET.SubElement(td, "span").text = cell
-    return table
-
-
-def attach_table(fig: ET.Element, spec: dict) -> None:
-    """Put the data table first in the figure and fold the printed image into a details element."""
-    img = fig.find("img")
-    if img is None:
-        raise BookError(f"enhancements.json: table {fig.get('id')}: the figure has no direct img")
-    details = ET.Element("details", {"class": "print-version"})
-    ET.SubElement(details, "summary").text = "הטבלה כפי שהודפסה"
-    index = list(fig).index(img)
-    fig.remove(img)
-    details.append(img)
-    fig.insert(index, details)
-    fig.insert(0, table_element(fig.get("id", ""), spec))
-    link = ET.Element("a", {"class": "csv-link", "href": f"data/tables/{fig.get('id')}.csv", "download": ""})
-    link.text = "הורדת הטבלה (CSV)"
-    fig.insert(1, link)
-    fig.set("class", (fig.get("class", "") + " has-table").strip())
-
-
-def chart_panel(spec: dict, where: str) -> dict:
-    """Check one charts/<figure>.json file and return the panel that reader.js draws. Format:
-    {figure, title, source: {kind, label, url?, method, accuracy?: {x, y}, ...}, x: {label, unit, type: year|number},
-    y: {label, unit}, series: [{name, kind: line|points, points: [[x, y], ...]}], bands?: [{axis, from, to, label}],
-    markers?: [{axis, at, label}], notes?}. Line points keep their drawing order: x may repeat or step back."""
-    if spec["x"]["type"] not in ("year", "number") or not spec["series"]:
-        raise BookError(f"{where}: x.type must be year or number, and there must be series")
-    for series in spec["series"]:
-        if series["kind"] not in ("line", "points") or len(series["points"]) < 2:
-            raise BookError(f"{where}: series {series['name']!r} needs kind line or points and two or more points")
-        if any(len(pt) != 2 or not all(isinstance(v, (int, float)) for v in pt) for pt in series["points"]):
-            raise BookError(f"{where}: series {series['name']!r} has a point that is not [x, y]")
-    for item in [*spec.get("bands", []), *spec.get("markers", [])]:
-        if item["axis"] not in ("x", "y"):
-            raise BookError(f"{where}: band or marker axis must be x or y")
-    source = spec["source"]
-    if source.get("url") and not source["url"].startswith("https://"):
-        raise BookError(f"{where}: source URL must be https")
-    accuracy = source.get("accuracy")
-    line = source["label"]
-    if source["kind"] == "digitized":
-        line += ". דיגיטציה של האיור המודפס"
-        if accuracy:
-            line += f"; דיוק: {accuracy['x']} בציר האופקי, {accuracy['y']} בציר האנכי"
-    # Only public fields go to the site; source.overlay is a private review image.
-    return {"title": spec["title"], "x": spec["x"], "y": spec["y"], "series": spec["series"],
-            "bands": spec.get("bands", []), "markers": spec.get("markers", []), "notes": spec.get("notes", ""),
-            "source": {"line": line + ".", "url": source.get("url"), "method": source.get("method", "")}}
-
-
-def measured_panel(spec: dict, data: dict, where: str) -> dict:
-    """Panel for a live measured series from the enhancements file: [ISO date, value] points."""
-    points = data["points"]
-    if len(points) < 2 or any(len(pt) != 2 for pt in points):
-        raise BookError(f"{where}: needs at least two [date, value] points")
-    if not data["source"]["url"].startswith("https://"):
-        raise BookError(f"{where}: source URL must be https")
-    years = f"{points[0][0][:4]}–{points[-1][0][:4]}"
-    return {"title": spec["title"], "x": {"label": "תאריך", "unit": "", "type": "date"},
-            "y": {"label": spec["unit"], "unit": ""}, "series": [{"name": spec["title"], "kind": "line", "points": points}],
-            "bands": [], "markers": [], "notes": "",
-            "source": {"line": f"נתונים עדכניים שנוספו לאתר, {years}: {data['source']['label']}.", "url": data["source"]["url"], "method": ""}}
-
-
-def panel_table(panel: dict) -> ET.Element:
-    """Data table of one panel. A dated series shows its first reading of each year."""
-    table = ET.Element("table", {"class": "data-table"})
-    ET.SubElement(table, "caption").text = panel["title"]
-    head = ET.SubElement(ET.SubElement(table, "thead"), "tr")
-    x_name = " ".join(filter(None, [panel["x"]["label"], panel["x"]["unit"] and f"({panel['x']['unit']})"]))
-    y_name = " ".join(filter(None, [panel["y"]["label"], panel["y"]["unit"] and f"({panel['y']['unit']})"]))
-    names = ["סדרה", x_name, y_name] if len(panel["series"]) > 1 else [x_name, y_name]
-    for name in names:
-        ET.SubElement(head, "th", {"scope": "col"}).text = name
-    body = ET.SubElement(table, "tbody")
-    for series in panel["series"]:
-        points = series["points"]
-        if panel["x"]["type"] == "date":
-            first: dict[str, list] = {}
-            for pt in points:
-                first.setdefault(pt[0][:4], pt)
-            points = list(first.values())
-        for x, y in points:
-            tr = ET.SubElement(body, "tr")
-            if len(panel["series"]) > 1:
-                ET.SubElement(tr, "td").text = series["name"]
-            ET.SubElement(tr, "th", {"scope": "row", "dir": "ltr"}).text = f"{x:g}" if isinstance(x, float) else str(x)
-            ET.SubElement(tr, "td", {"dir": "ltr"}).text = f"{y:g}"
-    return table
-
-
 def write_csv(path: Path, header: list[str], rows: list[list]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8-sig", newline="") as f:  # The BOM lets spreadsheet apps read Hebrew.
         writer = csv.writer(f)
         writer.writerow(header)
         writer.writerows(rows)
-
-
-def chart_box(fig_id: str, panels: list[dict], href: str, csv_href: str) -> ET.Element:
-    """Drawing area for reader.js, the source line of each panel, data tables and a CSV link."""
-    box = ET.Element("div", {"class": "chart-box", "data-chart": href})
-    ET.SubElement(box, "div", {"class": "chart-area", "hidden": "hidden"})
-    for panel in panels:
-        line = ET.SubElement(box, "p", {"class": "chart-source"})
-        if panel["source"]["url"]:
-            ET.SubElement(line, "a", {"href": panel["source"]["url"], "rel": "noopener"}).text = panel["source"]["line"]
-        else:
-            line.text = panel["source"]["line"]
-        if panel["notes"]:
-            ET.SubElement(box, "p", {"class": "chart-notes"}).text = panel["notes"]
-    details = ET.SubElement(box, "details", {"class": "print-version"})
-    ET.SubElement(details, "summary").text = "הנתונים בטבלה"
-    for panel in panels:
-        details.append(panel_table(panel))
-    ET.SubElement(box, "a", {"class": "csv-link", "href": csv_href, "download": ""}).text = "הורדת הנתונים (CSV)"
-    return box
-
-
-def load_charts(out: Path, enhancements_file: Path | None, data_dir: Path | None, conv: "Converter") -> dict[str, ET.Element]:
-    panels: dict[str, list[dict]] = {}
-    measured = json.loads(enhancements_file.read_text(encoding="utf-8")).get("charts", {}) if enhancements_file else {}
-    for fig_id, spec in measured.items():
-        data = json.loads((enhancements_file.resolve().parent.parent / spec["data"]).read_text(encoding="utf-8"))
-        panels.setdefault(fig_id, []).append(measured_panel(spec, data, f"enhancements.json: chart for {fig_id}"))
-    for path in sorted((data_dir / "charts").glob("*.json")) if data_dir else []:
-        spec = json.loads(path.read_text(encoding="utf-8"))
-        if spec["figure"] != path.stem:
-            raise BookError(f"{path.name}: figure {spec['figure']!r} does not match the file name")
-        panels.setdefault(path.stem, []).append(chart_panel(spec, f"charts/{path.name}"))
-    result = {}
-    for fig_id, figure_panels in panels.items():
-        if conv.tags.get(fig_id) != "figure":
-            raise missing_id("chart", fig_id, "a figure")
-        (out / "data" / "charts").mkdir(parents=True, exist_ok=True)
-        (out / "data" / "charts" / f"{fig_id}.json").write_text(
-            json.dumps({"figure": fig_id, "panels": figure_panels}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-        rows = [[panel["title"], series["name"], x, y] for panel in figure_panels for series in panel["series"] for x, y in series["points"]]
-        write_csv(out / "data" / "charts" / f"{fig_id}.csv", ["גרף", "סדרה", "x", "y"], rows)
-        result[fig_id] = chart_box(fig_id, figure_panels, f"data/charts/{fig_id}.json", f"data/charts/{fig_id}.csv")
-    return result
-
-
-def load_tables(path: Path | None, conv: "Converter") -> dict[str, dict]:
-    tables = json.loads(path.read_text(encoding="utf-8")).get("tables", {}) if path else {}
-    for fig_id in tables:
-        if conv.tags.get(fig_id) != "figure":
-            raise missing_id("enhancements.json: table", fig_id, "a figure")
-    return tables
-
-
-def load_enhancements(out: Path, conv: Converter, path: Path | None) -> dict[str, dict[str, str]]:
-    """Validate the enhancements file against the EPUB and copy referenced site-only assets."""
-    if path is None:
-        return {}
-    content_root = path.resolve().parent.parent
-    data = json.loads(path.read_text(encoding="utf-8"))
-    result: dict[str, dict[str, str]] = {}
-    for fig_id, fig in data["figures"].items():
-        if conv.tags.get(fig_id) != "figure":
-            raise missing_id("enhancements.json: figures", fig_id, "a figure")
-        original = content_root / fig["original"]
-        if not original.is_file():
-            raise BookError(f"enhancements.json: {fig_id}: {original} does not exist")
-        dest = out / "originals" / original.name
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(original, dest)
-        result[fig_id] = {"original": f"originals/{original.name}"}
-    return result
-
-
-PHOTO_WIDTHS = (960, 1920)
-PREVIEW_SIZE = (1200, 630)  # Open Graph and Twitter large image.
-
-
-def feature_photo(enhancements_file: Path | None, out: Path) -> tuple[str, str]:
-    """The enhancements "hero" block {image, alt, credit, caption, source}: a credited photograph that closes the
-    book above the footer, and the link preview image. Returns (closing figure HTML, preview image path);
-    empty strings when the block is absent."""
-    photo = json.loads(enhancements_file.read_text(encoding="utf-8")).get("hero") if enhancements_file else None
-    if not photo:
-        return "", ""
-    if not (photo["alt"] and photo["credit"] and photo["caption"] and photo["source"]):
-        raise BookError("enhancements.json: hero needs alt, caption, credit and source")
-    (out / "media").mkdir(exist_ok=True)
-    with Image.open(enhancements_file.resolve().parent.parent / photo["image"]) as im:
-        rgb = im.convert("RGB")
-        for width in PHOTO_WIDTHS:
-            copy = rgb.copy()
-            copy.thumbnail((width, width * 4))
-            copy.save(out / "media" / f"feature-{width}.webp", "WEBP", quality=80, method=6)
-        ImageOps.fit(rgb, PREVIEW_SIZE).save(out / "media" / "preview.jpg", "JPEG", quality=82, optimize=True)
-    srcset = ", ".join(f"media/feature-{w}.webp {w}w" for w in PHOTO_WIDTHS)
-    figure = (f'<aside aria-label="תמונת הכריכה במסגרתה המלאה"><figure class="closing-photo"><img src="media/feature-{PHOTO_WIDTHS[-1]}.webp" srcset="{srcset}" sizes="100vw" '
-              f'alt="{html.escape(photo["alt"])}" loading="lazy" decoding="async">'
-              f'<figcaption><span class="caption">{html.escape(photo["caption"])}</span>'
-              f'<span class="credit">{html.escape(photo["credit"])}</span>'
-              f'<span class="closing-note">תמונת הכריכה, במסגרתה המלאה.</span></figcaption></figure></aside>')
-    return figure, "media/preview.jpg"
-
-
-def preview_meta(title: str, description: str, image: str) -> str:
-    """Link preview tags. Limit: image URLs are relative, which some preview services do not follow;
-    revisit when the build learns the site's public URL."""
-    tags = [("og:type", "book"), ("og:title", title), ("og:description", description)]
-    if image:
-        tags += [("og:image", image), ("og:image:width", str(PREVIEW_SIZE[0])), ("og:image:height", str(PREVIEW_SIZE[1]))]
-    lines = [f'<meta property="{k}" content="{html.escape(v)}">' for k, v in tags]
-    lines.append(f'<meta name="twitter:card" content="{"summary_large_image" if image else "summary"}">')
-    return "\n".join(lines)
-
-
-def related_html(path: Path | None) -> str:
-    """Footer list of outbound links from the enhancements file. Empty when the file has none."""
-    related = json.loads(path.read_text(encoding="utf-8")).get("related") if path else None
-    if not related:
-        return ""
-    items = []
-    for link in related["links"]:
-        if not link["href"].startswith("https://"):
-            raise BookError(f"enhancements.json: related link {link['href'][:60]!r} must be an https URL")
-        note = f' <span class="related-note">{html.escape(link["note"])}</span>' if link.get("note") else ""
-        items.append(f'<li><a href="{html.escape(link["href"])}" rel="noopener">{html.escape(link["label"])}</a>{note}</li>')
-    title = html.escape(related["title"])
-    return f'<nav class="related" aria-label="{title}"><h2 class="related-title">{title}</h2><ul>{"".join(items)}</ul></nav>'
 
 
 class Thumbs:
@@ -826,131 +393,6 @@ class Thumbs:
         return self.made[src]
 
 
-def oklch_hex(lightness: float, chroma: float, hue: float) -> str | None:
-    """sRGB hex for an OKLCH colour, or None when it is outside the sRGB gamut."""
-    a, b = chroma * math.cos(math.radians(hue)), chroma * math.sin(math.radians(hue))
-    l_ = (lightness + 0.3963377774 * a + 0.2158037573 * b) ** 3
-    m_ = (lightness - 0.1055613458 * a - 0.0638541728 * b) ** 3
-    s_ = (lightness - 0.0894841775 * a - 1.2914855480 * b) ** 3
-    rgb = (4.0767416621 * l_ - 3.3077115913 * m_ + 0.2309699292 * s_,
-           -1.2684380046 * l_ + 2.6097574011 * m_ - 0.3413193965 * s_,
-           -0.0041960863 * l_ - 0.7034186147 * m_ + 1.7076926715 * s_)
-    if any(not 0 <= c <= 1 for c in rgb):
-        return None
-    srgb = (12.92 * c if c <= 0.0031308 else 1.055 * c ** (1 / 2.4) - 0.055 for c in rgb)
-    return "#" + "".join(f"{round(255 * c):02x}" for c in srgb)
-
-
-def place_colours(count: int, lightness: tuple[float, float]) -> list[str]:
-    """One colour per place. Hues step by the golden angle and lightness alternates, so neighbours in the
-    list differ in hue and in lightness. Limit: with many places, some pairs far apart in the list look alike,
-    especially with colour blindness, so each place also shows its number and name. Revisit if places get a grouping."""
-    colours = []
-    for i in range(count):
-        hue, l_, chroma = (25 + i * 137.508) % 360, lightness[i % 2], 0.16
-        # Lower the chroma to fit sRGB, but not below 0.11 (grey territory); turn the hue a little instead.
-        while (colour := oklch_hex(l_, chroma, hue)) is None:
-            chroma -= 0.005
-            if chroma < 0.11:
-                hue, chroma = (hue + 7) % 360, 0.16
-        colours.append(colour)
-    return colours
-
-
-def number_ink(colour: str) -> str:
-    """White or near-black, whichever has more WCAG contrast on the colour, for the number on a place dot."""
-    channels = [int(colour[i:i + 2], 16) / 255 for i in (1, 3, 5)]
-    lum = sum(w * (c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4)
-              for w, c in zip((0.2126, 0.7152, 0.0722), channels))
-    return "#ffffff" if 1.05 / (lum + 0.05) >= (lum + 0.05) / 0.0617 else "#1c1a17"  # 0.0617: luminance of #1c1a17 + 0.05.
-
-
-def place_style(count: int) -> str:
-    """CSS custom properties --place-N (colour) and --place-ink-N (number colour) for light and dark mode."""
-    def props(colours: list[str]) -> str:
-        return " ".join(f"--place-{i}: {c}; --place-ink-{i}: {number_ink(c)};" for i, c in enumerate(colours, start=1))
-    light = props(place_colours(count, (0.48, 0.7)))
-    dark = props(place_colours(count, (0.5, 0.665)))
-    return (f":root {{ {light} }}\n@media (prefers-color-scheme: dark) {{ :root:not([data-theme=\"light\"]) {{ {dark} }} }}\n"
-            f":root[data-theme=\"dark\"] {{ {dark} }}")
-
-
-def places_html(data_dir: Path | None, conv: "Converter", thumbs: Thumbs) -> str:
-    """Map section from places.json: {"places": [{id, name, lat, lon, wikidata, targets, description,
-    description_source, figures}]}. Every element ID must exist in the EPUB. Empty when the file is absent."""
-    path = data_dir / "places.json" if data_dir else None
-    if path is None or not path.is_file():
-        return ""
-    places = json.loads(path.read_text(encoding="utf-8"))["places"]
-    items, points, seen = [], [], set()
-    for n, place in enumerate(places, start=1):
-        pid, name, lat, lon = place["id"], place["name"], float(place["lat"]), float(place["lon"])
-        where = f"places.json: place {pid!r}"
-        if pid in seen or pid in conv.ids:
-            raise BookError(f"{where}: id is not unique")
-        seen.add(pid)
-        if not (-90 <= lat <= 90 and -180 <= lon <= 180):
-            raise BookError(f"{where}: bad coordinates")
-        if not (place["wikidata"].startswith("Q") and place["wikidata"][1:].isdigit()):
-            raise BookError(f"{where}: wikidata must be a Q identifier")
-        for ref in [*place["targets"], place["description_source"]]:
-            if ref not in conv.ids:
-                raise missing_id(where, ref)
-        kind = place["description_kind"]
-        if kind not in ("book", "edition") or (kind == "edition" and not place.get("description_url", "").startswith("https://")):
-            raise BookError(f"{where}: description_kind must be book or edition; an edition description needs an https description_url")
-        if not isinstance(place.get("far", False), bool):
-            raise BookError(f"{where}: far must be true or false")
-        if not place["targets"]:
-            raise BookError(f"{where}: needs at least one target")
-        for fig in place["figures"]:
-            if fig not in conv.figure_img:
-                raise missing_id(where, fig, "a figure with an image")
-        first_target: dict[str, str] = {}  # Chapter ID -> the place's first target in it, in file order.
-        for t in place["targets"]:
-            first_target.setdefault(conv.chapter_of[t], t)
-        chapters = [{"href": f"#{t}", "chapter": c, "title": conv.chapter_title[c]} for c, t in first_target.items()]
-        points.append({
-            "id": pid, "n": n, "name": name, "lat": lat, "lon": lon, "far": place.get("far", False),
-            "wikidata": f"https://www.wikidata.org/wiki/{place['wikidata']}",
-            "description": place["description"], "source": f"#{place['description_source']}",
-            "description_kind": kind, "description_url": place.get("description_url"),
-            "chapters": chapters,
-            "figures": [{"href": f"#{f}", "thumb": thumbs(conv.figure_img[f][0]), "alt": conv.figure_img[f][1]}
-                        for f in place["figures"]],
-        })
-        links = "".join(f'<a href="{html.escape(c["href"])}">{html.escape(c["title"])}</a>' for c in chapters)
-        items.append(f'<li id="place-{html.escape(pid)}" style="--place: var(--place-{n}); --ink: var(--place-ink-{n})">'
-                     f'<i class="place-dot" aria-hidden="true"></i>'
-                     f'<span class="place-name">{html.escape(name)}</span><span class="place-chapters">{links}</span></li>')
-    data = json.dumps(points, ensure_ascii=False).replace("</", "<\\/")
-    return ('<section class="places" id="places" aria-labelledby="places-title">'
-            '<div class="places-head"><h2 id="places-title">המקומות בספר</h2>'
-            '<p class="places-intro">לחיצה על מקום במפה מציגה את תיאורו מתוך הספר ואת הפרקים שבהם הוא מופיע.</p></div>'
-            '<div class="places-map" id="places-map" hidden></div>'
-            f'<details class="places-all"><summary>כל המקומות ({len(places)})</summary>'
-            f'<ol class="places-list">{"".join(items)}</ol></details>'
-            f'<style>{place_style(len(places))}</style>'
-            f'<script type="application/json" id="places-data">{data}</script></section>')
-
-
-BRAND_FILES = ("favicon.ico", "icon.svg", "apple-touch-icon.png", "icon-192.png", "icon-512.png", "icon-mask.png")
-ICON_LINKS = """<link rel="icon" href="favicon.ico" sizes="32x32">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">"""
-
-
-def brand_files(enhancements_file: Path | None) -> list[Path]:
-    """Icon files from the brand/ folder next to the enhancements file. A book without that folder has no icons."""
-    folder = enhancements_file.parent / "brand" if enhancements_file else None
-    if folder is None or not folder.is_dir():
-        return []
-    files = [folder / name for name in BRAND_FILES]
-    if missing := [f.name for f in files if not f.is_file()]:
-        raise BookError(f"{folder}: missing icon files {missing}")
-    return files
-
-
 def fill(template: str, values: dict[str, str]) -> str:
     """Replace {{key}} markers in one pass, so marker text inside book content stays literal."""
     head, *parts = template.split("{{")
@@ -966,11 +408,51 @@ def fill(template: str, values: dict[str, str]) -> str:
     return "".join(out)
 
 
+@dataclass
+class Site:
+    """What a feature module sees: the book, the converter, the output folder and the site data folder."""
+
+    z: zipfile.ZipFile
+    book: Book
+    conv: Converter
+    out: Path
+    epub: Path
+    enhancements_file: Path | None
+    data_dir: Path | None  # The folder that holds enhancements.json and the other site data files.
+    thumbs: Thumbs
+    report: dict[str, object]
+
+
+HOOKS = ("load", "transform", "after_contents", "values", "write")
+SHARED_SLOTS = ("head", "end")  # Template markers that several features may fill; their parts join in feature order.
+
+
+def load_features() -> list[ModuleType]:
+    """Every tools/web/*.py feature module, in file name order. Each build loads them fresh, so module state never
+    carries over from an earlier build. A module defines any of HOOKS (see site/features/README.md)."""
+    features = []
+    for path in sorted((ROOT / "tools" / "web").glob("*.py")):
+        spec = importlib.util.spec_from_file_location(f"web_feature_{path.stem}", path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        if not any(hasattr(module, hook) for hook in HOOKS):
+            raise BookError(f"{path.name}: a feature module needs at least one of {HOOKS}")
+        features.append(module)
+    return features
+
+
+def bundle(suffix: str) -> str:
+    """site/features/*.js or *.css joined in file name order: one script and one stylesheet for the page."""
+    return "".join(p.read_text(encoding="utf-8") for p in sorted((SITE / "features").glob(f"*{suffix}")))
+
+
 def build(epub: Path, out: Path, enhancements_file: Path | None = SITE / "enhancements.json") -> dict[str, object]:
     if out.exists():
         shutil.rmtree(out)
     out.mkdir(parents=True)
     epub_bytes = epub.read_bytes()
+    features = load_features()
+    hooked = lambda hook: [getattr(f, hook) for f in features if hasattr(f, hook)]  # noqa: E731
     with zipfile.ZipFile(epub) as z:
         book = read_book(z)
         conv = Converter(z, book)
@@ -980,86 +462,72 @@ def build(epub: Path, out: Path, enhancements_file: Path | None = SITE / "enhanc
             dest = out / "book" / path
             dest.parent.mkdir(parents=True, exist_ok=True)
             dest.write_bytes(z.read(path))
-        thumbs = Thumbs(out)
         data_dir = enhancements_file.parent if enhancements_file else None
+        site = Site(z, book, conv, out, epub, enhancements_file, data_dir, Thumbs(out), {})
         load_id_moves(enhancements_file.resolve().parent.parent if enhancements_file else ROOT)
-        enhancements = load_enhancements(out, conv, enhancements_file)
-        conv.tables = load_tables(enhancements_file, conv)
-        for fig_id, spec in conv.tables.items():
-            write_csv(out / "data" / "tables" / f"{fig_id}.csv", spec["columns"], spec["rows"])
-        conv.charts = load_charts(out, enhancements_file, data_dir, conv)
-        conv.crosslinks = load_crosslinks(data_dir, conv)
-        conv.glossary = load_glossary(data_dir, conv)
-        docs = [conv.convert(item, body, enhancements) for item, body in conv.bodies]
-        # The places map sits right after the printed contents, or before the book when it has none.
+        for load in hooked("load"):
+            load(site)
+        transforms = [functools.partial(t, site) for t in hooked("transform")]
+        docs = [conv.convert(item, body, transforms) for item, body in conv.bodies]
+        # Feature sections that sit right after the printed contents, or before the book when it has none.
         at = conv.kinds.index("contents") + 1 if "contents" in conv.kinds else 0
-        docs.insert(at, places_html(data_dir, conv, thumbs))
-        toc = toc_html(z, book, conv)
-        timeline = timeline_html(data_dir, conv)
+        docs.insert(at, "".join(part(site) for part in hooked("after_contents")))
+        values: dict[str, str] = dict.fromkeys(SHARED_SLOTS, "")
+        for feature_values in hooked("values"):
+            for key, value in feature_values(site).items():
+                if key in SHARED_SLOTS:
+                    values[key] += value
+                elif key in values:
+                    raise BookError(f"template marker {key!r} has two features")
+                else:
+                    values[key] = value
         conv.check_links()
     css = next(p for p in assets if p.endswith(".css"))
-    closing = feature_photo(enhancements_file, out)
     # The Kindle download is the canonical EPUB itself. Send to Kindle accepts EPUB.
     download = out / "download" / epub.name
     download.parent.mkdir()
     download.write_bytes(epub_bytes)
-    page = fill(
-        (SITE / "index.html").read_text(encoding="utf-8"),
-        {
-            "lang": html.escape(book.language),
-            "dir": book.direction,
-            "title": html.escape(book.title),
-            "creator": html.escape(book.creator),
-            "description": html.escape(book.description),
-            "cover": html.escape(f"book/{book.cover.path}"),
-            "epub_href": html.escape(f"download/{epub.name}"),
-            "epub_size": f"{len(epub_bytes) / 1_000_000:.1f} MB",
-            "book_id": html.escape(book.identifier),
-            "book_css": html.escape(f"book/{css}"),
-            "toc": toc,
-            "timeline_tab": timeline[0],
-            "timeline": timeline[1],
-            "glossary": glossary_data(conv.glossary) if conv.glossary else "",
-            "font_preload": "\n".join(
-                f'<link rel="preload" href="{html.escape("book/" + i.path)}" as="font" type="{i.media_type}" crossorigin>'
-                for i in sorted(book.items.values(), key=lambda i: i.path)
-                if i.media_type.startswith("font/")
-            ),
-            "colophon": "\n".join(conv.colophon),
-            "related": related_html(enhancements_file),
-            "closing_photo": closing[0],
-            "preview_meta": preview_meta(book.title, book.description, closing[1]),
-            "icons": ICON_LINKS if brand_files(enhancements_file) else "",
-            "short_title": html.escape(book.creator),  # The bar shows the author's name when the title does not fit.
-            "book": "\n".join(docs),
-        },
-    )
+    core = {
+        "lang": html.escape(book.language),
+        "dir": book.direction,
+        "title": html.escape(book.title),
+        "creator": html.escape(book.creator),
+        "description": html.escape(book.description),
+        "cover": html.escape(f"book/{book.cover.path}"),
+        "epub_href": html.escape(f"download/{epub.name}"),
+        "epub_size": f"{len(epub_bytes) / 1_000_000:.1f} MB",
+        "book_id": html.escape(book.identifier),
+        "book_css": html.escape(f"book/{css}"),
+        "font_preload": "\n".join(
+            f'<link rel="preload" href="{html.escape("book/" + i.path)}" as="font" type="{i.media_type}" crossorigin>'
+            for i in sorted(book.items.values(), key=lambda i: i.path)
+            if i.media_type.startswith("font/")
+        ),
+        "colophon": "\n".join(conv.colophon),
+        "short_title": html.escape(book.creator),  # The bar shows the author's name when the title does not fit.
+        "book": "\n".join(docs),
+    }
+    if clash := core.keys() & values.keys():
+        raise BookError(f"features fill core template markers {sorted(clash)}")
+    page = fill((SITE / "index.html").read_text(encoding="utf-8"), core | values)
     (out / "index.html").write_text(page, encoding="utf-8")
-    for name in ("reader.css", "reader.js"):
-        shutil.copyfile(SITE / name, out / name)
-    for path in brand_files(enhancements_file):
-        shutil.copyfile(path, out / path.name)
-    # Location: the running number of a text block (its index here plus one), like a Kindle location.
-    search = [
-        {"id": e.id, "page": e.page, "section": e.section, "chapter": e.chapter, "text": e.text,
-         "kind": SEARCH_KIND.get(conv.tags[e.id], "text")} | ({"thumb": thumbs(e.img)} if e.img else {})
-        for e in conv.search
-    ]
-    index = {"pages": conv.pages, "entries": search}
-    (out / "search.json").write_text(json.dumps(index, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-    report: dict[str, object] = {
+    (out / "reader.css").write_text(bundle(".css"), encoding="utf-8")
+    (out / "reader.js").write_text(bundle(".js"), encoding="utf-8")
+    site.report.update({
         "epub": epub.name,
         "epub_sha256": hashlib.sha256(epub_bytes).hexdigest(),
         "spine": [i.path for i in book.spine],
         "ids": len(conv.ids),
-        "search_entries": len(search),
-        "enhanced_ids": sorted(enhancements),
-    }
-    (out / "build.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    return report
+    })
+    for write in hooked("write"):
+        write(site)
+    (out / "build.json").write_text(json.dumps(site.report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return site.report
 
 
 if __name__ == "__main__":
+    # Feature modules import this file as "build_web"; make that name this running module, not a second copy.
+    sys.modules.setdefault("build_web", sys.modules["__main__"])
     epub = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "dist" / "book.epub"
     out = Path(sys.argv[2]) if len(sys.argv) > 2 else ROOT / "dist" / "web"
     enh: Path | None = SITE / "enhancements.json"

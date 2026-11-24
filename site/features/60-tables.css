@@ -1,0 +1,21 @@
+/* Data tables rebuilt from printed table images. Bars show the highlighted column against its largest value. */
+.book figure.has-table { max-width: 46rem; margin-inline: auto; }
+.book table.data-table { width: 100%; margin: 0; border-collapse: collapse; font-family: var(--sans); font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+.data-table th, .data-table td { padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--rule); text-align: start; vertical-align: middle; }
+.data-table tbody th { font-weight: 500; }
+.data-table thead th { padding: 0; border-bottom: 2px solid var(--ink); }
+.data-table thead button { width: 100%; padding: 0.5rem 0.6rem; font: inherit; font-weight: 600; text-align: start; color: inherit; background: none; border: 0; cursor: pointer; }
+.data-table thead button::after { content: " ↕"; color: var(--muted); font-weight: 400; }
+.data-table th[aria-sort="ascending"] button::after { content: " ↑"; color: var(--accent); }
+.data-table th[aria-sort="descending"] button::after { content: " ↓"; color: var(--accent); }
+.data-table td.bar { background: linear-gradient(to left, color-mix(in srgb, var(--accent) 22%, transparent) calc(var(--v) * 100%), transparent 0); }
+.book figure.has-table { overflow-x: auto; }
+@media (max-width: 40rem) {
+  .book table.data-table { font-size: 0.75rem; }
+  .data-table th, .data-table td { padding: 0.35rem 0.3rem; }
+  .data-table thead button { padding: 0.4rem 0.3rem; }
+}
+.print-version { margin-top: 0.75rem; font-family: var(--sans); font-size: 0.85rem; }
+.print-version summary { cursor: pointer; color: var(--muted); }
+.print-version img { margin-top: 0.75rem; }
+
