@@ -31,6 +31,8 @@ import shutil
 import sys
 import tomllib
 import unicodedata
+import xml.etree.ElementTree as ET
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal
@@ -118,6 +120,57 @@ class Unit:
 
 class IngestError(Exception):
     """The PDF or the config breaks an assumption of this script."""
+
+
+def squash(text: str) -> str:
+    """Text without spaces and points, for comparing paragraph texts between builds."""
+    return "".join(c for c in text if not c.isspace() and not unicodedata.combining(c))
+
+
+def id_key(text: str) -> str:
+    """Start of a paragraph's text: the key that keeps its ID from build to build."""
+    return squash(text)[:40]
+
+
+class IdRegistry:
+    """Paragraph IDs that stay stable when ingestion changes where paragraphs start and end.
+
+    CONTENT_DIR/ids.csv lists each paragraph ID with the key of its text, in book order. A new paragraph takes
+    the next unused ID of its unit whose key starts like its own; otherwise it gets a new number after the
+    unit's highest. An ID whose paragraph joined another one is gone; run() records where its text went.
+    """
+
+    def __init__(self, path: Path) -> None:
+        self.path = path
+        self.rows: dict[str, list[tuple[str, str]]] = {}
+        if path.exists():
+            with path.open(encoding="utf-8", newline="") as f:
+                for row in csv.DictReader(f):
+                    self.rows.setdefault(row["id"].rsplit("-p", 1)[0], []).append((row["id"], row["key"]))
+        self.used: set[str] = set()
+        self.pos: dict[str, int] = {}
+        self.top = {u: max(int(i.rsplit("-p", 1)[1]) for i, _ in rows) for u, rows in self.rows.items()}
+        self.assigned: list[tuple[str, str]] = []
+
+    def assign(self, unit: str, text: str) -> str:
+        key = id_key(text)
+        rows = self.rows.get(unit, [])
+        start = self.pos.get(unit, 0)
+        for i in [*range(start, len(rows)), *range(start)]:
+            old_id, old_key = rows[i]
+            n = min(len(old_key), len(key))
+            if old_id not in self.used and (old_key == key or (n >= 12 and old_key[:n] == key[:n])):
+                self.used.add(old_id)
+                self.pos[unit] = i + 1
+                self.assigned.append((old_id, key))
+                return old_id
+        self.top[unit] = self.top.get(unit, 0) + 1
+        new_id = f"{unit}-p{self.top[unit]:03d}"
+        self.assigned.append((new_id, key))
+        return new_id
+
+    def gone(self) -> list[tuple[str, str]]:
+        return [(i, k) for rows in self.rows.values() for i, k in rows if i not in self.used]
 
 
 def hebrew_share(text: str) -> float:
@@ -367,6 +420,13 @@ def swap_reversed_pairs(markup: str) -> tuple[str, list[str]]:
     return "".join(out), fixed
 
 
+def has_list_label(text: str) -> bool:
+    """The line starts with a list label: one Hebrew letter or one or two digits, and a full stop ("ד.", "12.")."""
+    head = text.split(" ", 1)[0]
+    label = head[:-1]
+    return head.endswith(".") and ((len(label) == 1 and is_hebrew(label)) or (label.isdigit() and len(label) <= 2))
+
+
 def figs_above(figs: list["Figure"], line: Line) -> bool:
     return any(f.bbox[3] <= line.y0 + 2 for f in figs)
 
@@ -475,6 +535,7 @@ class Ingest:
         self.assets: list[dict[str, str]] = []
         self.seen_xrefs: dict[int, str] = {}
         self.units = self.load_units()
+        self.ids = IdRegistry(content / "ids.csv")
 
     # ---------- structure ----------
 
@@ -509,13 +570,27 @@ class Ingest:
         page_rtl = hebrew_share(" ".join(ln.text for ln in merged)) >= 0.5
         for ln in merged:
             # Line direction: without letters, the page direction; on a Hebrew page, any Hebrew letter makes
-            # the line right to left (a mostly Latin reference line inside a Hebrew paragraph).
+            # the line right to left (a mostly Latin reference line inside a Hebrew paragraph). On a Latin page,
+            # any Latin letter makes a body line left to right (a Hebrew reference inside English text, PDF page 34).
             has_hebrew = any(is_hebrew(c) for c in ln.text)
-            wanted = page_rtl if not any(c.isalpha() for c in ln.text) else (
-                has_hebrew if page_rtl else hebrew_share(ln.text) >= 0.5)
+            has_latin = any(c.isascii() and c.isalpha() for c in ln.text)
+            if not any(c.isalpha() for c in ln.text):
+                wanted = page_rtl
+            elif page_rtl:
+                wanted = has_hebrew
+            else:
+                wanted = not has_latin if ln.role == "body" else hebrew_share(ln.text) >= 0.5
             if wanted != ln.rtl:
                 ln.rtl = wanted
                 ln.text, ln.html = render_best(ln.clusters, ln.size, wanted)
+        # A body line of Latin text only that starts at the right edge right under a Hebrew line ends that
+        # Hebrew paragraph (a citation, PDF page 264). Read it right to left: ".(Katz et al. 1977)" -> "(Katz et al. 1977).".
+        right = max((ln.x1 for ln in merged if ln.role == "body"), default=0.0)
+        for prev, ln in zip(merged, merged[1:]):
+            if (page_rtl and prev.rtl and not ln.rtl and ln.role == prev.role == "body" and -3 <= ln.y0 - prev.y1 < 3
+                    and ln.x1 >= right - float(self.layout["indent_tolerance"]) and not any(is_hebrew(c) for c in ln.text)):
+                ln.rtl = True
+                ln.text, ln.html = render_best(ln.clusters, ln.size, True)
         kept = []
         for ln in merged:
             rule = next((o for o in self.cfg.get("omit", []) if o["page"] == pno and o["contains"] in ln.text), None)
@@ -710,7 +785,7 @@ class Ingest:
 
     # ---------- assembly ----------
 
-    def paragraphs(self, lines: list[Line]) -> list[list[Line]]:
+    def paragraphs(self, lines: list[Line], figs: Sequence[Figure] = ()) -> list[list[Line]]:
         if not lines:
             return []
         body = [ln for ln in lines if ln.role == "body"] or lines
@@ -719,21 +794,37 @@ class Ingest:
         paras: list[list[Line]] = [[lines[0]]]
         for n, (prev, cur) in enumerate(zip(lines, lines[1:])):
             gap = cur.y0 - prev.y1
-            if cur.role != prev.role or gap > max(cur.y1 - cur.y0, 6) * 0.9 or gap < -2:
+            # Lines of one paragraph can overlap a little: a tall glyph ("=" on PDF page 264) raises a line box.
+            overlap = 4 if cur.role == "body" else 2
+            if cur.role != prev.role or gap > max(cur.y1 - cur.y0, 6) * 0.9 or gap < -overlap:
                 paras.append([cur])
                 continue
             # The column edge near these lines: a figure beside the text narrows the column locally.
+            # A list label ("ד." on PDF page 282) hangs outside the column, so its line does not set the edge.
             near = [ln for ln in lines[max(0, n - 1):n + 3] if ln.role == cur.role]
+            near = [ln for ln in near if not has_list_label(ln.text)] or near
             col_left, col_right = min(ln.x0 for ln in near), max(ln.x1 for ln in near)
+            # Where a figure beside the text ends, the column widens. The wider lines below must not make
+            # the last narrow line look short (PDF page 234): judge that line against the lines above it.
+            prev_left, prev_right = col_left, col_right
+            beside = [f for f in figs if f.bbox[1] < prev.y1 and prev.y0 < f.bbox[3] <= cur.y0 + 2
+                      and (f.bbox[2] <= prev.x0 + 2 if prev.rtl else f.bbox[0] >= prev.x1 - 2)]
+            if beside:
+                above = [ln for ln in lines[max(0, n - 2):n + 1] if ln.role == prev.role]
+                prev_left, prev_right = min(ln.x0 for ln in above), max(ln.x1 for ln in above)
             if cur.rtl:
                 starts = cur.x1 < min(right, col_right) - indent
-                prev_short = prev.x0 > max(left, col_left) + short
+                prev_short = prev.x0 > max(left, prev_left) + short
             else:
                 starts = cur.x0 > max(left, col_left) + indent
-                prev_short = prev.x1 < min(right, col_right) - short
+                prev_short = prev.x1 < min(right, prev_right) - short
             if cur.role in ("footnote", "caption", "small"):
                 # Notes and sources use hanging indents: only a leading number starts a new entry.
                 starts = cur.text.split(" ", 1)[0].rstrip(".").isdigit()
+            if cur.role == "body" and has_list_label(cur.text):
+                starts = True  # A list item.
+            if cur.role == "body" and gap >= float(self.layout["paragraph_gap"]):
+                starts = True  # Print adds space between paragraphs that start without an indent.
             if starts or (prev_short and cur.role == "body"):
                 paras.append([cur])
             else:
@@ -1003,7 +1094,7 @@ class Ingest:
             body, heading = self.contents_html(unit)
             self.page_ids.update({p: [unit.id] for p in range(unit.start, unit.end + 1)})
             return body, [], heading
-        counters = {"p": 0, "fig": 0, "n": 0}
+        counters = {"fig": 0, "n": 0}
         notes: dict[int, dict[str, object]] = {}
         last_note: int | None = None
         prev_note_y = -1e9
@@ -1017,7 +1108,7 @@ class Ingest:
             figs = self.figures(pno)
             lines = self.attach_captions(figs, self.lines(pno))
             flow: list[tuple[float, str]] = []
-            paras = self.paragraphs(lines)
+            paras = self.paragraphs(lines, figs)
             body_paras = [pa for pa in paras if pa[0].role == "body"]
             top_body = body_paras[0] if body_paras else None
             next_open: str | None = None
@@ -1062,8 +1153,7 @@ class Ingest:
                         continue
                     self.issue(pno, "note", f"{unit.id}: small print at the page foot without a number; kept as a paragraph")
                     role = "caption"
-                counters["p"] += 1
-                pid = f"{unit.id}-p{counters['p']:03d}"
+                pid = self.ids.assign(unit.id, " ".join(ln.text for ln in para))
                 tag = {"title": "p", "display": "p"}.get(role, "p")
                 cls = {"title": "display-title", "display": "display-title", "byline": "byline",
                        "subheading": "subheading", "caption": "small"}.get(role)
@@ -1171,6 +1261,7 @@ class Ingest:
         unused = sorted(set(self.cfg.get("alt", {})) - self.used_alt)
         if unused:
             raise IngestError(f"book.toml [alt] keys match no image: {unused}")
+        self.write_ids()
         self.write_inventory()
 
     def write_cover(self) -> str | None:
@@ -1260,6 +1351,35 @@ class Ingest:
             for u, href, _ in docs for p in u.pages)
         nav = NAV.format(lang=m["language"], toc=toc, pages=pages)
         (self.out / "OEBPS" / "nav.xhtml").write_text(nav, encoding="utf-8")
+
+    def write_ids(self) -> None:
+        """Save the ID registry. A gone ID must have its text inside another paragraph: log the move, or stop."""
+        texts: dict[str, str] = {}
+        for f in (self.out / "OEBPS" / "text").glob("*.xhtml"):
+            for el in ET.parse(f).getroot().iter():
+                if (el_id := el.get("id")) and el_id.rsplit("-p", 1)[-1].isdigit():
+                    texts[el_id] = squash("".join(el.itertext()))
+        moves, lost = [], []
+        for old_id, key in self.ids.gone():
+            home = [i for i, t in texts.items() if key in t]
+            if len(home) != 1:
+                lost.append(f"{old_id} {key!r} -> {home or 'no paragraph'}")
+                continue
+            moves.append({"old_id": old_id, "new_id": home[0]})
+            self.issue(0, "id-moved", f"{old_id}: paragraph joined {home[0]}; update references to it")
+        if lost:
+            raise IngestError("gone paragraph IDs whose text is in no single paragraph. Check the paragraph rules. "
+                              "If a text fix changed the text on purpose, put the new start text as the key in ids.csv:\n  "
+                              + "\n  ".join(lost))
+        with self.ids.path.open("w", encoding="utf-8", newline="") as f:
+            w = csv.writer(f, lineterminator="\n")
+            w.writerow(["id", "key"])
+            w.writerows(self.ids.assigned)
+        self.inventory.mkdir(exist_ok=True)
+        with (self.inventory / "id-moves.csv").open("w", encoding="utf-8", newline="") as f:
+            w2 = csv.DictWriter(f, fieldnames=["old_id", "new_id"], lineterminator="\n")
+            w2.writeheader()
+            w2.writerows(moves)
 
     def write_inventory(self) -> None:
         inv = self.inventory

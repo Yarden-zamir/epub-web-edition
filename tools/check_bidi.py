@@ -9,6 +9,8 @@ Usage: uv run tools/check_bidi.py CONTENT_DIR [--show N]
 
 Brackets compare as one symbol, because Hebrew and Latin fonts store them differently
 (tools/check_text.py checks bracket pairs). Spaces are ignored.
+book.toml [[bidi_reviewed]] lists lines that differ on purpose (page and a text the line contains). They are
+counted, not failed. An entry that matches no differing line is an error, so the list stays true.
 """
 
 import sys
@@ -30,6 +32,8 @@ def main() -> None:
     content = Path(sys.argv[1]).resolve()
     show = int(sys.argv[sys.argv.index("--show") + 1]) if "--show" in sys.argv else 15
     ing = ingest_pdf.Ingest(content)
+    reviewed = [(r["page"], r["contains"]) for r in ing.cfg.get("bidi_reviewed", [])]
+    seen: set[tuple[int, str]] = set()
     total = bad = 0
     examples = []
     for pno in range(1, ing.doc.page_count + 1):
@@ -40,10 +44,15 @@ def main() -> None:
             shown = key(get_display(ln.text, base_dir="R" if ln.rtl else "L"))
             total += 1
             if shown != printed:
+                if hits := [r for r in reviewed if r[0] == pno and r[1] in ln.text]:
+                    seen.update(hits)
+                    continue
                 bad += 1
                 if len(examples) < show:
                     examples.append(f"p{pno}: printed {printed[:70]!r}\n      shown   {shown[:70]!r}")
-    print(f"lines {total} | order differs from print {bad}")
+    if stale := [r for r in reviewed if r not in seen]:
+        raise SystemExit(f"book.toml [[bidi_reviewed]] entries match no differing line: {stale}")
+    print(f"lines {total} | order differs from print {bad} | reviewed differences {len(seen)}")
     print("\n".join(examples))
     sys.exit(1 if bad else 0)
 
