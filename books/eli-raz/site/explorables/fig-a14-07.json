@@ -4,10 +4,33 @@
   "title": "ירידת המפלס והיווצרות הבולענים",
   "instruction": "גררו את פני האגם למטה, או הזיזו את המחוון, וראו מה קורה לשכבת המלח.",
   "schematic": "שרטוט סכמטי לפי האיור המודפס, לא בקנה מידה. המפלסים לקוחים מהאיור ומנתוני רשות המים. קצב ההמסה והקריסה בשרטוט הוא להמחשה בלבד.",
-  "control": {"label": "מפלס ים המלח", "min": 395, "max": 441.5, "step": 0.5, "start": 395, "unit": "מטר מתחת לפני הים"},
+  "control": {
+    "label": "מפלס ים המלח",
+    "min": 395,
+    "max": 441.5,
+    "step": 0.5,
+    "start": 395,
+    "unit": "מטר מתחת לפני הים",
+    "hint": 8
+  },
   "marks": [
-    {"value": 395, "year": "1960", "note": "מפלס 395- באיור המודפס"},
-    {"value": 414, "year": "2000", "note": "מפלס 414- באיור המודפס"}
+    {
+      "value": 395,
+      "label": "1960",
+      "year": "1960",
+      "note": "מפלס 395- באיור המודפס"
+    },
+    {
+      "value": 414,
+      "label": "2000",
+      "year": "2000",
+      "note": "מפלס 414- באיור המודפס"
+    },
+    {
+      "value": 441.5,
+      "label": "היום",
+      "note": "מדידת רשות המים האחרונה (נובמבר 2026)"
+    }
   ],
   "labels": {
     "slope": "מדרון החוף",
@@ -18,7 +41,9 @@
     "groundwater": "מי תהום",
     "west": "מערב",
     "east": "מזרח",
-    "drag": "גררו"
+    "drag": "גררו",
+    "fresh_dissolves": "מי תהום מתוקים ממיסים את המלח",
+    "sinkhole": "בולען: הקרקע קורסת / אל החלל שהמלח הותיר"
   },
   "texts": {
     "protected": "במפלס גבוה, אופפים מי ים המלח הרוויים (שאינם יכולים להמס מלח) את שכבת המלח, ומגינים עליה מפני המסה על ידי מי התהום.",
@@ -30,15 +55,64 @@
   },
   "geometry_note": "The cross-section follows the printed figure: in 1960 (level -395) the salt layer lies below the interface; in 2000 (level -414) its western part lies above it, in fresh groundwater. Positions between and after these levels are a linear schematic, not a model.",
   "sources": [
-    {"label": "האיור המודפס וכיתובו (מפלסים 395- ו־414-, תוויות)", "element": "fig-a14-07"},
-    {"label": "שלבי היווצרות הבולען", "element": "fig-a14-06"},
-    {"label": "שכבת מלח בעומק 20 עד 70 מ' (Wachs et al. 2000)", "element": "a14-p013"},
-    {"label": "ממערב לשכבת המלח אין בולענים", "element": "a14-p060"},
-    {"label": "מספר הבולענים המצטבר (Nof, Abelson, Raz et al. 2019)", "element": "fig-a14-08"},
-    {"label": "מפלס ים המלח: רשות המים, data.gov.il", "url": "https://data.gov.il/dataset/https-www-data-gov-il-dataset-683"}
+    {
+      "label": "האיור המודפס וכיתובו (מפלסים 395- ו־414-, תוויות)",
+      "element": "fig-a14-07"
+    },
+    {
+      "label": "שלבי היווצרות הבולען",
+      "element": "fig-a14-06"
+    },
+    {
+      "label": "שכבת מלח בעומק 20 עד 70 מ' (Wachs et al. 2000)",
+      "element": "a14-p013"
+    },
+    {
+      "label": "ממערב לשכבת המלח אין בולענים",
+      "element": "a14-p060"
+    },
+    {
+      "label": "מספר הבולענים המצטבר (Nof, Abelson, Raz et al. 2019)",
+      "element": "fig-a14-08"
+    },
+    {
+      "label": "מפלס ים המלח: רשות המים, data.gov.il",
+      "url": "https://data.gov.il/dataset/https-www-data-gov-il-dataset-683"
+    }
   ],
   "data": {
-    "level": {"file": "data/dead-sea-level.json"},
-    "sinkholes": {"file": "charts/fig-a14-08.json", "series": "בולענים (מצטבר)"}
-  }
+    "level": {
+      "file": "data/dead-sea-level.json"
+    },
+    "sinkholes": {
+      "file": "charts/fig-a14-08.json",
+      "series": "בולענים (מצטבר)"
+    }
+  },
+  "label_notes": {
+    "fresh_dissolves": "Plain wording of the printed figure: the salt layer is exposed to dissolution by the undersaturated groundwater (fig-a14-07), while the saturated Dead Sea water cannot dissolve salt.",
+    "sinkhole": "Plain wording of a14-p012 (sinkholes are gravitational collapses of the surface into a volume deficit below it) and of the fig-a14-06 caption (collapse into dissolution cavities in the salt). ' / ' splits the two lines."
+  },
+  "legend": [
+    {
+      "swatch": "dry-ground",
+      "label": "קרקע יבשה"
+    },
+    {
+      "swatch": "fresh-ground",
+      "label": "קרקע ספוגה במי תהום מתוקים"
+    },
+    {
+      "swatch": "brine-ground",
+      "label": "קרקע ספוגה במי ים המלח הרוויים"
+    },
+    {
+      "swatch": "salt",
+      "label": "שכבת המלח"
+    },
+    {
+      "swatch": "lake",
+      "label": "ים המלח"
+    }
+  ]
 }

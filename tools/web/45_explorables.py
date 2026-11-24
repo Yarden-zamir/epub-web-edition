@@ -5,7 +5,8 @@ Each file explorables/<figure ID>.json next to the enhancements file describes o
   "figure": the printed figure it explains (must match the file name),
   "kind": the drawing module in site/features/explorables/<kind>.js,
   "title", "instruction" (one short Hebrew line), "schematic" (what is simplified),
-  "control": {"label", "min", "max", "step", "start", "unit"},
+  "control": {"label", "min", "max", "step", "start", "unit", "hint"?: how far the first-view nudge moves},
+  "marks"?: [{"value", "label"}]: points on the control that a click moves to,
   "sources": [{"label", "element"?: book element ID, "url"?}],
   "data"?: {name: {"file": path under the folder of the enhancements file, "series"?: series name in a charts file}},
   anything else the drawing module reads (labels, values), each value with its source in "sources".
@@ -82,8 +83,9 @@ def load(site: Site) -> None:
             if source.get("element") and source["element"] not in tags:
                 raise BookError(f"{where}: source element {source['element']!r} is not in the EPUB")
         control = spec["control"]
-        if not control["min"] <= control["start"] <= control["max"]:
-            raise BookError(f"{where}: control start {control['start']} is outside {control['min']}..{control['max']}")
+        for name, value in [("start", control["start"]), *((f"mark {m['label']}", m["value"]) for m in spec.get("marks", []))]:
+            if not control["min"] <= value <= control["max"]:
+                raise BookError(f"{where}: control {name} {value} is outside {control['min']}..{control['max']}")
         spec["data"] = {name: load_data(data_dir, name, ref, where) for name, ref in spec.get("data", {}).items()}
         (out / "data" / "explorables").mkdir(parents=True, exist_ok=True)
         (out / "data" / "explorables" / path.name).write_text(

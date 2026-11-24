@@ -1,28 +1,33 @@
 // Interactive explainers inside printed figures (build: tools/web/45_explorables.py).
 // Each figure gets a toggle between the explainer and the printed image. The explainer loads when it nears the view.
-// A native range input is the one control: it gives keyboard, touch and screen reader support. Drawing modules
-// (<kind>.js) may add direct dragging in the drawing; it sets the same input.
+// One value drives a drawing on a canvas. A native range input holds the value for keyboard, touch and screen
+// readers. An HTML handle over the canvas follows the pointer 1:1; keys, marks, reset and the first-view hint move
+// the value with a short ease. Per frame: one canvas redraw, one handle transform, one short text. A canvas keeps a
+// drag at 60 fps on a phone: SVG attribute changes cost style, pre-paint and layer work on this very long page.
 //
 // A drawing file (7N-explorable-<kind>.js) registers explorableKit.kinds[kind] = {
-//   valueText(value, spec) -> string             what the control value means, for the readout and screen readers
-//   mount(svg, spec, api) -> update(value) -> string   draws once, then redraws for a value and returns the summary
-// }  api: { setValue(value), drag(element, onMove(point, start)), commit() }
+//   view: [x, y, width, height]                   drawing units shown in the canvas
+//   valueParts(value, spec) -> {num, unit, note} the value as text: a number (fixed decimals), its unit and an
+//                                                optional note. Each part sits in a fixed-width slot, so nothing moves.
+//   animated?: true                              water and salt move slowly: env.time runs (FLOW_FPS frames a second at most)
+//   create(spec, env) -> {                       prepares fixed shapes once
+//     draw(ctx, value, env) -> summary string    draws one frame in drawing units
+//     handle(value) -> [x, y]                    where the drag handle sits
+//     drag(point, start) -> value               value for a pointer at point ({x, y} in drawing units)
+//     move?(value, env) -> summary string        moves overlay elements by transform and opacity only
+//     followsValue?: false                        the canvas does not change with the value (only move() does), so a
+//                                                 drag repaints nothing; the canvas redraws on resize, theme and motion
+//     resize?(env)                                redraws overlay canvases after a size or theme change
+//   }
+// }
+// env: unit (drawing units per CSS pixel), time (seconds, for slow motion), wantsFrame (set it during draw to get the
+//      next frame too, for a one-off animation), color(token), gradient(key, x0, y0, x1, y1, stops),
+//      layer(key, [x, y, w, h], draw) -> a bitmap of draw() for parts that never change (copy it with ctx.drawImage),
+//      overlay(tag, className) -> an element over the canvas (and under the handle), scale (CSS px per unit), view,
+//      label(ctx, text, x, y, options), figures(ctx, text, x, y, options) for a number with fixed-width digits,
+//      textWidth(ctx, text, {size, weight}) -> width of a label in drawing units.
 // All feature scripts share one scope (site/features/README.md): only explorableKit is global here.
 const explorableKit = (() => {
-const NS = "http://www.w3.org/2000/svg";
-
-function svgEl(tag, attrs = {}, parent = null) {
-  const el = document.createElementNS(NS, tag);
-  for (const [name, value] of Object.entries(attrs)) el.setAttribute(name, String(value));
-  if (parent) parent.append(el);
-  return el;
-}
-
-function svgText(text, attrs, parent) {
-  const el = svgEl("text", attrs, parent);
-  el.textContent = text;
-  return el;
-}
 
 // Linear interpolation in a list of [x, y] points sorted by x; clamps at both ends.
 function interpolate(points, x) {
@@ -38,13 +43,154 @@ function interpolate(points, x) {
   return points[points.length - 1][1];
 }
 
-const number = (value, digits = 0) =>
-  value.toLocaleString("he-IL", { minimumFractionDigits: digits, maximumFractionDigits: digits });
+const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+// 0 at a, 1 at b, eased in between: shapes fade and grow instead of popping in.
+const ramp = (v, a, b) => { const t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+// One formatter per number of decimals: toLocaleString with options builds a new one on every call (every frame).
+const formats = new Map();
+const number = (value, digits = 0) => {
+  if (!formats.has(digits)) formats.set(digits, new Intl.NumberFormat("he-IL", { minimumFractionDigits: digits, maximumFractionDigits: digits }));
+  return formats.get(digits).format(value);
+};
+// A number inside Hebrew text: isolated (U+2068 ... U+2069), so the sentence around it never reorders.
+const iso = (text) => `\u2068${text}\u2069`;
+const MINUS = "\u2212";
+const valueText = (kind, v, spec) => { const p = kind.valueParts(v, spec); return `${p.num} ${p.unit}${p.note ? ` (${p.note})` : ""}`; };
+const FLOW_FPS = 20; // Slow motion of water and salt: enough frames to read as flow, few enough to cost little.
+const easeOut = (t) => 1 - (1 - t) ** 3;
+// A path through points, for a Path2D or the context itself.
+function polyline(target, points, close = false) {
+  points.forEach(([x, y], i) => (i ? target.lineTo(x, y) : target.moveTo(x, y)));
+  if (close) target.closePath();
+  return target;
+}
+const shape = (points, close = true) => polyline(new Path2D(), points, close);
 
-function svgPoint(svg, event) {
-  const matrix = svg.getScreenCTM();
-  if (!matrix) throw new Error("explorable: the drawing has no screen matrix");
-  return new DOMPoint(event.clientX, event.clientY).matrixTransform(matrix.inverse());
+function hintSeen(id) {
+  try { return localStorage.getItem(`explorable-hint:${id}`) === "1"; } catch { return false; }
+}
+function markHintSeen(id) {
+  try { localStorage.setItem(`explorable-hint:${id}`, "1"); } catch { /* Private mode: the hint may show again. */ }
+}
+
+// Colours, gradients and fonts come from the CSS tokens. A theme change clears them and redraws.
+function makeEnv(box) {
+  const colors = new Map(), gradients = new Map(), layers = new Map(), sprites = new Map();
+  let ctx = null, family = "";
+  // A label as a bitmap at the current size, font and theme: text drawn left-aligned at (0, 0), with its box.
+  function sprite(text, size, weight, color) {
+    const key = `${text}|${size}|${weight}|${color}|${env.pixel}`;
+    if (!sprites.has(key)) {
+      if (sprites.size > 400) sprites.clear(); // Labels with changing numbers must not grow the cache without end.
+      const font = `${weight} ${size * env.unit}px ${family}`, halo = 2.75 * env.unit;
+      const bitmap = document.createElement("canvas");
+      const b = bitmap.getContext("2d");
+      b.font = font;
+      b.direction = "rtl";
+      b.textAlign = "left";
+      const m = b.measureText(text);
+      const x0 = -m.actualBoundingBoxLeft - halo, y0 = -m.actualBoundingBoxAscent - halo;
+      const w = m.actualBoundingBoxRight + halo - x0, h = m.actualBoundingBoxDescent + halo - y0;
+      bitmap.width = Math.max(1, Math.ceil(w * env.pixel));
+      bitmap.height = Math.max(1, Math.ceil(h * env.pixel));
+      b.setTransform(env.pixel, 0, 0, env.pixel, -x0 * env.pixel, -y0 * env.pixel);
+      b.font = font; // A size change resets the context's state.
+      b.direction = "rtl";
+      b.textAlign = "left";
+      b.lineJoin = "round";
+      b.lineWidth = 3.5 * env.unit;
+      b.strokeStyle = env.color("--paper");
+      b.strokeText(text, 0, 0);
+      b.fillStyle = env.color(color);
+      b.fillText(text, 0, 0);
+      sprites.set(key, { bitmap, x0, y0, w: bitmap.width / env.pixel, h: bitmap.height / env.pixel, width: m.width });
+    }
+    return sprites.get(key);
+  }
+  const env = {
+    unit: 1,
+    time: 0,
+    wantsFrame: false,
+    bind(context) { ctx = context; },
+    pixel: 1, // Device pixels per drawing unit.
+    reset() { colors.clear(); gradients.clear(); layers.clear(); sprites.clear(); family = getComputedStyle(box).fontFamily; },
+    // Static parts are drawn once into a bitmap at the current size and theme; a frame only copies it.
+    layer(key, [x, y, w, h], draw) {
+      const id = `${key}@${env.pixel.toFixed(4)}`;
+      if (!layers.has(id)) {
+        const bitmap = document.createElement("canvas");
+        bitmap.width = Math.max(1, Math.ceil(w * env.pixel));
+        bitmap.height = Math.max(1, Math.ceil(h * env.pixel));
+        const lc = bitmap.getContext("2d");
+        lc.setTransform(env.pixel, 0, 0, env.pixel, -x * env.pixel, -y * env.pixel);
+        draw(lc);
+        for (const old of layers.keys()) if (old.startsWith(`${key}@`)) layers.delete(old);
+        layers.set(id, bitmap);
+      }
+      return layers.get(id);
+    },
+    color(token) {
+      if (!colors.has(token)) {
+        const value = getComputedStyle(box).getPropertyValue(token).trim();
+        if (!value) throw new Error(`explorable: CSS token ${token} is not set`);
+        colors.set(token, value);
+      }
+      return colors.get(token);
+    },
+    gradient(key, x0, y0, x1, y1, stops) {
+      if (!gradients.has(key)) {
+        const g = ctx.createLinearGradient(x0, y0, x1, y1);
+        for (const [offset, token] of stops) g.addColorStop(offset, env.color(token));
+        gradients.set(key, g);
+      }
+      return gradients.get(key);
+    },
+    // Hebrew label with a paper halo, about `size` CSS pixels at any width. align: "left", "right" or "center".
+    // Each label is drawn once into a small bitmap (text with a halo is slow to draw without a GPU); a frame copies
+    // it, at whole device pixels when the label is not rotated, so it stays sharp.
+    label(c, text, x, y, { align = "center", size = 13, weight = 600, color = "--ink", rotate = 0 } = {}) {
+      const s = sprite(text, size, weight, color);
+      const left = x + (align === "left" ? 0 : align === "right" ? -s.width : -s.width / 2);
+      const m = c.getTransform();
+      if (!rotate && !m.b && !m.c && Math.abs(m.a - env.pixel) < 1e-6 && Math.abs(m.d - env.pixel) < 1e-6) {
+        c.save();
+        c.setTransform(1, 0, 0, 1, 0, 0);
+        c.drawImage(s.bitmap, Math.round(m.a * (left + s.x0) + m.e), Math.round(m.d * (y + s.y0) + m.f));
+        c.restore();
+        return;
+      }
+      c.save();
+      c.translate(x, y);
+      if (rotate) c.rotate(rotate);
+      c.drawImage(s.bitmap, left - x + s.x0, s.y0, s.w, s.h);
+      c.restore();
+    },
+    textWidth(c, text, { size = 13, weight = 600 } = {}) {
+      c.save();
+      c.font = `${weight} ${size * env.unit}px ${family}`;
+      const width = c.measureText(text).width;
+      c.restore();
+      return width;
+    },
+    // A number whose digits all take the width of "0", right-aligned at x: it never shifts as it changes.
+    figures(c, text, x, y, { size = 13, weight = 700, color = "--ink" } = {}) {
+      c.save();
+      c.font = `${weight} ${size * env.unit}px ${family}`;
+      c.direction = "ltr";
+      c.textAlign = "center";
+      c.lineJoin = "round";
+      c.lineWidth = 3.5 * env.unit;
+      c.strokeStyle = env.color("--paper");
+      c.fillStyle = env.color(color);
+      const digit = c.measureText("0").width;
+      const widths = [...text].map((ch) => (ch >= "0" && ch <= "9" ? digit : c.measureText(ch).width));
+      let at = x - widths.reduce((a, b) => a + b, 0);
+      [...text].forEach((ch, i) => { c.strokeText(ch, at + widths[i] / 2, y); c.fillText(ch, at + widths[i] / 2, y); at += widths[i]; });
+      c.restore();
+    },
+  };
+  env.reset();
+  return env;
 }
 
 async function setUp(figure, box) {
@@ -54,107 +200,266 @@ async function setUp(figure, box) {
   const kind = kinds[spec.kind];
   if (!kind) throw new Error(`explorable ${figure.id}: no drawing for kind ${spec.kind}`);
   const c = spec.control;
+  const span = c.max - c.min;
+  const decimals = String(c.step).split(".")[1]?.length ?? 0;
+  const snap = (v) => clamp(Number((Math.round((v - c.min) / c.step) * c.step + c.min).toFixed(decimals)), c.min, c.max);
+  const [vx, vy, vw, vh] = kind.view;
 
-  const head = document.createElement("div");
-  head.className = "xp-head";
-  const title = document.createElement("p");
-  title.className = "xp-title";
-  title.textContent = spec.title;
-  const instruction = document.createElement("p");
-  instruction.className = "xp-instruction";
-  instruction.textContent = spec.instruction;
-  head.append(title, instruction);
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; };
+  const head = el("div", "xp-head");
+  head.append(el("p", "xp-title", spec.title), el("p", "xp-instruction", spec.instruction));
+  const stage = el("div", "xp-stage");
+  stage.style.aspectRatio = `${vw} / ${vh}`;
+  const canvas = el("canvas", "xp-canvas");
+  canvas.setAttribute("role", "img");
+  canvas.setAttribute("aria-label", spec.title);
+  const handle = el("div", "xp-handle");
+  handle.setAttribute("aria-hidden", "true"); // The range input is the accessible control.
+  const grip = el("span", "xp-grip");
+  grip.innerHTML = '<svg viewBox="-12 -12 24 24" aria-hidden="true"><path d="M0 -6.5 L-4 -2.5 M0 -6.5 L4 -2.5 M0 -6.5 V6.5 M0 6.5 L-4 2.5 M0 6.5 L4 2.5"/></svg>';
+  handle.append(el("span", "xp-grip-ring"), grip);
+  stage.append(canvas, handle);
 
-  const stage = document.createElement("div");
-  stage.className = "xp-stage";
-  const svg = svgEl("svg", { class: "xp-svg", role: "img", "aria-label": spec.title });
-
-  const controls = document.createElement("div");
-  controls.className = "xp-controls";
+  const controls = el("div", "xp-controls");
   const id = `${figure.id}-xp`;
-  const label = document.createElement("label");
+  const label = el("label", "xp-label-text", c.label);
   label.htmlFor = id;
-  label.textContent = c.label;
-  const input = document.createElement("input");
-  Object.assign(input, { type: "range", id, min: c.min, max: c.max, step: c.step, value: c.start });
-  input.dir = "ltr"; // Same direction as the chart axes on this site: the start of the process on the left.
-  const output = document.createElement("output");
+  // The value: number, unit and note, each in a slot as wide as its longest text, so the line never moves.
+  const output = el("output", "xp-output");
   output.htmlFor = id;
-  const reset = document.createElement("button");
+  const numSlot = el("bdi", "xp-num"), unitSlot = el("span", "xp-unit"), noteSlot = el("span", "xp-note");
+  numSlot.dir = "ltr";
+  output.append(numSlot, " ", unitSlot, " ", noteSlot);
+  const track = el("div", "xp-track");
+  track.dir = "ltr"; // Same direction as the chart axes on this site: the start of the process on the left.
+  const input = el("input", "xp-range");
+  Object.assign(input, { type: "range", id, min: c.min, max: c.max, step: c.step, value: c.start });
+  const fill = el("span", "xp-fill");
+  track.append(el("span", "xp-rail"), fill, input);
+  const marks = el("div", "xp-marks");
+  for (const mark of spec.marks ?? []) {
+    const b = el("button", "xp-mark", mark.label);
+    b.type = "button";
+    const at = (mark.value - c.min) / span;
+    b.style.setProperty("--at", at.toFixed(4));
+    b.dataset.edge = at < 0.08 ? "start" : at > 0.92 ? "end" : "middle";
+    b.setAttribute("aria-label", `${c.label}: ${mark.label}`);
+    b.addEventListener("click", () => { markHintSeen(figure.id); touched = true; animateTo(mark.value); });
+    marks.append(b);
+  }
+  if (marks.childElementCount) track.append(marks);
+  const reset = el("button", "xp-reset", "איפוס");
   reset.type = "button";
-  reset.className = "xp-reset";
-  reset.textContent = "איפוס";
-  controls.append(label, input, output, reset);
+  const top = el("div", "xp-control-head");
+  top.append(label, output);
+  controls.append(top, track, reset);
 
-  const readout = document.createElement("p");
-  readout.className = "xp-readout";
-  // Screen readers hear the summary when a move ends, not on every step of a drag.
-  const live = document.createElement("p");
-  live.className = "visually-hidden";
+  const readout = el("p", "xp-readout");
+  // Screen readers hear the summary when a move ends, not on every frame of a drag.
+  const live = el("p", "visually-hidden");
   live.setAttribute("aria-live", "polite");
-
-  stage.append(svg);
-  box.prepend(head, stage, controls, readout, live);
+  // Optional legend under the drawing: [{swatch, label}], each swatch a class in 72-explorables.css.
+  const legend = el("ul", "xp-legend");
+  for (const item of spec.legend ?? []) {
+    const li = el("li");
+    li.append(el("span", `xp-swatch xp-swatch-${item.swatch}`), item.label);
+    legend.append(li);
+  }
+  box.prepend(head, stage, ...(legend.childElementCount ? [legend] : []), controls, readout, live);
   box.hidden = false;
 
-  let frame = 0;
-  let summary = "";
-  const update = kind.mount(svg, spec, {
-    setValue(value) {
-      input.value = String(value); // The input clamps and rounds to its step.
-      render();
-    },
-    drag(element, onMove) {
-      element.classList.add("xp-handle");
-      element.addEventListener("pointerdown", (down) => {
-        if (down.button !== 0) return;
-        down.preventDefault();
-        element.setPointerCapture(down.pointerId);
-        stage.classList.add("dragging");
-        const start = { point: svgPoint(svg, down), value: Number(input.value) };
-        const move = (e) => onMove(svgPoint(svg, e), start);
-        const end = () => {
-          element.removeEventListener("pointermove", move);
-          stage.classList.remove("dragging");
-          commit();
-        };
-        element.addEventListener("pointermove", move);
-        element.addEventListener("pointerup", end, { once: true });
-        element.addEventListener("pointercancel", end, { once: true });
-      });
-    },
-    commit: () => commit(),
-  });
-  function render() {
+  // Slot widths: measured at set-up and again once the site font has loaded (it may load after set-up).
+  function sizeSlots() {
+    // Every value of the control, with each slot's own font (canvas measure: no layout reads).
+    // Tabular digits all take the width of "0", so digits are measured as "0".
+    const probe = document.createElement("canvas").getContext("2d");
+    const steps = Math.min(400, Math.round(span / c.step));
+    const samples = [...Array(steps + 1).keys()].map((i) => kind.valueParts(snap(c.min + (span * i) / steps), spec));
+    const widest = (slot, text) => {
+      // Not the `font` shorthand: Chrome returns "" for it once font-variant-numeric is set.
+      const cs = getComputedStyle(slot);
+      probe.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+      return Math.ceil(Math.max(...samples.map((p) => probe.measureText([...text(p)].map((ch) => (ch >= "0" && ch <= "9" ? "0" : ch)).join("")).width)));
+    };
+    numSlot.style.minWidth = `${widest(numSlot, (p) => p.num) + 3}px`;
+    unitSlot.style.minWidth = `${widest(unitSlot, (p) => p.unit) + 1}px`;
+    noteSlot.style.minWidth = `${widest(noteSlot, (p) => (p.note ? `(${p.note})` : "")) + 1}px`;
+  }
+  sizeSlots();
+  const env = makeEnv(box);
+  env.scale = 1;
+  env.view = kind.view;
+  env.overlay = (tag, className) => {
+    const e = el(tag, `xp-layer ${className}`);
+    stage.insertBefore(e, handle);
+    return e;
+  };
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error(`explorable ${figure.id}: no 2D canvas`);
+  env.bind(ctx);
+  const scene = kind.create(spec, env);
+  let value = c.start, summary = "", scale = 1, moving = false, touched = false; // touched: the reader moved it.
+  let frame = 0, tween = 0, pending = c.start; // pending: the newest value asked for; redraws use it, not `value`.
+
+  let canvasValue = NaN; // The value the canvas shows; NaN after a resize or theme change.
+  function drawCanvas(v) {
+    const dpr = devicePixelRatio || 1;
+    env.time = performance.now() / 1000;
+    ctx.setTransform(dpr * scale, 0, 0, dpr * scale, -vx * dpr * scale, -vy * dpr * scale);
+    ctx.clearRect(vx, vy, vw, vh);
+    const text = scene.draw(ctx, v, env);
+    if (!scene.move) summary = text;
+    canvasValue = v;
+    if (env.wantsFrame) { // A one-off animation in the drawing runs: draw again next frame, unless a move draws anyway.
+      env.wantsFrame = false;
+      if (!followUp) followUp = requestAnimationFrame(() => { followUp = 0; if (!frame && !tween) drawCanvas(value); });
+    }
+  }
+  let followUp = 0;
+  function paint(v) {
+    value = v;
+    if (scene.followsValue !== false || Number.isNaN(canvasValue)) drawCanvas(v);
+    if (scene.move) summary = scene.move(v, env);
+    const [hx, hy] = scene.handle(v);
+    handle.style.transform = `translate(${((hx - vx) * scale).toFixed(1)}px, ${((hy - vy) * scale).toFixed(1)}px)`;
+    const parts = kind.valueParts(snap(v), spec);
+    if (numSlot.textContent !== parts.num) numSlot.textContent = parts.num;
+    if (unitSlot.textContent !== parts.unit) unitSlot.textContent = parts.unit;
+    const note = parts.note ? `(${parts.note})` : "";
+    if (noteSlot.textContent !== note) noteSlot.textContent = note;
+    fill.style.transform = `scaleX(${((v - c.min) / span).toFixed(4)})`;
+    // The paragraph changes when a move ends, so a drag does not reflow the page on every frame.
+    if (!moving && readout.textContent !== summary) readout.textContent = summary;
+  }
+  // Pointer moves can come faster than frames: draw the newest value once per frame.
+  function show(v) {
+    pending = v;
     if (frame) return;
-    frame = requestAnimationFrame(() => {
-      frame = 0;
-      const value = Number(input.value);
-      const text = kind.valueText(value, spec);
-      output.textContent = text;
-      input.setAttribute("aria-valuetext", text);
-      summary = update(value);
-      readout.textContent = summary;
-    });
+    frame = requestAnimationFrame(() => { frame = 0; paint(pending); });
+  }
+  function setValue(v) {
+    cancelAnimationFrame(tween); tween = 0;
+    v = clamp(v, c.min, c.max);
+    input.value = String(snap(v));
+    show(v);
+  }
+  function animateTo(target, duration = 380) {
+    target = snap(target);
+    input.value = String(target);
+    cancelAnimationFrame(tween);
+    if (reduceMotion.matches || duration === 0) { moving = false; show(target); commit(); return; }
+    moving = true;
+    const from = value, start = performance.now();
+    const step = (now) => {
+      const t = Math.min(1, (now - start) / duration);
+      if (t === 1) moving = false;
+      paint(from + (target - from) * easeOut(t));
+      tween = t < 1 ? requestAnimationFrame(step) : 0;
+      if (!tween) commit();
+    };
+    tween = requestAnimationFrame(step);
   }
   function commit() {
-    requestAnimationFrame(() => requestAnimationFrame(() => { live.textContent = summary; }));
+    input.setAttribute("aria-valuetext", valueText(kind, Number(input.value), spec));
+    requestAnimationFrame(() => { if (!moving) { readout.textContent = summary; live.textContent = summary; } });
   }
-  input.addEventListener("input", render);
-  input.addEventListener("change", commit);
-  reset.addEventListener("click", () => {
-    input.value = String(c.start);
-    render();
-    commit();
+
+  // touch-action: none on the handle stops scrolling; these also stop a long-press menu and a late scroll.
+  handle.addEventListener("contextmenu", (e) => e.preventDefault());
+  handle.addEventListener("touchmove", (e) => { if (stage.classList.contains("dragging")) e.preventDefault(); }, { passive: false });
+  handle.addEventListener("pointerdown", (down) => {
+    if (down.button !== 0) return;
+    down.preventDefault();
+    markHintSeen(figure.id);
+    touched = true;
+    handle.setPointerCapture(down.pointerId);
+    stage.classList.add("dragging");
+    moving = true;
+    const rect = canvas.getBoundingClientRect(); // Read once per drag: no layout reads while moving.
+    const at = (e) => ({ x: (e.clientX - rect.left) / scale + vx, y: (e.clientY - rect.top) / scale + vy });
+    const start = { point: at(down), value };
+    const move = (e) => setValue(scene.drag(at(e), start));
+    const end = () => {
+      handle.removeEventListener("pointermove", move);
+      stage.classList.remove("dragging");
+      animateTo(value, 160); // Settle on the nearest step.
+    };
+    handle.addEventListener("pointermove", move);
+    handle.addEventListener("pointerup", end, { once: true });
+    handle.addEventListener("pointercancel", end, { once: true });
   });
-  // Labels keep about 13 CSS pixels at any width: one CSS pixel is --xp-unit drawing units.
+  input.addEventListener("input", () => { touched = true; moving = true; setValue(Number(input.value)); });
+  // The input holds the new value; `value` may still be the last painted one (a tap fires input and change together).
+  input.addEventListener("change", () => { moving = false; show(Number(input.value)); commit(); });
+  input.addEventListener("pointerdown", () => markHintSeen(figure.id));
+  input.addEventListener("keydown", (e) => {
+    const big = c.step * Math.max(1, Math.round(span / c.step / 10));
+    const delta = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1, PageUp: 10, PageDown: -10 }[e.key];
+    const base = Number(input.value); // The target of a running ease, so quick presses add up.
+    let target = null;
+    if (delta) target = base + (Math.abs(delta) === 10 || e.shiftKey ? Math.sign(delta) * big : delta * c.step);
+    if (e.key === "Home") target = c.min;
+    if (e.key === "End") target = c.max;
+    if (target === null) return;
+    e.preventDefault();
+    markHintSeen(figure.id);
+    touched = true;
+    animateTo(target, 220);
+  });
+  reset.addEventListener("click", () => { touched = true; animateTo(c.start, 520); });
+
+  // The canvas matches its box in device pixels; drawings work in their own units (`scale` CSS px each).
   new ResizeObserver(() => {
-    if (!svg.clientWidth) return;
-    const unit = svg.viewBox.baseVal.width / svg.clientWidth;
-    svg.style.setProperty("--xp-unit", unit.toFixed(3));
-    svg.classList.toggle("xp-narrow", unit > 1.3); // Phones: labels marked xp-minor hide.
-  }).observe(svg);
-  render();
+    const width = stage.clientWidth;
+    if (!width) return;
+    scale = width / vw;
+    env.unit = 1 / scale;
+    env.pixel = scale * (devicePixelRatio || 1);
+    const dpr = devicePixelRatio || 1;
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(width * (vh / vw) * dpr);
+    env.scale = scale;
+    canvasValue = NaN;
+    scene.resize?.(env);
+    show(pending);
+  }).observe(stage);
+  const retheme = () => { env.reset(); canvasValue = NaN; scene.resize?.(env); show(pending); };
+  // The canvas draws with the site font; draw again once it has loaded, or labels keep a fallback font.
+  const refont = () => { sizeSlots(); retheme(); };
+  document.fonts.ready.then(refont);
+  document.fonts.addEventListener("loadingdone", refont);
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", retheme);
+  new MutationObserver(retheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  commit();
+
+  if (kind.animated) {
+    let onScreen = false, running = false;
+    const loop = () => {
+      if (!onScreen || document.hidden || reduceMotion.matches) { running = false; return; }
+      if (!frame && !tween && !moving) requestAnimationFrame(() => drawCanvas(value));
+      setTimeout(loop, 1000 / FLOW_FPS);
+    };
+    const start = () => { if (!running && onScreen) { running = true; loop(); } };
+    new IntersectionObserver((entries) => { onScreen = entries[0].isIntersecting; start(); }).observe(stage);
+    document.addEventListener("visibilitychange", start);
+  }
+
+  // One nudge, the first time a visitor sees this explainer: the handle moves a little and comes back.
+  if (!reduceMotion.matches && !hintSeen(figure.id) && c.hint) {
+    new IntersectionObserver((entries, observer) => {
+      if (!entries[0].isIntersecting) return;
+      observer.disconnect();
+      setTimeout(() => {
+        if (hintSeen(figure.id) || touched) return;
+        markHintSeen(figure.id);
+        stage.classList.add("hinting");
+        const back = value;
+        animateTo(back + c.hint, 650);
+        // The way back is skipped when the reader took over in the meantime.
+        setTimeout(() => { if (!touched) animateTo(back, 650); setTimeout(() => stage.classList.remove("hinting"), 700); }, 750);
+      }, 500);
+    }, { threshold: 0.6 }).observe(stage);
+  }
 }
 
 const kinds = {}; // Filled by the drawing files, which run after this one; set-up waits for the figure to scroll near.
@@ -169,7 +474,8 @@ for (const figure of document.querySelectorAll("figure.has-explorable")) {
     const b = document.createElement("button");
     b.type = "button";
     b.textContent = text;
-    b.addEventListener("click", () => setView(explain));
+    // Scroll anchoring could move the page as the figure changes height: keep its top where it is (75-map-figures.js).
+    b.addEventListener("click", () => keepFigureTop(figure, () => setView(explain)));
     group.append(b);
     return b;
   };
@@ -181,7 +487,6 @@ for (const figure of document.querySelectorAll("figure.has-explorable")) {
     printButton.setAttribute("aria-pressed", String(!explain));
     box.hidden = !explain || !ready;
     if (img) img.hidden = explain && ready;
-    figure.classList.toggle("showing-print", !explain);
   };
   figure.prepend(group);
   group.hidden = true; // Shown once the explainer works; until then the printed image stays.
@@ -189,9 +494,9 @@ for (const figure of document.querySelectorAll("figure.has-explorable")) {
     if (!entries[0].isIntersecting) return;
     observer.disconnect();
     setUp(figure, box)
-      .then(() => { ready = true; group.hidden = false; setView(true); })
+      .then(() => keepFigureTop(figure, () => { ready = true; group.hidden = false; setView(true); }))
       .catch((err) => { box.hidden = true; group.remove(); console.error(err); });
   }, { rootMargin: "400px" }).observe(figure);
 }
-return { kinds, svgEl, svgText, interpolate, number };
+return { kinds, interpolate, number, iso, MINUS, clamp, ramp, polyline, shape };
 })();

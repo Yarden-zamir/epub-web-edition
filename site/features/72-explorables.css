@@ -1,88 +1,141 @@
-/* Interactive explainers inside printed figures (explorables.js). Colours come from the site tokens and the
-   cover palette in books/eli-raz/AGENTS-BRIEF.md: sand #e6cfa6, cliff #916c43, sea #0e4840, teal #2b7f86.
-   Text always sits on a paper-coloured halo, so it keeps AA contrast on any fill. */
+/* Interactive explainers inside printed figures (72-explorables.js and the 7N-explorable-*.js drawings).
+   Colours: the site tokens and the cover palette in books/eli-raz/AGENTS-BRIEF.md (cliff #916c43, sand #bc9f73,
+   sea #0e4840, teal #2b7f86, light sand #e6cfa6). The drawings read the --xp-* tokens below from a canvas, so each
+   is a plain colour (no var() or color-mix()). Labels in drawings have a paper halo: AA contrast on any fill. */
 :root {
-  --xp-land: #e6cfa6; --xp-land-edge: #916c43; --xp-salt: #fbfaf7; --xp-salt-edge: #6f685d;
-  --xp-brine: #9fbcb8; --xp-fresh: #cfe5e6; --xp-lake: #4f8a85;
-  --xp-fresh-ink: #1d6a71; --xp-brine-ink: #8f3f22; --xp-void: #1c1a17; --xp-dissolve: #e7b49a;
-  --xp-plate-a: #e6cfa6; --xp-plate-b: #d6c29d; --xp-basin: #0e4840; --xp-copper: #3f8f6a;
+  --xp-sky-top: #fbf8f2; --xp-sky: #f1ebe0;
+  --xp-land: #ead6b0; --xp-land-deep: #d9bd8c; --xp-land-edge: #916c43; --xp-cap: #a88459;
+  --xp-salt: #fdfcf9; --xp-salt-shade: #e7e1d6; --xp-salt-edge: #8a8274;
+  --xp-fresh: #d3e8e8; --xp-fresh-deep: #b5d6d7; --xp-fresh-ink: #1d6a71; --xp-surface: #b9d6d3;
+  --xp-brine: #a9c4bf; --xp-lake: #5e9893; --xp-lake-deep: #2f6a64; --xp-brine-ink: #8f3f22;
+  --xp-void: #241f1a;
+  --xp-plate-a: #ead6b0; --xp-plate-a-deep: #dcc293; --xp-plate-b: #dcc6a0; --xp-plate-b-deep: #c9ae7f;
+  --xp-basin: #0e4840; --xp-basin-light: #1f6a61; --xp-copper: #3f8f6a; --xp-copper-edge: #2c6a4e;
+  --xp-dot: rgb(60 40 20 / 0.08); --xp-shadow: rgb(40 25 10 / 0.22);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --xp-land: #4a3d2b; --xp-land-edge: #bc9f73; --xp-salt: #d8d2c7; --xp-salt-edge: #f3ede3;
-    --xp-brine: #1f3d3a; --xp-fresh: #1d3437; --xp-lake: #2b7f86;
-    --xp-fresh-ink: #7cc9cf; --xp-brine-ink: #e3a07c; --xp-void: #050404; --xp-dissolve: #b8754f;
-    --xp-plate-a: #4a3d2b; --xp-plate-b: #3a3024; --xp-basin: #2b7f86; --xp-copper: #5fb98d;
+    --xp-sky-top: #1b1a18; --xp-sky: #161514;
+    --xp-land: #4d3f2c; --xp-land-deep: #3a2f21; --xp-land-edge: #bc9f73; --xp-cap: #8a6c48;
+    --xp-salt: #e4ded3; --xp-salt-shade: #b9b1a3; --xp-salt-edge: #f3ede3;
+    --xp-fresh: #1e3a3d; --xp-fresh-deep: #18302f; --xp-fresh-ink: #7cc9cf; --xp-surface: #5fa6ad;
+    --xp-brine: #23423e; --xp-lake: #2f8088; --xp-lake-deep: #1d5a5f; --xp-brine-ink: #e3a07c;
+    --xp-void: #050404;
+    --xp-plate-a: #4d3f2c; --xp-plate-a-deep: #3f3324; --xp-plate-b: #42372a; --xp-plate-b-deep: #352c21;
+    --xp-basin: #1f6f76; --xp-basin-light: #2b8a92; --xp-copper: #5fb98d; --xp-copper-edge: #8fd6b1;
+    --xp-dot: rgb(255 240 220 / 0.05); --xp-shadow: rgb(0 0 0 / 0.45);
   }
 }
 :root[data-theme="dark"] {
-  --xp-land: #4a3d2b; --xp-land-edge: #bc9f73; --xp-salt: #d8d2c7; --xp-salt-edge: #f3ede3;
-  --xp-brine: #1f3d3a; --xp-fresh: #1d3437; --xp-lake: #2b7f86;
-  --xp-fresh-ink: #7cc9cf; --xp-brine-ink: #e3a07c; --xp-void: #050404; --xp-dissolve: #b8754f;
-  --xp-plate-a: #4a3d2b; --xp-plate-b: #3a3024; --xp-basin: #2b7f86; --xp-copper: #5fb98d;
+  --xp-sky-top: #1b1a18; --xp-sky: #161514;
+  --xp-land: #4d3f2c; --xp-land-deep: #3a2f21; --xp-land-edge: #bc9f73; --xp-cap: #8a6c48;
+  --xp-salt: #e4ded3; --xp-salt-shade: #b9b1a3; --xp-salt-edge: #f3ede3;
+  --xp-fresh: #1e3a3d; --xp-fresh-deep: #18302f; --xp-fresh-ink: #7cc9cf; --xp-surface: #5fa6ad;
+  --xp-brine: #23423e; --xp-lake: #2f8088; --xp-lake-deep: #1d5a5f; --xp-brine-ink: #e3a07c;
+  --xp-void: #050404;
+  --xp-plate-a: #4d3f2c; --xp-plate-a-deep: #3f3324; --xp-plate-b: #42372a; --xp-plate-b-deep: #352c21;
+  --xp-basin: #1f6f76; --xp-basin-light: #2b8a92; --xp-copper: #5fb98d; --xp-copper-edge: #8fd6b1;
+  --xp-dot: rgb(255 240 220 / 0.05); --xp-shadow: rgb(0 0 0 / 0.45);
 }
 
+/* Frame: a card with the title, the drawing, the control and the explanation. */
 .book figure.has-explorable { max-width: 48rem; margin-inline: auto; }
 .book figure.has-explorable > img { margin-inline: auto; }
-.explorable { font-family: var(--sans); }
-.xp-head { margin-bottom: 0.5rem; }
-.xp-title { margin: 0; font-weight: 700; font-size: 1rem; }
-.xp-instruction { margin: 0.15rem 0 0; color: var(--soft); font-size: 0.85rem; }
-.xp-stage { position: relative; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; background: var(--paper); }
-.xp-svg { display: block; width: 100%; height: auto; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
-.xp-svg .xp-label {
-  fill: var(--ink); font-size: calc(13px * var(--xp-unit, 1)); font-weight: 600;
-  paint-order: stroke; stroke: var(--paper); stroke-width: calc(3.5px * var(--xp-unit, 1)); stroke-linejoin: round;
+.explorable {
+  font-family: var(--sans); padding: clamp(0.9rem, 3vw, 1.4rem);
+  border: 1px solid var(--rule); border-radius: 18px; background: var(--paper);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 18px 40px -26px var(--xp-shadow);
+  contain: content; /* Changes inside the card do not lay out or paint the rest of the book. */
 }
-.xp-narrow .xp-minor { display: none; }
-.xp-svg .xp-compass { fill: var(--muted); font-weight: 400; }
-.xp-handle { cursor: grab; touch-action: none; }
+@media (max-width: 40rem) { .book figure.has-explorable > :is(.explorable, .view-toggle) { margin-inline: 0.75rem; } }
+.xp-head { margin-bottom: 0.8rem; }
+.xp-title { margin: 0; font-weight: 700; font-size: 1.05rem; line-height: 1.35; }
+.xp-instruction { margin: 0.25rem 0 0; color: var(--soft); font-size: 0.85rem; line-height: 1.5; }
+.xp-stage {
+  position: relative; -webkit-touch-callout: none; border-radius: 12px; overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 12%, transparent);
+}
+.explorable[data-kind="transform"] .xp-stage { max-width: 22rem; margin-inline: auto; }
+.xp-canvas { display: block; width: 100%; height: 100%; }
+.xp-legend { display: flex; flex-wrap: wrap; gap: 0.3rem 1rem; margin: 0.6rem 0 0; padding: 0; list-style: none; font-size: 0.78rem; color: var(--soft); }
+.xp-legend li { display: inline-flex; align-items: center; gap: 0.4rem; }
+.xp-swatch { width: 1.1rem; height: 0.8rem; border-radius: 3px; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 18%, transparent); }
+/* The same mixes as the drawing: ground with water in its pores (a tint and dots), salt, open lake water. */
+.xp-swatch-fresh-ground { background: radial-gradient(circle, color-mix(in srgb, var(--xp-fresh-ink) 45%, transparent) 0.7px, transparent 1px) 0 0 / 4px 4px, color-mix(in srgb, var(--xp-fresh) 62%, var(--xp-land)); }
+.xp-swatch-brine-ground { background: radial-gradient(circle, color-mix(in srgb, var(--xp-fresh-ink) 45%, transparent) 0.7px, transparent 1px) 0 0 / 4px 4px, color-mix(in srgb, var(--xp-brine) 72%, var(--xp-land)); }
+.xp-swatch-dry-ground { background: var(--xp-land); }
+.xp-swatch-salt { background: var(--xp-salt); }
+.xp-swatch-lake { background: var(--xp-lake); }
+/* Overlays: pre-drawn canvases and labels that move by transform and opacity only (compositor work, no repaint). */
+.xp-layer { position: absolute; left: 0; top: 0; pointer-events: none; will-change: transform; }
+.xp-tag {
+  font: 600 13px/1 var(--sans); color: var(--ink); white-space: nowrap; direction: rtl; will-change: transform, opacity;
+  text-shadow: 0 0 2px var(--paper), 0 0 2px var(--paper), 0 0 3px var(--paper), 0 0 3px var(--paper);
+}
+
+/* Handle: a 48 px touch target, moved only by transform. The page does not scroll while it is dragged. */
+.xp-handle {
+  position: absolute; left: -24px; top: -24px; width: 48px; height: 48px; display: grid; place-items: center;
+  cursor: grab; touch-action: none; will-change: transform;
+}
+.xp-grip, .xp-grip-ring { grid-area: 1 / 1; width: 26px; height: 26px; border-radius: 50%; box-sizing: border-box; }
+.xp-grip {
+  display: block; background: var(--paper); border: 1.5px solid var(--ink); box-shadow: 0 2px 6px var(--xp-shadow);
+  transition: transform var(--dur-quick) var(--ease-out), border-color var(--dur-quick) var(--ease-out);
+}
+.xp-grip svg { width: 100%; height: 100%; fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.xp-handle:hover .xp-grip, .dragging .xp-grip { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 2px 6px var(--xp-shadow); transform: scale(1.08); }
 .dragging .xp-handle { cursor: grabbing; }
-.xp-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.75rem; margin-top: 0.75rem; font-size: 0.85rem; }
-.xp-controls label { font-weight: 600; }
-.xp-controls input[type="range"] { flex: 1 1 12rem; min-width: 0; min-height: 2.75rem; margin: 0; accent-color: var(--accent); }
-.xp-controls output { flex: 1 0 100%; order: 3; color: var(--soft); font-variant-numeric: tabular-nums; }
-.xp-reset { padding: 0.35rem 0.9rem; border: 1px solid var(--rule); border-radius: 999px; color: var(--ink); font-size: 0.8rem; min-height: 2.25rem; }
-.xp-reset:hover { background: var(--mat); }
-.xp-readout { margin: 0.5rem 0 0; font-size: 0.9rem; line-height: 1.6; color: var(--ink); min-height: 4.8em; }
-.xp-schematic, .xp-sources { margin: 0.5rem 0 0; font-size: 0.78rem; line-height: 1.5; color: var(--muted); }
+.xp-grip-ring { border: 2px solid var(--accent); opacity: 0; }
+.hinting .xp-grip-ring { animation: xp-ring 1.1s ease-out 2; }
+@keyframes xp-ring { from { opacity: 0.9; transform: scale(1); } to { opacity: 0; transform: scale(2.3); } }
+
+/* Control: label and value, a styled range with marks, and a reset button. */
+.xp-controls { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 0.2rem 0.9rem; margin-top: 1rem; }
+.xp-control-head { grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.2rem 0.75rem; }
+.xp-label-text { font-weight: 700; font-size: 0.85rem; }
+/* The value line never moves: each part has a fixed-width slot (set from the longest value), the digits are
+   tabular, and the number is isolated from the Hebrew around it. */
+.xp-output { font-size: 0.85rem; color: var(--soft); white-space: nowrap; }
+.xp-output > * { display: inline-block; }
+.xp-num { font-variant-numeric: tabular-nums; text-align: right; unicode-bidi: isolate; font-weight: 700; color: var(--ink); }
+.xp-note { text-align: start; }
+.xp-track { position: relative; min-width: 0; }
+.xp-range { display: block; width: 100%; height: 2.75rem; margin: 0; background: transparent; -webkit-appearance: none; appearance: none; cursor: pointer; }
+/* The rail and the fill sit under a transparent track; the fill moves by transform only. 14px: half the thumb. */
+.xp-rail, .xp-fill { position: absolute; left: 14px; right: 14px; top: calc(1.375rem - 3px); height: 6px; border-radius: 3px; pointer-events: none; }
+.xp-rail { background: var(--rule); }
+.xp-fill { background: var(--accent); transform-origin: left center; transform: scaleX(0); will-change: transform; }
+.xp-range { position: relative; }
+.xp-range::-webkit-slider-runnable-track { height: 6px; background: transparent; }
+.xp-range::-moz-range-track { height: 6px; background: transparent; }
+.xp-range::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; width: 28px; height: 28px; margin-top: -11px; border-radius: 50%;
+  background: var(--paper); border: 2px solid var(--accent); box-shadow: 0 2px 6px var(--xp-shadow);
+}
+.xp-range::-moz-range-thumb { width: 24px; height: 24px; border-radius: 50%; background: var(--paper); border: 2px solid var(--accent); box-shadow: 0 2px 6px var(--xp-shadow); }
+.xp-range:focus { outline: none; }
+.xp-range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 35%, transparent); }
+.xp-range:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 35%, transparent); }
+.xp-range:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
+.xp-marks { position: relative; height: 2.75rem; margin: -0.55rem 14px 0; } /* 14px: half the thumb, so marks meet its centre. */
+.xp-mark {
+  position: absolute; left: calc(var(--at) * 100%); top: 0; transform: translateX(-50%);
+  min-height: 2.75rem; padding: 0.35rem 0.45rem 0; font-size: 0.75rem; font-weight: 600; color: var(--muted); white-space: nowrap;
+}
+.xp-mark::before { content: ""; position: absolute; top: 0; left: 50%; width: 1px; height: 0.4rem; background: var(--muted); }
+.xp-mark[data-edge="start"] { transform: none; padding-left: 0; }
+.xp-mark[data-edge="start"]::before { left: 0; }
+.xp-mark[data-edge="end"] { transform: translateX(-100%); padding-right: 0; }
+.xp-mark[data-edge="end"]::before { left: auto; right: 0; }
+.xp-mark:hover { color: var(--accent); }
+.xp-reset {
+  display: inline-flex; align-items: center; gap: 0.35rem; min-height: 2.75rem; padding: 0 1rem;
+  border: 1px solid var(--rule); border-radius: 999px; color: var(--ink); font-size: 0.85rem; font-weight: 600;
+}
+.xp-reset::before { content: "↺"; font-size: 1rem; line-height: 1; }
+.xp-reset:hover { background: var(--mat); border-color: color-mix(in srgb, var(--ink) 25%, transparent); }
+.xp-readout { font-variant-numeric: tabular-nums; margin: 0.75rem 0 0; font-size: 0.92rem; line-height: 1.65; color: var(--ink); min-height: 4.95em; }
+.xp-schematic, .xp-sources { margin: 0.6rem 0 0; font-size: 0.78rem; line-height: 1.55; color: var(--muted); }
+.xp-schematic { padding-top: 0.75rem; border-top: 1px solid var(--rule); }
 .xp-sources a { color: inherit; }
-
-/* Sinkholes (sinkholes.js) */
-.sk-land { fill: var(--xp-land); }
-.sk-brine { fill: var(--xp-brine); }
-.sk-fresh { fill: var(--xp-fresh); }
-.sk-lake { fill: var(--xp-lake); opacity: 0.85; }
-.sk-salt { fill: var(--xp-salt); stroke: var(--xp-salt-edge); stroke-width: 1.2; }
-.sk-dissolving { fill: var(--xp-dissolve); }
-.sk-void { fill: var(--xp-void); }
-.sk-rubble { fill: var(--xp-land-edge); opacity: 0.55; }
-.sk-ground { fill: none; stroke: var(--xp-land-edge); stroke-width: 2; }
-.sk-table { stroke: var(--xp-fresh-ink); stroke-width: 1.5; stroke-dasharray: 6 4; }
-.sk-interface { stroke: var(--ink); stroke-width: 1.5; }
-.sk-surface { stroke: var(--xp-fresh-ink); stroke-width: 2.5; }
-.sk-arrow path { fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-.sk-arrow.fresh path { stroke: var(--xp-fresh-ink); }
-.sk-arrow.brine path { stroke: var(--xp-brine-ink); }
-.sk-grip circle { fill: var(--paper); stroke: var(--ink); stroke-width: 1.5; }
-.sk-grip path { fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; }
-@media (prefers-reduced-motion: no-preference) {
-  .sk-arrow.fresh path { animation: xp-flow-east 1.8s ease-in-out infinite alternate; }
-  .sk-arrow.brine path { animation: xp-flow-west 1.8s ease-in-out infinite alternate; }
-}
-@keyframes xp-flow-east { from { transform: translateX(-4px); } to { transform: translateX(4px); } }
-@keyframes xp-flow-west { from { transform: translateX(4px); } to { transform: translateX(-4px); } }
-
-/* Transform (transform.js): a tall map, so it keeps a phone-like width on large screens. */
-.explorable[data-kind="transform"] .xp-svg { max-width: 26rem; margin-inline: auto; }
-.tf-basin { fill: var(--xp-basin); }
-.tf-west { fill: var(--xp-plate-a); stroke: var(--ink); stroke-width: 1.5; }
-.tf-plate-east { fill: var(--xp-plate-b); stroke: var(--ink); stroke-width: 1.5; }
-.tf-copper { fill: var(--xp-copper); }
-.tf-arrow { fill: none; stroke: var(--ink); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-.tf-town { fill: var(--ink); }
-.tf-grip circle { fill: var(--paper); stroke: var(--ink); stroke-width: 1.5; }
-.tf-grip path { fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; }
-@media (prefers-reduced-motion: no-preference) {
-  .xp-stage:not(.dragging) .tf-east { transition: transform 120ms ease-out; }
-}

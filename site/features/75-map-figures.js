@@ -305,16 +305,6 @@ function drawMap(figure, box, spec) {
   else if (spec.kind === "image-map") imageMap(box, spec, img);
   else throw new Error(`${box.dataset.map}: unknown map kind ${spec.kind}`);
 }
-// The swap between the printed image and the map changes the figure's height. When the figure is on screen, its top
-// stays where it was: Chrome's scroll anchoring can pick the printed image, which the swap hides, and then moves the
-// page by hundreds of pixels. Off screen, the browser's anchoring keeps the text in view in place.
-function keepFigureTop(figure, change) {
-  const before = figure.getBoundingClientRect();
-  const onScreen = before.top < innerHeight && before.bottom > 0;
-  change();
-  const shift = figure.getBoundingClientRect().top - before.top;
-  if (onScreen && Math.abs(shift) > 1) scrollBy({ top: shift, behavior: "instant" });
-}
 
 for (const figure of document.querySelectorAll("figure.has-map")) {
   const box = figure.querySelector(":scope > .map-figure");

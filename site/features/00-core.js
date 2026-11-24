@@ -73,6 +73,17 @@ function highlight(el, marks = []) {
   el.classList.add("flash");
   highlightTimers.push(setTimeout(() => el.classList.remove("flash"), 1200));
 }
+// A swap between a printed image and its live view (a map in 75-map-figures.js, an explainer in 72-explorables.js)
+// changes the figure's height. When the figure is on screen, its top
+// stays where it was: Chrome's scroll anchoring can pick the printed image, which the swap hides, and then moves the
+// page by hundreds of pixels. Off screen, the browser's anchoring keeps the text in view in place.
+function keepFigureTop(figure, change) {
+  const before = figure.getBoundingClientRect();
+  const onScreen = before.top < innerHeight && before.bottom > 0;
+  change();
+  const shift = figure.getBoundingClientRect().top - before.top;
+  if (onScreen && Math.abs(shift) > 1) scrollBy({ top: shift, behavior: "instant" });
+}
 // Every jump lands its target about 22% down the screen, so the lines before it give context,
 // and never less than the fixed bar's height plus 4rem from the top (short phones).
 function jumpOffset() {
