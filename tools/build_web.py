@@ -370,6 +370,19 @@ def title_and_byline(top: ET.Element) -> tuple[str, tuple[str, str | None] | Non
     return title, ((clean_text(byline), lang) if byline is not None else None)
 
 
+def credit_html(lines: list[str], links: dict[str, str], where: str) -> str:
+    """The attribution lines as HTML, with the first use of each linked word made a link."""
+    text = " · ".join(html.escape(line) for line in lines)
+    for word, url in links.items():
+        if not url.startswith("https://"):
+            raise BookError(f"{where}: attribution link for {word!r} must be https")
+        key = html.escape(word)
+        if key not in text:
+            raise BookError(f"{where}: attribution_links names {word!r}, which no attribution line has")
+        text = text.replace(key, f'<a href="{html.escape(url)}" rel="noopener">{key}</a>', 1)
+    return text
+
+
 def write_csv(path: Path, header: list[str], rows: list[list]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8-sig", newline="") as f:  # The BOM lets spreadsheet apps read Hebrew.
