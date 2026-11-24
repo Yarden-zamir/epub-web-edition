@@ -1176,6 +1176,9 @@ class Ingest:
             text = self.join(para)
             # A credit can start the line or follow the caption in the same line ("… צילום: name").
             cut = min((i for pre in prefixes for i in [text.find(pre + ":"), text.find(pre + " ")] if i > 0), default=-1)
+            # A credit in brackets ("… (צילום מאוקטובר 2002).") keeps its opening bracket.
+            if cut > 0 and text[:cut].rstrip().endswith("("):
+                cut = text[:cut].rstrip().rindex("(")
             if text.startswith(prefixes):
                 spans.append(f'<span class="credit">{text}</span>')
             elif cut > 0:
