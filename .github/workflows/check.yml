@@ -76,7 +76,16 @@ jobs:
             *) flags="--full --advisory sample" ;;
           esac
           [[ "$RECORD" == true ]] && flags="$flags --record"
-          uv run books/eli-raz/scripts/check.py $flags
+          uv run books/eli-raz/scripts/check.py $flags 2>&1 | tee check.log
+          rc=${PIPESTATUS[0]}
+          # The job summary on the PR page: the mode, each step's time, the smoke and advisory results.
+          {
+            echo "### check ($EVENT): \`check.py $flags\`"
+            echo '```'
+            grep -E '^\(|ingest inputs|EPUBCheck:|axe on|smoke ok|advisory|check ok|failed' check.log || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$rc"
       - if: always()
         uses: actions/upload-artifact@v7
         with:
