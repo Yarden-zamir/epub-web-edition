@@ -532,7 +532,7 @@ def timeline_html(data_dir: Path | None, conv: Converter) -> tuple[str, str]:
         if not isinstance(ev["major"], bool):
             raise BookError(f"timeline.json: event {i}: major must be true or false")
         cls = "tl-event tl-major" if ev["major"] else "tl-event"
-        items.append(f'<li class="{cls}"><a href="#{html.escape(ev["target"])}">'
+        items.append(f'<li class="{cls}"><a href="#{html.escape(ev["target"])}" data-quote="{html.escape(ev["quote"])}">'
                      f'<span class="tl-date">{html.escape(ev["label"])}</span>'
                      f'<span class="tl-text">{html.escape(ev["text"])}</span></a></li>')
     tab = '<button type="button" role="tab" id="tab-timeline" aria-selected="false" aria-controls="toc-timeline" tabindex="-1">ציר זמן</button>'

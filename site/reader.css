@@ -189,6 +189,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* Figures */
 .book figure { margin: clamp(3rem, 9vw, 6.5rem) 0; text-align: start; }
+/* Figures that follow each other form a set: about a third of the usual gap between them.
+   Page markers between them are hidden, so they count as adjacent. */
+.book figure:has(+ figure, + [data-epub-type="pagebreak"] + figure) { margin-bottom: clamp(1rem, 3vw, 2.2rem); }
+.book :is(figure + figure, figure + [data-epub-type="pagebreak"] + figure) { margin-top: clamp(1rem, 3vw, 2.2rem); }
 .book figure img { display: block; cursor: zoom-in; }
 .book figcaption { margin: 1rem auto 0; font-family: var(--sans); font-size: 0.9rem; line-height: 1.55; color: var(--ink); }
 .book figcaption .credit { margin-top: 0.25rem; color: var(--muted); opacity: 1; font-size: 0.9em; }
@@ -272,8 +276,13 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .deep-link { margin-inline-start: 0.5rem; padding: 0.15rem 0.5rem; font-family: var(--sans); font-size: 0.75rem; font-weight: 400; letter-spacing: 0; color: var(--muted); vertical-align: middle; opacity: 0; border-radius: 999px; }
 :is(h2, figcaption):hover .deep-link, .deep-link:focus-visible, .deep-link[data-copied] { opacity: 1; }
 @media (hover: none) { .deep-link { display: none; } }
-.flash { animation: flash 2s ease-out; }
-@keyframes flash { from { background: color-mix(in srgb, var(--accent) 14%, transparent); } }
+/* Jump highlight: background only, so nothing moves. JS removes it after about a second. */
+.flash { animation: flash 1.2s ease-in both; }
+@keyframes flash { 0%, 70% { background: color-mix(in srgb, var(--accent) 18%, transparent); } 100% { background: transparent; } }
+@media (prefers-reduced-motion: reduce) { .flash { animation: none; background: color-mix(in srgb, var(--accent) 18%, transparent); } }
+::highlight(jump-1) { background-color: color-mix(in srgb, var(--accent) 32%, transparent); }
+::highlight(jump-2) { background-color: color-mix(in srgb, var(--accent) 18%, transparent); }
+::highlight(jump-3) { background-color: color-mix(in srgb, var(--accent) 8%, transparent); }
 
 /* Footer */
 .footer { background: var(--night); color: var(--on-night); font-family: var(--sans); }
