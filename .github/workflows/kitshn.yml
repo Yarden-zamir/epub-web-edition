@@ -92,7 +92,9 @@ jobs:
           key: playwright-1.64.1-chromium-headless-shell
       - name: Install Playwright browser
         if: steps.web.outputs.cache-hit != 'true'
-        run: uv run --with playwright==1.64.1 playwright install --with-deps --only-shell chromium
+        # No --with-deps (about 10 s of apt): the runner image ships Chrome and its libraries. A missing library fails
+        # the smoke test loudly; then add --with-deps back.
+        run: uv run --with playwright==1.64.1 playwright install --only-shell chromium
 
       - name: Build and check
         if: steps.web.outputs.cache-hit != 'true'
