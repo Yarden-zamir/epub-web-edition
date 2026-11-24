@@ -61,4 +61,4 @@ A module defines any of these functions. Each one receives `site` (`build_web.Si
 ## Check a change
 
 - A refactor must keep the built site byte-identical. Hash every file of a sample and a release build before and after the change, and compare.
-- Land a change with `uv run books/eli-raz/scripts/lane_push.py <your-name>` (books/eli-raz/AGENTS-BRIEF.md, "Git flow"). GitHub Actions runs `tools/verify.py`, the smoke and axe checks, explainers and videos; this machine runs only `uv run books/eli-raz/scripts/check.py` (light).
+- Land a change through a PR and the merge queue (skill `eli-raz-pr-flow`, docs/WORKFLOW.md). GitHub Actions runs `tools/verify.py`, the smoke and axe checks, explainers and videos; this machine runs only `uv run books/eli-raz/scripts/check.py` (light).

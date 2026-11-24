@@ -1,9 +1,9 @@
 # Deploy both apps of kitshn.config.ts: the sample edition (built in the deploy job) and the Eli Raz edition
-# (built in the "book" job). To build and deploy by hand: gh workflow run kitshn.yml -R Yarden-zamir/epub-web-edition
+# (built in the "book" job). To build and deploy by hand: gh workflow run kitshn.yml -R game-design-driven/epub-web-edition
 on:
+  # main moves only through the merge queue (docs/WORKFLOW.md); each push to main is a tested commit.
   push:
-    # Lane branches run .github/workflows/checks.yml and deploy nothing.
-    branches-ignore: ["lane/**"]
+    branches: [main]
   pull_request:
     types: [opened, synchronize, reopened, closed]
   workflow_dispatch:
@@ -33,7 +33,7 @@ jobs:
           path: books/eli-raz/dist/release/web
           key: book-web-${{ hashFiles('books/eli-raz/**', 'tools/**', 'site/**', 'epub-src/OEBPS/fonts/**', 'epub-src/OEBPS/css/**', '.github/workflows/kitshn.yml', '.github/actions/book-tools/action.yml') }}
       # The shared cache of check.py: ingest outputs by input hash, EPUBs that passed EPUBCheck, sections that
-      # passed axe. The nightly slow-checks.yml saves into it too.
+      # passed axe. check.yml saves into it too.
       - name: Restore check cache
         if: steps.web.outputs.cache-hit != 'true'
         uses: actions/cache@v6
@@ -45,7 +45,7 @@ jobs:
         if: steps.web.outputs.cache-hit != 'true'
         uses: ./.github/actions/book-tools
       # The deploy gate (check.py --gate): ingest, build, check_release with the size budget, EPUBCheck, and the quick
-      # smoke test. Lanes run every check in checks.yml before they land; slow-checks.yml runs them nightly on main.
+      # smoke test. The merge queue ran every check on this commit before it reached main (check.yml).
       - name: Build and check
         if: steps.web.outputs.cache-hit != 'true'
         env:
@@ -54,7 +54,7 @@ jobs:
       - name: Shrink uv cache
         if: steps.web.outputs.cache-hit != 'true'
         run: uv cache prune --ci
-      # Artifact storage of a private repo counts against the account quota, so keep each run's files one day.
+      # One day is enough: the deploy job of the same run downloads it.
       - uses: actions/upload-artifact@v7
         with:
           name: book-web

@@ -2,15 +2,17 @@
 
 Pipeline that turns a book into a reflowable EPUB 3 and a continuous web edition built from that EPUB.
 
-This repository is private. It holds two editions:
+It holds two editions:
 
 - The synthetic sample edition at the root (`epub-src/`, `inventory/`, `originals/`). Its content is placeholder.
 - The Eli Raz edition in `books/eli-raz/`, the real book "אלי רז חוקר הבולענים", live at https://eli-raz.yarden-zamir.com.
   See `books/eli-raz/AGENTS-BRIEF.md` for its build and rules.
 
 Licences: the MIT licence in `LICENSE` covers the pipeline code and the sample edition only.
-The Eli Raz book content is © its authors and photographers, all rights reserved; see `books/eli-raz/NOTICE.md`.
-Before this repository goes public, its history needs a rewrite (`books/eli-raz/NOTICE.md` says why).
+The Eli Raz book content (its text, images and source PDF) is © its authors and photographers, all rights reserved,
+published with the family's permission; see `books/eli-raz/NOTICE.md`.
+
+How work reaches `main`: branches, pull requests and a merge queue (`docs/WORKFLOW.md`).
 
 ## Deploy
 
@@ -20,7 +22,7 @@ The book deploys first. Three things keep a deploy short:
 - kitshn uploads only files whose hash Cloudflare does not have yet, and both builds are byte-reproducible.
 - The workflow keeps the last checked book build under the hash of everything the build reads. A push that changes none of it (for example only the sample) restores that build and skips the build and checks.
 - `check.py` skips both PDF ingests when the hash of their inputs is unchanged (`INGEST_INPUTS`).
-Checks: a lane pushes to `lane/<name>` with `books/eli-raz/scripts/lane_push.py`; `.github/workflows/checks.yml` runs every check there, and the script lands the lane on main when they pass. `.github/workflows/slow-checks.yml` runs every check nightly on main; it reports and blocks no deploy.
+Checks: `.github/workflows/check.yml` checks each pull request, runs every check in the merge queue, and runs a full check on `main` every night (`docs/WORKFLOW.md`, Checks).
 
 ## Pipeline
 

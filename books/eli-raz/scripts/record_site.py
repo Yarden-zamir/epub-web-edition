@@ -9,7 +9,7 @@ screenshots; no DOM snapshots, which this long page makes very large), a screens
 
 Usage: uv run scripts/record_site.py WEB_DIR OUT_DIR
 Open a trace: uv run --with playwright==1.64.1 playwright show-trace OUT_DIR/<name>.zip
-CI runs it in .github/workflows/checks.yml and uploads OUT_DIR as an artifact. It checks nothing; it records.
+CI runs it in .github/workflows/check.yml (nightly, or by hand with record) and uploads OUT_DIR as an artifact. It checks nothing; it records.
 """
 import functools
 import http.server

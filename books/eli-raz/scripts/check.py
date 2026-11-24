@@ -24,8 +24,8 @@ Usage, from the repo root (flags combine):
   --advisory sample     comma-separated groups (epubcheck, smoke, explorables, record, sample) whose failure only
                         warns (a GitHub annotation in CI) and does not fail the run
 
-Lanes do not run the heavy checks here: scripts/lane_push.py pushes to lane/<name>, where .github/workflows/checks.yml
-runs all of them on GitHub's machines.
+Agents do not run the heavy checks on the build machine: .github/workflows/check.yml runs them on GitHub for each PR
+(--gate), the merge queue (every check) and every night (--full); docs/WORKFLOW.md, Checks.
 Shared cache (all worktrees on this machine): ~/.cache/eli-raz, or $ELI_RAZ_CACHE.
 The heavy flags need .tools/ in the repo root: EPUBCheck 5.4.0 in .tools/epubcheck-5.4.0/, a Java runtime in
 .tools/jdk-*/, axe-core 4.14.0 in .tools/axe/package/, and the Chromium of Playwright 1.64.1 (see smoke_site.py).
@@ -111,7 +111,7 @@ def finish(args: list[str], code: int, out: str, start: float, advisory: str | N
     say(out[-4000:].rstrip())
     say(f"({time.monotonic() - start:.0f} s: {' '.join(args[:3])[-70:]})")
     if code != 0 and advisory:
-        # GitHub Actions shows this line as a warning annotation; scripts/lane_push.py prints it.
+        # GitHub Actions shows this line as a warning annotation; gh run view lists it.
         say(f"::warning title=advisory check failed::{advisory}: {' '.join(args[:3])[-70:]} exited {code}; it does not block")
     elif code != 0:
         sys.exit(f"{args[:3]} failed with exit code {code}")

@@ -43,7 +43,7 @@ Clearance evidence: scratchpad clearance record of 2026-11-24, summarized in boo
 
 ## Repos
 
-15. Commit and push continuously (user rule, 2026-11-24). Since 2026-11-24 the book lives in books/eli-raz/ of the private repo Yarden-zamir/epub-web-edition (git flow: AGENTS-BRIEF.md).
+15. Commit and push continuously (user rule, 2026-11-24). Since 2026-11-24 the book lives in books/eli-raz/ of the public repo game-design-driven/epub-web-edition (workflow: docs/WORKFLOW.md).
 
 ## Web enrichment (site/enhancements.json)
 

@@ -15,6 +15,6 @@ The MIT licence in the root `LICENSE` file covers only the pipeline code (`tools
 - The list of these changes and credits is in `CONTENT-CHANGES.md`: section 2 (image changes and credits, from `book.toml` `[release]`) and section 4 (web additions). The licence links are in `book.toml` `[[release.credit]]`, `content-data/attribution.md` and the `attribution` and `source` fields of `site/figure-maps/*.json`, `site/charts/*.json` and `site/then-now.json`.
 - Maps drawn for this edition (`replacements/`, `scripts/*map*.py`) use OpenStreetMap data (© OpenStreetMap contributors, ODbL), Natural Earth (public domain) and Copernicus DEM. Each map carries a short credit, and the edition note under it holds the full wording (`content-data/attribution.md`).
 
-## Before this repo goes public
+## The source PDF and the release edition
 
-This repo is private. Its git history holds the plain source PDF and the print images that the release edition withholds or replaces (`book.toml` `[release]`: p066-x251, p183-x717, p301-x1169, p302-x1173). To make the code public, rewrite the history first (for example with `git filter-repo` to remove `books/eli-raz/source/source.pdf` and `books/eli-raz/PERMISSIONS.md`), or publish the pipeline from a separate public repo.
+The repo holds the printed book as `source/source.pdf`, in its files and its history, by the decision of the family's representative (2026-11-24). It includes the print images that the release edition withholds or replaces (`book.toml` `[release]`: p066-x251, p183-x717, p301-x1169, p302-x1173); the rights of those images stay with their holders. The public web edition and EPUB are the release edition.
