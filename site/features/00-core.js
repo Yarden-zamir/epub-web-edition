@@ -249,7 +249,9 @@ function sizeDocuments() {
   root.removeAttribute("data-sizing");
 }
 sizeDocuments();
-document.fonts.ready.then(sizeDocuments);
+// The fonts are preloaded and usually loaded before this deferred script runs. Then the first measure is final, and a
+// second one would only repeat a full-page layout (the costliest task of a load on a phone).
+if (document.fonts.status !== "loaded") document.fonts.ready.then(sizeDocuments);
 {
   let width = innerWidth, timer = 0;
   addEventListener("resize", () => {
