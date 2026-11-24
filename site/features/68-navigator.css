@@ -12,7 +12,7 @@
 .tabs::before { content: ""; position: absolute; z-index: -1; top: var(--tab-top, 0.25rem); left: 0; width: var(--tab-w, 0); height: var(--tab-h, 0); border-radius: var(--radius-pill); background: var(--ink); transform: translateX(var(--tab-x, 0)); transition: transform var(--dur-base) var(--ease-out), width var(--dur-base) var(--ease-out); }
 .tabs [role="tab"][aria-selected="true"] { color: var(--paper); }
 .toc-filter { position: sticky; top: 0; z-index: 1; padding: 0.75rem 1rem 0.5rem; background: var(--paper); }
-.toc-filter input { width: 100%; box-sizing: border-box; padding: 0.6rem 0.9rem; border: 1px solid var(--rule); border-radius: var(--radius-s); background: var(--mat); color: inherit; font: inherit; font-size: 0.95rem; }
+.toc-filter input { width: 100%; padding: 0.6rem 0.9rem; border: 1px solid var(--rule); border-radius: var(--radius-s); background: var(--mat); color: inherit; font: inherit; font-size: 0.95rem; }
 .toc-filter input:focus { outline: 2px solid var(--accent); outline-offset: 0; }
 .toc-empty { margin: 1rem 1.5rem; color: var(--muted); }
 .panel-list .toc ol { padding: 0; }
@@ -46,7 +46,7 @@
 .pi-list { list-style: none; margin: 0; padding: 0 0.5rem 0.75rem; }
 .pi-group .toc-part-title { margin: 0.75rem 0 0; }
 .pi-item { padding: 0.35rem 0; border-bottom: 1px solid var(--rule); }
-.pi-place { display: grid; box-sizing: border-box; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "dot name far" ". desc desc"; align-items: center; gap: 0.1rem 0.5rem; width: 100%; padding: 0.4rem 0.6rem; border-radius: calc(var(--radius-m) - 0.5rem); text-align: start; }
+.pi-place { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "dot name far" ". desc desc"; align-items: center; gap: 0.1rem 0.5rem; width: 100%; padding: 0.4rem 0.6rem; border-radius: calc(var(--radius-m) - 0.5rem); text-align: start; }
 .pi-place:hover, .pi-place:focus-visible { background: var(--mat); }
 .pi-place i { grid-area: dot; width: 0.7rem; height: 0.7rem; border-radius: 50%; background: var(--place); }
 .pi-name { grid-area: name; font-weight: 600; }
