@@ -6,4 +6,6 @@
 .rail-track i.part { inset-inline-start: 0; width: 0.5rem; background: var(--ink); }
 .rail-track i.current { inset-inline-start: -0.2rem; width: 0.9rem; height: 3px; background: var(--accent); }
 .rail-label { position: absolute; inset-inline-start: 1.6rem; translate: 0 -50%; max-width: min(18rem, 70vw); padding: 0.35rem 0.75rem; border-radius: var(--radius-s); background: var(--ink); color: var(--paper); font-family: var(--sans); font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
+/* A mouse has the scrollbar on this edge: the rail only shows the chapters and lets clicks through. */
+@media (pointer: fine) { .rail { pointer-events: none; } }
 @media print { .rail { display: none; } }
