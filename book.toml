@@ -137,6 +137,54 @@ reason = "PDF page 283: print opens this bracket and closes only the inner (Goog
 contains = "(1934(."
 reason = "PDF page 310: print shows two opening brackets around the year; kept as printed."
 
+# Verse set as poems (a01-p011 names Moshe Mazar's maqama, Elisheva Rosenbaum's poems and Galit Hazan-Rokach's poem;
+# a24 quotes a song). Line texts are exact extracted lines; stanza sizes follow the printed gaps (3 pt or more, or 10 pt
+# in the maqama). The author line prints "חזן-רוקם"; a01-p011 spells "חזן-רוקח". Kept as printed.
+[[poem]]
+unit = "a07"
+pages = [50]
+title = "כְּמוֹ אֵשֶׁת לוֹט"
+author = "גלית חזן-רוקם"
+first = "כְּמוֹ אֵשֶׁת לוֹט"
+last = "בְּשׁוּב הַמַּיִם מִן הַיָּם אֶל הָרָקִיעַ"
+stanzas = [6]
+[[poem]]
+unit = "a24"
+pages = [207]
+first = "היה היה איש"
+last = "(לא יפה)..."
+stanzas = [7]
+[[poem]]
+unit = "a26"
+pages = [213, 214]
+first = "שמעו שמעו בני מואב ועמון"
+last = "וכולנו על מקלותינו, נרד אליך לעין גדי לרגל..."
+stanzas = [4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+[[poem]]
+unit = "a30"
+pages = [244]
+title = "גזעי התמרים"
+author = "אלישבע רוזנבוים (באר), עין גדי"
+first = "גִּזְעֵי הַתְּמָרִים"
+last = "פְּרוּשָׂה עֲלֵיהֶם."
+stanzas = [7]
+[[poem]]
+unit = "a35"
+pages = [290]
+title = "דרך חלון האוטובוס"
+author = "אלישבע רוזנבוים (באר), עין גדי"
+first = "כָּל הַמַּרְאוֹת אֵינָם"
+last = "נְמוֹגוֹת."
+stanzas = [6, 5]
+[[poem]]
+unit = "a36"
+pages = [308]
+title = "קו 486 - בדרך היורדת אל הבית"
+author = "אלישבע רוזנבוים (באר), עין גדי"
+first = "שמים,"
+last = "הביתה."
+stanzas = [33, 1]
+
 # Tables printed as text. ingest_pdf.py replaces the printed lines from "top" to "bottom" with an XHTML
 # table. The rows must hold exactly the printed characters; "replaces" lists the paragraph IDs that held them.
 # Cells transcribed from the print layout (render checked); the first row is the header.
@@ -467,8 +515,8 @@ height_px = 1600
 [facsimile]
 # Appendix with a page image of every PDF page, one document per page, with a Return link to the text.
 # Derived images, rendered from source.pdf. They are not scans of paper.
-dpi = 64  # 428x604 px per page, about v3 size. Keeps the EPUB under the 25 MB per-file limit of the web host.
-quality = 60
+dpi = 56  # 375x529 px per page; 316 pages take about 8.8 MB. The release EPUB must stay at most 24 MB (tools/check_size.py).
+quality = 55
 title = "עמודי המקור"
 note = "תוספת של מהדורה זו: תמונות של כל עמודי הספר המודפס, כפי שהם מופיעים בקובץ הדפוס. הן נועדו להשוואה עם הטקסט. בכל עמוד יש קישור חזרה למקום המתאים בטקסט."
 return_label = "חזרה לטקסט"
@@ -554,7 +602,7 @@ fonts = "fonts"      # Noto Sans Hebrew (SIL OFL) as the bundled fallback.
 "p019-x68" = "חלל תצוגה ריק ובו פסלים לבנים מגובשי מלח, תלויים מהתקרה ועומדים על הרצפה."
 "p020-x85" = "פסל של שמלה מגובשת במלח לבן ומסולסל, תלוי באוויר על רקע אפור."
 "p020-x87" = "כינור מכוסה בגבישי מלח לבנים על רקע שחור."
-"p020-x82-masked" = "ספר בכריכה קשה בשם SIGALIT LANDAU – SALT YEARS, בתמונה אלכסונית."
+"p020-x82" = "ספר בכריכה קשה בשם SIGALIT LANDAU – SALT YEARS, בתמונה אלכסונית."
 "p020-x91-masked" = "ספר בכריכה קשה בשם SIGALIT LANDAU – SALT YEARS, בתמונה אלכסונית."
 "p020-x93" = "ידיים מרימות מן המים בד מגובש במלח לבן, קשור למקל עץ."
 "p020-x95" = "גבר ואישה בכובע ובשמלה צבעונית מורידים מעגורן אל המים שמלה מגובשת במלח, על חוף ים המלח."
@@ -604,14 +652,14 @@ fonts = "fonts"      # Noto Sans Hebrew (SIL OFL) as the bundled fallback.
 "p115-x444" = "בולען גדול בכביש, עם גושי אספלט שבורים בתוכו ואדם עומד מעבר לו, עם חותמת תאריך 28 10 2003."
 "p116-x450-masked" = "מבט מלמעלה על גשר בטון ומתחתיו ערוץ יבש עם שיחים."
 "p123-x490" = "יריעה גיאוטכנית שחורה ומחוררת מונחת על קרקע עם חצץ, ובה פתח מרובע שנחתך."
-"p125-x500-masked" = "מבט מגובה על חוף ים המלח: רצועות מלח לבנות מתעקלות לאורך המים הטורקיזיים, ורכס הרים באופק."
+"p125-x500" = "מבט מגובה על חוף ים המלח: רצועות מלח לבנות מתעקלות לאורך המים הטורקיזיים, ורכס הרים באופק."
 
 "p126-x505" = "מפל מים דק יורד על דופן סלע בקניון צר ומצוקים בגוני חום וכתום, ושני אנשים קטנים למטה."
 "p127-x509" = "גבר במשקפי שמש ובחולצה ירוקה בהירה יושב על סלעים, לצד צמחייה ירוקה."
 "p129-x515" = "פרט מפסיפס מפת מידבא: ציורי ערים עם מגדלים ועצי תמר, וכיתוב ביוונית."
 "p129-x517" = "פרט מפסיפס מפת מידבא: חוף מסוגנן עם ציורי מבנים ועצי תמר, וכיתוב ביוונית."
 "p133-x527" = "קטע טקסט מודפס בעברית בכתב ישן, בפתיחה 'לולבי עבר הירדן'."
-"p135-x535-masked" = "תצלום שחור־לבן: סירת מפרש עם שני מפרשים משולשים על מים שקטים, ורכס הרים באופק."
+"p135-x535" = "תצלום שחור־לבן: סירת מפרש עם שני מפרשים משולשים על מים שקטים, ורכס הרים באופק."
 "p136-x544-masked" = "עוגן עשוי עץ ועופרת מונח על חצץ."
 "p138-x553" = "תצלום שחור־לבן של חורבה: שני קירות אבן מקבילים יורדים במדרון לעבר החוף, ומאחור הרים."
 "p140-x559" = "תצלום שחור־לבן: ספינת מפרש וסירה קטנה על המים, ואנשים בגלימות עומדים ויושבים על החוף."
@@ -723,10 +771,10 @@ fonts = "fonts"      # Noto Sans Hebrew (SIL OFL) as the bundled fallback.
 [[release.change]]
 image = "p066-x251"
 action = "replace"
-file = "replacements/p066-x251-open-map.png"
-alt = "מפה של מרכז אסיה: טג'יקיסטן מודגשת במרכז, קירגיזסטן מצפון ואפגניסטן מדרום, הערים דושנבה, טשקנט וקאבול, ומשולש אדום על פסגת לנין ברכס פאמיר, בגבול טג'יקיסטן וקירגיזסטן."
-note = "מפה חלופית למהדורה זו, משורטטת מנתוני Natural Earth (נחלת הכלל). המפה המודפסת אינה נכללת עד לבירור זכויותיה."
-reason = "Printed map looks like a Google Maps screenshot without attribution; Google allows only embeds, links and APIs on the web. Replacement drawn by scripts/pamir_map.py."
+file = "replacements/p066-x251-open-map.jpg"
+alt = "מפת תבליט מדושנבה ועד פסגת לנין: קו מקווקו של טיסה מדושנבה למנחת בג'ירגיטל, וקו מנוקד של מסוק משם אל מחנה הבסיס באצ'יקטש שבעמק אלאי, מצפון לרכס טרנס־אלאי ולגבול טג'יקיסטן וקירגיזסטן. במפה מוגדלת שמתחת: מחנה הבסיס, המחנה הראשון, המחבת שבה אירע האסון ופסגת לנין, בין קרחונים, עם קנה מידה של 2 ק\"מ. בפינה מפת התמצאות של מרכז אסיה."
+note = "מפה חלופית חדשה למהדורה זו. מקומות, מחנות וקרחונים: OpenStreetMap (רישיון ODbL). גבולות ונהרות: Natural Earth (נחלת הכלל). תבליט: Copernicus DEM (האיחוד האירופי ו־ESA). קווי הטיסה והמסוק ישרים וסכמטיים. המפה המודפסת אינה נכללת עד לבירור זכויותיה."
+reason = "Printed map looks like a Google Maps screenshot without attribution. Replacement drawn by scripts/pamir_map.py from OSM, Natural Earth and Copernicus DEM; sources in the script and in site/figure-maps/fig-a10-02.json."
 
 [[release.change]]
 image = "p183-x717"
@@ -736,15 +784,19 @@ reason = "No source found among 411 Commons candidates."
 
 [[release.change]]
 image = "p301-x1169"
-action = "withhold"
-note = "המפה (ביין וחובריו, 2020) הוסרה זמנית ממהדורה זו, עד לקבלת רשות מבעלי הזכויות."
-reason = "Figure from a publication on a satellite base map; neither source is cleared."
+action = "replace"
+file = "replacements/p301-x1169-open-map.jpg"
+alt = "מפת תבליט מעקבה ועד עמאן ומהים התיכון ועד מדבר ירדן: קו רצוף של מי ים סוף מעקבה צפונה לאורך הערבה בצד הירדני אל מתקן התפלה בקרבת ים המלח, המסומן בעיגול מקווקו כמיקום משוער; קו כפול של מי ים ורכז מהמתקן אל ים המלח; וקו מקווקו של מים מותפלים מהמתקן לעמאן. מקרא עם הכמויות של שלב א': 500, 400 ו־100 מלמ\"ש, וקנה מידה של 50 ק\"מ."
+note = "מפה סכמטית חדשה שצוירה למהדורה זו לפי הטקסט בפרק. היא אינה האיור של ביין וחובריו (2020), שאינו נכלל עד לקבלת רשות מבעלי הזכויות. התוואי ומיקום מתקן ההתפלה משוערים. מקומות וים המלח: OpenStreetMap (רישיון ODbL). גבולות: Natural Earth (נחלת הכלל). תבליט: Copernicus DEM (האיחוד האירופי ו־ESA)."
+reason = "Printed figure (Bein et al. 2020 on a satellite base map) is not cleared. New schematic map from the book text (a36-p044, a36-p045, a36-p048, caption of fig-a36-09) by scripts/jordan_maps.py."
 
 [[release.change]]
 image = "p302-x1173"
-action = "withhold"
-note = "תצלום האוויר (Google Earth) הוסר זמנית ממהדורה זו, עד להשלמת הייחוס הנדרש."
-reason = "Google Earth view shows only 'Google'; Google requires the imagery providers too. Pending decision."
+action = "replace"
+file = "replacements/p302-x1173-open-view.jpg"
+alt = "מבט תלת־ממדי מדרום־מערב לכיוון צפון־מזרח על רמת המדבר הירדני: בפינה השמאלית התחתונה בריכות האידוי בדרום ים המלח, מעליהן מצוק הבקע. על שפת הרמה עוברת דרך המלך (כביש 35) דרך טפילה וכרכ, ומאחוריה, ברמה, הכביש המדברי (כביש 15) דרך אל־חסא וקטרנה, שלאורכו עובר מוביל דיסי–עמאן. חץ אדום מצביע צפונה לעמאן."
+note = "מבט חדש שצויר למהדורה זו מנתונים פתוחים, במקום תצלום Google Earth שאינו נכלל. הגבהים מוגדלים פי 2. כבישים ויישובים: OpenStreetMap (רישיון ODbL). תבליט: Copernicus DEM (האיחוד האירופי ו־ESA). מוביל דיסי–עמאן עובר בתחום הדרך של הכביש המדברי, לפי סקר ההשפעה על הסביבה של המוביל (Consolidated Consultants, 2008). במבט זה הכביש המדברי, 'הנתיב האופקי' שבכיתוב, עובר באלכסון. תוואי החלופות שבתצלום המקורי אינם מוצגים."
+reason = "Google Earth print use needs Google plus the imagery providers next to the image; the print shows only 'Google' and the providers cannot be recovered. New perspective view by scripts/jordan_maps.py from OSM and Copernicus DEM."
 
 [[release.credit]]
 image = "p034-x147"

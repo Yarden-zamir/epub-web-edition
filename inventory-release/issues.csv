@@ -12,7 +12,7 @@ A-0010,18,info,p018-x64.jpeg: no caption next to this image in print,open
 A-0011,19,info,p019-x68.jpeg: no caption next to this image in print,open
 A-0012,20,info,p020-x85.jpeg: no caption next to this image in print,open
 A-0013,20,info,p020-x87.jpeg: no caption next to this image in print,open
-A-0014,20,info,p020-x82-masked.png: no caption next to this image in print,open
+A-0014,20,info,p020-x82.jpeg: no caption next to this image in print,open
 A-0015,20,info,p020-x91-masked.png: no caption next to this image in print,open
 A-0016,20,info,p020-x95.jpeg: no caption next to this image in print,open
 A-0017,20,info,a05-p004: paragraph continues across the page break (marker kept inside),open
@@ -38,156 +38,162 @@ A-0036,38,info,p038-x161.jpeg: no caption next to this image in print,open
 A-0037,39,info,p039-x165-render.jpg: no caption next to this image in print,open
 A-0038,46,info,a07-p015: paragraph continues across the page break (marker kept inside),open
 A-0039,49,info,a07-p029: paragraph continues across the page break (marker kept inside),open
-A-0040,51,info,p051-x207.jpeg: no caption next to this image in print,open
-A-0041,52,info,p052-x211.jpeg: no caption next to this image in print,open
-A-0042,53,info,p053-x215-render.jpg: no caption next to this image in print,open
-A-0043,56,info,p056-x223.jpeg: no caption next to this image in print,open
-A-0044,57,info,p057-x227.jpeg: no caption next to this image in print,open
-A-0045,60,info,p060-x235.jpeg: no caption next to this image in print,open
-A-0046,60,info,a09-p014: paragraph continues across the page break (marker kept inside),open
-A-0047,63,info,a09-p032: paragraph continues across the page break (marker kept inside),open
-A-0048,64,info,a09-p036: paragraph continues across the page break (marker kept inside),open
-A-0049,65,info,p065-x247.jpeg: no caption next to this image in print,open
-A-0050,66,intentional-change,"Release: p066-x251 replace: Printed map looks like a Google Maps screenshot without attribution; Google allows only embeds, links and APIs on the web. Replacement drawn by scripts/pamir_map.py.",open
-A-0051,67,info,a10-p004: paragraph continues across the page break (marker kept inside),open
-A-0052,68,info,p068-x257.jpeg: no caption next to this image in print,open
-A-0053,70,char-map,U+FFFD mapped to U+05B7; check against print,open
-A-0054,72,info,a10-p024: paragraph continues across the page break (marker kept inside),open
-A-0055,78,intentional-change,fig-a10-11: QR code image links to its decoded target,open
-A-0056,78,intentional-change,fig-a10-12: QR code image links to its decoded target,open
-A-0057,78,intentional-change,fig-a10-13: QR code image links to its decoded target,open
-A-0058,78,intentional-change,fig-a10-14: QR code image links to its decoded target,open
-A-0059,79,info,p079-x310.jpeg: no caption next to this image in print,open
-A-0060,82,info,a11-p015: paragraph continues across the page break (marker kept inside),open
-A-0061,89,info,p089-x332.jpeg: no caption next to this image in print,open
-A-0062,93,info,p093-x356.jpeg: no caption next to this image in print,open
-A-0063,94,info,p094-x360.jpeg: no caption next to this image in print,open
-A-0064,96,info,p096-x366.jpeg: no caption next to this image in print,open
-A-0065,98,info,a13-p031: paragraph continues across the page break (marker kept inside),open
-A-0066,100,info,p100-x376.jpeg: no caption next to this image in print,open
-A-0067,101,info,p101-x380.jpeg: no caption next to this image in print,open
-A-0068,104,info,a13-p058: paragraph continues across the page break (marker kept inside),open
-A-0069,106,info,p106-x394.jpeg: no caption next to this image in print,open
-A-0070,107,info,p107-x398.jpeg: no caption next to this image in print,open
-A-0071,108,info,a14-p005: paragraph continues across the page break (marker kept inside),open
-A-0072,109,info,p109-x406.jpeg: no caption next to this image in print,open
-A-0073,115,info,p115-x444.jpeg: no caption next to this image in print,open
-A-0074,117,info,p117-x458.jpeg: no caption next to this image in print,open
-A-0075,118,info,p118-x464.jpeg: no caption next to this image in print,open
-A-0076,120,info,a14-p052: paragraph continues across the page break (marker kept inside),open
-A-0077,125,info,p125-x500-masked.png: no caption next to this image in print,open
-A-0078,126,info,p126-x505.jpeg: no caption next to this image in print,open
-A-0079,127,intentional-change,"Text fix 'וסביבתו) Siwa,' -> 'וסביבתו (Siwa,': Opening bracket before a Latin run.",open
-A-0080,127,info,p127-x509.jpeg: no caption next to this image in print,open
-A-0081,128,info,a15-p007: paragraph continues across the page break (marker kept inside),open
-A-0082,131,info,a15-p018: paragraph continues across the page break (marker kept inside),open
-A-0083,136,auto-fix,Bracket pair ')Hadas et al. 2005(' reordered around a left-to-right run; check against print,open
-A-0084,140,info,a16-p016: paragraph continues across the page break (marker kept inside),open
-A-0085,145,info,p145-x577.jpeg: no caption next to this image in print,open
-A-0086,148,info,p148-x587.jpeg: no caption next to this image in print,open
-A-0087,148,info,a17-p012: paragraph continues across the page break (marker kept inside),open
-A-0088,149,info,p149-x591.jpeg: no caption next to this image in print,open
-A-0089,151,info,p151-x599.jpeg: no caption next to this image in print,open
-A-0090,151,info,p151-x601.jpeg: no caption next to this image in print,open
-A-0091,153,info,a17-p022: paragraph continues across the page break (marker kept inside),open
-A-0092,154,info,a17-p024: paragraph continues across the page break (marker kept inside),open
-A-0093,156,info,a17-p031: paragraph continues across the page break (marker kept inside),open
-A-0094,157,info,p157-x615.jpeg: no caption next to this image in print,open
-A-0095,157,info,p157-x617.jpeg: no caption next to this image in print,open
-A-0096,159,info,p159-x628.jpeg: no caption next to this image in print,open
-A-0097,159,info,p159-x632-masked.png: no caption next to this image in print,open
-A-0098,159,info,a17-p042: paragraph continues across the page break (marker kept inside),open
-A-0099,162,info,p162-x645.png: no caption next to this image in print,open
-A-0100,164,info,a17-p054: paragraph continues across the page break (marker kept inside),open
-A-0101,166,intentional-change,fig-a17-18: QR code image links to its decoded target,open
-A-0102,167,info,p167-x661.jpeg: no caption next to this image in print,open
-A-0103,168,info,a18-p003: paragraph continues across the page break (marker kept inside),open
-A-0104,172,info,a18-p022: paragraph continues across the page break (marker kept inside),open
-A-0105,174,info,a18-p026: paragraph continues across the page break (marker kept inside),open
-A-0106,176,info,a18-p037: paragraph continues across the page break (marker kept inside),open
-A-0107,179,info,a18-p045: paragraph continues across the page break (marker kept inside),open
-A-0108,181,intentional-change,"a18-t1: table printed as text, set as a table (11 lines)",open
-A-0109,182,info,p182-x707.jpeg: no caption next to this image in print,open
-A-0110,183,intentional-change,Release: p183-x717 withhold: No source found among 411 Commons candidates.,open
-A-0111,183,info,p183-x713-masked.png: no caption next to this image in print,open
-A-0112,183,info,: no caption next to this image in print,open
-A-0113,187,info,p187-x735.jpeg: no caption next to this image in print,open
-A-0114,189,info,p189-x745.jpeg: no caption next to this image in print,open
-A-0115,191,info,p191-x751.jpeg: no caption next to this image in print,open
-A-0116,194,info,a21-p011: paragraph continues across the page break (marker kept inside),open
-A-0117,195,info,p195-x765.jpeg: no caption next to this image in print,open
-A-0118,196,info,p196-x769.jpeg: no caption next to this image in print,open
-A-0119,200,info,p200-x794.png: no caption next to this image in print,open
-A-0120,201,info,p201-x800-render.jpg: no caption next to this image in print,open
-A-0121,202,info,p202-x806.jpeg: no caption next to this image in print,open
-A-0122,203,info,p203-x810.jpeg: no caption next to this image in print,open
-A-0123,205,info,p205-x816.jpeg: no caption next to this image in print,open
-A-0124,206,info,a24-p006: paragraph continues across the page break (marker kept inside),open
-A-0125,209,info,p209-x833.jpeg: no caption next to this image in print,open
-A-0126,210,char-map,U+001A mapped to U+05B0; check against print,open
-A-0127,211,char-map,U+001A mapped to U+05B0; check against print,open
-A-0128,212,info,p212-x843.jpeg: no caption next to this image in print,open
-A-0129,213,info,p213-x847.jpeg: no caption next to this image in print,open
-A-0130,215,info,p215-x853.jpeg: no caption next to this image in print,open
-A-0131,222,info,a27-p033: paragraph continues across the page break (marker kept inside),open
-A-0132,226,info,a27-p047: paragraph continues across the page break (marker kept inside),open
-A-0133,227,info,a27-p054: paragraph continues across the page break (marker kept inside),open
-A-0134,228,info,a27-p057: paragraph continues across the page break (marker kept inside),open
-A-0135,229,info,p229-x896.jpeg: no caption next to this image in print,open
-A-0136,230,info,a28-p005: paragraph continues across the page break (marker kept inside),open
-A-0137,231,info,p231-x902.jpeg: no caption next to this image in print,open
-A-0138,233,info,p233-x908.jpeg: no caption next to this image in print,open
-A-0139,234,info,p234-x914.jpeg: no caption next to this image in print,open
-A-0140,234,intentional-change,fig-a29-03: QR code image links to its decoded target,open
-A-0141,234,info,a29-p005: paragraph continues across the page break (marker kept inside),open
-A-0142,235,info,p235-x920.jpeg: no caption next to this image in print,open
-A-0143,236,info,p236-x924.jpeg: no caption next to this image in print,open
-A-0144,237,info,p237-x929.jpeg: no caption next to this image in print,open
-A-0145,247,info,a31-p007: paragraph continues across the page break (marker kept inside),open
-A-0146,249,info,p249-x967.jpeg: no caption next to this image in print,open
-A-0147,253,info,a32-p013: paragraph continues across the page break (marker kept inside),open
-A-0148,254,info,a32-p017: paragraph continues across the page break (marker kept inside),open
-A-0149,255,info,p255-x987.jpeg: no caption next to this image in print,open
-A-0150,256,info,p256-x993.jpeg: no caption next to this image in print,open
-A-0151,257,note,a33: reference '3' has no single matching note; kept as superscript,open
-A-0152,257,note,a33: reference '2' has no single matching note; kept as superscript,open
-A-0153,257,note,a33: reference '12' has no single matching note; kept as superscript,open
-A-0154,257,note,a33: reference '13' has no single matching note; kept as superscript,open
-A-0155,259,info,p259-x1005.jpeg: no caption next to this image in print,open
-A-0156,260,info,p260-x1009.jpeg: no caption next to this image in print,open
-A-0157,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
-A-0158,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
-A-0159,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
-A-0160,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
+A-0040,50,intentional-change,a07-poem1: verse set as a poem (6 lines),open
+A-0041,51,info,p051-x207.jpeg: no caption next to this image in print,open
+A-0042,52,info,p052-x211.jpeg: no caption next to this image in print,open
+A-0043,53,info,p053-x215-render.jpg: no caption next to this image in print,open
+A-0044,56,info,p056-x223.jpeg: no caption next to this image in print,open
+A-0045,57,info,p057-x227.jpeg: no caption next to this image in print,open
+A-0046,60,info,p060-x235.jpeg: no caption next to this image in print,open
+A-0047,60,info,a09-p014: paragraph continues across the page break (marker kept inside),open
+A-0048,63,info,a09-p032: paragraph continues across the page break (marker kept inside),open
+A-0049,64,info,a09-p036: paragraph continues across the page break (marker kept inside),open
+A-0050,65,info,p065-x247.jpeg: no caption next to this image in print,open
+A-0051,66,intentional-change,"Release: p066-x251 replace: Printed map looks like a Google Maps screenshot without attribution. Replacement drawn by scripts/pamir_map.py from OSM, Natural Earth and Copernicus DEM; sources in the script and in site/figure-maps/fig-a10-02.json.",open
+A-0052,67,info,a10-p004: paragraph continues across the page break (marker kept inside),open
+A-0053,68,info,p068-x257.jpeg: no caption next to this image in print,open
+A-0054,70,char-map,U+FFFD mapped to U+05B7; check against print,open
+A-0055,72,info,a10-p024: paragraph continues across the page break (marker kept inside),open
+A-0056,78,intentional-change,fig-a10-11: QR code image links to its decoded target,open
+A-0057,78,intentional-change,fig-a10-12: QR code image links to its decoded target,open
+A-0058,78,intentional-change,fig-a10-13: QR code image links to its decoded target,open
+A-0059,78,intentional-change,fig-a10-14: QR code image links to its decoded target,open
+A-0060,79,info,p079-x310.jpeg: no caption next to this image in print,open
+A-0061,82,info,a11-p015: paragraph continues across the page break (marker kept inside),open
+A-0062,89,info,p089-x332.jpeg: no caption next to this image in print,open
+A-0063,93,info,p093-x356.jpeg: no caption next to this image in print,open
+A-0064,94,info,p094-x360.jpeg: no caption next to this image in print,open
+A-0065,96,info,p096-x366.jpeg: no caption next to this image in print,open
+A-0066,98,info,a13-p031: paragraph continues across the page break (marker kept inside),open
+A-0067,100,info,p100-x376.jpeg: no caption next to this image in print,open
+A-0068,101,info,p101-x380.jpeg: no caption next to this image in print,open
+A-0069,104,info,a13-p058: paragraph continues across the page break (marker kept inside),open
+A-0070,106,info,p106-x394.jpeg: no caption next to this image in print,open
+A-0071,107,info,p107-x398.jpeg: no caption next to this image in print,open
+A-0072,108,info,a14-p005: paragraph continues across the page break (marker kept inside),open
+A-0073,109,info,p109-x406.jpeg: no caption next to this image in print,open
+A-0074,115,info,p115-x444.jpeg: no caption next to this image in print,open
+A-0075,117,info,p117-x458.jpeg: no caption next to this image in print,open
+A-0076,118,info,p118-x464.jpeg: no caption next to this image in print,open
+A-0077,120,info,a14-p052: paragraph continues across the page break (marker kept inside),open
+A-0078,125,info,p125-x500.jpeg: no caption next to this image in print,open
+A-0079,126,info,p126-x505.jpeg: no caption next to this image in print,open
+A-0080,127,intentional-change,"Text fix 'וסביבתו) Siwa,' -> 'וסביבתו (Siwa,': Opening bracket before a Latin run.",open
+A-0081,127,info,p127-x509.jpeg: no caption next to this image in print,open
+A-0082,128,info,a15-p007: paragraph continues across the page break (marker kept inside),open
+A-0083,131,info,a15-p018: paragraph continues across the page break (marker kept inside),open
+A-0084,136,auto-fix,Bracket pair ')Hadas et al. 2005(' reordered around a left-to-right run; check against print,open
+A-0085,140,info,a16-p016: paragraph continues across the page break (marker kept inside),open
+A-0086,145,info,p145-x577.jpeg: no caption next to this image in print,open
+A-0087,148,info,p148-x587.jpeg: no caption next to this image in print,open
+A-0088,148,info,a17-p012: paragraph continues across the page break (marker kept inside),open
+A-0089,149,info,p149-x591.jpeg: no caption next to this image in print,open
+A-0090,151,info,p151-x599.jpeg: no caption next to this image in print,open
+A-0091,151,info,p151-x601.jpeg: no caption next to this image in print,open
+A-0092,153,info,a17-p022: paragraph continues across the page break (marker kept inside),open
+A-0093,154,info,a17-p024: paragraph continues across the page break (marker kept inside),open
+A-0094,156,info,a17-p031: paragraph continues across the page break (marker kept inside),open
+A-0095,157,info,p157-x615.jpeg: no caption next to this image in print,open
+A-0096,157,info,p157-x617.jpeg: no caption next to this image in print,open
+A-0097,159,info,p159-x628.jpeg: no caption next to this image in print,open
+A-0098,159,info,p159-x632-masked.png: no caption next to this image in print,open
+A-0099,159,info,a17-p042: paragraph continues across the page break (marker kept inside),open
+A-0100,162,info,p162-x645.png: no caption next to this image in print,open
+A-0101,164,info,a17-p054: paragraph continues across the page break (marker kept inside),open
+A-0102,166,intentional-change,fig-a17-18: QR code image links to its decoded target,open
+A-0103,167,info,p167-x661.jpeg: no caption next to this image in print,open
+A-0104,168,info,a18-p003: paragraph continues across the page break (marker kept inside),open
+A-0105,172,info,a18-p022: paragraph continues across the page break (marker kept inside),open
+A-0106,174,info,a18-p026: paragraph continues across the page break (marker kept inside),open
+A-0107,176,info,a18-p037: paragraph continues across the page break (marker kept inside),open
+A-0108,179,info,a18-p045: paragraph continues across the page break (marker kept inside),open
+A-0109,181,intentional-change,"a18-t1: table printed as text, set as a table (11 lines)",open
+A-0110,182,info,p182-x707.jpeg: no caption next to this image in print,open
+A-0111,183,intentional-change,Release: p183-x717 withhold: No source found among 411 Commons candidates.,open
+A-0112,183,info,p183-x713-masked.png: no caption next to this image in print,open
+A-0113,183,info,: no caption next to this image in print,open
+A-0114,187,info,p187-x735.jpeg: no caption next to this image in print,open
+A-0115,189,info,p189-x745.jpeg: no caption next to this image in print,open
+A-0116,191,info,p191-x751.jpeg: no caption next to this image in print,open
+A-0117,194,info,a21-p011: paragraph continues across the page break (marker kept inside),open
+A-0118,195,info,p195-x765.jpeg: no caption next to this image in print,open
+A-0119,196,info,p196-x769.jpeg: no caption next to this image in print,open
+A-0120,200,info,p200-x794.png: no caption next to this image in print,open
+A-0121,201,info,p201-x800-render.jpg: no caption next to this image in print,open
+A-0122,202,info,p202-x806.jpeg: no caption next to this image in print,open
+A-0123,203,info,p203-x810.jpeg: no caption next to this image in print,open
+A-0124,205,info,p205-x816.jpeg: no caption next to this image in print,open
+A-0125,206,info,a24-p006: paragraph continues across the page break (marker kept inside),open
+A-0126,207,intentional-change,a24-poem1: verse set as a poem (7 lines),open
+A-0127,209,info,p209-x833.jpeg: no caption next to this image in print,open
+A-0128,210,char-map,U+001A mapped to U+05B0; check against print,open
+A-0129,211,char-map,U+001A mapped to U+05B0; check against print,open
+A-0130,212,info,p212-x843.jpeg: no caption next to this image in print,open
+A-0131,213,intentional-change,a26-poem1: verse set as a poem (40 lines),open
+A-0132,213,info,p213-x847.jpeg: no caption next to this image in print,open
+A-0133,215,info,p215-x853.jpeg: no caption next to this image in print,open
+A-0134,222,info,a27-p033: paragraph continues across the page break (marker kept inside),open
+A-0135,226,info,a27-p047: paragraph continues across the page break (marker kept inside),open
+A-0136,227,info,a27-p054: paragraph continues across the page break (marker kept inside),open
+A-0137,228,info,a27-p057: paragraph continues across the page break (marker kept inside),open
+A-0138,229,info,p229-x896.jpeg: no caption next to this image in print,open
+A-0139,230,info,a28-p005: paragraph continues across the page break (marker kept inside),open
+A-0140,231,info,p231-x902.jpeg: no caption next to this image in print,open
+A-0141,233,info,p233-x908.jpeg: no caption next to this image in print,open
+A-0142,234,info,p234-x914.jpeg: no caption next to this image in print,open
+A-0143,234,intentional-change,fig-a29-03: QR code image links to its decoded target,open
+A-0144,234,info,a29-p005: paragraph continues across the page break (marker kept inside),open
+A-0145,235,info,p235-x920.jpeg: no caption next to this image in print,open
+A-0146,236,info,p236-x924.jpeg: no caption next to this image in print,open
+A-0147,237,info,p237-x929.jpeg: no caption next to this image in print,open
+A-0148,244,intentional-change,a30-poem1: verse set as a poem (7 lines),open
+A-0149,247,info,a31-p007: paragraph continues across the page break (marker kept inside),open
+A-0150,249,info,p249-x967.jpeg: no caption next to this image in print,open
+A-0151,253,info,a32-p013: paragraph continues across the page break (marker kept inside),open
+A-0152,254,info,a32-p017: paragraph continues across the page break (marker kept inside),open
+A-0153,255,info,p255-x987.jpeg: no caption next to this image in print,open
+A-0154,256,info,p256-x993.jpeg: no caption next to this image in print,open
+A-0155,257,note,a33: reference '3' has no single matching note; kept as superscript,open
+A-0156,257,note,a33: reference '2' has no single matching note; kept as superscript,open
+A-0157,257,note,a33: reference '12' has no single matching note; kept as superscript,open
+A-0158,257,note,a33: reference '13' has no single matching note; kept as superscript,open
+A-0159,259,info,p259-x1005.jpeg: no caption next to this image in print,open
+A-0160,260,info,p260-x1009.jpeg: no caption next to this image in print,open
 A-0161,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
-A-0162,264,auto-fix,Bracket pair ') Katz et al. 1977 (' reordered around a left-to-right run; check against print,open
-A-0163,265,auto-fix,Bracket pair ') Begin et al. 1974 (' reordered around a left-to-right run; check against print,open
-A-0164,274,auto-fix,Bracket pair ') Neev and Hall 1979 (' reordered around a left-to-right run; check against print,open
-A-0165,277,auto-fix,"Bracket pair ') Wilkansky, 1936 (' reordered around a left-to-right run; check against print",open
-A-0166,279,intentional-change,Text fix 'ואילו 1934(Bass-Becking)' -> 'ואילו Bass-Becking (1934)': Name and year order inside a Hebrew line.,open
-A-0167,279,info,a35-p015: paragraph continues across the page break (marker kept inside),open
-A-0168,280,intentional-change,Text fix 'האמירה של 2009) Boetius and Joye):' -> 'האמירה של Boetius and Joye (2009):': Citation run with a year in brackets.,open
-A-0169,281,info,a35-p029: paragraph continues across the page break (marker kept inside),open
-A-0170,282,info,a35-p034: paragraph continues across the page break (marker kept inside),open
-A-0171,283,intentional-change,"Text fix 'החיפוש) Google Scholar, 2016).' -> 'החיפוש (Google Scholar, 2016).': Opening bracket before a Latin run.",open
-A-0172,283,intentional-change,"Text fix '(, Gay-Lussac, 1819; Ehrenberg, 1848; Lortet' -> '(Gay-Lussac, 1819; Ehrenberg, 1848; Lortet,': One citation run over two lines; print breaks it at the line end.",open
-A-0173,283,intentional-change,"Text fix 'Bass-Becking,1934; 1891),' -> '1891; Bass-Becking,1934),': End of the same citation run.",open
-A-0174,284,intentional-change,Text fix 'יתר(ולכן' -> 'יתר) ולכן': Closing bracket of the note that opens with (מלבד; print shows it after יתר.,open
-A-0175,284,info,a35-p045: paragraph continues across the page break (marker kept inside),open
-A-0176,286,intentional-change,"Text fix '(, Kaplan & Friedman, 1970; Oren & Shilo' -> '(Kaplan & Friedman, 1970; Oren & Shilo,': One citation run over two lines; print breaks it at the line end.",open
-A-0177,286,intentional-change,"Text fix 'Oren,1983a, 1993; 1982).' -> '1982; Oren,1983a, 1993).': End of the same citation run.",open
-A-0178,287,intentional-change,"a35-t1: table printed as text, set as a table (10 lines)",open
-A-0179,287,info,a35-p058: paragraph continues across the page break (marker kept inside),open
-A-0180,291,intentional-change,"Text fix ') Bourcart, 1899).' -> '(Bourcart, 1899).': Opening bracket at the start of a line before a Latin run.",open
-A-0181,291,intentional-change,Text fix 'הנורווגי 1919(Hiorth) הציע' -> 'הנורווגי Hiorth (1919) הציע': Name and year order inside a Hebrew line.,open
-A-0182,293,info,p293-x1140.jpeg: no caption next to this image in print,open
-A-0183,294,intentional-change,"Text fix ') Wachs et al., 2000,' -> '(Wachs et al., 2000,': Opening bracket at the start of a line before a Latin run.",open
-A-0184,297,info,p297-x1152.jpeg: no caption next to this image in print,open
-A-0185,299,info,p299-x1163.jpeg: no caption next to this image in print,open
-A-0186,301,intentional-change,Release: p301-x1169 withhold: Figure from a publication on a satellite base map; neither source is cleared.,open
-A-0187,302,intentional-change,Release: p302-x1173 withhold: Google Earth view shows only 'Google'; Google requires the imagery providers too. Pending decision.,open
-A-0188,303,intentional-change,Text fix '(RB (.' -> '(RB).': Closing bracket after a Latin abbreviation.,open
-A-0189,309,hyphen,Joined a line-end hyphen: 'Collapse-',open
-A-0190,310,hyphen,Joined a line-end hyphen: 'High-',open
-A-0191,316,reuse,Image xref 1379 repeats; first file p001-x1379.jpeg,open
-A-0192,316,info,p316-x1379.jpeg: no caption next to this image in print,open
+A-0162,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
+A-0163,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
+A-0164,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
+A-0165,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
+A-0166,264,auto-fix,Bracket pair ') Katz et al. 1977 (' reordered around a left-to-right run; check against print,open
+A-0167,265,auto-fix,Bracket pair ') Begin et al. 1974 (' reordered around a left-to-right run; check against print,open
+A-0168,274,auto-fix,Bracket pair ') Neev and Hall 1979 (' reordered around a left-to-right run; check against print,open
+A-0169,277,auto-fix,"Bracket pair ') Wilkansky, 1936 (' reordered around a left-to-right run; check against print",open
+A-0170,279,intentional-change,Text fix 'ואילו 1934(Bass-Becking)' -> 'ואילו Bass-Becking (1934)': Name and year order inside a Hebrew line.,open
+A-0171,279,info,a35-p015: paragraph continues across the page break (marker kept inside),open
+A-0172,280,intentional-change,Text fix 'האמירה של 2009) Boetius and Joye):' -> 'האמירה של Boetius and Joye (2009):': Citation run with a year in brackets.,open
+A-0173,281,info,a35-p029: paragraph continues across the page break (marker kept inside),open
+A-0174,282,info,a35-p034: paragraph continues across the page break (marker kept inside),open
+A-0175,283,intentional-change,"Text fix 'החיפוש) Google Scholar, 2016).' -> 'החיפוש (Google Scholar, 2016).': Opening bracket before a Latin run.",open
+A-0176,283,intentional-change,"Text fix '(, Gay-Lussac, 1819; Ehrenberg, 1848; Lortet' -> '(Gay-Lussac, 1819; Ehrenberg, 1848; Lortet,': One citation run over two lines; print breaks it at the line end.",open
+A-0177,283,intentional-change,"Text fix 'Bass-Becking,1934; 1891),' -> '1891; Bass-Becking,1934),': End of the same citation run.",open
+A-0178,284,intentional-change,Text fix 'יתר(ולכן' -> 'יתר) ולכן': Closing bracket of the note that opens with (מלבד; print shows it after יתר.,open
+A-0179,284,info,a35-p045: paragraph continues across the page break (marker kept inside),open
+A-0180,286,intentional-change,"Text fix '(, Kaplan & Friedman, 1970; Oren & Shilo' -> '(Kaplan & Friedman, 1970; Oren & Shilo,': One citation run over two lines; print breaks it at the line end.",open
+A-0181,286,intentional-change,"Text fix 'Oren,1983a, 1993; 1982).' -> '1982; Oren,1983a, 1993).': End of the same citation run.",open
+A-0182,287,intentional-change,"a35-t1: table printed as text, set as a table (10 lines)",open
+A-0183,287,info,a35-p058: paragraph continues across the page break (marker kept inside),open
+A-0184,290,intentional-change,a35-poem1: verse set as a poem (11 lines),open
+A-0185,291,intentional-change,"Text fix ') Bourcart, 1899).' -> '(Bourcart, 1899).': Opening bracket at the start of a line before a Latin run.",open
+A-0186,291,intentional-change,Text fix 'הנורווגי 1919(Hiorth) הציע' -> 'הנורווגי Hiorth (1919) הציע': Name and year order inside a Hebrew line.,open
+A-0187,293,info,p293-x1140.jpeg: no caption next to this image in print,open
+A-0188,294,intentional-change,"Text fix ') Wachs et al., 2000,' -> '(Wachs et al., 2000,': Opening bracket at the start of a line before a Latin run.",open
+A-0189,297,info,p297-x1152.jpeg: no caption next to this image in print,open
+A-0190,299,info,p299-x1163.jpeg: no caption next to this image in print,open
+A-0191,301,intentional-change,"Release: p301-x1169 replace: Printed figure (Bein et al. 2020 on a satellite base map) is not cleared. New schematic map from the book text (a36-p044, a36-p045, a36-p048, caption of fig-a36-09) by scripts/jordan_maps.py.",open
+A-0192,302,intentional-change,Release: p302-x1173 replace: Google Earth print use needs Google plus the imagery providers next to the image; the print shows only 'Google' and the providers cannot be recovered. New perspective view by scripts/jordan_maps.py from OSM and Copernicus DEM.,open
+A-0193,303,intentional-change,Text fix '(RB (.' -> '(RB).': Closing bracket after a Latin abbreviation.,open
+A-0194,308,intentional-change,a36-poem1: verse set as a poem (34 lines),open
+A-0195,309,hyphen,Joined a line-end hyphen: 'Collapse-',open
+A-0196,310,hyphen,Joined a line-end hyphen: 'High-',open
+A-0197,316,reuse,Image xref 1379 repeats; first file p001-x1379.jpeg,open
+A-0198,316,info,p316-x1379.jpeg: no caption next to this image in print,open
