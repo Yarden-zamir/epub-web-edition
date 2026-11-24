@@ -46,13 +46,15 @@ PLACES = {  # Wikidata item, latitude, longitude, as read on 2026-11-24.
     "kinneret": ("Q126982", 32.818906, 35.590033),
     "tiran": ("Q208157", 28.003888888889, 34.465277777778),
 }
-# Fault trace, south to north (lon, lat). South of the Straits of Tiran the line follows the Red Sea axis.
-FAULT = [(35.70, 25.50), (35.05, 26.90), (34.47, 27.98), (34.62, 28.45), (34.74, 28.95), (34.88, 29.30), (34.97, 29.53),
+# The triple junction of the three plates at the south tip of Sinai, in the sea (schematic).
+JUNCTION = (34.40, 27.62)
+# Fault trace, south to north (lon, lat). South of the junction the line follows the Red Sea axis.
+FAULT = [(35.70, 25.50), (35.05, 26.90), JUNCTION, (34.47, 27.98), (34.62, 28.45), (34.74, 28.95), (34.88, 29.30), (34.97, 29.53),
          (35.07, 29.85), (35.17, 30.25), (35.29, 30.62), (35.38, 30.95), (35.44, 31.25), (35.50, 31.55), (35.54, 31.80),
          (35.56, 32.10), (35.57, 32.45), (35.58, 32.70), (35.60, 32.90), (35.62, 33.15), (35.76, 33.45), (36.00, 33.90),
          (36.24, 34.35), (36.35, 34.70), (36.38, 35.30), (36.40, 36.50)]
 # The Gulf of Suez and the Suez Canal: Africa to the west, the Sinai subplate to the east (one block in the explainer).
-SUEZ = [(33.95, 27.40), (33.55, 28.00), (33.00, 28.75), (32.57, 29.70), (32.55, 29.97), (32.35, 30.55), (32.31, 31.26), (32.25, 32.40)]
+SUEZ = [JUNCTION, (33.55, 28.00), (33.00, 28.75), (32.57, 29.70), (32.55, 29.97), (32.35, 30.55), (32.31, 31.26), (32.25, 32.40)]
 # Plate velocities relative to Eurasia, mm/yr (east, north): GSRM v2.1 at 30.2077 N 35.2413 E (see above).
 VELOCITY = {"arabia": (-0.41, 14.75), "sinai": (-1.94, 8.38)}
 SLIP_KM = 105  # The book (a18-p021): the relative left-lateral motion.
@@ -123,6 +125,7 @@ def main() -> None:
         "gulf": rings(km["gulf"]),
         "fault": line(FAULT),
         "suez": line(SUEZ),
+        "junction": line([JUNCTION])[0],
         "places": places,
         "place_sources": {key: f"Wikidata {qid}" for key, (qid, _, _) in PLACES.items()},
         "velocity_mm_yr": {k: list(v) for k, v in VELOCITY.items()},

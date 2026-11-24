@@ -9,7 +9,7 @@
   --xp-fresh: #d3e8e8; --xp-fresh-deep: #b5d6d7; --xp-fresh-ink: #1d6a71; --xp-surface: #b9d6d3;
   --xp-brine: #a9c4bf; --xp-lake: #5e9893; --xp-lake-deep: #2f6a64; --xp-brine-ink: #8f3f22;
   --xp-void: #241f1a;
-  --xp-plate-a: #ead6b0; --xp-plate-a-deep: #dcc293; --xp-plate-b: #dcc6a0; --xp-plate-b-deep: #c9ae7f;
+  --xp-arabia: #e0a65f; --xp-sinai: #f1e0b4; --xp-africa: #cf9a86; --xp-sea-tint: rgb(24 104 112 / 0.5);
   --xp-basin: #0e4840; --xp-basin-light: #1f6a61; --xp-copper: #3f8f6a; --xp-copper-edge: #2c6a4e;
   --xp-dot: rgb(60 40 20 / 0.08); --xp-shadow: rgb(40 25 10 / 0.22);
 }
@@ -21,7 +21,7 @@
     --xp-fresh: #1e3a3d; --xp-fresh-deep: #18302f; --xp-fresh-ink: #7cc9cf; --xp-surface: #5fa6ad;
     --xp-brine: #23423e; --xp-lake: #2f8088; --xp-lake-deep: #1d5a5f; --xp-brine-ink: #e3a07c;
     --xp-void: #050404;
-    --xp-plate-a: #4d3f2c; --xp-plate-a-deep: #3f3324; --xp-plate-b: #42372a; --xp-plate-b-deep: #352c21;
+    --xp-arabia: #a3672b; --xp-sinai: #6e664a; --xp-africa: #81505a; --xp-sea-tint: rgb(40 128 146 / 0.45);
     --xp-basin: #1f6f76; --xp-basin-light: #2b8a92; --xp-copper: #5fb98d; --xp-copper-edge: #8fd6b1;
     --xp-dot: rgb(255 240 220 / 0.05); --xp-shadow: rgb(0 0 0 / 0.45);
   }
@@ -33,7 +33,7 @@
   --xp-fresh: #1e3a3d; --xp-fresh-deep: #18302f; --xp-fresh-ink: #7cc9cf; --xp-surface: #5fa6ad;
   --xp-brine: #23423e; --xp-lake: #2f8088; --xp-lake-deep: #1d5a5f; --xp-brine-ink: #e3a07c;
   --xp-void: #050404;
-  --xp-plate-a: #4d3f2c; --xp-plate-a-deep: #3f3324; --xp-plate-b: #42372a; --xp-plate-b-deep: #352c21;
+  --xp-arabia: #a3672b; --xp-sinai: #6e664a; --xp-africa: #81505a; --xp-sea-tint: rgb(40 128 146 / 0.45);
   --xp-basin: #1f6f76; --xp-basin-light: #2b8a92; --xp-copper: #5fb98d; --xp-copper-edge: #8fd6b1;
   --xp-dot: rgb(255 240 220 / 0.05); --xp-shadow: rgb(0 0 0 / 0.45);
 }
@@ -66,7 +66,9 @@
 .xp-swatch-dry-ground { background: var(--xp-land); }
 .xp-swatch-salt { background: var(--xp-salt); }
 .xp-swatch-lake { background: var(--xp-lake); }
-.xp-swatch-sea { background: var(--xp-basin); }
+.xp-swatch-arabia { background: var(--xp-arabia); }
+.xp-swatch-sinai { background: var(--xp-sinai); }
+.xp-swatch-africa { background: var(--xp-africa); }
 .xp-swatch-copper { background: var(--xp-copper); }
 .xp-swatch-grid { background: linear-gradient(90deg, transparent 45%, color-mix(in srgb, var(--ink) 35%, transparent) 45% 55%, transparent 55%), linear-gradient(transparent 45%, color-mix(in srgb, var(--ink) 35%, transparent) 45% 55%, transparent 55%), var(--paper); }
 
