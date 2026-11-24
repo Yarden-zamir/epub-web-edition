@@ -2,10 +2,9 @@
 # (built in the "book" job). To build and deploy by hand: gh workflow run kitshn.yml -R game-design-driven/epub-web-edition
 on:
   # main moves only through the merge queue (docs/WORKFLOW.md); each push to main is a tested commit.
+  # No pull_request: pull requests get check.yml, not a preview deploy (each preview is a kitshn card).
   push:
     branches: [main]
-  pull_request:
-    types: [opened, synchronize, reopened, closed]
   workflow_dispatch:
 permissions:
   contents: read
@@ -13,7 +12,7 @@ permissions:
 jobs:
   book:
     # The book deploys only from main (kitshn.config.ts), so other branches and pull requests skip its build.
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 40
     permissions:
