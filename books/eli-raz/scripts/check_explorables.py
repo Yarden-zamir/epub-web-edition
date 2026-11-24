@@ -18,7 +18,8 @@ Heavy parts, on by default in GitHub Actions (GITHUB_ACTIONS=true), or with --pe
 - videos (VIDEO_DIR, in CI SHOT_DIR/videos): each explainer at phone size, dragged with real touch events, and at desktop
   size with a mouse, keys, a mark and reset (motion on).
 No element of the book may reach past the viewport, and the page may not scroll sideways, during or after
-interaction (each explainer moved through its full range).
+interaction (each explainer moved through its full range). After a jump to an explainer's figure, the figure may
+not move while the explainer replaces the printed image, nor when the toggle switches between the two.
 Usage: uv run scripts/check_explorables.py WEB_DIR AXE_JS [SHOT_DIR [VIDEO_DIR]] [--perf] [--trace]
 """
 import functools
@@ -230,6 +231,32 @@ with sync_playwright() as p:
             if errors:
                 problems.append(f"{width} {scheme}: errors {errors[:3]}")
             page.close()
+
+    # A jump to an explainer's figure (#id) keeps the figure where the jump put it while the explainer replaces the
+    # printed image, and the toggle between the two does not move it either (scroll anchoring can shift the page).
+    for width, height in ((393, 852), (1280, 900)):
+        page = browser.new_page(viewport={"width": width, "height": height}, reduced_motion="reduce")
+        for fig_id in ids:
+            where = f"{fig_id} {width} jump"
+            page.goto(f"{URL}#{fig_id}", wait_until="load", timeout=90000)
+            fig = page.locator(f"#{fig_id}")
+            top = lambda: page.evaluate("id => document.getElementById(id).getBoundingClientRect().top", fig_id)
+            first = top()
+            moved = 0.0
+            for _ in range(20):  # The explainer loads as the figure nears the view, then swaps in.
+                page.wait_for_timeout(150)
+                moved = max(moved, abs(top() - first))
+            if not fig.locator("input[type=range]").is_visible():
+                problems.append(f"{where}: the explainer did not appear after a jump to its figure")
+            elif moved > 2:
+                problems.append(f"{where}: the figure moved {moved:.0f} px while the explainer replaced the printed image")
+            for name in ("האיור המודפס", "הדגמה אינטראקטיבית"):
+                before = top()
+                fig.get_by_role("button", name=name).click()
+                page.wait_for_timeout(300)
+                if abs(top() - before) > 2:
+                    problems.append(f"{where}: the figure moved {abs(top() - before):.0f} px on the toggle '{name}'")
+        page.close()
 
     # Touch: a phone with real touch events through CDP.
     context = browser.new_context(viewport={"width": 393, "height": 852}, is_mobile=True, has_touch=True)
