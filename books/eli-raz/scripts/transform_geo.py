@@ -131,7 +131,12 @@ def main() -> None:
         "displacement_km": {"arabia": [round(ae * scale, 1), round(an * scale, 1)], "sinai": [round(se * scale, 1), round(sn * scale, 1)]},
         "graticule": {"lon": [32, 33, 34, 35, 36, 37], "lat": [28, 29, 30, 31, 32, 33]},
     }
-    spec_path.write_text(json.dumps(spec, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    # The rest of the file stays readable; the generated geometry is one compact line at the end.
+    geo = spec.pop("geo")
+    text = json.dumps(spec, ensure_ascii=False, indent=2)
+    text = text[:-2] + ',\n  "geo": ' + json.dumps(geo, ensure_ascii=False, separators=(",", ":")) + "\n}\n"
+    spec_path.write_text(text, encoding="utf-8")
+    spec["geo"] = geo
     size = len(json.dumps(spec["geo"]))
     print(f"wrote {spec_path.relative_to(ROOT)}: geo {size / 1000:.0f} kB, {sum(len(r) for r in spec['geo']['land'])} land points")
 
