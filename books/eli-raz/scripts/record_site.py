@@ -53,7 +53,8 @@ MAP_FILES = {"tiles": ".tile.opentopomap.org/", "library": "leaflet", "data": "/
 # Times are ms from the jump. A box that is still hidden (not drawn yet) has no tiles.
 MAP_TIMES = """async ([jump, box, layered]) => {
   const library = typeof L !== 'undefined';
-  document.querySelector(jump).scrollIntoView({ block: 'start', behavior: 'instant' });
+  // The reader's own jump (00-core.js): scrollIntoView lands short inside chapters that content-visibility skips.
+  placeAtJumpLine(document.querySelector(jump));
   const t0 = performance.now(), found = { library_before_jump: library };
   const frame = () => new Promise(r => requestAnimationFrame(r));
   while (performance.now() - t0 < 60000) {
