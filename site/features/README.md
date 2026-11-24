@@ -29,6 +29,19 @@ Use the tokens of `00-base.css`, never a literal value for the same purpose.
 - Colours: `--paper`, `--ink`, `--soft`, `--muted`, `--rule`, `--mat`, `--accent`, `--night`, `--on-night`, `--on-night-soft`. Text needs 4.5:1, and large text or a control needs 3:1, in light and dark mode. Text over a photo or a map always gets a solid backing or a scrim.
 - Focus: the global `:focus-visible` ring follows the element's own corners. Leave 4px of room around a focusable part inside a scroll or `overflow: hidden` box, so the ring is never cut. On dark ground the ring uses `--on-night`.
 
+Motion:
+
+| Token | Value | For |
+|---|---|---|
+| `--ease-out` | cubic-bezier(0.22, 1, 0.36, 1) | Things that enter or settle |
+| `--ease-in-out` | cubic-bezier(0.65, 0, 0.35, 1) | Things that move from one place to another |
+| `--dur-quick` | 140ms | Hover, press, small fades |
+| `--dur-base` | 220ms | Popovers, dialogs, toggles |
+| `--dur-slow` | 340ms | Larger moves, slides between images |
+
+- Reduced motion sets every `--dur-*` to 0ms, so a transition that uses them respects it without its own media query.
+- Script animations read the same tokens, for example `parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--dur-base"))`. A 0 ms Web Animation still resolves `finished`; a 0 ms CSS transition fires no `transitionend`, so do not wait for one.
+
 ## Build module hooks
 
 A module defines any of these functions. Each one receives `site` (`build_web.Site`: `book`, `conv`, `out`, `data_dir`, `enhancements_file`, `thumbs`, `report`).

@@ -27,9 +27,16 @@
   --measure: 38rem; /* About 34em of body text: 60-70 Hebrew characters a line. */
   --gutter: clamp(1.25rem, 5vw, 3rem);
   /* "Book Sans" is the book's bundled Noto Sans Hebrew (Hebrew letters only); Latin letters fall through to the system sans. */
+  /* Motion: every transition and animation takes its timing from these. Reduced motion sets the durations to 0. */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-quick: 140ms;
+  --dur-base: 220ms;
+  --dur-slow: 340ms;
   --sans: "Book Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif;
   color-scheme: light;
 }
+@media (prefers-reduced-motion: reduce) { :root { --dur-quick: 0ms; --dur-base: 0ms; --dur-slow: 0ms; } }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --paper: #141312; --ink: #ece6dc; --soft: #c2bbaf; --muted: #948d82; --rule: #2c2a27;

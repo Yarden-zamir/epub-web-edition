@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="{{lang}}" dir="{{dir}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#191715">
+<title>תיקוני המהדורה · {{title}}</title>
+<link rel="icon" href="../favicon.ico" sizes="32x32">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<style>@import url("{{book_css}}") layer(book);</style>
+<link rel="stylesheet" href="../reader.css">
+<script src="errata.js" defer></script>
+</head>
+<body class="errata-page">
+<a class="skip-link" href="#er-list">דלגו לרשימה</a>
+<header class="er-bar">
+  <a class="er-back" href="../">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m0 0-6-6m6 6-6 6"/></svg>
+    <span>{{title}}</span>
+  </a>
+</header>
+
+<main class="er-main">
+  <h1>תיקוני המהדורה</h1>
+  <p class="er-lede">{{verified}} טעויות תוקנו בטקסט, מתוך {{total}} ממצאים בבדיקה של הספר המודפס.</p>
+  <div class="er-intro">
+    <p>בספר המודפס יש טעויות, כמו בכל ספר. במהדורה הזו תיקנו רק טעויות שההוכחה להן חד־משמעית, ושהתיקון שלהן צר: מספר, שם או כמה אותיות. ליד כל תיקון בספר יש סימן <span class="er-dagger">†</span> קטן. לחיצה עליו מראה מה נדפס ולמה תיקנו.</p>
+    <p>שאר הממצאים נשארו בספר כפי שנדפסו. כולם מופיעים כאן, עם ההסבר, עם המקורות ועם צילום של השורה מהספר המודפס.</p>
+  </div>
+  <label class="er-switch">
+    <input type="checkbox" role="switch" id="er-printed">
+    <span class="er-switch-track" aria-hidden="true"></span>
+    <span class="er-switch-text">הצגת הספר כפי שנדפס, עם הטעויות<small>הבחירה נשמרת בדפדפן הזה. בספר מופיע פס קטן להחזרת הנוסח המתוקן.</small></span>
+  </label>
+
+  <div class="er-tools" id="er-list" tabindex="-1">
+    <div class="er-filters" role="group" aria-label="סינון לפי סוג">{{filters}}</div>
+    <form class="er-search" role="search" id="er-search-form">
+      <label for="er-search" class="visually-hidden">חיפוש בממצאים</label>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>
+      <input id="er-search" type="search" autocomplete="off" placeholder="חיפוש: מילה, שם, שנה">
+    </form>
+    <p class="er-status" id="er-status" aria-live="polite"></p>
+  </div>
+{{sections}}
+  <p class="er-empty" id="er-empty" hidden>לא נמצאו ממצאים</p>
+  <p class="er-note">{{translator}}</p>
+</main>
+
+<dialog id="er-viewer" class="er-viewer" aria-labelledby="erv-title">
+  <div class="erv-head">
+    <h2 id="erv-title" class="visually-hidden">הספר המודפס לצד הנוסח שלנו</h2>
+    <div class="erv-tabs" role="group" aria-label="תמונה"></div>
+    <button type="button" class="erv-close" data-close aria-label="סגירה">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="erv-body">
+    <div class="erv-image" id="erv-image" tabindex="0" role="region" aria-label="הספר המודפס"><img id="erv-img" alt=""></div>
+    <div class="erv-text" id="erv-text" tabindex="0" role="region" aria-label="הנוסח שלנו"></div>
+  </div>
+</dialog>
+</body>
+</html>

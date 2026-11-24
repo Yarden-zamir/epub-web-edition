@@ -47,11 +47,15 @@ async function loadIndex() {
   if (searchIndex) return searchIndex;
   const response = await fetch("search.json");
   if (!response.ok) throw new Error(`search.json: HTTP ${response.status}`);
-  const { pages, entries } = await response.json();
+  const { pages, entries, variants = [] } = await response.json();
   const vocabulary = new Map(); // word -> [entry index, ...] (repeats count as term frequency)
   let totalLength = 0;
-  entries.forEach((e, i) => {
-    e.loc = i + 1;
+  entries.forEach((e, i) => { e.loc = i + 1; });
+  // Variants: another text of a block, such as the printed form of a corrected block. Found by search,
+  // shown and located as that block.
+  const block = new Map(entries.map((e) => [e.id, e]));
+  const all = [...entries, ...variants.map((v) => ({ ...block.get(v.id), text: v.text }))];
+  all.forEach((e, i) => {
     e.tokens = tokenize(e.text);
     totalLength += e.tokens.length;
     for (const t of e.tokens) {
@@ -59,12 +63,12 @@ async function loadIndex() {
       vocabulary.get(t.word).push(i);
     }
   });
-  searchIndex = { pages, entries, vocabulary, avgLength: totalLength / entries.length };
+  searchIndex = { pages, entries, all, vocabulary, avgLength: totalLength / all.length };
   return searchIndex;
 }
 
 function rank(index, terms) {
-  const { entries, vocabulary, avgLength } = index;
+  const { all: entries, vocabulary, avgLength } = index;
   const N = entries.length;
   // For each query word: entry index -> summed match weight, and the matching vocabulary words.
   const perTerm = terms.map((term, ti) => {
@@ -220,7 +224,8 @@ async function runSearch() {
   const pick = (id, marks = []) => { saveRecent(query); goTo(id, { marks }); };
   const jumps = goToTargets(query, index);
   for (const j of jumps) results.append(resultItem({ href: `#${j.id}`, body: j.label, onPick: () => pick(j.id) }));
-  const hits = terms.length ? rank(index, terms) : [];
+  const seen = new Set(); // A block and its variant can both match: keep the better hit.
+  const hits = (terms.length ? rank(index, terms) : []).filter((h) => !seen.has(h.e.id) && seen.add(h.e.id));
   status.textContent = hits.length === 0 && jumps.length === 0 ? "לא נמצאו תוצאות" : hits.length === 1 ? "תוצאה אחת" : hits.length ? `${hits.length} תוצאות` : "";
   for (const { e, marks } of hits.slice(0, 80)) {
     const where = [e.section, e.page ? `עמ' ${e.page}` : null].filter(Boolean).join(" · ");

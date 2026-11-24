@@ -28,6 +28,7 @@ function goLink(href, label, pop) {
   return go;
 }
 function noteContent(ref) {
+  if (ref.matches(".edition-mark")) return correctionContent(ref); // 75-errata.js.
   const note = document.getElementById(ref.getAttribute("href").slice(1));
   if (!note) throw new Error(`reader.js: note ${ref.getAttribute("href")} is missing`);
   const body = document.createElement("div");
