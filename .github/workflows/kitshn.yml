@@ -1,0 +1,98 @@
+# Build the release web edition from this repo and Yarden-zamir/epub-web-edition at main, then deploy it with kitshn.
+# Starts on a push to main here, and by workflow_dispatch: the pipeline repo's workflow live-site.yml dispatches it
+# after each push to its main. To build by hand: gh workflow run kitshn.yml -R Yarden-zamir/eli-raz-edition
+name: kitshn
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: read
+    # A newer push or dispatch makes this build obsolete. The deploy job keeps its own queue (kitshn2-deploy.yml).
+    concurrency:
+      group: build-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v7
+        with:
+          repository: Yarden-zamir/epub-web-edition
+          ref: main
+          path: pipeline
+          persist-credentials: false
+
+      # The layout of pipeline/.tools is the one that scripts/build_release.py reads.
+      - name: Restore tool downloads
+        id: tools
+        uses: actions/cache@v6
+        with:
+          path: pipeline/.tools
+          key: tools-jre-21.0.13.1+2-epubcheck-5.4.0-axe-4.14.0
+      - name: Download tools
+        if: steps.tools.outputs.cache-hit != 'true'
+        working-directory: pipeline
+        run: |
+          set -euo pipefail
+          mkdir -p .tools/dl
+          cd .tools
+          curl -fsSL -o dl/jre.tgz https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.13.1%2B2/OpenJDK21U-jre_x64_linux_hotspot_21.0.13.1_2.tar.gz
+          curl -fsSL -o dl/epubcheck.zip https://github.com/w3c/epubcheck/releases/download/v5.4.0/epubcheck-5.4.0.zip
+          curl -fsSL -o dl/axe.tgz https://registry.npmjs.org/axe-core/-/axe-core-4.14.0.tgz
+          sha256sum -c - <<'SUMS'
+          18f44fab9065217f3ba61d0eef8a7b5f3c3713aa7293001b0d4ac10ede3850f0  dl/jre.tgz
+          33350c61038e71dfb3d45a76aed04bf5481e6d5500cb780f6e98db8bbd15a28c  dl/epubcheck.zip
+          2277b0a3ef47af9b52497faa3e71598e86e0a0e5e6eb295207a5657ede4709af  dl/axe.tgz
+          SUMS
+          tar -xzf dl/jre.tgz
+          unzip -q dl/epubcheck.zip
+          mkdir axe
+          tar -xzf dl/axe.tgz -C axe
+          rm -r dl
+
+      - name: Install uv 0.13.6
+        run: |
+          curl -LsSf https://astral.sh/uv/0.13.6/install.sh | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Restore uv cache
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cache/uv
+            ~/.local/share/uv/python
+          key: uv-0.13.6-${{ hashFiles('pipeline/tools/*.py', 'scripts/*.py') }}
+          restore-keys: uv-0.13.6-
+      - name: Restore Playwright browser
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-1.64.1-chromium-headless-shell
+      - name: Install Playwright browser
+        run: uv run --with playwright==1.64.1 playwright install --with-deps --only-shell chromium
+
+      - name: Build and check
+        run: uv run scripts/build_release.py pipeline
+      - name: Shrink uv cache
+        run: uv cache prune --ci
+      - uses: actions/upload-artifact@v7
+        with:
+          name: web
+          path: dist/release/web
+          if-no-files-found: error
+          retention-days: 7
+
+  kitshn:
+    needs: build
+    uses: Yarden-zamir/kitshn/.github/workflows/kitshn2-deploy.yml@main
+    with:
+      artifact: web
+      artifact-path: dist/release/web
+    secrets: inherit

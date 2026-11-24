@@ -7,10 +7,10 @@ Read this file fully before you start. Your own task message names your part.
 
 - Book: "אלי רז חוקר הבולענים" (Eli Raz, geologist and sinkhole researcher, Ein Gedi). 316-page Hebrew PDF rebuilt into an EPUB and a web edition.
 - Pipeline repo (public, code only, MIT): ~/Github/epub-web-edition/main. Tools: tools/ingest_pdf.py, tools/build_epub.py, tools/build_web.py, tools/check_release.py, tools/verify.py; site layer: site/index.html, site/reader.css, site/reader.js.
-- Content repo (private, no remote): ~/Github/eli-raz-edition/main. book.toml, book.css, site/ (web-only data), scripts/, work/ (scratch, ignored by git), OPEN-POINTS.md, CONTENT-CHANGES.md.
-- Source PDF (read-only, never modify): ~/private-inputs/eli-raz/source-2026-11-23/source.pdf.
+- Content repo (private, GitHub Yarden-zamir/eli-raz-edition): ~/Github/eli-raz-edition/main. book.toml, book.css, site/ (web-only data), scripts/, work/ (scratch, ignored by git), OPEN-POINTS.md, CONTENT-CHANGES.md.
+- Source PDF (never modify): source/source.pdf in the content repo, with source/SHA256SUMS and source/PROVENANCE.txt. book.toml names it relative to the content folder. The original stays read-only in ~/private-inputs/eli-raz/source-2026-11-23/.
 - Release EPUB source tree (the public edition text): ~/Github/eli-raz-edition/main/epub-src-release/OEBPS/text/*.xhtml. Element IDs there are stable; all web additions attach by these IDs.
-- Live site (public, approved by the family): https://eli-raz.yarden-zamir.com. Only the orchestrator publishes it with kitshn. Do not change access. Do not contact anyone.
+- Live site (public, approved by the family): https://eli-raz.yarden-zamir.com. GitHub Actions builds and deploys it (see "Live site deploy" below). Do not change access. Do not contact anyone.
 - Commit and push while you work (standing approval from the user, 2026-11-24). Both repos push to GitHub: the pipeline repo is public (Yarden-zamir/epub-web-edition; a push to main deploys the synthetic sample site), the content repo is private (Yarden-zamir/eli-raz-edition). Commit after each verified step, conventional commits, short bodies, no AI or tool credit lines. Several agents share each checkout: commit only your own paths with `git commit -- <paths>` (a plain `git commit` also takes files that other agents staged), never `git add -A`; pull with rebase before pushing if the push is rejected.
 - Never commit real book content (Hebrew text, images, data) to the public pipeline repo.
 
@@ -24,7 +24,16 @@ uv run tools/build_epub.py $C/epub-src-release $C/dist/release/eli-raz.epub
 uv run tools/build_web.py $C/dist/release/eli-raz.epub $C/dist/release/web $C/site/enhancements.json
 uv run tools/check_release.py $C $C/dist/release/eli-raz.epub $C/dist/release/web
 ```
-Serve dist/release/web with a local http.server for browser tests. Playwright 1.64.1 with the cached Chromium at ~/.cache/ms-playwright/chromium-1255/chrome-linux64/chrome (pass executable_path). axe-core is at ~/Github/epub-web-edition/main/.tools/axe/package/axe.min.js. Test with reduced_motion="reduce" for axe (scroll animations cause false contrast hits).
+Serve dist/release/web with a local http.server for browser tests. Playwright 1.64.1 with its own Chromium: `uv run --with playwright==1.64.1 playwright install --only-shell chromium`. axe-core is at ~/Github/epub-web-edition/main/.tools/axe/package/axe.min.js. Test with reduced_motion="reduce" for axe (scroll animations cause false contrast hits).
+
+Full release build with every check (the same steps as CI): `uv run scripts/build_release.py ~/Github/epub-web-edition/main` from the content folder. It runs both ingests, build_epub, build_web, check_release (with check_size), EPUBCheck 5.4.0 and scripts/smoke_site.py.
+
+## Live site deploy
+
+- .github/workflows/kitshn.yml in the content repo builds with scripts/build_release.py against Yarden-zamir/epub-web-edition at main, and deploys dist/release/web with kitshn (kitshn.config.ts) to https://eli-raz.yarden-zamir.com.
+- It runs on each push to the content repo's main. The pipeline repo's .github/workflows/live-site.yml starts it (workflow_dispatch) after each push to the pipeline's main.
+- A failed check stops the deploy, and the live site stays as it was. Read the run log: `gh run list -R Yarden-zamir/eli-raz-edition -w kitshn.yml`.
+- Build and deploy by hand: `gh workflow run kitshn.yml -R Yarden-zamir/eli-raz-edition`.
 
 ## User rules (Yarden; follow exactly)
 

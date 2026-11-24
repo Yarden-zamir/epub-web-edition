@@ -5,7 +5,9 @@
 """Smoke test a built web edition before publishing: loads at phone and desktop width, light and dark.
 
 Fails on a script error, horizontal overflow, or an axe violation (with reduced motion, so scroll animations do not cause false hits).
-Usage: uv run scripts/smoke_site.py WEB_DIR
+Usage: uv run scripts/smoke_site.py WEB_DIR AXE_JS
+AXE_JS is axe.min.js of axe-core 4.14.0. The browser is the Chromium of Playwright 1.64.1:
+uv run --with playwright==1.64.1 playwright install --only-shell chromium
 """
 import functools
 import http.server
@@ -15,9 +17,9 @@ from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
-web = Path(sys.argv[1])
-AXE = Path.home() / "Github/epub-web-edition/main/.tools/axe/package/axe.min.js"
-CHROME = Path.home() / ".cache/ms-playwright/chromium-1255/chrome-linux64/chrome"
+web, AXE = Path(sys.argv[1]), Path(sys.argv[2])
+if not (web / "index.html").is_file() or not AXE.is_file():
+    sys.exit(f"usage: smoke_site.py WEB_DIR AXE_JS; missing {web / 'index.html'} or {AXE}")
 
 
 class Quiet(http.server.SimpleHTTPRequestHandler):
@@ -29,7 +31,7 @@ srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), functools.partial(Quiet,
 threading.Thread(target=srv.serve_forever, daemon=True).start()
 problems = []
 with sync_playwright() as p:
-    browser = p.chromium.launch(executable_path=str(CHROME))
+    browser = p.chromium.launch()
     for width, height in ((393, 852), (1280, 900)):
         for scheme in ("light", "dark"):
             page = browser.new_page(viewport={"width": width, "height": height}, color_scheme=scheme, reduced_motion="reduce")
