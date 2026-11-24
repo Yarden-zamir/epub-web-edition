@@ -59,6 +59,9 @@ def main() -> None:
     for credit in release.get("credit", []):
         if html.escape(credit["text"]) not in text:
             missing.append(f"{credit['image']}: edition credit missing")
+    for notice in release.get("notice", []):
+        if html.escape(notice["text"], quote=False) not in text:
+            missing.append(f"release notice missing: {notice['text'][:40]}")
     missing += over_budget(epub)
     print(f"changed images {len(release.get('change', []))} | banned files {len(banned)} | leaks {len(leaks)}")
     print(f"credits {len(release.get('credit', []))} | missing notes or credits {len(missing)}")

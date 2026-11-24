@@ -1598,6 +1598,10 @@ class Ingest:
         docs: list[tuple[Unit, str, str | None]] = []
         for unit in self.units:
             body, _, heading = self.render_unit(unit)
+            if unit.kind == "titlepage" and self.release:
+                # book.toml [[release.notice]]: legal notices of the public edition (data licences), once.
+                body += "".join(f'\n<p id="{unit.id}-notice{n}" class="edition-note">{html.escape(x["text"], quote=False)}</p>'
+                                for n, x in enumerate(self.cfg["release"].get("notice", []), start=1))
             epub_type = {"cover": "cover", "titlepage": "titlepage", "contents": "toc", "part": "part",
                          "article": "chapter", "frontispiece": "frontispiece", "blank": "",
                          "bibliography": "bibliography", "backcover": ""}[unit.kind]
@@ -1694,6 +1698,15 @@ class Ingest:
             props = ' properties="cover-image"' if img == cover_file else ""
             manifest.append(f'<item id="img-{img.stem}" href="images/{img.name}" media-type="{media[ext]}"{props}/>')
         spine = []
+        if cover:
+            # A cover page first in the spine: readers and Kindle open the book on it. Web skips it (epub-only).
+            alt = html.escape(f'{m["title"]}, {", ".join(m["creators"])}: {m.get("description", "")}', quote=True)
+            body = (f'<section id="cover-image" class="cover-image epub-only" epub:type="cover">'
+                    f'<img src="../images/{cover}" alt="{alt}"/></section>')
+            (self.out / "OEBPS" / "text" / "cover-image.xhtml").write_text(
+                DOC.format(lang=m["language"], title=html.escape(m["title"]), body=body), encoding="utf-8")
+            manifest.append('<item id="x-cover-image" href="text/cover-image.xhtml" media-type="application/xhtml+xml"/>')
+            spine.append('<itemref idref="x-cover-image" linear="yes"/>')
         for unit, href, _ in docs:
             manifest.append(f'<item id="x-{unit.id}" href="{href}" media-type="application/xhtml+xml"/>')
             spine.append(f'<itemref idref="x-{unit.id}"/>')
@@ -1714,7 +1727,16 @@ class Ingest:
         pages = "\n      ".join(
             f'<li><a href="{href}#pg-{p}">{self.label(p)}</a></li>'
             for u, href, _ in docs for p in u.pages)
-        nav = NAV.format(lang=m["language"], toc=toc, pages=pages)
+        # Landmarks (KDP navigation guidelines): cover, the printed contents in the spine, and the start of the text.
+        first = next(u for u, _, _ in docs if u.kind == "article")
+        contents = next((u for u, _, _ in docs if u.kind == "contents"), None)
+        marks = []
+        if cover:
+            marks.append('<li><a epub:type="cover" href="text/cover-image.xhtml">כריכה</a></li>')
+        marks.append(f'<li><a epub:type="toc" href="text/{contents.id}.xhtml#{contents.id}">תוכן העניינים</a></li>' if contents
+                     else '<li><a epub:type="toc" href="nav.xhtml#toc">תוכן העניינים</a></li>')
+        marks.append(f'<li><a epub:type="bodymatter" href="text/{first.id}.xhtml#{first.id}">תחילת הספר</a></li>')
+        nav = NAV.format(lang=m["language"], toc=toc, pages=pages, landmarks="\n      ".join(marks))
         (self.out / "OEBPS" / "nav.xhtml").write_text(nav, encoding="utf-8")
 
     def check_corrections(self) -> None:
@@ -1849,6 +1871,11 @@ NAV = """<?xml version="1.0" encoding="UTF-8"?>
     <h2 id="toc-h">תוכן העניינים</h2>
     <ol>
       {toc}
+    </ol>
+  </nav>
+  <nav epub:type="landmarks" id="landmarks" hidden="hidden">
+    <ol>
+      {landmarks}
     </ol>
   </nav>
   <nav epub:type="page-list" id="page-list" role="doc-pagelist" hidden="hidden">
