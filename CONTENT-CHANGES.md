@@ -12,6 +12,7 @@ Add an entry in the same change that makes it. Newest first within each section.
 
 | Where | Change | Why |
 |---|---|---|
+| PDF pages 50, 207, 213-214, 244, 290, 308 | Six verse pieces set as poems (section.poem, title and author line, stanzas, one line per printed line, staircase indents as printed on page 308): Galit Hazan-Rokach "כְּמוֹ אֵשֶׁת לוֹט" (a07), the song quoted in a24, Moshe Mazar's maqama (a26), Elisheva Rosenbaum "גזעי התמרים" (a30), "דרך חלון האוטובוס" (a35), "קו 486 - בדרך היורדת אל הבית" (a36). Each line keeps the ID of the paragraph it started | Print sets verse in lines and stanzas; the text layer gave paragraphs that merged lines. book.toml [[poem]]. The author line prints "חזן-רוקם" (a01-p011: "חזן-רוקח"); kept as printed |
 | Whole book (1,125 points on 75 PDF pages: poems in a07, a30 and a35; Bible quotes in a15, a17, a19, a25; words such as הקַשָרים in a10) | Each point is on the letter it prints on, for example "גִּזְעֵי הַתְּמָרִים", "כְּמוֹ", "לֹא" (was "ּגִזְעֵי הַּתְמִָרים"). Points follow standard typing order: shin and sin dot, dagesh, vowel. A point that a letter glyph already carries is not doubled | The PDF places zero-width point glyphs at a neighbour's edge. Ingest now places each point by its outline in the embedded font. Checked: every pointed line (151) against a 300 dpi render; tools/check_marks.py |
 | PDF pages 25, 181, 287 | Three tables printed as text (Dead Sea salinity by year twice, copper and slag by period) set as XHTML tables (a06-t1, a18-t1, a35-t1) | Print shows tables; the text layer gave one cell per paragraph. book.toml [[text_table]]; the rows must hold exactly the printed characters. |
 | PDF page 78 | QR captions and film credits separated: "הסרט שצולם בידי צוות המחפשים, חלק 1" (fig-a10-13), "…הנספים לפני האסון" (fig-a10-14), credits as two paragraphs (a10-p051, a10-p052) | The PDF stores two stacked caption lines of neighbouring columns as one text line, so letters interleaved. |
@@ -27,17 +28,17 @@ Add an entry in the same change that makes it. Newest first within each section.
 
 | Where | Change | Why |
 |---|---|---|
-| PDF page 66 (p066-x251) | Replaced by a new relief map (scripts/pamir_map.py), with an edition note: Dushanbe to Lenin Peak with the flight and helicopter legs that a10 tells, and a detail of the base camp, the first camp, the Frying Pan and the peak. Places from OSM, borders from Natural Earth, relief from Copernicus DEM. New alt text and note: work/maps/HANDOFF.md, for book.toml | Printed map looks like an unattributed Google Maps screenshot. |
+| PDF page 66 (p066-x251) | Replaced by a new relief map (scripts/pamir_map.py), with an edition note: Dushanbe to Lenin Peak with the flight and helicopter legs that a10 tells, and a detail of the base camp, the first camp, the Frying Pan and the peak. Places from OSM, borders from Natural Earth, relief from Copernicus DEM. Alt text and note in book.toml (JPEG, 474 KB) | Printed map looks like an unattributed Google Maps screenshot. |
 | PDF page 183 (p183-x717) | Withheld, labelled placeholder, masked on the facsimile page | No source found. |
-| PDF page 301 (p301-x1169) | Withheld, as above. Open replacement ready: a new schematic map of the eastern RD conveyance drawn from the book text (replacements/p301-x1169-open-map.jpg, scripts/jordan_maps.py); book.toml change in work/maps/HANDOFF.md | Publication figure on a satellite base map; not cleared. |
-| PDF page 302 (p302-x1173) | Withheld, as above. Open replacement ready: a new perspective relief view looking north-east with the Desert Highway and the King's Highway from OSM (replacements/p302-x1173-open-view.jpg, scripts/jordan_maps.py); book.toml change in work/maps/HANDOFF.md | Google Earth view without the imagery providers; Google requires the providers next to the image. |
+| PDF page 301 (p301-x1169) | Replaced (was withheld) by a new schematic map of the eastern RD conveyance drawn from the book text (replacements/p301-x1169-open-map.jpg, scripts/jordan_maps.py), with an edition note that it is not the figure of Bein et al. (2020). Facsimile page stays masked | Publication figure on a satellite base map; not cleared. |
+| PDF page 302 (p302-x1173) | Replaced (was withheld) by a new perspective relief view looking north-east with the Desert Highway and the King's Highway from OSM (replacements/p302-x1173-open-view.jpg, scripts/jordan_maps.py), with an edition note on its sources. Facsimile page stays masked | Google Earth view without the imagery providers; Google requires the providers next to the image. |
 | PDF pages 34, 35, 49, 183, 183, 270, 275 | Edition credit with source record and licence added after the printed caption | Licence terms ask for attribution and a licence link. |
 
 ## 3. Additions (EPUB)
 
 | What | Where |
 |---|---|
-| Facsimile appendix: one 64 dpi image of every printed page, with a Return link | End of the book |
+| Facsimile appendix: one 56 dpi image (JPEG quality 55) of every printed page, with a Return link. Lowered from 64 dpi on 2026-11-24 to keep the release EPUB at most 24 MB | End of the book |
 | Alt text for all 217 images | book.toml [alt]; written from the images, not printed |
 | QR codes link to their decoded targets | book.toml [qr_links] |
 
