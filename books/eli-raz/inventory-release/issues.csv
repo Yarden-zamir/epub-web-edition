@@ -16,240 +16,241 @@ A-0014,20,info,p020-x87.jpeg: no caption next to this image in print,open
 A-0015,20,info,p020-x82.jpeg: no caption next to this image in print,open
 A-0016,20,info,p020-x95.jpeg: no caption next to this image in print,open
 A-0017,20,info,a05-p004: paragraph continues across the page break (marker kept inside),open
-A-0018,23,intentional-change,Note reference 3 restored: Print sets reference 3 as a full-size digit (typesetting slip). Note 3 exists at the page foot.,open
-A-0019,23,info,a06-p003: paragraph continues across the page break (marker kept inside),open
-A-0020,22,intentional-change,"Omitted 'The English text continues from the left page as a two-page ': Print-only reading note for the two-page spreads. The EPUB puts the English pages in reading order, so the note would mislead.",open
-A-0021,22,info,a06-p005: paragraph continues across the page break (marker kept inside),open
-A-0022,25,intentional-change,"a06-t1: table printed as text, set as a table (8 lines)",open
-A-0023,25,hyphen,Joined a line-end hyphen: 'religious-',open
-A-0024,24,info,a06-p017: paragraph continues across the page break (marker kept inside),open
-A-0025,26,intentional-change,Correction 'salts form any other source' -> 'salts from any other source': Typo: 'form' for 'from'. Evidence: Reading of the sentence; no outside source needed.,open
-A-0026,26,info,a06-p021: paragraph continues across the page break (marker kept inside),open
-A-0027,29,intentional-change,"Correction '(2:23, KJV)' -> '(2:13, KJV)': The salt-of-the-covenant verse is Leviticus 2:13. Leviticus 2 has 16 verses. Evidence: https://bible-api.com/leviticus+2:13?translation=kjv",open
-A-0028,29,intentional-change,Correction 'shalt though season' -> 'shalt thou season': Misquote of the KJV: 'shalt thou season with salt'. Evidence: https://bible-api.com/leviticus+2:13?translation=kjv,open
-A-0029,29,intentional-change,"Correction 'south of Hebron' -> 'south of Bethlehem': Tekoa lies about 8 km south of Bethlehem, between Bethlehem and Hebron, not south of Hebron. Evidence: https://en.wikipedia.org/wiki/Tekoa_(ancient_town)",open
-A-0030,29,note-join,a06: unnumbered note text joined to note 13 (continued from the previous page),open
-A-0031,29,intentional-change,"Correction 'n. 173.' -> 'n. 174.': In Röhricht's Regesta (1893), pp. 43-44, the 1138 charter of Fulk on Tekoa, bitumen and salt is no. 174. No. 173 is a Templar charter on churches. Evidence: https://archive.org/download/regestaregnihie00rhgoog/regestaregnihie00rhgoog_djvu.txt",open
-A-0032,29,info,a06-p022: paragraph continues across the page break (marker kept inside),open
-A-0033,31,info,p031-x137.jpeg: no caption next to this image in print,open
-A-0034,30,info,a06-p025: paragraph continues across the page break (marker kept inside),open
-A-0035,33,intentional-change,"Correction 'For 3,300 years' -> 'For 2,300 years': Aristotle lived 384-322 BC; from his time to the 1930s is about 2,260 years. The book itself dates him to the 4th century BC (a35-p016). Evidence: https://en.wikipedia.org/wiki/Aristotle",open
-A-0036,33,info,a06-p027: paragraph continues across the page break (marker kept inside),open
-A-0037,32,hyphen,Joined a line-end hyphen: 'high-',open
-A-0038,32,info,a06-p030: paragraph continues across the page break (marker kept inside),open
-A-0039,35,info,a06-p031: paragraph continues across the page break (marker kept inside),open
-A-0040,34,intentional-change,"Text fix 'site in the world (108,107 ראו איורים בעמודים).' -> 'site in the world (ראו איורים בעמודים 107, 108).': Page numbers after a Hebrew run inside an English line: logical order, so the line displays like the print.",open
-A-0041,38,info,p038-x159.jpeg: no caption next to this image in print,open
-A-0042,38,info,p038-x161.jpeg: no caption next to this image in print,open
-A-0043,39,info,p039-x165-render.jpg: no caption next to this image in print,open
-A-0044,44,intentional-change,"Release: p044-x185 replace: Higher-resolution original (2029 px British Library scan, via Commons, sha1 e6301012...) of the printed map; 167 SIFT inliers. Licence checked on the British Library Flickr page 2026-11-24: No known copyright restrictions.",open
-A-0045,46,info,a07-p015: paragraph continues across the page break (marker kept inside),open
-A-0046,49,info,a07-p029: paragraph continues across the page break (marker kept inside),open
-A-0047,50,intentional-change,a07-poem1: verse set as a poem (6 lines),open
-A-0048,51,info,p051-x207.jpeg: no caption next to this image in print,open
-A-0049,52,info,p052-x211.jpeg: no caption next to this image in print,open
-A-0050,53,info,p053-x215-render.jpg: no caption next to this image in print,open
-A-0051,56,info,p056-x223.jpeg: no caption next to this image in print,open
-A-0052,57,info,p057-x227.jpeg: no caption next to this image in print,open
-A-0053,60,info,p060-x235.jpeg: no caption next to this image in print,open
-A-0054,60,info,a09-p014: paragraph continues across the page break (marker kept inside),open
-A-0055,61,intentional-change,"Correction 'בן אוויס' -> 'בן נוויס': Ben Nevis, 1,345 m, highest peak of the British Isles, in Scotland. The text gives the same height and place; one letter is missing in the name. Evidence: https://en.wikipedia.org/wiki/Ben_Nevis",open
-A-0056,63,info,a09-p032: paragraph continues across the page break (marker kept inside),open
-A-0057,64,info,a09-p036: paragraph continues across the page break (marker kept inside),open
-A-0058,65,info,p065-x247.jpeg: no caption next to this image in print,open
-A-0059,66,intentional-change,"Release: p066-x251 replace: Printed map looks like a Google Maps screenshot without attribution. Replacement drawn by scripts/pamir_map.py from OSM, Natural Earth and Copernicus DEM; sources in the script and in site/figure-maps/fig-a10-02.json.",open
-A-0060,66,intentional-change,"Correction ""'מועדון האלפיני הישראל'"" -> ""'מועדון האלפיני הישראלי'"": Missing final yod in the club name. a10-p002 prints 'המועדון האלפיני הישראלי'. Checked in the PDF render: the slip is in the print. Evidence: https://wiki.imga.org.il/index.php?title=%D7%94%D7%9E%D7%95%D7%A2%D7%93%D7%95%D7%9F_%D7%94%D7%90%D7%9C%D7%A4%D7%99%D7%A0%D7%99",open
-A-0061,67,info,a10-p004: paragraph continues across the page break (marker kept inside),open
-A-0062,68,info,p068-x257.jpeg: no caption next to this image in print,open
-A-0063,70,char-map,U+FFFD mapped to U+05B7; check against print,open
-A-0064,72,info,a10-p024: paragraph continues across the page break (marker kept inside),open
-A-0065,78,intentional-change,fig-a10-11: QR code image links to its decoded target,open
-A-0066,78,intentional-change,fig-a10-12: QR code image links to its decoded target,open
-A-0067,78,intentional-change,fig-a10-13: QR code image links to its decoded target,open
-A-0068,78,intentional-change,fig-a10-14: QR code image links to its decoded target,open
-A-0069,79,info,p079-x310.jpeg: no caption next to this image in print,open
-A-0070,82,info,a11-p015: paragraph continues across the page break (marker kept inside),open
-A-0071,89,info,p089-x332.jpeg: no caption next to this image in print,open
-A-0072,93,info,p093-x356.jpeg: no caption next to this image in print,open
-A-0073,94,info,p094-x360.jpeg: no caption next to this image in print,open
-A-0074,96,info,p096-x366.jpeg: no caption next to this image in print,open
-A-0075,98,info,a13-p031: paragraph continues across the page break (marker kept inside),open
-A-0076,100,info,p100-x376.jpeg: no caption next to this image in print,open
-A-0077,101,info,p101-x380.jpeg: no caption next to this image in print,open
-A-0078,103,intentional-change,Correction 'שבאינדוזיה' -> 'שבאינדונזיה': Typo: Komodo island is in Indonesia (אינדונזיה). Evidence: https://en.wikipedia.org/wiki/Komodo_(island),open
-A-0079,104,info,a13-p058: paragraph continues across the page break (marker kept inside),open
-A-0080,106,info,p106-x394.jpeg: no caption next to this image in print,open
-A-0081,107,info,p107-x398.jpeg: no caption next to this image in print,open
-A-0082,108,info,a14-p005: paragraph continues across the page break (marker kept inside),open
-A-0083,109,info,p109-x406.jpeg: no caption next to this image in print,open
-A-0084,115,info,p115-x444.jpeg: no caption next to this image in print,open
-A-0085,117,info,p117-x458.jpeg: no caption next to this image in print,open
-A-0086,118,info,p118-x464.jpeg: no caption next to this image in print,open
-A-0087,120,info,a14-p052: paragraph continues across the page break (marker kept inside),open
-A-0088,125,info,p125-x500.jpeg: no caption next to this image in print,open
-A-0089,126,info,p126-x505.jpeg: no caption next to this image in print,open
-A-0090,127,intentional-change,"Text fix 'וסביבתו)Siwa,' -> 'וסביבתו (Siwa,': Opening bracket before a Latin run.",open
-A-0091,127,info,p127-x509.jpeg: no caption next to this image in print,open
-A-0092,128,info,a15-p007: paragraph continues across the page break (marker kept inside),open
-A-0093,131,info,a15-p018: paragraph continues across the page break (marker kept inside),open
-A-0094,136,intentional-change,Text fix '.)Hadas et al. 2005(' -> '(Hadas et al. 2005).': Caption citation run; print reads (Hadas et al. 2005).,open
-A-0095,140,info,a16-p016: paragraph continues across the page break (marker kept inside),open
-A-0096,141,intentional-change,"Text fix ""'אדלה',(Adela) על"" -> ""'אדלה', (Adela) על"": Missing space; print reads 'אדלה', (Adela) על (glyph order checked).",open
-A-0097,145,intentional-change,"Text fix 'בקתדרה 2002,101.' -> 'בקתדרה 101, 2002.': Number order in a Hebrew line: print reads 101, 2002 (errata/print-check.md row 33).",open
-A-0098,145,info,p145-x577.jpeg: no caption next to this image in print,open
-A-0099,146,intentional-change,Correction 'אברהם מוסיל' -> 'אלואיס מוסיל': The Czech explorer of Edom at the start of the 20th century is Alois Musil (1868-1944). Evidence: https://en.wikipedia.org/wiki/Alois_Musil,open
-A-0100,148,info,p148-x587.jpeg: no caption next to this image in print,open
-A-0101,148,info,a17-p012: paragraph continues across the page break (marker kept inside),open
-A-0102,149,info,p149-x591.jpeg: no caption next to this image in print,open
-A-0103,151,info,p151-x599.jpeg: no caption next to this image in print,open
-A-0104,151,info,p151-x601.jpeg: no caption next to this image in print,open
-A-0105,153,info,a17-p022: paragraph continues across the page break (marker kept inside),open
-A-0106,154,info,a17-p024: paragraph continues across the page break (marker kept inside),open
-A-0107,156,info,a17-p031: paragraph continues across the page break (marker kept inside),open
-A-0108,157,info,p157-x615.jpeg: no caption next to this image in print,open
-A-0109,157,info,p157-x617.jpeg: no caption next to this image in print,open
-A-0110,159,info,p159-x628.jpeg: no caption next to this image in print,open
-A-0111,159,info,p159-x632-masked.png: no caption next to this image in print,open
-A-0112,159,info,a17-p042: paragraph continues across the page break (marker kept inside),open
-A-0113,162,info,p162-x645.png: no caption next to this image in print,open
-A-0114,164,info,a17-p054: paragraph continues across the page break (marker kept inside),open
-A-0115,166,intentional-change,"Text fix 'בקתדרה 2002,101,' -> 'בקתדרה 101, 2002,': Number order; print reads 101, 2002.",open
-A-0116,166,intentional-change,fig-a17-18: QR code image links to its decoded target,open
-A-0117,167,info,p167-x661.jpeg: no caption next to this image in print,open
-A-0118,168,info,a18-p003: paragraph continues across the page break (marker kept inside),open
-A-0119,172,info,a18-p022: paragraph continues across the page break (marker kept inside),open
-A-0120,173,intentional-change,"Text fix '(,Barker' -> '(Barker,': Citation run at the line end; print reads (Barker,",open
-A-0121,174,info,a18-p026: paragraph continues across the page break (marker kept inside),open
-A-0122,176,info,a18-p037: paragraph continues across the page break (marker kept inside),open
-A-0123,179,info,a18-p045: paragraph continues across the page break (marker kept inside),open
-A-0124,181,intentional-change,"a18-t1: table printed as text, set as a table (11 lines)",open
-A-0125,181,intentional-change,"Correction 'בחפירות רבת א-נחאס' -> ""בחפירות ח'רבת א-נחאס"": Two letters dropped: the site is ח'רבת א-נחאס (Khirbat en-Nahas) in all 8 other places in the book. Checked in the PDF render: the slip is in the print. Evidence: https://en.wikipedia.org/wiki/Khirbat_en-Nahas",open
-A-0126,182,info,p182-x707.jpeg: no caption next to this image in print,open
-A-0127,183,intentional-change,Release: p183-x717 withhold: No source found among 411 Commons candidates.,open
-A-0128,183,info,p183-x713-masked.png: no caption next to this image in print,open
-A-0129,183,info,: no caption next to this image in print,open
-A-0130,185,intentional-change,"Correction 'במאה ה-14' -> 'במאה ה-15': Arnold von Harff travelled to the Holy Land in 1496-1499 (still the Mamluk period, so the bracket stays true). Evidence: https://en.wikipedia.org/wiki/Arnold_von_Harff",open
-A-0131,187,info,p187-x735.jpeg: no caption next to this image in print,open
-A-0132,189,info,p189-x745.jpeg: no caption next to this image in print,open
-A-0133,191,info,p191-x751.jpeg: no caption next to this image in print,open
-A-0134,194,info,a21-p011: paragraph continues across the page break (marker kept inside),open
-A-0135,195,info,p195-x765.jpeg: no caption next to this image in print,open
-A-0136,196,info,p196-x769.jpeg: no caption next to this image in print,open
-A-0137,200,info,p200-x794.png: no caption next to this image in print,open
-A-0138,201,info,p201-x800-render.jpg: no caption next to this image in print,open
-A-0139,202,info,p202-x806.jpeg: no caption next to this image in print,open
-A-0140,203,info,p203-x810.jpeg: no caption next to this image in print,open
-A-0141,205,info,p205-x816.jpeg: no caption next to this image in print,open
-A-0142,206,info,a24-p006: paragraph continues across the page break (marker kept inside),open
-A-0143,207,intentional-change,a24-poem1: verse set as a poem (7 lines),open
-A-0144,209,info,p209-x833.jpeg: no caption next to this image in print,open
-A-0145,210,char-map,U+001A mapped to U+05B0; check against print,open
-A-0146,211,char-map,U+001A mapped to U+05B0; check against print,open
-A-0147,212,info,p212-x843.jpeg: no caption next to this image in print,open
-A-0148,213,intentional-change,a26-poem1: verse set as a poem (40 lines),open
-A-0149,213,info,p213-x847.jpeg: no caption next to this image in print,open
-A-0150,215,info,p215-x853.jpeg: no caption next to this image in print,open
-A-0151,222,info,a27-p033: paragraph continues across the page break (marker kept inside),open
-A-0152,226,info,a27-p047: paragraph continues across the page break (marker kept inside),open
-A-0153,227,info,a27-p054: paragraph continues across the page break (marker kept inside),open
-A-0154,228,info,a27-p057: paragraph continues across the page break (marker kept inside),open
-A-0155,229,info,p229-x896.jpeg: no caption next to this image in print,open
-A-0156,230,info,a28-p005: paragraph continues across the page break (marker kept inside),open
-A-0157,231,info,p231-x902.jpeg: no caption next to this image in print,open
-A-0158,233,info,p233-x908.jpeg: no caption next to this image in print,open
-A-0159,234,info,p234-x914.jpeg: no caption next to this image in print,open
-A-0160,234,intentional-change,fig-a29-03: QR code image links to its decoded target,open
-A-0161,234,info,a29-p005: paragraph continues across the page break (marker kept inside),open
-A-0162,235,info,p235-x920.jpeg: no caption next to this image in print,open
-A-0163,236,info,p236-x924.jpeg: no caption next to this image in print,open
-A-0164,237,info,p237-x929.jpeg: no caption next to this image in print,open
-A-0165,244,intentional-change,a30-poem1: verse set as a poem (7 lines),open
-A-0166,245,intentional-change,"Correction 'מבול בשלושה במאי' -> 'מבול בשני במאי': The Arugot flood was on 2 May 2001. The same article says 2 May twice (a31-p006, a31-p007). Israel Meteorological Service: storm in the night of 1-2 May 2001, the Arugot bridge collapsed. Evidence: https://ims.gov.il/sites/default/files/inline-files/%D7%A1%D7%A7%D7%99%D7%A8%D7%AA%20%D7%90%D7%99%D7%A8%D7%95%D7%A2%D7%99%D7%9D%20%D7%A7%D7%99%D7%A6%D7%95%D7%A0%D7%99%D7%99%D7%9D%20-%20%D7%A2%D7%93%D7%9B%D7%95%D7%95%D7%9F%20%D7%9E%D7%A8%D7%A5%202023_0.pdf",open
-A-0167,247,intentional-change,Correction 'של ה-3 במאי' -> 'של ה-2 במאי': Same event as 'ביום השיטפון ב-2 במאי' earlier in this paragraph. IMS dates the storm and the Arugot bridge collapse to 1-2 May 2001. Evidence: https://ims.gov.il/sites/default/files/inline-files/%D7%A1%D7%A7%D7%99%D7%A8%D7%AA%20%D7%90%D7%99%D7%A8%D7%95%D7%A2%D7%99%D7%9D%20%D7%A7%D7%99%D7%A6%D7%95%D7%A0%D7%99%D7%99%D7%9D%20-%20%D7%A2%D7%93%D7%9B%D7%95%D7%95%D7%9F%20%D7%9E%D7%A8%D7%A5%202023_0.pdf,open
-A-0168,247,intentional-change,"Correction 'דברים יד, 14-13' -> 'דברים יא, 14-13': The quoted verses ('והיה אם שמע תשמעו ... ונתתי מטר ארצכם בעתו יורה ומלקוש') are Deuteronomy 11:13-14. Deuteronomy 14:13-14 is about unclean birds. Evidence: https://www.sefaria.org/api/v3/texts/Deuteronomy.11.13-14",open
-A-0169,247,info,a31-p007: paragraph continues across the page break (marker kept inside),open
-A-0170,249,info,p249-x967.jpeg: no caption next to this image in print,open
-A-0171,253,info,a32-p013: paragraph continues across the page break (marker kept inside),open
-A-0172,254,info,a32-p017: paragraph continues across the page break (marker kept inside),open
-A-0173,255,info,p255-x987.jpeg: no caption next to this image in print,open
-A-0174,256,info,p256-x993.jpeg: no caption next to this image in print,open
-A-0175,257,note,a33: reference '3' has no single matching note; kept as superscript,open
-A-0176,257,note,a33: reference '2' has no single matching note; kept as superscript,open
-A-0177,257,note,a33: reference '12' has no single matching note; kept as superscript,open
-A-0178,257,note,a33: reference '13' has no single matching note; kept as superscript,open
-A-0179,259,info,p259-x1005.jpeg: no caption next to this image in print,open
-A-0180,260,info,p260-x1009.jpeg: no caption next to this image in print,open
-A-0181,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
+A-0018,21,intentional-change,"Release: p021-x103 replace: Photographer's file (Moshe Bernstein, received 2026-11-24; provenance/cover-photo.md), 1942 x 1019, about 2.1x the printed 1009 x 477; SIFT 703 of 713 inliers. About 10% narrower on the right than the print.",open
+A-0019,23,intentional-change,Note reference 3 restored: Print sets reference 3 as a full-size digit (typesetting slip). Note 3 exists at the page foot.,open
+A-0020,23,info,a06-p003: paragraph continues across the page break (marker kept inside),open
+A-0021,22,intentional-change,"Omitted 'The English text continues from the left page as a two-page ': Print-only reading note for the two-page spreads. The EPUB puts the English pages in reading order, so the note would mislead.",open
+A-0022,22,info,a06-p005: paragraph continues across the page break (marker kept inside),open
+A-0023,25,intentional-change,"a06-t1: table printed as text, set as a table (8 lines)",open
+A-0024,25,hyphen,Joined a line-end hyphen: 'religious-',open
+A-0025,24,info,a06-p017: paragraph continues across the page break (marker kept inside),open
+A-0026,26,intentional-change,Correction 'salts form any other source' -> 'salts from any other source': Typo: 'form' for 'from'. Evidence: Reading of the sentence; no outside source needed.,open
+A-0027,26,info,a06-p021: paragraph continues across the page break (marker kept inside),open
+A-0028,29,intentional-change,"Correction '(2:23, KJV)' -> '(2:13, KJV)': The salt-of-the-covenant verse is Leviticus 2:13. Leviticus 2 has 16 verses. Evidence: https://bible-api.com/leviticus+2:13?translation=kjv",open
+A-0029,29,intentional-change,Correction 'shalt though season' -> 'shalt thou season': Misquote of the KJV: 'shalt thou season with salt'. Evidence: https://bible-api.com/leviticus+2:13?translation=kjv,open
+A-0030,29,intentional-change,"Correction 'south of Hebron' -> 'south of Bethlehem': Tekoa lies about 8 km south of Bethlehem, between Bethlehem and Hebron, not south of Hebron. Evidence: https://en.wikipedia.org/wiki/Tekoa_(ancient_town)",open
+A-0031,29,note-join,a06: unnumbered note text joined to note 13 (continued from the previous page),open
+A-0032,29,intentional-change,"Correction 'n. 173.' -> 'n. 174.': In Röhricht's Regesta (1893), pp. 43-44, the 1138 charter of Fulk on Tekoa, bitumen and salt is no. 174. No. 173 is a Templar charter on churches. Evidence: https://archive.org/download/regestaregnihie00rhgoog/regestaregnihie00rhgoog_djvu.txt",open
+A-0033,29,info,a06-p022: paragraph continues across the page break (marker kept inside),open
+A-0034,31,info,p031-x137.jpeg: no caption next to this image in print,open
+A-0035,30,info,a06-p025: paragraph continues across the page break (marker kept inside),open
+A-0036,33,intentional-change,"Correction 'For 3,300 years' -> 'For 2,300 years': Aristotle lived 384-322 BC; from his time to the 1930s is about 2,260 years. The book itself dates him to the 4th century BC (a35-p016). Evidence: https://en.wikipedia.org/wiki/Aristotle",open
+A-0037,33,info,a06-p027: paragraph continues across the page break (marker kept inside),open
+A-0038,32,hyphen,Joined a line-end hyphen: 'high-',open
+A-0039,32,info,a06-p030: paragraph continues across the page break (marker kept inside),open
+A-0040,35,info,a06-p031: paragraph continues across the page break (marker kept inside),open
+A-0041,34,intentional-change,"Text fix 'site in the world (108,107 ראו איורים בעמודים).' -> 'site in the world (ראו איורים בעמודים 107, 108).': Page numbers after a Hebrew run inside an English line: logical order, so the line displays like the print.",open
+A-0042,38,info,p038-x159.jpeg: no caption next to this image in print,open
+A-0043,38,info,p038-x161.jpeg: no caption next to this image in print,open
+A-0044,39,info,p039-x165-render.jpg: no caption next to this image in print,open
+A-0045,44,intentional-change,"Release: p044-x185 replace: Higher-resolution original (2029 px British Library scan, via Commons, sha1 e6301012...) of the printed map; 167 SIFT inliers. Licence checked on the British Library Flickr page 2026-11-24: No known copyright restrictions.",open
+A-0046,46,info,a07-p015: paragraph continues across the page break (marker kept inside),open
+A-0047,49,info,a07-p029: paragraph continues across the page break (marker kept inside),open
+A-0048,50,intentional-change,a07-poem1: verse set as a poem (6 lines),open
+A-0049,51,info,p051-x207.jpeg: no caption next to this image in print,open
+A-0050,52,info,p052-x211.jpeg: no caption next to this image in print,open
+A-0051,53,info,p053-x215-render.jpg: no caption next to this image in print,open
+A-0052,56,info,p056-x223.jpeg: no caption next to this image in print,open
+A-0053,57,info,p057-x227.jpeg: no caption next to this image in print,open
+A-0054,60,info,p060-x235.jpeg: no caption next to this image in print,open
+A-0055,60,info,a09-p014: paragraph continues across the page break (marker kept inside),open
+A-0056,61,intentional-change,"Correction 'בן אוויס' -> 'בן נוויס': Ben Nevis, 1,345 m, highest peak of the British Isles, in Scotland. The text gives the same height and place; one letter is missing in the name. Evidence: https://en.wikipedia.org/wiki/Ben_Nevis",open
+A-0057,63,info,a09-p032: paragraph continues across the page break (marker kept inside),open
+A-0058,64,info,a09-p036: paragraph continues across the page break (marker kept inside),open
+A-0059,65,info,p065-x247.jpeg: no caption next to this image in print,open
+A-0060,66,intentional-change,"Release: p066-x251 replace: Printed map looks like a Google Maps screenshot without attribution. Replacement drawn by scripts/pamir_map.py from OSM, Natural Earth and Copernicus DEM; sources in the script and in site/figure-maps/fig-a10-02.json.",open
+A-0061,66,intentional-change,"Correction ""'מועדון האלפיני הישראל'"" -> ""'מועדון האלפיני הישראלי'"": Missing final yod in the club name. a10-p002 prints 'המועדון האלפיני הישראלי'. Checked in the PDF render: the slip is in the print. Evidence: https://wiki.imga.org.il/index.php?title=%D7%94%D7%9E%D7%95%D7%A2%D7%93%D7%95%D7%9F_%D7%94%D7%90%D7%9C%D7%A4%D7%99%D7%A0%D7%99",open
+A-0062,67,info,a10-p004: paragraph continues across the page break (marker kept inside),open
+A-0063,68,info,p068-x257.jpeg: no caption next to this image in print,open
+A-0064,70,char-map,U+FFFD mapped to U+05B7; check against print,open
+A-0065,72,info,a10-p024: paragraph continues across the page break (marker kept inside),open
+A-0066,78,intentional-change,fig-a10-11: QR code image links to its decoded target,open
+A-0067,78,intentional-change,fig-a10-12: QR code image links to its decoded target,open
+A-0068,78,intentional-change,fig-a10-13: QR code image links to its decoded target,open
+A-0069,78,intentional-change,fig-a10-14: QR code image links to its decoded target,open
+A-0070,79,info,p079-x310.jpeg: no caption next to this image in print,open
+A-0071,82,info,a11-p015: paragraph continues across the page break (marker kept inside),open
+A-0072,89,info,p089-x332.jpeg: no caption next to this image in print,open
+A-0073,93,info,p093-x356.jpeg: no caption next to this image in print,open
+A-0074,94,info,p094-x360.jpeg: no caption next to this image in print,open
+A-0075,96,info,p096-x366.jpeg: no caption next to this image in print,open
+A-0076,98,info,a13-p031: paragraph continues across the page break (marker kept inside),open
+A-0077,100,info,p100-x376.jpeg: no caption next to this image in print,open
+A-0078,101,info,p101-x380.jpeg: no caption next to this image in print,open
+A-0079,103,intentional-change,Correction 'שבאינדוזיה' -> 'שבאינדונזיה': Typo: Komodo island is in Indonesia (אינדונזיה). Evidence: https://en.wikipedia.org/wiki/Komodo_(island),open
+A-0080,104,info,a13-p058: paragraph continues across the page break (marker kept inside),open
+A-0081,106,info,p106-x394.jpeg: no caption next to this image in print,open
+A-0082,107,info,p107-x398.jpeg: no caption next to this image in print,open
+A-0083,108,info,a14-p005: paragraph continues across the page break (marker kept inside),open
+A-0084,109,info,p109-x406.jpeg: no caption next to this image in print,open
+A-0085,115,info,p115-x444.jpeg: no caption next to this image in print,open
+A-0086,117,info,p117-x458.jpeg: no caption next to this image in print,open
+A-0087,118,info,p118-x464.jpeg: no caption next to this image in print,open
+A-0088,120,info,a14-p052: paragraph continues across the page break (marker kept inside),open
+A-0089,125,info,p125-x500.jpeg: no caption next to this image in print,open
+A-0090,126,info,p126-x505.jpeg: no caption next to this image in print,open
+A-0091,127,intentional-change,"Text fix 'וסביבתו)Siwa,' -> 'וסביבתו (Siwa,': Opening bracket before a Latin run.",open
+A-0092,127,info,p127-x509.jpeg: no caption next to this image in print,open
+A-0093,128,info,a15-p007: paragraph continues across the page break (marker kept inside),open
+A-0094,131,info,a15-p018: paragraph continues across the page break (marker kept inside),open
+A-0095,136,intentional-change,Text fix '.)Hadas et al. 2005(' -> '(Hadas et al. 2005).': Caption citation run; print reads (Hadas et al. 2005).,open
+A-0096,140,info,a16-p016: paragraph continues across the page break (marker kept inside),open
+A-0097,141,intentional-change,"Text fix ""'אדלה',(Adela) על"" -> ""'אדלה', (Adela) על"": Missing space; print reads 'אדלה', (Adela) על (glyph order checked).",open
+A-0098,145,intentional-change,"Text fix 'בקתדרה 2002,101.' -> 'בקתדרה 101, 2002.': Number order in a Hebrew line: print reads 101, 2002 (errata/print-check.md row 33).",open
+A-0099,145,info,p145-x577.jpeg: no caption next to this image in print,open
+A-0100,146,intentional-change,Correction 'אברהם מוסיל' -> 'אלואיס מוסיל': The Czech explorer of Edom at the start of the 20th century is Alois Musil (1868-1944). Evidence: https://en.wikipedia.org/wiki/Alois_Musil,open
+A-0101,148,info,p148-x587.jpeg: no caption next to this image in print,open
+A-0102,148,info,a17-p012: paragraph continues across the page break (marker kept inside),open
+A-0103,149,info,p149-x591.jpeg: no caption next to this image in print,open
+A-0104,151,info,p151-x599.jpeg: no caption next to this image in print,open
+A-0105,151,info,p151-x601.jpeg: no caption next to this image in print,open
+A-0106,153,info,a17-p022: paragraph continues across the page break (marker kept inside),open
+A-0107,154,info,a17-p024: paragraph continues across the page break (marker kept inside),open
+A-0108,156,info,a17-p031: paragraph continues across the page break (marker kept inside),open
+A-0109,157,info,p157-x615.jpeg: no caption next to this image in print,open
+A-0110,157,info,p157-x617.jpeg: no caption next to this image in print,open
+A-0111,159,info,p159-x628.jpeg: no caption next to this image in print,open
+A-0112,159,info,p159-x632-masked.png: no caption next to this image in print,open
+A-0113,159,info,a17-p042: paragraph continues across the page break (marker kept inside),open
+A-0114,162,info,p162-x645.png: no caption next to this image in print,open
+A-0115,164,info,a17-p054: paragraph continues across the page break (marker kept inside),open
+A-0116,166,intentional-change,"Text fix 'בקתדרה 2002,101,' -> 'בקתדרה 101, 2002,': Number order; print reads 101, 2002.",open
+A-0117,166,intentional-change,fig-a17-18: QR code image links to its decoded target,open
+A-0118,167,info,p167-x661.jpeg: no caption next to this image in print,open
+A-0119,168,info,a18-p003: paragraph continues across the page break (marker kept inside),open
+A-0120,172,info,a18-p022: paragraph continues across the page break (marker kept inside),open
+A-0121,173,intentional-change,"Text fix '(,Barker' -> '(Barker,': Citation run at the line end; print reads (Barker,",open
+A-0122,174,info,a18-p026: paragraph continues across the page break (marker kept inside),open
+A-0123,176,info,a18-p037: paragraph continues across the page break (marker kept inside),open
+A-0124,179,info,a18-p045: paragraph continues across the page break (marker kept inside),open
+A-0125,181,intentional-change,"a18-t1: table printed as text, set as a table (11 lines)",open
+A-0126,181,intentional-change,"Correction 'בחפירות רבת א-נחאס' -> ""בחפירות ח'רבת א-נחאס"": Two letters dropped: the site is ח'רבת א-נחאס (Khirbat en-Nahas) in all 8 other places in the book. Checked in the PDF render: the slip is in the print. Evidence: https://en.wikipedia.org/wiki/Khirbat_en-Nahas",open
+A-0127,182,info,p182-x707.jpeg: no caption next to this image in print,open
+A-0128,183,intentional-change,Release: p183-x717 withhold: No source found among 411 Commons candidates.,open
+A-0129,183,info,p183-x713-masked.png: no caption next to this image in print,open
+A-0130,183,info,: no caption next to this image in print,open
+A-0131,185,intentional-change,"Correction 'במאה ה-14' -> 'במאה ה-15': Arnold von Harff travelled to the Holy Land in 1496-1499 (still the Mamluk period, so the bracket stays true). Evidence: https://en.wikipedia.org/wiki/Arnold_von_Harff",open
+A-0132,187,info,p187-x735.jpeg: no caption next to this image in print,open
+A-0133,189,info,p189-x745.jpeg: no caption next to this image in print,open
+A-0134,191,info,p191-x751.jpeg: no caption next to this image in print,open
+A-0135,194,info,a21-p011: paragraph continues across the page break (marker kept inside),open
+A-0136,195,info,p195-x765.jpeg: no caption next to this image in print,open
+A-0137,196,info,p196-x769.jpeg: no caption next to this image in print,open
+A-0138,200,info,p200-x794.png: no caption next to this image in print,open
+A-0139,201,info,p201-x800-render.jpg: no caption next to this image in print,open
+A-0140,202,info,p202-x806.jpeg: no caption next to this image in print,open
+A-0141,203,info,p203-x810.jpeg: no caption next to this image in print,open
+A-0142,205,info,p205-x816.jpeg: no caption next to this image in print,open
+A-0143,206,info,a24-p006: paragraph continues across the page break (marker kept inside),open
+A-0144,207,intentional-change,a24-poem1: verse set as a poem (7 lines),open
+A-0145,209,info,p209-x833.jpeg: no caption next to this image in print,open
+A-0146,210,char-map,U+001A mapped to U+05B0; check against print,open
+A-0147,211,char-map,U+001A mapped to U+05B0; check against print,open
+A-0148,212,info,p212-x843.jpeg: no caption next to this image in print,open
+A-0149,213,intentional-change,a26-poem1: verse set as a poem (40 lines),open
+A-0150,213,info,p213-x847.jpeg: no caption next to this image in print,open
+A-0151,215,info,p215-x853.jpeg: no caption next to this image in print,open
+A-0152,222,info,a27-p033: paragraph continues across the page break (marker kept inside),open
+A-0153,226,info,a27-p047: paragraph continues across the page break (marker kept inside),open
+A-0154,227,info,a27-p054: paragraph continues across the page break (marker kept inside),open
+A-0155,228,info,a27-p057: paragraph continues across the page break (marker kept inside),open
+A-0156,229,info,p229-x896.jpeg: no caption next to this image in print,open
+A-0157,230,info,a28-p005: paragraph continues across the page break (marker kept inside),open
+A-0158,231,info,p231-x902.jpeg: no caption next to this image in print,open
+A-0159,233,info,p233-x908.jpeg: no caption next to this image in print,open
+A-0160,234,info,p234-x914.jpeg: no caption next to this image in print,open
+A-0161,234,intentional-change,fig-a29-03: QR code image links to its decoded target,open
+A-0162,234,info,a29-p005: paragraph continues across the page break (marker kept inside),open
+A-0163,235,info,p235-x920.jpeg: no caption next to this image in print,open
+A-0164,236,info,p236-x924.jpeg: no caption next to this image in print,open
+A-0165,237,info,p237-x929.jpeg: no caption next to this image in print,open
+A-0166,244,intentional-change,a30-poem1: verse set as a poem (7 lines),open
+A-0167,245,intentional-change,"Correction 'מבול בשלושה במאי' -> 'מבול בשני במאי': The Arugot flood was on 2 May 2001. The same article says 2 May twice (a31-p006, a31-p007). Israel Meteorological Service: storm in the night of 1-2 May 2001, the Arugot bridge collapsed. Evidence: https://ims.gov.il/sites/default/files/inline-files/%D7%A1%D7%A7%D7%99%D7%A8%D7%AA%20%D7%90%D7%99%D7%A8%D7%95%D7%A2%D7%99%D7%9D%20%D7%A7%D7%99%D7%A6%D7%95%D7%A0%D7%99%D7%99%D7%9D%20-%20%D7%A2%D7%93%D7%9B%D7%95%D7%95%D7%9F%20%D7%9E%D7%A8%D7%A5%202023_0.pdf",open
+A-0168,247,intentional-change,Correction 'של ה-3 במאי' -> 'של ה-2 במאי': Same event as 'ביום השיטפון ב-2 במאי' earlier in this paragraph. IMS dates the storm and the Arugot bridge collapse to 1-2 May 2001. Evidence: https://ims.gov.il/sites/default/files/inline-files/%D7%A1%D7%A7%D7%99%D7%A8%D7%AA%20%D7%90%D7%99%D7%A8%D7%95%D7%A2%D7%99%D7%9D%20%D7%A7%D7%99%D7%A6%D7%95%D7%A0%D7%99%D7%99%D7%9D%20-%20%D7%A2%D7%93%D7%9B%D7%95%D7%95%D7%9F%20%D7%9E%D7%A8%D7%A5%202023_0.pdf,open
+A-0169,247,intentional-change,"Correction 'דברים יד, 14-13' -> 'דברים יא, 14-13': The quoted verses ('והיה אם שמע תשמעו ... ונתתי מטר ארצכם בעתו יורה ומלקוש') are Deuteronomy 11:13-14. Deuteronomy 14:13-14 is about unclean birds. Evidence: https://www.sefaria.org/api/v3/texts/Deuteronomy.11.13-14",open
+A-0170,247,info,a31-p007: paragraph continues across the page break (marker kept inside),open
+A-0171,249,info,p249-x967.jpeg: no caption next to this image in print,open
+A-0172,253,info,a32-p013: paragraph continues across the page break (marker kept inside),open
+A-0173,254,info,a32-p017: paragraph continues across the page break (marker kept inside),open
+A-0174,255,info,p255-x987.jpeg: no caption next to this image in print,open
+A-0175,256,info,p256-x993.jpeg: no caption next to this image in print,open
+A-0176,257,note,a33: reference '3' has no single matching note; kept as superscript,open
+A-0177,257,note,a33: reference '2' has no single matching note; kept as superscript,open
+A-0178,257,note,a33: reference '12' has no single matching note; kept as superscript,open
+A-0179,257,note,a33: reference '13' has no single matching note; kept as superscript,open
+A-0180,259,info,p259-x1005.jpeg: no caption next to this image in print,open
+A-0181,260,info,p260-x1009.jpeg: no caption next to this image in print,open
 A-0182,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
 A-0183,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
 A-0184,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
 A-0185,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
-A-0186,264,auto-fix,Bracket pair ') Katz et al. 1977 (' reordered around a left-to-right run; check against print,open
-A-0187,265,auto-fix,Bracket pair ') Begin et al. 1974 (' reordered around a left-to-right run; check against print,open
-A-0188,274,auto-fix,Bracket pair ') Neev and Hall 1979 (' reordered around a left-to-right run; check against print,open
-A-0189,277,auto-fix,"Bracket pair ') Wilkansky, 1936 (' reordered around a left-to-right run; check against print",open
-A-0190,278,intentional-change,"Text fix '(,Oren' -> '(Oren,': Citation run at the line end; print reads (Oren,",open
-A-0191,279,intentional-change,Text fix 'ואילו 1934(Bass-Becking)' -> 'ואילו Bass-Becking (1934)': Name and year order inside a Hebrew line.,open
-A-0192,279,info,a35-p015: paragraph continues across the page break (marker kept inside),open
-A-0193,280,intentional-change,Text fix 'האמירה של 2009) Boetius and Joye):' -> 'האמירה של Boetius and Joye (2009):': Citation run with a year in brackets.,open
-A-0194,280,intentional-change,"Text fix '(2008, Calo, 2011; Oren).' -> '(Calo, 2011; Oren, 2008).': Citation order; print reads (Calo, 2011; Oren, 2008).",open
-A-0195,281,info,a35-p029: paragraph continues across the page break (marker kept inside),open
-A-0196,282,intentional-change,"Text fix '(, Oren et al.,2004' -> '(Oren et al.,2004,': Citation run at the line end; print reads (Oren et al.,2004,",open
-A-0197,282,info,a35-p034: paragraph continues across the page break (marker kept inside),open
-A-0198,283,intentional-change,"Text fix 'החיפוש) Google Scholar, 2016).' -> 'החיפוש (Google Scholar, 2016).': Opening bracket before a Latin run.",open
-A-0199,283,intentional-change,"Text fix '(, Gay-Lussac, 1819; Ehrenberg, 1848; Lortet' -> '(Gay-Lussac, 1819; Ehrenberg, 1848; Lortet,': One citation run over two lines; print breaks it at the line end.",open
-A-0200,283,intentional-change,"Text fix 'Bass-Becking,1934;1891),' -> '1891; Bass-Becking,1934),': End of the same citation run.",open
-A-0201,284,intentional-change,Text fix 'יתר(ולכן' -> 'יתר) ולכן': Closing bracket of the note that opens with (מלבד; print shows it after יתר.,open
-A-0202,284,info,a35-p045: paragraph continues across the page break (marker kept inside),open
-A-0203,285,intentional-change,"Text fix 'בשנים 1980,1964' -> 'בשנים 1964, 1980': Number order; print reads 1964, 1980.",open
-A-0204,286,intentional-change,"Text fix '(, Kaplan & Friedman, 1970; Oren & Shilo' -> '(Kaplan & Friedman, 1970; Oren & Shilo,': One citation run over two lines; print breaks it at the line end.",open
-A-0205,286,intentional-change,"Text fix 'Oren,1983a, 1993;1982).' -> '1982; Oren,1983a, 1993).': End of the same citation run.",open
-A-0206,286,intentional-change,"Correction '(Bodaker et al., 2000)' -> '(Bodaker et al., 2010)': The book cites this paper as 2010 in a35-p005 and in the bibliography (sources-p053, The ISME Journal 4: 399-407). No Bodaker 2000 paper exists. Evidence: https://doi.org/10.1038/ismej.2009.141",open
-A-0207,287,intentional-change,"a35-t1: table printed as text, set as a table (10 lines)",open
-A-0208,287,info,a35-p058: paragraph continues across the page break (marker kept inside),open
-A-0209,288,intentional-change,Correction '(Coyn & Bellier' -> '(Coyne & Bellier': The French engineering firm that wrote the Red Sea - Dead Sea feasibility study is Coyne et Bellier. Evidence: https://www.eib.org/attachments/registers/82425040.pdf,open
-A-0210,290,intentional-change,a35-poem1: verse set as a poem (11 lines),open
-A-0211,291,intentional-change,"Text fix ') Bourcart, 1899).' -> '(Bourcart, 1899).': Opening bracket at the start of a line before a Latin run.",open
-A-0212,291,intentional-change,Text fix 'הנורווגי 1919(Hiorth) הציע' -> 'הנורווגי Hiorth (1919) הציע': Name and year order inside a Hebrew line.,open
-A-0213,292,intentional-change,Text fix 'להרצל) Bourcart 1899).' -> 'להרצל (Bourcart 1899).': Opening bracket before a Latin run.,open
-A-0214,293,info,p293-x1140.jpeg: no caption next to this image in print,open
-A-0215,294,intentional-change,"Text fix ') Wachs et al., 2000,' -> '(Wachs et al., 2000,': Opening bracket at the start of a line before a Latin run.",open
-A-0216,297,info,p297-x1152.jpeg: no caption next to this image in print,open
-A-0217,299,info,p299-x1163.jpeg: no caption next to this image in print,open
-A-0218,301,intentional-change,"Release: p301-x1169 replace: Printed figure (Bein et al. 2020 on a satellite base map) is not cleared. New schematic map from the book text (a36-p044, a36-p045, a36-p048, caption of fig-a36-09) by scripts/jordan_maps.py.",open
-A-0219,302,intentional-change,Release: p302-x1173 replace: Google Earth print use needs Google plus the imagery providers next to the image; the print shows only 'Google' and the providers cannot be recovered. New perspective view by scripts/jordan_maps.py from OSM and Copernicus DEM.,open
-A-0220,303,intentional-change,Text fix 'ה- GSI & Tahal(RD' -> 'ה-RD (GSI & Tahal': Run order; print reads ה-RD (GSI & Tahal,open
-A-0221,303,intentional-change,Text fix '(RB(.' -> '(RB).': Closing bracket after a Latin abbreviation.,open
-A-0222,303,intentional-change,"Correction 'לכמיליון עד סוף העשור' -> 'לכמיליארד עד סוף העשור': From about 600 million m³ a year to 'about a million' is impossible. Government Decision 3533 (June 2018) sets the 2030 desalination target at 1,100 million m³ a year. Evidence: https://www.ceci.org.il/wp-content/uploads/2023/10/%D7%AA%D7%9B%D7%A0%D7%99%D7%AA-%D7%90%D7%A1%D7%98%D7%A8%D7%98%D7%92%D7%99%D7%AA-%D7%9C%D7%94%D7%AA%D7%9E%D7%95%D7%93%D7%93%D7%95%D7%AA-%D7%A2%D7%9D-%D7%AA%D7%A7%D7%95%D7%A4%D7%AA-%D7%91%D7%A6%D7%95%D7%A8%D7%AA-%D7%91%D7%9E%D7%A9%D7%A7-%D7%94%D7%9E%D7%99%D7%9D-%D7%9C%D7%A9%D7%A0%D7%99%D7%9D-2018-2030.pdf",open
-A-0223,304,intentional-change,"Text fix '.)GSI & Tahal Reports, 2011)' -> '(GSI & Tahal Reports, 2011).': End of the same citation run.",open
-A-0224,305,intentional-change,"Text fix '(Neev and Emery, 1967 (.' -> '(Neev and Emery, 1967).': Closing bracket after a Latin run.",open
-A-0225,305,intentional-change,Text fix '9 /1978' -> '1978/9': Print reads 1978/9 (winter 1978-79).,open
-A-0226,308,intentional-change,a36-poem1: verse set as a poem (34 lines),open
-A-0227,309,intentional-change,"Text fix '0 1. רז, אלי' -> '10. רז, אלי': Entry number 10 came out as 0 1.",open
-A-0228,309,hyphen,Joined a line-end hyphen: 'Collapse-',open
-A-0229,309,intentional-change,"Correction 'תרח""ץ' -> 'תרצ""ח': Letters swapped in the Hebrew year. The entry is dated 1938, which is תרצ""ח (5698). Evidence: https://www.hebcal.com/converter?cfg=json&gy=1938&gm=6&gd=1&g2h=1",open
-A-0230,310,hyphen,Joined a line-end hyphen: 'High-',open
-A-0231,310,intentional-change,"Correction 'Geological Society of America Bulletin, v.116,pp. 555–571' -> 'Geological Survey of Israel Bulletin 63': Begin, Ehrlich and Nathan 1974 is Geological Survey of Israel Bulletin 63. GSA Bulletin 116: 555-571 is a different paper (Bookman/Ken-Tor et al. 2004, doi:10.1130/B25286.1). Evidence: https://www.cambridge.org/core/books/abs/quaternary-of-the-levant/lake-lisan/CF25D6DE02054F2F38A24D91617CBC85",open
-A-0232,311,intentional-change,"Text fix 'Ehrenberg, C.G. 54.מובא' -> '54. Ehrenberg, C.G. מובא': Entry 54 starts its own line in print; the label came out after the Latin run (errata/print-check.md row 68).",open
-A-0233,311,intentional-change,"Text fix 'I onescu,D.' -> 'Ionescu,D.': Print reads Ionescu.",open
-A-0234,311,intentional-change,Correction 'Coyn and Bellier' -> 'Coyne and Bellier': The firm name is Coyne et Bellier (same entry as a35-p070). Evidence: https://www.eib.org/attachments/registers/82425040.pdf,open
-A-0235,311,intentional-change,"Correction 'pp. 31–41' -> 'pp. 33–41': Oren 1983, Limnology and Oceanography 28(1): pages 33-41 (Crossref). Evidence: https://api.crossref.org/works/10.4319/lo.1983.28.1.0033",open
-A-0236,316,reuse,Image xref 1379 repeats; first file p001-x1379.jpeg,open
-A-0237,316,info,p316-x1379.jpeg: no caption next to this image in print,open
-A-0238,0,intentional-change,a09-p011: cross-reference to a20-h is a link,open
-A-0239,0,intentional-change,a10-p003: cross-reference to a09-h is a link,open
-A-0240,0,intentional-change,a10-p029: cross-reference to a11-h is a link,open
-A-0241,0,intentional-change,a14-p008: cross-reference to a13-h is a link,open
-A-0242,0,intentional-change,a14-p013: cross-reference to a34-h is a link,open
-A-0243,0,intentional-change,a14-p024: cross-reference to a31-h is a link,open
-A-0244,0,intentional-change,a22-p013: cross-reference to a10-h is a link,open
-A-0245,0,intentional-change,a22-p017: cross-reference to a13-h is a link,open
-A-0246,0,intentional-change,a27-p008: cross-reference to a18-h is a link,open
-A-0247,0,intentional-change,a27-p039: cross-reference to a17-h is a link,open
-A-0248,0,intentional-change,a29-p007: cross-reference to a33-h is a link,open
-A-0249,0,intentional-change,a34-p018: cross-reference to a14-h is a link,open
-A-0250,0,intentional-change,a35-p038: cross-reference to a36-h is a link,open
-A-0251,0,intentional-change,a35-p048: cross-reference to a36-h is a link,open
-A-0252,0,intentional-change,a36-p009: cross-reference to a14-h is a link,open
-A-0253,0,intentional-change,a36-p042: cross-reference to a14-h is a link,open
-A-0254,0,intentional-change,a36-p063: cross-reference to a35-h is a link,open
+A-0186,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
+A-0187,264,auto-fix,Bracket pair ') Katz et al. 1977 (' reordered around a left-to-right run; check against print,open
+A-0188,265,auto-fix,Bracket pair ') Begin et al. 1974 (' reordered around a left-to-right run; check against print,open
+A-0189,274,auto-fix,Bracket pair ') Neev and Hall 1979 (' reordered around a left-to-right run; check against print,open
+A-0190,277,auto-fix,"Bracket pair ') Wilkansky, 1936 (' reordered around a left-to-right run; check against print",open
+A-0191,278,intentional-change,"Text fix '(,Oren' -> '(Oren,': Citation run at the line end; print reads (Oren,",open
+A-0192,279,intentional-change,Text fix 'ואילו 1934(Bass-Becking)' -> 'ואילו Bass-Becking (1934)': Name and year order inside a Hebrew line.,open
+A-0193,279,info,a35-p015: paragraph continues across the page break (marker kept inside),open
+A-0194,280,intentional-change,Text fix 'האמירה של 2009) Boetius and Joye):' -> 'האמירה של Boetius and Joye (2009):': Citation run with a year in brackets.,open
+A-0195,280,intentional-change,"Text fix '(2008, Calo, 2011; Oren).' -> '(Calo, 2011; Oren, 2008).': Citation order; print reads (Calo, 2011; Oren, 2008).",open
+A-0196,281,info,a35-p029: paragraph continues across the page break (marker kept inside),open
+A-0197,282,intentional-change,"Text fix '(, Oren et al.,2004' -> '(Oren et al.,2004,': Citation run at the line end; print reads (Oren et al.,2004,",open
+A-0198,282,info,a35-p034: paragraph continues across the page break (marker kept inside),open
+A-0199,283,intentional-change,"Text fix 'החיפוש) Google Scholar, 2016).' -> 'החיפוש (Google Scholar, 2016).': Opening bracket before a Latin run.",open
+A-0200,283,intentional-change,"Text fix '(, Gay-Lussac, 1819; Ehrenberg, 1848; Lortet' -> '(Gay-Lussac, 1819; Ehrenberg, 1848; Lortet,': One citation run over two lines; print breaks it at the line end.",open
+A-0201,283,intentional-change,"Text fix 'Bass-Becking,1934;1891),' -> '1891; Bass-Becking,1934),': End of the same citation run.",open
+A-0202,284,intentional-change,Text fix 'יתר(ולכן' -> 'יתר) ולכן': Closing bracket of the note that opens with (מלבד; print shows it after יתר.,open
+A-0203,284,info,a35-p045: paragraph continues across the page break (marker kept inside),open
+A-0204,285,intentional-change,"Text fix 'בשנים 1980,1964' -> 'בשנים 1964, 1980': Number order; print reads 1964, 1980.",open
+A-0205,286,intentional-change,"Text fix '(, Kaplan & Friedman, 1970; Oren & Shilo' -> '(Kaplan & Friedman, 1970; Oren & Shilo,': One citation run over two lines; print breaks it at the line end.",open
+A-0206,286,intentional-change,"Text fix 'Oren,1983a, 1993;1982).' -> '1982; Oren,1983a, 1993).': End of the same citation run.",open
+A-0207,286,intentional-change,"Correction '(Bodaker et al., 2000)' -> '(Bodaker et al., 2010)': The book cites this paper as 2010 in a35-p005 and in the bibliography (sources-p053, The ISME Journal 4: 399-407). No Bodaker 2000 paper exists. Evidence: https://doi.org/10.1038/ismej.2009.141",open
+A-0208,287,intentional-change,"a35-t1: table printed as text, set as a table (10 lines)",open
+A-0209,287,info,a35-p058: paragraph continues across the page break (marker kept inside),open
+A-0210,288,intentional-change,Correction '(Coyn & Bellier' -> '(Coyne & Bellier': The French engineering firm that wrote the Red Sea - Dead Sea feasibility study is Coyne et Bellier. Evidence: https://www.eib.org/attachments/registers/82425040.pdf,open
+A-0211,290,intentional-change,a35-poem1: verse set as a poem (11 lines),open
+A-0212,291,intentional-change,"Text fix ') Bourcart, 1899).' -> '(Bourcart, 1899).': Opening bracket at the start of a line before a Latin run.",open
+A-0213,291,intentional-change,Text fix 'הנורווגי 1919(Hiorth) הציע' -> 'הנורווגי Hiorth (1919) הציע': Name and year order inside a Hebrew line.,open
+A-0214,292,intentional-change,Text fix 'להרצל) Bourcart 1899).' -> 'להרצל (Bourcart 1899).': Opening bracket before a Latin run.,open
+A-0215,293,info,p293-x1140.jpeg: no caption next to this image in print,open
+A-0216,294,intentional-change,"Text fix ') Wachs et al., 2000,' -> '(Wachs et al., 2000,': Opening bracket at the start of a line before a Latin run.",open
+A-0217,297,info,p297-x1152.jpeg: no caption next to this image in print,open
+A-0218,299,info,p299-x1163.jpeg: no caption next to this image in print,open
+A-0219,301,intentional-change,"Release: p301-x1169 replace: Printed figure (Bein et al. 2020 on a satellite base map) is not cleared. New schematic map from the book text (a36-p044, a36-p045, a36-p048, caption of fig-a36-09) by scripts/jordan_maps.py.",open
+A-0220,302,intentional-change,Release: p302-x1173 replace: Google Earth print use needs Google plus the imagery providers next to the image; the print shows only 'Google' and the providers cannot be recovered. New perspective view by scripts/jordan_maps.py from OSM and Copernicus DEM.,open
+A-0221,303,intentional-change,Text fix 'ה- GSI & Tahal(RD' -> 'ה-RD (GSI & Tahal': Run order; print reads ה-RD (GSI & Tahal,open
+A-0222,303,intentional-change,Text fix '(RB(.' -> '(RB).': Closing bracket after a Latin abbreviation.,open
+A-0223,303,intentional-change,"Correction 'לכמיליון עד סוף העשור' -> 'לכמיליארד עד סוף העשור': From about 600 million m³ a year to 'about a million' is impossible. Government Decision 3533 (June 2018) sets the 2030 desalination target at 1,100 million m³ a year. Evidence: https://www.ceci.org.il/wp-content/uploads/2023/10/%D7%AA%D7%9B%D7%A0%D7%99%D7%AA-%D7%90%D7%A1%D7%98%D7%A8%D7%98%D7%92%D7%99%D7%AA-%D7%9C%D7%94%D7%AA%D7%9E%D7%95%D7%93%D7%93%D7%95%D7%AA-%D7%A2%D7%9D-%D7%AA%D7%A7%D7%95%D7%A4%D7%AA-%D7%91%D7%A6%D7%95%D7%A8%D7%AA-%D7%91%D7%9E%D7%A9%D7%A7-%D7%94%D7%9E%D7%99%D7%9D-%D7%9C%D7%A9%D7%A0%D7%99%D7%9D-2018-2030.pdf",open
+A-0224,304,intentional-change,"Text fix '.)GSI & Tahal Reports, 2011)' -> '(GSI & Tahal Reports, 2011).': End of the same citation run.",open
+A-0225,305,intentional-change,"Text fix '(Neev and Emery, 1967 (.' -> '(Neev and Emery, 1967).': Closing bracket after a Latin run.",open
+A-0226,305,intentional-change,Text fix '9 /1978' -> '1978/9': Print reads 1978/9 (winter 1978-79).,open
+A-0227,308,intentional-change,a36-poem1: verse set as a poem (34 lines),open
+A-0228,309,intentional-change,"Text fix '0 1. רז, אלי' -> '10. רז, אלי': Entry number 10 came out as 0 1.",open
+A-0229,309,hyphen,Joined a line-end hyphen: 'Collapse-',open
+A-0230,309,intentional-change,"Correction 'תרח""ץ' -> 'תרצ""ח': Letters swapped in the Hebrew year. The entry is dated 1938, which is תרצ""ח (5698). Evidence: https://www.hebcal.com/converter?cfg=json&gy=1938&gm=6&gd=1&g2h=1",open
+A-0231,310,hyphen,Joined a line-end hyphen: 'High-',open
+A-0232,310,intentional-change,"Correction 'Geological Society of America Bulletin, v.116,pp. 555–571' -> 'Geological Survey of Israel Bulletin 63': Begin, Ehrlich and Nathan 1974 is Geological Survey of Israel Bulletin 63. GSA Bulletin 116: 555-571 is a different paper (Bookman/Ken-Tor et al. 2004, doi:10.1130/B25286.1). Evidence: https://www.cambridge.org/core/books/abs/quaternary-of-the-levant/lake-lisan/CF25D6DE02054F2F38A24D91617CBC85",open
+A-0233,311,intentional-change,"Text fix 'Ehrenberg, C.G. 54.מובא' -> '54. Ehrenberg, C.G. מובא': Entry 54 starts its own line in print; the label came out after the Latin run (errata/print-check.md row 68).",open
+A-0234,311,intentional-change,"Text fix 'I onescu,D.' -> 'Ionescu,D.': Print reads Ionescu.",open
+A-0235,311,intentional-change,Correction 'Coyn and Bellier' -> 'Coyne and Bellier': The firm name is Coyne et Bellier (same entry as a35-p070). Evidence: https://www.eib.org/attachments/registers/82425040.pdf,open
+A-0236,311,intentional-change,"Correction 'pp. 31–41' -> 'pp. 33–41': Oren 1983, Limnology and Oceanography 28(1): pages 33-41 (Crossref). Evidence: https://api.crossref.org/works/10.4319/lo.1983.28.1.0033",open
+A-0237,316,reuse,Image xref 1379 repeats; first file p001-x1379.jpeg,open
+A-0238,316,info,p316-x1379.jpeg: no caption next to this image in print,open
+A-0239,0,intentional-change,a09-p011: cross-reference to a20-h is a link,open
+A-0240,0,intentional-change,a10-p003: cross-reference to a09-h is a link,open
+A-0241,0,intentional-change,a10-p029: cross-reference to a11-h is a link,open
+A-0242,0,intentional-change,a14-p008: cross-reference to a13-h is a link,open
+A-0243,0,intentional-change,a14-p013: cross-reference to a34-h is a link,open
+A-0244,0,intentional-change,a14-p024: cross-reference to a31-h is a link,open
+A-0245,0,intentional-change,a22-p013: cross-reference to a10-h is a link,open
+A-0246,0,intentional-change,a22-p017: cross-reference to a13-h is a link,open
+A-0247,0,intentional-change,a27-p008: cross-reference to a18-h is a link,open
+A-0248,0,intentional-change,a27-p039: cross-reference to a17-h is a link,open
+A-0249,0,intentional-change,a29-p007: cross-reference to a33-h is a link,open
+A-0250,0,intentional-change,a34-p018: cross-reference to a14-h is a link,open
+A-0251,0,intentional-change,a35-p038: cross-reference to a36-h is a link,open
+A-0252,0,intentional-change,a35-p048: cross-reference to a36-h is a link,open
+A-0253,0,intentional-change,a36-p009: cross-reference to a14-h is a link,open
+A-0254,0,intentional-change,a36-p042: cross-reference to a14-h is a link,open
+A-0255,0,intentional-change,a36-p063: cross-reference to a35-h is a link,open

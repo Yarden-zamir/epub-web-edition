@@ -1112,6 +1112,15 @@ reason = "Google Earth print use needs Google plus the imagery providers next to
 # Better originals of printed figures (pd-sources/REPORT.md, matches.tsv; same image by SIFT + RANSAC).
 # Cropped to the printed crop by scripts/crop_to_print.py; long side at most 2000 px, JPEG quality 85.
 [[release.change]]
+image = "p021-x103"
+action = "replace"
+file = "replacements/p021-x103-photographer.jpg"
+mask = false  # Same photograph, credited in the printed caption; the facsimile page keeps it.
+alt = "מבט מגובה על מפרץ ים המלח: כתם מים חום־כתום עגול בתוך המים הטורקיזיים, בין מצוקים."
+note = "במהדורה זו: הקובץ של הצלם, ברזולוציה גבוהה יותר, של אותו תצלום. המסגרת צרה מעט בצד ימין, כי הקובץ נגמר שם."
+reason = "Photographer's file (Moshe Bernstein, received 2026-11-24; provenance/cover-photo.md), 1942 x 1019, about 2.1x the printed 1009 x 477; SIFT 703 of 713 inliers. About 10% narrower on the right than the print."
+
+[[release.change]]
 image = "p044-x185"
 action = "replace"
 file = "replacements/p044-x185-british-library.jpg"
