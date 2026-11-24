@@ -10,7 +10,7 @@ OEBPS/images/p018-x64.jpeg,5d79bce89f6112a5efc1943511aaf3b0fba6461aba79146b0e340
 OEBPS/images/p019-x68.jpeg,bc0a99b611fdb512fa044996e713d1dc4a8851cf9e5660e502383489243b4c3b,19,68,1009x652,unmodified PDF image stream,pending
 OEBPS/images/p020-x85.jpeg,1d968545efc4b01ec7adec32eeb913056a0719dd4130c49456df3d0ce05a205c,20,85,480x546,unmodified PDF image stream,pending
 OEBPS/images/p020-x87.jpeg,2c77ec6a84dfede8a1227d7e9f21246f19b0a055c339d726ac2e15124ab5a591,20,87,252x194,unmodified PDF image stream,pending
-OEBPS/images/p020-x82-masked.png,09ce1de5c1954dbb059981fa76be8f19e323e6452356ecdb0c5d182aeaf3a797,20,82,432x370,PDF image stream with its soft mask applied (lossless PNG),pending
+OEBPS/images/p020-x82.jpeg,f5a462df44fb2789f2c5ef33c5d03bc78446259735cd862f9c2bc096f27ecb9c,20,82,432x370,unmodified PDF image stream; its soft mask is opaque (alpha 250 or more) and left out,pending
 OEBPS/images/p020-x91-masked.png,7e54f2363069f293462e71bccc56cb7ae301a2acad41a534cfff56c26d7a7426,20,91,432x370,PDF image stream with its soft mask applied (lossless PNG),pending
 OEBPS/images/p020-x93.jpeg,80c8ef2eabbf59f885b9b83620918e3e5c964a18e54e221d266348f7d2e7eb75,20,93,338x256,unmodified PDF image stream,pending
 OEBPS/images/p020-x95.jpeg,b3b5a50447ebfcfee534f5ebe3837e50849ffcb6b6c131bb34339ece006c724f,20,95,247x296,unmodified PDF image stream,pending
@@ -88,13 +88,13 @@ OEBPS/images/p121-x482.jpeg,77a658b23bcc993b74276a3b9cad5fa262d69f75ee6faa0e3315
 OEBPS/images/p122-x486.jpeg,6fc8c8f31a0de0f5f783a8f35cfe18152c8a39d9ac4e895abf97d30d907fcad2,122,486,709x444,unmodified PDF image stream,pending
 OEBPS/images/p123-x490.jpeg,dade86a502890dc7c1459e29be33bd4bb06f9c608d1a63891cff69039c1891c7,123,490,709x520,unmodified PDF image stream,pending
 OEBPS/images/p124-x494.jpeg,3f4516912494b3683b82f7a3590fee48c7c94aaef1dcdd5bb355adecc005bad2,124,494,260x639,unmodified PDF image stream,pending
-OEBPS/images/p125-x500-masked.png,158b2b09a262f51eb1269957ea89be6b36f5ba0d5a2ac503ab141078024e56ba,125,500,1009x1097,PDF image stream with its soft mask applied (lossless PNG),pending
+OEBPS/images/p125-x500.jpeg,9dc9ef45b98d9b1a3102b42a5ac7cb2d404d797a80f21734f20d6fbf2c9e7130,125,500,1009x1097,unmodified PDF image stream; its soft mask is opaque (alpha 250 or more) and left out,pending
 OEBPS/images/p126-x505.jpeg,dd2524eb1aebe6df950b33256aaadce3a1e8762706f85dedd19c9a96e5d4f35c,126,505,589x926,unmodified PDF image stream,pending
 OEBPS/images/p127-x509.jpeg,0da928e228d4ecccdfd93c93e07ded1756d96946d47de04f9300cb338d24052e,127,509,1009x477,unmodified PDF image stream,pending
 OEBPS/images/p129-x515.jpeg,31d9652c24ffda6bd559d50ecf8da714df66194353e460bf799537eb283488d8,129,515,709x357,unmodified PDF image stream,pending
 OEBPS/images/p129-x517-render.jpg,20d31198f66ef8d6e1257979b51d50bb328b4f855f10a0be3ec5d44a6067207e,129,517,398x224,page region rendered at 84 dpi: placed rotated or mirrored in print; original stream kept in work/originals,pending
 OEBPS/images/p133-x527.png,d6a7d108b897672f434ceccfefe44b35edc06ad5a293feec9404f7e0456993df,133,527,678x449,unmodified PDF image stream,pending
-OEBPS/images/p135-x535-masked.png,a6531647b05e8233285224ade94620ea5fe2a0fa93f28bd18e16fa653debc65e,135,535,1009x477,PDF image stream with its soft mask applied (lossless PNG),pending
+OEBPS/images/p135-x535.png,3bd6293f9007562b0d2a4cf2613e60def53d1ca160ef7e8266aec7dcc39399bf,135,535,1009x477,unmodified PDF image stream; its soft mask is opaque (alpha 250 or more) and left out,pending
 OEBPS/images/p136-x540.jpeg,e9738a131c1b735be76c84f339628631d02479bbb0cf86e5cd6bd09b7516a7ce,136,540,709x377,unmodified PDF image stream,pending
 OEBPS/images/p136-x544-masked.png,fae5891cfc5ab142f2cb62b48a498c2c9357337691b9b3c8d01f24a15ba4c032,136,544,359x402,PDF image stream with its soft mask applied (lossless PNG),pending
 OEBPS/images/p137-x549.png,e19060915da5e52fa754d880aa820271f8ba9205125ccd4e4e63697e2e3d1fef,137,549,488x294,unmodified PDF image stream,pending

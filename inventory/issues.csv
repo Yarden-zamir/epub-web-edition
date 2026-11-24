@@ -12,7 +12,7 @@ A-0010,18,info,p018-x64.jpeg: no caption next to this image in print,open
 A-0011,19,info,p019-x68.jpeg: no caption next to this image in print,open
 A-0012,20,info,p020-x85.jpeg: no caption next to this image in print,open
 A-0013,20,info,p020-x87.jpeg: no caption next to this image in print,open
-A-0014,20,info,p020-x82-masked.png: no caption next to this image in print,open
+A-0014,20,info,p020-x82.jpeg: no caption next to this image in print,open
 A-0015,20,info,p020-x91-masked.png: no caption next to this image in print,open
 A-0016,20,info,p020-x95.jpeg: no caption next to this image in print,open
 A-0017,20,info,a05-p004: paragraph continues across the page break (marker kept inside),open
@@ -75,7 +75,7 @@ A-0073,115,info,p115-x444.jpeg: no caption next to this image in print,open
 A-0074,117,info,p117-x458.jpeg: no caption next to this image in print,open
 A-0075,118,info,p118-x464.jpeg: no caption next to this image in print,open
 A-0076,120,info,a14-p052: paragraph continues across the page break (marker kept inside),open
-A-0077,125,info,p125-x500-masked.png: no caption next to this image in print,open
+A-0077,125,info,p125-x500.jpeg: no caption next to this image in print,open
 A-0078,126,info,p126-x505.jpeg: no caption next to this image in print,open
 A-0079,127,intentional-change,"Text fix 'וסביבתו) Siwa,' -> 'וסביבתו (Siwa,': Opening bracket before a Latin run.",open
 A-0080,127,info,p127-x509.jpeg: no caption next to this image in print,open

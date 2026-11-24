@@ -96,3 +96,8 @@ span.indent-3 { padding-right: 3em; padding-inline-start: 3em; }
 span.indent-4 { padding-right: 4em; padding-inline-start: 4em; }
 span.indent-5 { padding-right: 5em; padding-inline-start: 5em; }
 span.indent-6 { padding-right: 6em; padding-inline-start: 6em; }
+
+/* Edition corrections (book.toml [[correction]]): the corrected text reads as normal text; a small dagger links
+   to an edition note with the printed form (a footnote, so Kindle shows it as a pop-up). */
+a.edition-mark { font-size: 0.7em; vertical-align: super; line-height: 0; text-decoration: none; }
+aside.edition-correction { font-size: 0.8em; }

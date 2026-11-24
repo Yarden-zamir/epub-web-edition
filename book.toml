@@ -5,6 +5,8 @@ pdf = "~/private-inputs/eli-raz/source-2026-11-23/source.pdf"
 pdf_sha256 = "c7efc94efd4cbd42bf9d479a20ff1af763e017ec0ce1cfab75d2be7e3560e994"
 # Ornaments that are not book content. Checked visually on PDF pages 6-7.
 decorative = ["p006-x17", "p007-x21"]
+# Reader note before the printed form of a [[correction]] (an edition note at the end of the chapter).
+correction_note = "תיקון של מהדורה זו. בדפוס:"
 
 # Wrong code points in the PDF text layer, mapped to what the print shows.
 # U+0007: InDesign "indent to here" after note and source numbers (130 cases). Prints as a space.
@@ -224,6 +226,12 @@ rows = [
   ["אלעזרי־וולקני, 1940", "", "", "", "245"],
 ]
 replaces = ["a35-p062", "a35-p063", "a35-p064", "a35-p065", "a35-p066", "a35-p067"]
+
+# Corrections of proven errors in the print (approved by Yarden 2026-11-24). Both editions apply them.
+# Format: [[correction]] page = PDF page, find = printed text inside one printed line (once), replace = corrected
+# text, reason = what is wrong, evidence = the source that proves it. The reader sees the corrected text with a
+# dagger that links to an edition note with the printed form (correction_note above). Apply only entries marked
+# verified in errata/ERRATA.md, and add each one to CONTENT-CHANGES.md.
 
 # Text left out on purpose. Each entry is logged as an intentional change.
 [[omit]]
