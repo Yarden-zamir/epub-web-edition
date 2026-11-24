@@ -240,7 +240,7 @@ class Converter:
         self.kinds.append(kind)
         if chapter and top is not None:
             self.kind_of[chapter] = kind
-            self.chapter_title[chapter], self.byline[chapter] = title_and_byline(top, kind)
+            self.chapter_title[chapter], self.byline[chapter] = title_and_byline(top)
         for el in body.iter():
             el.tag = local(el.tag)
             attrs = dict(el.attrib)
@@ -278,9 +278,9 @@ class Converter:
                 self.chapter_of[el_id] = chapter
             if el.tag == "section" and el_id:
                 heading = next((h for h in el if local(h.tag) in ("h1", "h2", "h3")), None)
-                section = clean_text(heading) if heading is not None else section
+                section = reading_text(heading) if heading is not None else section
             indexed = el.tag in INDEXED_TAGS or (el.tag == "span" and "line" in (el.get("class") or "").split())  # Poem lines.
-            if el_id and indexed and (text := clean_text(el)):
+            if el_id and indexed and (text := reading_text(el)):
                 self.search.append(SearchEntry(el_id, page, section, text))
         images = {fig.get("id"): img.get("src") for fig in body.iter("figure")
                   if fig.get("id") and (img := fig.find(".//img")) is not None}
@@ -320,6 +320,20 @@ def clean_text(el: ET.Element) -> str:
     return " ".join("".join(el.itertext()).split())
 
 
+def reading_text(el: ET.Element) -> str:
+    """clean_text without note markers (noteref links such as "*" or "†"), for titles, section names and search text.
+    Works before and after conversion (epub:type or data-epub-type)."""
+    def runs(e: ET.Element):
+        yield e.text or ""
+        for child in e:
+            if local(child.tag) == "br":  # A printed line break reads as a space.
+                yield " "
+            elif "noteref" not in (child.get(f"{{{OPS}}}type") or child.get("data-epub-type") or "").split():
+                yield from runs(child)
+            yield child.tail or ""
+    return " ".join("".join(runs(el)).split())
+
+
 def text_slots(el: ET.Element) -> list[tuple[ET.Element, str]]:
     """(owner, "text" or "tail") for every run of text inside el, in reading order, outside links and buttons."""
     slots = [(el, "text")]
@@ -343,21 +357,14 @@ def wrap_text(root: ET.Element, owner: ET.Element, slot: str, start: int, end: i
     return new
 
 
-def title_and_byline(top: ET.Element, kind: str) -> tuple[str, tuple[str, str | None] | None]:
+def title_and_byline(top: ET.Element) -> tuple[str, tuple[str, str | None] | None]:
     """Heading text of a top-level section, and its first byline paragraph (text, lang) if it has one.
-    A part title continues in the display-title paragraphs right after its heading (print splits it in two)."""
+    A printed line break in the heading (br) reads as a space; a subtitle is its own p.subheading, not part of the title."""
     children = list(top)
     heading = next((c for c in children if local(c.tag) in ("h1", "h2", "h3")), None)
     if heading is None:
         return "", None
-    # A heading can end with a source-note asterisk and run on into a subtitle; keep the title part.
-    title = clean_text(heading).split("*", 1)[0].strip()
-    if kind == "part":
-        for el in children[children.index(heading) + 1:]:
-            if local(el.tag) == "p" and "display-title" in (el.get("class") or "").split():
-                title += " " + clean_text(el)
-            elif local(el.tag) != "span":  # Page markers sit between the lines.
-                break
+    title = reading_text(heading)
     byline = next((c for c in children if local(c.tag) == "p" and "byline" in (c.get("class") or "").split()), None)
     lang = byline.get(f"{{{XML}}}lang", byline.get("lang")) if byline is not None else None
     return title, ((clean_text(byline), lang) if byline is not None else None)
