@@ -32,7 +32,7 @@ threading.Thread(target=srv.serve_forever, daemon=True).start()
 problems = []
 with sync_playwright() as p:
     browser = p.chromium.launch()
-    for width, height in ((393, 852), (1280, 900)):
+    for width, height in ((360, 740), (393, 852), (1280, 900)):
         for scheme in ("light", "dark"):
             page = browser.new_page(viewport={"width": width, "height": height}, color_scheme=scheme, reduced_motion="reduce")
             errors: list[str] = []
