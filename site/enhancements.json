@@ -205,5 +205,12 @@
       "title": "מפלס ים המלח לפי מדידות רשות המים",
       "unit": "מפלס (מטר, ביחס לפני הים)"
     }
+  },
+  "hero": {
+    "image": "site/media/kedem-flood.jpg",
+    "alt": "מבט אוויר על חוף ים המלח בנחל קדם תחת שמים סוערים: מצוקי העתקים שכבתיים, מפל צר בערוץ, ושיטפון חום שנשפך אל המים הירוקים־טורקיז ויוצר כתם סחף גדול.",
+    "credit": "צילום: משה ברנשטיין",
+    "caption": "פטריית סחף שטפונית על נחל קדם",
+    "source": "Photographer's file from Eli Raz's Drive share (received 2026-11-24); the same photograph as the printed cover (provenance/cover-photo.md). Bottom 58 px cropped to remove the photographer's signature; credited instead."
   }
 }

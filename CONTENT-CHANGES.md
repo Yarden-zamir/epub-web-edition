@@ -44,6 +44,7 @@ Add an entry in the same change that makes it. Newest first within each section.
 
 | Date | What | Source |
 |---|---|---|
+| 2026-11-24 | Cover photograph (Moshe Berenstein, flood plume at Nahal Kedem) in its wider original frame for the web hero, credited "צילום: משה ברנשטיין"; the photographer's signature strip (bottom 58 px) cropped off | Photographer's file from Eli Raz's Drive share; same photograph as the cover (provenance/cover-photo.md) |
 | 2026-11-24 | site/crosslinks.json: 17 links where the text names another chapter of the book, each from the printed phrase to that chapter's heading | Book text; checked by content-data/scripts/check_content_data.py |
 | 2026-11-24 | site/glossary.json: 51 geological and local terms that the book explains, each with a near-quote definition and the exact source text | Book text at each term's source element |
 | 2026-11-24 | site/timeline.json: 62 dated events (12 major) from Eli Raz's life and the book, each with the exact sentence and its paragraph | Book text; only dates that the text gives (notes in content-data/places.md) |
