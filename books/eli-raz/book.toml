@@ -969,12 +969,17 @@ fonts = "fonts"      # Noto Sans Hebrew (SIL OFL) as the bundled fallback.
 # The complete edition keeps every printed image. Evidence for each entry: clearance record of 2026-11-24.
 # Images that stay carry an edition credit with the source record and the licence. All of them are crops of the source.
 
+# Legal notices of the release edition, shown once on the title page after the printed credits.
+# Copernicus DEM licence, Article 6(c) (clauses in content-data/attribution.md; text from the maps agent, work/maps/HANDOFF.md).
+[[release.notice]]
+text = "הגופים האחראים לתוכנית קופרניקוס על פי דין או מכוח האצלה אינם נושאים באחריות כלשהי לשימוש כלשהו ב־Copernicus WorldDEM™-90 וב־Copernicus WorldDEM-30."
+
 [[release.change]]
 image = "p066-x251"
 action = "replace"
 file = "replacements/p066-x251-open-map.jpg"
 alt = "מפת תבליט מדושנבה ועד פסגת לנין: קו מקווקו של טיסה מדושנבה למנחת בג'ירגיטל, וקו מנוקד של מסוק משם אל מחנה הבסיס באצ'יקטש שבעמק אלאי, מצפון לרכס טרנס־אלאי ולגבול טג'יקיסטן וקירגיזסטן. במפה מוגדלת שמתחת: מחנה הבסיס, המחנה הראשון, המחבת שבה אירע האסון ופסגת לנין, בין קרחונים, עם קנה מידה של 2 ק\"מ. בפינה מפת התמצאות של מרכז אסיה."
-note = "מפה חלופית חדשה למהדורה זו. מקומות, מחנות וקרחונים: OpenStreetMap (רישיון ODbL). גבולות ונהרות: Natural Earth (נחלת הכלל). תבליט: Copernicus DEM (האיחוד האירופי ו־ESA). קווי הטיסה והמסוק ישרים וסכמטיים. המפה המודפסת אינה נכללת עד לבירור זכויותיה."
+note = "מפה חלופית חדשה למהדורה זו. קווי הטיסה והמסוק ישרים וסכמטיים. המפה המודפסת אינה נכללת עד לבירור זכויותיה. נתוני מפה: © OpenStreetMap, openstreetmap.org/copyright. גבולות ונהרות: Natural Earth. תבליט: produced using Copernicus WorldDEM™-90 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved. produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved."
 reason = "Printed map looks like a Google Maps screenshot without attribution. Replacement drawn by scripts/pamir_map.py from OSM, Natural Earth and Copernicus DEM; sources in the script and in site/figure-maps/fig-a10-02.json."
 
 [[release.change]]
@@ -988,7 +993,7 @@ image = "p301-x1169"
 action = "replace"
 file = "replacements/p301-x1169-open-map.jpg"
 alt = "מפת תבליט מעקבה ועד עמאן ומהים התיכון ועד מדבר ירדן: קו רצוף של מי ים סוף מעקבה צפונה לאורך הערבה בצד הירדני אל מתקן התפלה בקרבת ים המלח, המסומן בעיגול מקווקו כמיקום משוער; קו כפול של מי ים ורכז מהמתקן אל ים המלח; וקו מקווקו של מים מותפלים מהמתקן לעמאן. מקרא עם הכמויות של שלב א': 500, 400 ו־100 מלמ\"ש, וקנה מידה של 50 ק\"מ."
-note = "מפה סכמטית חדשה שצוירה למהדורה זו לפי הטקסט בפרק. היא אינה האיור של ביין וחובריו (2020), שאינו נכלל עד לקבלת רשות מבעלי הזכויות. התוואי ומיקום מתקן ההתפלה משוערים. מקומות וים המלח: OpenStreetMap (רישיון ODbL). גבולות: Natural Earth (נחלת הכלל). תבליט: Copernicus DEM (האיחוד האירופי ו־ESA)."
+note = "מפה סכמטית חדשה שצוירה למהדורה זו לפי הטקסט בפרק. היא אינה האיור של ביין וחובריו (2020), שאינו נכלל עד לקבלת רשות מבעלי הזכויות. התוואי ומיקום מתקן ההתפלה משוערים. נתוני מפה: © OpenStreetMap, openstreetmap.org/copyright. גבולות: Natural Earth. תבליט: produced using Copernicus WorldDEM™-90 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved."
 reason = "Printed figure (Bein et al. 2020 on a satellite base map) is not cleared. New schematic map from the book text (a36-p044, a36-p045, a36-p048, caption of fig-a36-09) by scripts/jordan_maps.py."
 
 [[release.change]]
@@ -996,7 +1001,7 @@ image = "p302-x1173"
 action = "replace"
 file = "replacements/p302-x1173-open-view.jpg"
 alt = "מבט תלת־ממדי מדרום־מערב לכיוון צפון־מזרח על רמת המדבר הירדני: בפינה השמאלית התחתונה בריכות האידוי בדרום ים המלח, מעליהן מצוק הבקע. על שפת הרמה עוברת דרך המלך (כביש 35) דרך טפילה וכרכ, ומאחוריה, ברמה, הכביש המדברי (כביש 15) דרך אל־חסא וקטרנה, שלאורכו עובר מוביל דיסי–עמאן. חץ אדום מצביע צפונה לעמאן."
-note = "מבט חדש שצויר למהדורה זו מנתונים פתוחים, במקום תצלום Google Earth שאינו נכלל. הגבהים מוגדלים פי 2. כבישים ויישובים: OpenStreetMap (רישיון ODbL). תבליט: Copernicus DEM (האיחוד האירופי ו־ESA). מוביל דיסי–עמאן עובר בתחום הדרך של הכביש המדברי, לפי סקר ההשפעה על הסביבה של המוביל (Consolidated Consultants, 2008). במבט זה הכביש המדברי, 'הנתיב האופקי' שבכיתוב, עובר באלכסון. תוואי החלופות שבתצלום המקורי אינם מוצגים."
+note = "מבט חדש שצויר למהדורה זו מנתונים פתוחים, במקום תצלום Google Earth שאינו נכלל. הגבהים מוגדלים פי 2. מוביל דיסי–עמאן עובר בתחום הדרך של הכביש המדברי, לפי סקר ההשפעה על הסביבה של המוביל (Consolidated Consultants, 2008). במבט זה הכביש המדברי, 'הנתיב האופקי' שבכיתוב, עובר באלכסון. תוואי החלופות שבתצלום המקורי אינם מוצגים. נתוני מפה: © OpenStreetMap, openstreetmap.org/copyright. תבליט: produced using Copernicus WorldDEM™-90 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved."
 reason = "Google Earth print use needs Google plus the imagery providers next to the image; the print shows only 'Google' and the providers cannot be recovered. New perspective view by scripts/jordan_maps.py from OSM and Copernicus DEM."
 
 [[release.credit]]

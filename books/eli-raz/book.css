@@ -101,3 +101,7 @@ span.indent-6 { padding-right: 6em; padding-inline-start: 6em; }
    to an edition note with the printed form (a footnote, so Kindle shows it as a pop-up). */
 a.edition-mark { font-size: 0.7em; vertical-align: super; line-height: 0; text-decoration: none; }
 aside.edition-correction { font-size: 0.8em; }
+
+/* Cover page (EPUB only): the render of the printed cover, one screen high. */
+section.cover-image { margin: 0; padding: 0; text-align: center; page-break-after: always; break-after: page; }
+section.cover-image img { max-width: 100%; max-height: 100vh; height: auto; }
