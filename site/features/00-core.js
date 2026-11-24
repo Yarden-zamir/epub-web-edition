@@ -264,6 +264,8 @@ function finishSizing(el = null) {
   measure(docs);
   return docs.length > 0;
 }
+// Two runs can overlap (a font arrives while the first one runs). They take from the same list, so they only finish
+// sooner.
 async function sizeDocumentsInSlices() {
   unsized = allDocuments();
   // The first slice waits for the next frame, so the page (or a deep link's target) paints before the slices start.
@@ -275,9 +277,9 @@ async function sizeDocumentsInSlices() {
   }
 }
 sizeDocumentsInSlices();
-// The fonts are preloaded and usually loaded before this deferred script runs. Then the first measure is final, and a
-// second one would only repeat a full-page layout (the costliest task of a load on a phone).
-if (document.fonts.status !== "loaded") document.fonts.ready.then(sizeDocuments);
+// The fonts are preloaded and usually loaded before this deferred script runs. Then the first measure is final. When a
+// font still loads (a deep link can open on text that uses one first), measure again in slices once it is there.
+if (document.fonts.status !== "loaded") document.fonts.ready.then(sizeDocumentsInSlices);
 {
   let width = innerWidth, timer = 0;
   addEventListener("resize", () => {
