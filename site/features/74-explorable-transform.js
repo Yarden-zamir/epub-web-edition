@@ -1,9 +1,9 @@
 // The Dead Sea transform (figure fig-a18-05). A schematic map, north up: the west block (Sinai–Israel)
 // stays still and the east block (Arabia–Jordan) slides north along the fault. The fault steps to the
-// left (west) three times; at each step the blocks move apart and a basin opens. The basin colour lies
-// behind both blocks, so only the east block moves, by a transform. The control value is the slip in km.
+// left (west) three times; at each step the blocks move apart and a basin opens: the sea colour lies behind
+// both blocks and shows through the gap. The control value is the slip in km.
 explorableKit.kinds.transform = (() => {
-const { svgEl, svgText, number } = explorableKit;
+const { number, iso, ramp, shape } = explorableKit;
 
 const W = 360, H = 600;
 const TOP_KM = 455, S = 0.9; // Drawing units per km along the fault.
@@ -21,77 +21,134 @@ function trace(north, south) {
   pts.push([SEGMENTS.at(-1)[0], north]);
   return pts.reverse();
 }
-const d = (pts) => "M" + pts.map(([x, y]) => `${x} ${y.toFixed(1)}`).join(" L") + " Z";
 const faultX = (km) => SEGMENTS.find(([, stepKm]) => km < stepKm)[0];
 
-function valueText(km, spec) {
-  return `${number(km)} ${spec.control.unit} צפונה`;
+function valueParts(km, spec) {
+  return { num: number(km), unit: `${spec.control.unit} צפונה`, note: "" };
 }
 
-function mount(svg, spec, api) {
+function create(spec) {
   const L = spec.labels;
   const t = spec.texts;
   const { max } = spec.control;
-  const id = svg.closest("figure").id;
-  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   const extra = max * S + 20; // The east block reaches below the frame, so moving it north leaves no hole.
   const fault = trace(-20, H + extra);
-  const westShape = d([[0, -20], ...fault.slice(0, -1), [fault.at(-1)[0], H + 20], [0, H + 20]]);
-  const eastShape = d([[W, -20], ...fault, [W, H + extra]]);
-  const defs = svgEl("defs", {}, svg);
-  svgEl("path", { d: westShape }, svgEl("clipPath", { id: `${id}-west` }, defs));
-  svgEl("path", { d: eastShape }, svgEl("clipPath", { id: `${id}-east` }, defs));
-
-  svgEl("rect", { class: "tf-basin", x: 0, y: 0, width: W, height: H }, svg);
-  svgEl("path", { class: "tf-west", d: westShape }, svg);
-  const copper = (parent, side) => svgEl("ellipse", {
-    class: "tf-copper", cx: COPPER.x, cy: Y(COPPER.km), rx: COPPER.rx, ry: COPPER.ry, "clip-path": `url(#${id}-${side})`,
-  }, parent);
-  copper(svg, "west");
-  const east = svgEl("g", { class: "tf-east" }, svg);
-  svgEl("path", { class: "tf-plate-east", d: eastShape }, east);
-  copper(east, "east");
-
-  const label = (text, attrs, parent = svg) =>
-    svgText(text, { class: "xp-label", "text-anchor": "middle", ...attrs }, parent);
-  const lines = (text, x, y, parent) => text.split("–").forEach((part, i, all) =>
-    label(i < all.length - 1 ? `${part}–` : part, { x, y: y + i * 17 }, parent));
-  lines(L.west_plate, 72, Y(260), svg);
-  lines(L.east_plate, 290, Y(250), east);
-  svgEl("path", { class: "tf-arrow", d: `M290 ${Y(200)} V${Y(150)} M282 ${Y(192)} L290 ${Y(200)} L298 ${Y(192)}` }, east);
-  label(L.feinan, { x: COPPER.x + 30, y: Y(COPPER.km) + 4, "text-anchor": "end" }, east);
-  label(L.timna, { x: COPPER.x - 26, y: Y(COPPER.km) + 4, "text-anchor": "start" });
-  svgEl("circle", { class: "tf-town", cx: faultX(EILAT_KM) - 5, cy: Y(EILAT_KM), r: 3.5 }, svg);
-  label(L.eilat, { x: faultX(EILAT_KM) - 12, y: Y(EILAT_KM) + 4, "text-anchor": "start", class: "xp-label xp-minor" });
-  label(`↑ ${L.north}`, { x: 12, y: 18, "text-anchor": "end", class: "xp-label xp-compass" });
-
-  // One label per basin, west of it; it moves to the basin's middle and shows once the basin is open.
-  const basins = SEGMENTS.slice(0, -1).map(([, stepKm], i) => {
-    const g = svgEl("g", { class: "tf-basin-label" }, svg);
-    label(L.basins[i], { x: SEGMENTS[i + 1][0] - 8, y: 4, "text-anchor": "start" }, g);
-    return { g, stepKm };
-  });
-
-  const grip = svgEl("g", { class: "tf-grip", transform: `translate(290 ${Y(90)})` }, east);
-  svgEl("circle", { r: 16 }, grip);
-  svgEl("path", { d: "M0 -9 L-5 -4 M0 -9 L5 -4 M0 -9 V9 M0 9 L-5 4 M0 9 L5 4" }, grip);
-  api.drag(grip, (point, start) => api.setValue(Math.min(max, Math.max(0, start.value + (start.point.y - point.y) / S))));
-
+  const westShape = shape([[0, -20], ...fault.slice(0, -1), [fault.at(-1)[0], H + 20], [0, H + 20]]);
+  const eastShape = shape([[W, -20], ...fault, [W, H + extra]]);
+  const faultLine = shape(fault, false);
+  const ripples = new Path2D();
+  for (let y = 40; y < H; y += 26) { // Texture in the basins only.
+    ripples.moveTo(108, y);
+    for (let x = 108; x < 248; x += 12) ripples.quadraticCurveTo(x + 3, y - 3, x + 6, y), ripples.quadraticCurveTo(x + 9, y + 3, x + 12, y);
+  }
+  const arrow = shape([[290, Y(150)], [281, Y(150) + 14], [287, Y(150) + 14], [287, Y(150) + 48], [293, Y(150) + 48], [293, Y(150) + 14], [299, Y(150) + 14]]);
+  const copper = new Path2D();
+  copper.ellipse(COPPER.x, Y(COPPER.km), COPPER.rx, COPPER.ry, 0, 0, Math.PI * 2);
   const list = new Intl.ListFormat("he", { type: "conjunction" });
-  return (km) => {
-    east.setAttribute("transform", `translate(0 ${(-km * S).toFixed(1)})`);
+  let dots = null, dotsColor = "";
+
+  function texture(ctx, env) {
+    // A small dot pattern for the rock, made once per theme.
+    const color = env.color("--xp-dot");
+    if (color !== dotsColor) {
+      const tile = document.createElement("canvas");
+      tile.width = tile.height = 9;
+      const tc = tile.getContext("2d");
+      tc.fillStyle = color;
+      tc.beginPath(); tc.arc(2, 2, 0.9, 0, Math.PI * 2); tc.arc(6.5, 6.5, 0.7, 0, Math.PI * 2); tc.fill();
+      dots = ctx.createPattern(tile, "repeat");
+      dotsColor = color;
+    }
+    return dots;
+  }
+  function plate(ctx, env, path, key, top, bottom) {
+    ctx.fillStyle = env.gradient(key, 0, 0, 0, H, [[0, top], [1, bottom]]);
+    ctx.fill(path);
+    ctx.fillStyle = texture(ctx, env);
+    ctx.fill(path);
+  }
+  function ore(ctx, env, clip) {
+    ctx.save();
+    ctx.clip(clip);
+    ctx.fillStyle = env.color("--xp-copper");
+    ctx.fill(copper);
+    ctx.strokeStyle = env.color("--xp-copper-edge");
+    ctx.lineWidth = 1;
+    ctx.stroke(copper);
+    ctx.restore();
+  }
+  function lines(ctx, env, text, x, y) {
+    text.split("–").forEach((part, i, all) => env.label(ctx, i < all.length - 1 ? `${part}–` : part, x, y + i * 17));
+  }
+
+  function draw(ctx, km, env) {
+    const u = env.unit;
+    ctx.fillStyle = env.gradient("sea", 0, 0, W, 0, [[0, "--xp-basin-light"], [1, "--xp-basin"]]);
+    ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = "rgb(255 255 255 / 0.16)";
+    ctx.lineWidth = 1;
+    ctx.save();
+    ctx.translate((env.time * 3) % 12 - 12, Math.sin(env.time * 0.8) * 2); // Ripples drift slowly in the basins.
+    ctx.stroke(ripples);
+    ctx.restore();
+    plate(ctx, env, westShape, "west", "--xp-plate-a", "--xp-plate-a-deep");
+    ore(ctx, env, westShape);
+    ctx.lineJoin = "round";
+
+    ctx.save();
+    ctx.translate(0, -km * S);
+    ctx.save();
+    ctx.translate(3, 0);
+    ctx.strokeStyle = env.color("--xp-shadow");
+    ctx.lineWidth = 6;
+    ctx.stroke(faultLine);
+    ctx.restore();
+    plate(ctx, env, eastShape, "east", "--xp-plate-b", "--xp-plate-b-deep");
+    ctx.strokeStyle = env.color("--ink");
+    ctx.lineWidth = 1.5;
+    ctx.stroke(faultLine);
+    ore(ctx, env, eastShape);
+    ctx.fillStyle = env.color("--ink");
+    ctx.fill(arrow);
+    lines(ctx, env, L.east_plate, 290, Y(250));
+    env.label(ctx, L.feinan, COPPER.x + 30, Y(COPPER.km) + 4, { align: "left" });
+    ctx.restore();
+    ctx.strokeStyle = env.color("--ink");
+    ctx.lineWidth = 1.5;
+    ctx.stroke(faultLine);
+
+    lines(ctx, env, L.west_plate, 72, Y(260));
+    env.label(ctx, L.timna, COPPER.x - 26, Y(COPPER.km) + 4, { align: "right" });
+    ctx.fillStyle = env.color("--ink");
+    ctx.beginPath(); ctx.arc(faultX(EILAT_KM) - 5, Y(EILAT_KM), 3.5, 0, Math.PI * 2); ctx.fill();
+    if (u <= 1.3) env.label(ctx, L.eilat, faultX(EILAT_KM) - 12, Y(EILAT_KM) + 4, { align: "right" });
+    env.label(ctx, `↑ ${L.north}`, 12, 18, { align: "left", size: 12, weight: 500, color: "--muted" });
+
+    // One label per basin, west of it: it follows the basin's middle and fades in as the basin opens.
     const open = [];
-    basins.forEach((b, i) => {
-      const length = km - STEP;
-      b.g.setAttribute("transform", `translate(0 ${Y(b.stepKm + STEP + Math.max(0, length) / 2).toFixed(1)})`);
-      b.g.toggleAttribute("hidden", length < 12);
+    const length = km - STEP;
+    SEGMENTS.slice(0, -1).forEach(([, stepKm], i) => {
+      const alpha = ramp(length, 6, 20);
+      if (alpha > 0.01) {
+        ctx.globalAlpha = alpha;
+        env.label(ctx, L.basins[i], SEGMENTS[i + 1][0] - 8, Y(stepKm + STEP + Math.max(0, length) / 2) + 4, { align: "right" });
+        ctx.globalAlpha = 1;
+      }
       if (length > 0) open.push(L.basins[i]);
     });
-    if (km === 0) return t.before;
-    const apart = t.apart.replace("{km}", number(km));
-    if (km === spec.slip_km) return `${t.today} ${apart}`;
+
+    const shown = Math.round(km);
+    if (shown === 0) return t.before;
+    const apart = t.apart.replace("{km}", iso(number(shown)));
+    if (shown === spec.slip_km) return `${t.today} ${apart}`;
     return `${t.moving}${open.length ? `: ${list.format(open)}.` : "."} ${apart}`;
+  }
+
+  return {
+    draw,
+    handle: (km) => [290, Y(90) - km * S],
+    drag: (point, start) => start.value + (start.point.y - point.y) / S,
   };
 }
-return { valueText, mount };
+return { view: [0, 0, W, H], animated: true, valueParts, create };
 })();
