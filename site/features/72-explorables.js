@@ -214,15 +214,18 @@ async function setUp(figure, box) {
   box.hidden = false;
 
   {
-    // Slot widths: every value of the control, measured once with the output's own font (no layout reads).
+    // Slot widths: every value of the control, measured once with each slot's own font (no layout reads).
+    // Tabular digits all take the width of "0", so digits are measured as "0".
     const probe = document.createElement("canvas").getContext("2d");
-    probe.font = getComputedStyle(output).font;
     const steps = Math.min(400, Math.round(span / c.step));
     const samples = [...Array(steps + 1).keys()].map((i) => kind.valueParts(snap(c.min + (span * i) / steps), spec));
-    const widest = (text) => Math.ceil(Math.max(...samples.map((p) => probe.measureText(text(p)).width)));
-    numSlot.style.minWidth = `${widest((p) => p.num) + 2}px`;
-    unitSlot.style.minWidth = `${widest((p) => p.unit)}px`;
-    noteSlot.style.minWidth = `${widest((p) => (p.note ? `(${p.note})` : ""))}px`;
+    const widest = (slot, text) => {
+      probe.font = getComputedStyle(slot).font;
+      return Math.ceil(Math.max(...samples.map((p) => probe.measureText([...text(p)].map((ch) => (ch >= "0" && ch <= "9" ? "0" : ch)).join("")).width)));
+    };
+    numSlot.style.minWidth = `${widest(numSlot, (p) => p.num) + 3}px`;
+    unitSlot.style.minWidth = `${widest(unitSlot, (p) => p.unit) + 1}px`;
+    noteSlot.style.minWidth = `${widest(noteSlot, (p) => (p.note ? `(${p.note})` : "")) + 1}px`;
   }
   const env = makeEnv(box);
   env.scale = 1;
