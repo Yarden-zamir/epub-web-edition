@@ -1,0 +1,1261 @@
+{
+ "generated": "2026-11-24",
+ "entries": [
+  {
+   "row": 1,
+   "status": "verified",
+   "element": "a06-p022",
+   "pdf_page": [
+    29
+   ],
+   "printed": "(2:23, KJV)",
+   "correction": "(2:13, KJV)",
+   "explanation": "Leviticus 2 has only 16 verses. The salt-of-the-covenant verse is Leviticus 2:13.",
+   "evidence": [
+    {
+     "label": "KJV Lev 2:13",
+     "url": "https://bible-api.com/leviticus+2:13?translation=kjv"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/1.png"
+  },
+  {
+   "row": 2,
+   "status": "verified",
+   "element": "a06-p022",
+   "pdf_page": [
+    29
+   ],
+   "printed": "shalt though season",
+   "correction": "shalt thou season",
+   "explanation": "The King James Version reads \"shalt thou season with salt\".",
+   "evidence": [
+    {
+     "label": "KJV Lev 2:13",
+     "url": "https://bible-api.com/leviticus+2:13?translation=kjv"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/2.png"
+  },
+  {
+   "row": 3,
+   "status": "verified",
+   "element": "a06-p021",
+   "pdf_page": [
+    26
+   ],
+   "printed": "salts form any other source",
+   "correction": "salts from any other source",
+   "explanation": "Typo: \"form\" for \"from\".",
+   "evidence": [],
+   "print_check": "in print",
+   "crop": "errata/print-check/3.png"
+  },
+  {
+   "row": 4,
+   "status": "verified",
+   "element": "a06-p023",
+   "pdf_page": [
+    29
+   ],
+   "printed": "south of Hebron",
+   "correction": "south of Bethlehem",
+   "explanation": "Tekoa lies about 8 km south of Bethlehem, on the road to Hebron. It is not south of Hebron.",
+   "evidence": [
+    {
+     "label": "Wikipedia: Tekoa",
+     "url": "https://en.wikipedia.org/wiki/Tekoa_(ancient_town)"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/4.png"
+  },
+  {
+   "row": 5,
+   "status": "verified",
+   "element": "a06-p030",
+   "pdf_page": [
+    33
+   ],
+   "printed": "For 3,300 years",
+   "correction": "For 2,300 years",
+   "explanation": "Aristotle lived in the 4th century BC, about 2,300 years before the 1930s.",
+   "evidence": [
+    {
+     "label": "Wikipedia: Aristotle",
+     "url": "https://en.wikipedia.org/wiki/Aristotle"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/5.png"
+  },
+  {
+   "row": 6,
+   "status": "verified",
+   "element": "a06-fn15",
+   "pdf_page": [
+    29
+   ],
+   "printed": "n. 173.",
+   "correction": "n. 174.",
+   "explanation": "In Röhricht's Regesta (1893), the 1138 charter on the salt and bitumen of Tekoa is no. 174. No. 173 is a Templar charter.",
+   "evidence": [
+    {
+     "label": "archive.org OCR",
+     "url": "https://archive.org/download/regestaregnihie00rhgoog/regestaregnihie00rhgoog_djvu.txt"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/6.png"
+  },
+  {
+   "row": 7,
+   "status": "verified",
+   "element": "a31-p002",
+   "pdf_page": [
+    245
+   ],
+   "printed": "מבול בשלושה במאי",
+   "correction": "מבול בשני במאי",
+   "explanation": "The same article dates the flood to 2 May 2001 two times. The Israel Meteorological Service records it on the night of 1-2 May 2001.",
+   "evidence": [
+    {
+     "label": "IMS extreme events review, 2023, p. 56",
+     "url": "https://ims.gov.il/sites/default/files/inline-files/%D7%A1%D7%A7%D7%99%D7%A8%D7%AA%20%D7%90%D7%99%D7%A8%D7%95%D7%A2%D7%99%D7%9D%20%D7%A7%D7%99%D7%A6%D7%95%D7%A0%D7%99%D7%99%D7%9D%20-%20%D7%A2%D7%93%D7%9B%D7%95%D7%95%D7%9F%20%D7%9E%D7%A8%D7%A5%202023_0.pdf"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/7.png"
+  },
+  {
+   "row": 8,
+   "status": "verified",
+   "element": "a31-p007",
+   "pdf_page": [
+    247
+   ],
+   "printed": "של ה-3 במאי",
+   "correction": "של ה-2 במאי",
+   "explanation": "The same paragraph dates the flood to 2 May. The Israel Meteorological Service agrees.",
+   "evidence": [
+    {
+     "label": "IMS extreme events review, 2023, p. 56",
+     "url": "https://ims.gov.il/sites/default/files/inline-files/%D7%A1%D7%A7%D7%99%D7%A8%D7%AA%20%D7%90%D7%99%D7%A8%D7%95%D7%A2%D7%99%D7%9D%20%D7%A7%D7%99%D7%A6%D7%95%D7%A0%D7%99%D7%99%D7%9D%20-%20%D7%A2%D7%93%D7%9B%D7%95%D7%95%D7%9F%20%D7%9E%D7%A8%D7%A5%202023_0.pdf"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/8.png"
+  },
+  {
+   "row": 9,
+   "status": "verified",
+   "element": "a31-p007",
+   "pdf_page": [
+    247
+   ],
+   "printed": "דברים יד, 14-13",
+   "correction": "דברים יא, 14-13",
+   "explanation": "The quoted verses (\"והיה אם שמע תשמעו … יורה ומלקוש\") are Deuteronomy 11:13-14. Deuteronomy 14:13-14 lists unclean birds.",
+   "evidence": [
+    {
+     "label": "Sefaria Deut 11:13-14",
+     "url": "https://www.sefaria.org/api/v3/texts/Deuteronomy.11.13-14"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/9.png"
+  },
+  {
+   "row": 10,
+   "status": "verified",
+   "element": "a10-p003",
+   "pdf_page": [
+    66
+   ],
+   "printed": "'מועדון האלפיני הישראל'",
+   "correction": "'מועדון האלפיני הישראלי'",
+   "explanation": "The final yod is missing. The same chapter prints \"המועדון האלפיני הישראלי\".",
+   "evidence": [],
+   "print_check": "in print",
+   "crop": "errata/print-check/10.png"
+  },
+  {
+   "row": 11,
+   "status": "verified",
+   "element": "a09-p023",
+   "pdf_page": [
+    61
+   ],
+   "printed": "בן אוויס",
+   "correction": "בן נוויס",
+   "explanation": "The 1,345 m peak in Scotland, the highest in the British Isles, is Ben Nevis (בן נוויס).",
+   "evidence": [
+    {
+     "label": "Wikipedia: Ben Nevis",
+     "url": "https://en.wikipedia.org/wiki/Ben_Nevis"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/11.png"
+  },
+  {
+   "row": 12,
+   "status": "verified",
+   "element": "a13-p058",
+   "pdf_page": [
+    103
+   ],
+   "printed": "שבאינדוזיה",
+   "correction": "שבאינדונזיה",
+   "explanation": "Komodo is in Indonesia (אינדונזיה).",
+   "evidence": [
+    {
+     "label": "Wikipedia: Komodo",
+     "url": "https://en.wikipedia.org/wiki/Komodo_(island)"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/12.png"
+  },
+  {
+   "row": 13,
+   "status": "verified",
+   "element": "a19-p009",
+   "pdf_page": [
+    185
+   ],
+   "printed": "במאה ה- 14",
+   "correction": "במאה ה- 15",
+   "explanation": "Arnold von Harff travelled in 1496-1499, in the 15th century. That is still the Mamluk period, so the bracket stays true.",
+   "evidence": [
+    {
+     "label": "Wikipedia: Arnold von Harff",
+     "url": "https://en.wikipedia.org/wiki/Arnold_von_Harff"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/13.png"
+  },
+  {
+   "row": 14,
+   "status": "verified",
+   "element": "a17-p009",
+   "pdf_page": [
+    146
+   ],
+   "printed": "אברהם מוסיל",
+   "correction": "אלואיס מוסיל",
+   "explanation": "The Czech explorer of Edom is Alois Musil (1868-1944).",
+   "evidence": [
+    {
+     "label": "Wikipedia: Alois Musil",
+     "url": "https://en.wikipedia.org/wiki/Alois_Musil"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/14.png"
+  },
+  {
+   "row": 15,
+   "status": "verified",
+   "element": "a18-p063",
+   "pdf_page": [
+    181
+   ],
+   "printed": "בחפירות רבת א-נחאס",
+   "correction": "בחפירות ח'רבת א-נחאס",
+   "explanation": "The site is Khirbat en-Nahas. The book prints \"ח'רבת א-נחאס\" in all 8 other places.",
+   "evidence": [
+    {
+     "label": "Wikipedia: Khirbat en-Nahas",
+     "url": "https://en.wikipedia.org/wiki/Khirbat_en-Nahas"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/15.png"
+  },
+  {
+   "row": 16,
+   "status": "verified",
+   "element": "a35-p058",
+   "pdf_page": [
+    286
+   ],
+   "printed": "(Bodaker et al., 2000)",
+   "correction": "(Bodaker et al., 2010)",
+   "explanation": "The book cites the same paper as Bodaker et al. 2010 in another paragraph and in the bibliography (ISME Journal 4: 399-407).",
+   "evidence": [
+    {
+     "label": "doi:10.1038/ismej.2009.141",
+     "url": "https://doi.org/10.1038/ismej.2009.141"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/16.png"
+  },
+  {
+   "row": 17,
+   "status": "verified",
+   "element": "sources-p069",
+   "pdf_page": [
+    311
+   ],
+   "printed": "pp. 31–41",
+   "correction": "pp. 33–41",
+   "explanation": "Oren 1983 in Limnology and Oceanography 28(1) is on pages 33-41.",
+   "evidence": [
+    {
+     "label": "Crossref",
+     "url": "https://api.crossref.org/works/10.4319/lo.1983.28.1.0033"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/17.png"
+  },
+  {
+   "row": 18,
+   "status": "verified",
+   "element": "sources-p024",
+   "pdf_page": [
+    309
+   ],
+   "printed": "תרח\"ץ",
+   "correction": "תרצ\"ח",
+   "explanation": "Two letters are swapped. The year 1938 is 5698, written תרצ\"ח.",
+   "evidence": [
+    {
+     "label": "Hebcal",
+     "url": "https://www.hebcal.com/converter?cfg=json&gy=1938&gm=6&gd=1&g2h=1"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/18.png"
+  },
+  {
+   "row": 19,
+   "status": "verified",
+   "element": "sources-p047",
+   "pdf_page": [
+    310
+   ],
+   "printed": "Geological Society of America Bulletin, v.116,pp. 555–571",
+   "correction": "Geological Survey of Israel Bulletin 63",
+   "explanation": "Begin, Ehrlich and Nathan 1974 is Geological Survey of Israel Bulletin 63. GSA Bulletin 116: 555-571 is a different paper from 2004.",
+   "evidence": [
+    {
+     "label": "Cambridge, Quaternary of the Levant, ch. 12",
+     "url": "https://www.cambridge.org/core/books/abs/quaternary-of-the-levant/lake-lisan/CF25D6DE02054F2F38A24D91617CBC85"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/19.png"
+  },
+  {
+   "row": 20,
+   "status": "verified",
+   "element": "a36-p053",
+   "pdf_page": [
+    303
+   ],
+   "printed": "לכמיליון עד סוף העשור",
+   "correction": "לכמיליארד עד סוף העשור",
+   "explanation": "A rise from about 600 million m³ to \"about a million\" is impossible. The government target for 2030 is 1,100 million m³ a year.",
+   "evidence": [
+    {
+     "label": "Follow-up report on the drought plan",
+     "url": "https://www.ceci.org.il/wp-content/uploads/2023/10/%D7%AA%D7%9B%D7%A0%D7%99%D7%AA-%D7%90%D7%A1%D7%98%D7%A8%D7%98%D7%92%D7%99%D7%AA-%D7%9C%D7%94%D7%AA%D7%9E%D7%95%D7%93%D7%93%D7%95%D7%AA-%D7%A2%D7%9D-%D7%AA%D7%A7%D7%95%D7%A4%D7%AA-%D7%91%D7%A6%D7%95%D7%A8%D7%AA-%D7%91%D7%9E%D7%A9%D7%A7-%D7%94%D7%9E%D7%99%D7%9D-%D7%9C%D7%A9%D7%A0%D7%99%D7%9D-2018-2030.pdf"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/20.png"
+  },
+  {
+   "row": 21,
+   "status": "verified",
+   "element": "a35-p070",
+   "pdf_page": [
+    288
+   ],
+   "printed": "(Coyn & Bellier",
+   "correction": "(Coyne & Bellier",
+   "explanation": "The engineering firm is Coyne et Bellier.",
+   "evidence": [
+    {
+     "label": "EIB register",
+     "url": "https://www.eib.org/attachments/registers/82425040.pdf"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/21.png"
+  },
+  {
+   "row": 22,
+   "status": "verified",
+   "element": "sources-p060",
+   "pdf_page": [
+    311
+   ],
+   "printed": "Coyn and Bellier",
+   "correction": "Coyne and Bellier",
+   "explanation": "The engineering firm is Coyne et Bellier.",
+   "evidence": [
+    {
+     "label": "EIB register",
+     "url": "https://www.eib.org/attachments/registers/82425040.pdf"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/22.png"
+  },
+  {
+   "row": 23,
+   "status": "family",
+   "element": "a10-p012",
+   "pdf_page": [
+    68
+   ],
+   "printed": "בני, דב, גדי ויוקי",
+   "correction": "בני, דב, גבי ויוקי",
+   "explanation": "The climber who died was Gabi Manobla, and the same chapter prints \"גבי מנובלא\". The text is Eli's memoir, so the family decides.",
+   "evidence": [
+    {
+     "label": "IMGA: אסון פאמיר",
+     "url": "https://wiki.imga.org.il/index.php?title=%D7%90%D7%A1%D7%95%D7%9F_%D7%A4%D7%90%D7%9E%D7%99%D7%A8"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/23.png"
+  },
+  {
+   "row": 24,
+   "status": "family",
+   "element": "a10-p020",
+   "pdf_page": [
+    69
+   ],
+   "printed": "באסון רעידת אדמה שהתרחש בתורכיה זמן מה קודם לכן",
+   "correction": "ארמניה?",
+   "explanation": "The story is set in 1990. The Israeli rescue team went to Armenia in December 1988, and the rescue mission to Turkey was in 1999. The family decides.",
+   "evidence": [
+    {
+     "label": "he.wikipedia: חטיבת החילוץ וההדרכה",
+     "url": "https://he.wikipedia.org/wiki/%D7%97%D7%98%D7%99%D7%91%D7%AA_%D7%94%D7%97%D7%99%D7%9C%D7%95%D7%A5_%D7%95%D7%94%D7%93%D7%A8%D7%9B%D7%94"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/24.png"
+  },
+  {
+   "row": 25,
+   "status": "family",
+   "element": "a09-p014, a10-p037",
+   "pdf_page": [
+    59,
+    76
+   ],
+   "printed": "באוגוסט 1981 / ב- 1982, אי שם באלפים הצרפתיים",
+   "correction": "one of the two",
+   "explanation": "The same Alps trip is dated 1981 in one chapter and 1982 in another. No outside source settles it, so the family decides.",
+   "evidence": [],
+   "print_check": "in print",
+   "crop": "errata/print-check/25.png"
+  },
+  {
+   "row": 26,
+   "status": "editor",
+   "element": "a10-p002",
+   "pdf_page": [
+    65
+   ],
+   "printed": "בגובה 3,005 מטר",
+   "correction": null,
+   "explanation": "The \"Frying Pan\" camp on Lenin Peak is at about 5,200-5,300 m, not 3,005 m. Sources differ on the exact height.",
+   "evidence": [
+    {
+     "label": "Wikipedia: Lenin Peak disaster",
+     "url": "https://en.wikipedia.org/wiki/Lenin_Peak_disaster"
+    },
+    {
+     "label": "IMGA",
+     "url": "https://wiki.imga.org.il/index.php?title=%D7%90%D7%A1%D7%95%D7%9F_%D7%A4%D7%90%D7%9E%D7%99%D7%A8"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/26.png"
+  },
+  {
+   "row": 27,
+   "status": "editor",
+   "element": "a06-p027",
+   "pdf_page": [
+    30
+   ],
+   "printed": "the Jewish World Zionist Organization appointed a scientific delegation, headed by … Blanckenhorn",
+   "correction": null,
+   "explanation": "Sultan Abdul Hamid II invited and funded Blanckenhorn's expedition, as another chapter of the book says. A fix needs a new wording of the clause.",
+   "evidence": [
+    {
+     "label": "Persée, Annales de Géographie 1913",
+     "url": "https://www.persee.fr/doc/geo_0003-4010_1913_bib_22_125_19303"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/27.png"
+  },
+  {
+   "row": 28,
+   "status": "editor",
+   "element": "a34-p007",
+   "pdf_page": [
+    261
+   ],
+   "printed": "עבד בחצי אי הלשון בשנת 1869",
+   "correction": null,
+   "explanation": "Lartet worked on the Lisan peninsula in 1864. 1869 is the year of his publication.",
+   "evidence": [
+    {
+     "label": "Wikipedia: Lake Lisan",
+     "url": "https://en.wikipedia.org/wiki/Lake_Lisan"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/28.png"
+  },
+  {
+   "row": 29,
+   "status": "editor",
+   "element": "a10-p003",
+   "pdf_page": [
+    66
+   ],
+   "printed": "'חזור למקום ממנו באת'",
+   "correction": null,
+   "explanation": "The title of that article in the book is \"חזור למדבר ממנו באת\".",
+   "evidence": [
+    {
+     "label": "a09-h.",
+     "url": null
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/29.png"
+  },
+  {
+   "row": 30,
+   "status": "editor",
+   "element": "a36-p063",
+   "pdf_page": [
+    305
+   ],
+   "printed": "'האקולוגיה של ים המלח'",
+   "correction": null,
+   "explanation": "The title of that article in the book is \"המערכת האקולוגית של ים המלח\".",
+   "evidence": [
+    {
+     "label": "a35-h.",
+     "url": null
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/30.png"
+  },
+  {
+   "row": 31,
+   "status": "editor",
+   "element": "a18-p041",
+   "pdf_page": [
+    177
+   ],
+   "printed": "(7373 מ\"ר)",
+   "correction": null,
+   "explanation": "The fortress measures 73 × 73 m (about 5,300 m²). The print lost the \"×\" sign, and the unit also needs a change.",
+   "evidence": [
+    {
+     "label": "PDF",
+     "url": "https://www.ancientportsantiques.com/wp-content/uploads/Documents/PLACES/RedSea/Elath-Finkelstein2014.pdf"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/31.png"
+  },
+  {
+   "row": 32,
+   "status": "editor",
+   "element": "a17-p015",
+   "pdf_page": [
+    150
+   ],
+   "printed": "מקדים בכמאה שנה את אמציהו",
+   "correction": null,
+   "explanation": "Bennett's earliest Edomite finds at Umm al-Biyara are about a century later than Amaziah, not earlier. A later paragraph of the same article agrees.",
+   "evidence": [
+    {
+     "label": "Bienkowski (ed.), Umm al-Biyara (2011): \"No occupation at Umm al-Biyara could be dated as early as Amaziah's reign\".",
+     "url": null
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/32.png"
+  },
+  {
+   "row": 33,
+   "status": "editor",
+   "element": "a17-src1",
+   "pdf_page": [
+    145
+   ],
+   "printed": "פורסם בקתדרה 101, 2002",
+   "correction": null,
+   "explanation": "Cathedra issue 101 is dated October 2001, not 2002.",
+   "evidence": [
+    {
+     "label": "he.wikipedia: פטרה",
+     "url": "https://he.wikipedia.org/wiki/%D7%A4%D7%98%D7%A8%D7%94"
+    }
+   ],
+   "print_check": "conversion error",
+   "crop": "errata/print-check/33.png"
+  },
+  {
+   "row": 34,
+   "status": "editor",
+   "element": "a17-p004, a18-p002",
+   "pdf_page": [
+    145,
+    167
+   ],
+   "printed": "19 ק\"מ מזרחית לחצבה / כ- 28 ק\"מ ממזרח לחצבה",
+   "correction": null,
+   "explanation": "The distance from Sela to Hatzeva is 19 km in one chapter and 28 km in another. By coordinates it is about 31 km.",
+   "evidence": [
+    {
+     "label": "Coordinates on Wikipedia (Sela, Hatzeva).",
+     "url": null
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/34.png"
+  },
+  {
+   "row": 35,
+   "status": "editor",
+   "element": "a17-p004",
+   "pdf_page": [
+    145
+   ],
+   "printed": "5 ק\"מ מצפון-מזרח לכפר בוצירה",
+   "correction": null,
+   "explanation": "Sela is about 3 km north-west of Busayra, not 5 km north-east.",
+   "evidence": [
+    {
+     "label": "Virtual Archaeology Review 2024, doi:10.4995/var.2024.19977: \"approximately 3 km northwest of Bozrah\".",
+     "url": "https://doi.org/10.4995/var.2024.19977"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/35.png"
+  },
+  {
+   "row": 36,
+   "status": "editor",
+   "element": "a15-p029",
+   "pdf_page": [
+    132
+   ],
+   "printed": "הקמת הקיבוץ בשנות ה- 60",
+   "correction": null,
+   "explanation": "Kibbutz Ein Gedi was founded in 1953-1956. The sentence may mean that the dispute began in the 1960s.",
+   "evidence": [
+    {
+     "label": "Wikipedia: Ein Gedi (kibbutz)",
+     "url": "https://en.wikipedia.org/wiki/Ein_Gedi_(kibbutz)"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/36.png"
+  },
+  {
+   "row": 37,
+   "status": "editor",
+   "element": "a08-p003",
+   "pdf_page": [
+    53
+   ],
+   "printed": "עמרם מצנע, אלוף פיקוד מרכז דאז",
+   "correction": null,
+   "explanation": "Amram Mitzna was head of Central Command in 1987-1989, but the text sets the story in the 1970s.",
+   "evidence": [
+    {
+     "label": "he.wikipedia: עמרם מצנע",
+     "url": "https://he.wikipedia.org/wiki/%D7%A2%D7%9E%D7%A8%D7%9D_%D7%9E%D7%A6%D7%A0%D7%A2"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/37.png"
+  },
+  {
+   "row": 38,
+   "status": "editor",
+   "element": "a04-p004",
+   "pdf_page": [
+    15
+   ],
+   "printed": "1958: מצעד יום העצמאות בחיפה",
+   "correction": null,
+   "explanation": "The 1958 Independence Day parade was in Jerusalem; Haifa held the parade in 1953, 1956, 1960 and 1963. The right year of the photo is not known.",
+   "evidence": [
+    {
+     "label": "he.wikipedia: מצעד צה\"ל",
+     "url": "https://he.wikipedia.org/wiki/%D7%9E%D7%A6%D7%A2%D7%93_%D7%A6%D7%94%22%D7%9C"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/38.png"
+  },
+  {
+   "row": 39,
+   "status": "editor",
+   "element": "a06-p025",
+   "pdf_page": [
+    31
+   ],
+   "printed": "For the first and last time, the Degania Dam gates were opened",
+   "correction": null,
+   "explanation": "The Degania Dam gates also opened in 1969, 1993 and 1995, so \"first and last time\" is not correct.",
+   "evidence": [
+    {
+     "label": "he.wikipedia: סכר דגניה",
+     "url": "https://he.wikipedia.org/wiki/%D7%A1%D7%9B%D7%A8_%D7%93%D7%92%D7%A0%D7%99%D7%94"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/39.png"
+  },
+  {
+   "row": 40,
+   "status": "editor",
+   "element": "a35-p052",
+   "pdf_page": [
+    285
+   ],
+   "printed": "400 אלף תאי דונליאלה",
+   "correction": null,
+   "explanation": "The published peak for 1964 is up to 40 thousand cells per ml. The book cites Oren 2008, which was not checked.",
+   "evidence": [
+    {
+     "label": "Oren and Ventosa 1999, International Microbiology.",
+     "url": null
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/40.png"
+  },
+  {
+   "row": 41,
+   "status": "editor",
+   "element": "sources-p055, sources-p091",
+   "pdf_page": [
+    310,
+    312
+   ],
+   "printed": "Letters to T. Herzl, 1809-1901",
+   "correction": null,
+   "explanation": "Herzl was born in 1860, so the letters cannot start in 1809. The range is probably 1899-1901, not confirmed.",
+   "evidence": [
+    {
+     "label": "Bourcart's proposal to Herzl, about 1899.",
+     "url": null
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/41.png"
+  },
+  {
+   "row": 42,
+   "status": "editor",
+   "element": "a35-p073",
+   "pdf_page": [
+    289
+   ],
+   "printed": "בשנת 1994 פסק בית המשפט בקליפורניה",
+   "correction": null,
+   "explanation": "The 1994 decision was Decision 1631 of the California State Water Resources Control Board. The court ruling was in 1983.",
+   "evidence": [
+    {
+     "label": "Mono Basin timeline",
+     "url": "https://www.monobasinresearch.org/timelines/d1631.php"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/42.png"
+  },
+  {
+   "row": 43,
+   "status": "editor",
+   "element": "a34-p046",
+   "pdf_page": [
+    272
+   ],
+   "printed": "(259 מ' במרץ 2026)",
+   "correction": null,
+   "explanation": "The bottom is at about −728 m and the surface at about −441 m, so the water depth is about 287 m. The sentence around it is also garbled.",
+   "evidence": [
+    {
+     "label": "Wikipedia: Dead Sea",
+     "url": "https://en.wikipedia.org/wiki/Dead_Sea"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/43.png"
+  },
+  {
+   "row": 44,
+   "status": "editor",
+   "element": "a36-p073",
+   "pdf_page": [
+    307
+   ],
+   "printed": "הוגש לשותפות ב- 2021",
+   "correction": null,
+   "explanation": "The book dates the same report 2011 in other places. World Bank reports date it 2013-2014.",
+   "evidence": [
+    {
+     "label": "EIB register",
+     "url": "https://www.eib.org/attachments/registers/82425040.pdf"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/44.png"
+  },
+  {
+   "row": 45,
+   "status": "editor",
+   "element": "a36-p045, a36-p046",
+   "pdf_page": [
+    300,
+    301
+   ],
+   "printed": "נחתם בנובמבר 2021 / ב- 2019, בטרם יבש הדיו",
+   "correction": null,
+   "explanation": "2019 cannot follow a signing in 2021. The 300 and 65 million m³ figures belong to the Israel-Jordan agreement of February 2015.",
+   "evidence": [
+    {
+     "label": "Times of Israel, 2015",
+     "url": "https://www.timesofisrael.com/israel-and-jordan-sign-historic-water-deal-to-save-dead-sea/"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/45.png"
+  },
+  {
+   "row": 46,
+   "status": "editor",
+   "element": "a36-p033",
+   "pdf_page": [
+    297
+   ],
+   "printed": "ב- 2015, בעקבות מזכר הבנות",
+   "correction": null,
+   "explanation": "Other paragraphs of the same chapter date the World Bank study from 2005 and the final report 2011.",
+   "evidence": [
+    {
+     "label": "World Bank study 2008-2013.",
+     "url": null
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/46.png"
+  },
+  {
+   "row": 47,
+   "status": "editor",
+   "element": "a36-p068, a36-p075",
+   "pdf_page": [
+    306,
+    307
+   ],
+   "printed": "2020",
+   "correction": null,
+   "explanation": "The same long-term policy document is dated 2022 in three other paragraphs and in the bibliography.",
+   "evidence": [
+    {
+     "label": "Times of Israel, 2022",
+     "url": "https://www.timesofisrael.com/authorities-urged-to-immediately-stabilize-dead-sea-levels/"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/47.png"
+  },
+  {
+   "row": 48,
+   "status": "editor",
+   "element": "sources-p063",
+   "pdf_page": [
+    311
+   ],
+   "printed": "Harza JRV Group (1997)",
+   "correction": null,
+   "explanation": "Other citations of the same report give 1998. The known reports are a 1996 draft and a final report of February 1998.",
+   "evidence": [
+    {
+     "label": "Known reports: 1996 draft, February 1998 final.",
+     "url": null
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/48.png"
+  },
+  {
+   "row": 49,
+   "status": "editor",
+   "element": "a35-p006, a36-p063",
+   "pdf_page": [
+    276,
+    305
+   ],
+   "printed": "Steinhorn, 1983",
+   "correction": null,
+   "explanation": "The bibliography lists only Steinhorn 1981. A 1983 paper exists, so the bibliography may lack it.",
+   "evidence": [
+    {
+     "label": "Limnology and Oceanography 1983.",
+     "url": null
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/49.png"
+  },
+  {
+   "row": 50,
+   "status": "editor",
+   "element": "a36-p006",
+   "pdf_page": [
+    292
+   ],
+   "printed": "כיהן בשנים 1950 עד 1955 כמרצה בטכניון",
+   "correction": null,
+   "explanation": "Lowdermilk was in Israel in 1951-1957 and taught at the Technion from about 1953-1955 to 1957.",
+   "evidence": [
+    {
+     "label": "NCpedia: Lowdermilk",
+     "url": "https://www.ncpedia.org/biography/lowdermilk-walter-clay"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/50.png"
+  },
+  {
+   "row": 51,
+   "status": "editor",
+   "element": "a06-fn24",
+   "pdf_page": [
+    35
+   ],
+   "printed": "6 (October 2009), pp. 1–11",
+   "correction": null,
+   "explanation": "The final pagination is volume 6, Suppl 5, pp. S575-S585. \"pp. 1–11\" may be the online-first version.",
+   "evidence": [
+    {
+     "label": "PubMed 19656820",
+     "url": "https://pubmed.ncbi.nlm.nih.gov/19656820/"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/51.png"
+  },
+  {
+   "row": 52,
+   "status": "editor",
+   "element": "a07-p018",
+   "pdf_page": [
+    46
+   ],
+   "printed": "428 − / 394 −",
+   "correction": null,
+   "explanation": "Symonds (1841) measured 1,312 ft (about 400 m) and Lynch (1848) 1,316 ft (about 401 m). The author may use another source.",
+   "evidence": [
+    {
+     "label": "McClintock and Strong: Salt Sea",
+     "url": "https://www.biblicalcyclopedia.com/S/salt-sea.html"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/52.png"
+  },
+  {
+   "row": 53,
+   "status": "editor",
+   "element": "a18-p003",
+   "pdf_page": [
+    167
+   ],
+   "printed": "מחדש ב- 1907",
+   "correction": null,
+   "explanation": "Musil did his field work in 1896-1902. 1907 is the year of his book Arabia Petraea.",
+   "evidence": [
+    {
+     "label": "Wikipedia: Alois Musil.",
+     "url": null
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/53.png"
+  },
+  {
+   "row": 54,
+   "status": "editor",
+   "element": "a34-p039",
+   "pdf_page": [
+    270
+   ],
+   "printed": "הגדולה שבהן הוא 5.7 ק\"מ",
+   "correction": null,
+   "explanation": "This was true for the old survey. Malham Cave measured about 10 km in 2019, so an update note is possible.",
+   "evidence": [
+    {
+     "label": "phys.org, 2019",
+     "url": "https://phys.org/news/2019-03-israelis-unveil-world-longest-salt.html"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/54.png"
+  },
+  {
+   "row": 55,
+   "status": "editor",
+   "element": "a35-p034",
+   "pdf_page": [
+    281
+   ],
+   "printed": "(Buchalo et al., 2000)",
+   "correction": null,
+   "explanation": "The first record of fungi in the Dead Sea is Buchalo et al. 1998, as another paragraph says. The bibliography has only the 2000 work, two times.",
+   "evidence": [
+    {
+     "label": "doi:10.1098/rspb.1998.0458",
+     "url": "https://doi.org/10.1098/rspb.1998.0458"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/55.png"
+  },
+  {
+   "row": 56,
+   "status": "editor",
+   "element": "a20-p002",
+   "pdf_page": [
+    189
+   ],
+   "printed": "אוזרח בשנת 1977",
+   "correction": null,
+   "explanation": "One weak source gives 1976 for Mitzpe Shalem. This is an eyewitness memoir.",
+   "evidence": [
+    {
+     "label": "Wikipedia: Mitzpe Shalem",
+     "url": "https://en.wikipedia.org/wiki/Mitzpe_Shalem"
+    }
+   ],
+   "print_check": "in print",
+   "crop": "errata/print-check/56.png"
+  },
+  {
+   "row": 57,
+   "status": "keep",
+   "element": "a10-p002",
+   "pdf_page": [
+    65
+   ],
+   "printed": "(7,200 מטר)",
+   "correction": null,
+   "explanation": "Lenin Peak is 7,134 m high. This is a round figure in a memoir.",
+   "evidence": [],
+   "print_check": "in print",
+   "crop": "errata/print-check/57.png"
+  },
+  {
+   "row": 58,
+   "status": "keep",
+   "element": "a10-p002",
+   "pdf_page": [
+    65
+   ],
+   "printed": "כחמישים מטפסים",
+   "correction": null,
+   "explanation": "43 climbers died. \"About fifty\" is a round figure.",
+   "evidence": [],
+   "print_check": "in print",
+   "crop": "errata/print-check/58.png"
+  },
+  {
+   "row": 59,
+   "status": "keep",
+   "element": "a14-p008",
+   "pdf_page": [
+    110
+   ],
+   "printed": "'מורל ועט ונייר טואלט'",
+   "correction": null,
+   "explanation": "The title of that article is \"מורל, עט ונייר טואלט\". Only the punctuation differs.",
+   "evidence": [],
+   "print_check": "in print",
+   "crop": "errata/print-check/59.png"
+  },
+  {
+   "row": 60,
+   "status": "keep",
+   "element": "a09-p023",
+   "pdf_page": [
+    61
+   ],
+   "printed": "האיים ההיברידיים",
+   "correction": null,
+   "explanation": "The Hebrides. This is a spelling of the name, not a factual error.",
+   "evidence": [],
+   "print_check": "in print",
+   "crop": "errata/print-check/60.png"
+  },
+  {
+   "row": 61,
+   "status": "keep",
+   "element": "a17-p010, a17-p036",
+   "pdf_page": [
+    146,
+    156
+   ],
+   "printed": "555-539",
+   "correction": null,
+   "explanation": "Nabonidus usually reigned 556-539 BC, but 555 also appears in the literature.",
+   "evidence": [],
+   "print_check": "in print",
+   "crop": "errata/print-check/61.png"
+  },
+  {
+   "row": 62,
+   "status": "keep",
+   "element": "a17-p054",
+   "pdf_page": [
+    163
+   ],
+   "printed": "ישעיה לד, ז-יז / עובדיה א, א-יט",
+   "correction": null,
+   "explanation": "The author chose these verse ranges.",
+   "evidence": [],
+   "print_check": "in print",
+   "crop": "errata/print-check/62.png"
+  },
+  {
+   "row": 63,
+   "status": "keep",
+   "element": "a07-p011",
+   "pdf_page": [
+    43
+   ],
+   "printed": "ב- 1818",
+   "correction": null,
+   "explanation": "The literature gives 1817 or 1819 for Gay-Lussac's analysis. The year is not settled.",
+   "evidence": [],
+   "print_check": "in print",
+   "crop": "errata/print-check/63.png"
+  },
+  {
+   "row": 64,
+   "status": "keep",
+   "element": "a18-p025",
+   "pdf_page": [
+    173
+   ],
+   "printed": "לפני כ- 550 מיליון שנה",
+   "correction": null,
+   "explanation": "The Burj Formation is Middle Cambrian, about 510 million years old. 550 is the author's round figure.",
+   "evidence": [],
+   "print_check": "in print",
+   "crop": "errata/print-check/64.png"
+  },
+  {
+   "row": 65,
+   "status": "keep",
+   "element": "a18-p026",
+   "pdf_page": [
+    173
+   ],
+   "printed": "הנקראת דיאופטז",
+   "correction": null,
+   "explanation": "Dioptase is a separate mineral from chrysocolla. This is a simplification.",
+   "evidence": [],
+   "print_check": "in print",
+   "crop": "errata/print-check/65.png"
+  },
+  {
+   "row": 66,
+   "status": "keep",
+   "element": "a17-p004",
+   "pdf_page": [
+    145
+   ],
+   "printed": "17 ק\"מ מדרום מזרח לעיירה טפילה",
+   "correction": null,
+   "explanation": "The figure may be a road distance.",
+   "evidence": [],
+   "print_check": "in print",
+   "crop": "errata/print-check/66.png"
+  },
+  {
+   "row": 67,
+   "status": "keep",
+   "element": "a13-p057",
+   "pdf_page": [
+    103
+   ],
+   "printed": "לכל היותר עוד שלוש וחצי שעות",
+   "correction": null,
+   "explanation": "The arithmetic differs from his own scenario, but this is a diary written in the pit.",
+   "evidence": [],
+   "print_check": "in print",
+   "crop": "errata/print-check/67.png"
+  },
+  {
+   "row": 68,
+   "status": "not-print",
+   "element": "sources-p060",
+   "pdf_page": [
+    311
+   ],
+   "printed": "54. Ehrenberg, C.G. מובא אצל אורן, א., (2008). חיים בים־המלח – עבר, הווה ועתיד. מלח הארץ 3, הוצ' מגנס, האוניברסיטה העברית בירושלים, עמ' 72.",
+   "correction": null,
+   "explanation": "In print, entry 54 is a separate entry: Ehrenberg, cited through Oren 2008. Our conversion merged it into entry 53.",
+   "evidence": [],
+   "print_check": "conversion error",
+   "crop": "errata/print-check/68.png"
+  },
+  {
+   "row": 69,
+   "status": "not-print",
+   "element": "sources-p035",
+   "pdf_page": [
+    310
+   ],
+   "printed": "30. C. B., Smith, N. G.,Ben-Yosef, E., Robinson",
+   "correction": null,
+   "explanation": "The printed bibliography has this broken entry: part of the author list only, with no title or year.",
+   "evidence": [],
+   "print_check": "in print",
+   "crop": "errata/print-check/69.png"
+  },
+  {
+   "row": 70,
+   "status": "not-print",
+   "element": "sources-p045",
+   "pdf_page": [
+    310
+   ],
+   "printed": "39. וינברג, ר. ובגין, ב\"ז, 'מה",
+   "correction": null,
+   "explanation": "The printed entry has no year. The text cites Weinberger and Begin 2005.",
+   "evidence": [],
+   "print_check": "in print",
+   "crop": "errata/print-check/70.png"
+  }
+ ]
+}
