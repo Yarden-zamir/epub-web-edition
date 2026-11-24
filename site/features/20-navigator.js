@@ -148,6 +148,12 @@ function applyFilter() {
   byId("toc-empty").hidden = shown > 0;
 }
 tocFilter.addEventListener("input", applyFilter);
+// The pill follows its tab when the tab row changes size (a phone turned with the navigator open). Without this the
+// selected tab, light text on the paper, disappears.
+new ResizeObserver(() => {
+  const selected = tabs.find((t) => t.getAttribute("aria-selected") === "true");
+  if (selected?.offsetWidth) placeTabPill(selected);
+}).observe(tabs[0].parentElement);
 onDialogOpen["toc-dialog"] = () => {
   placeTabPill(tabs.find((t) => t.getAttribute("aria-selected") === "true") ?? tabs[0]); // Sizes are known once open.
   let saved = null;
@@ -157,7 +163,8 @@ onDialogOpen["toc-dialog"] = () => {
   // The current chapter: the last top-level section that starts above a third of the screen.
   let current = null;
   for (const section of reading.querySelectorAll(".doc > section[id]")) {
-    if (section.getBoundingClientRect().top < innerHeight / 3) current = section.id;
+    // The document box: the section of a skipped document has no layout, and reading it would force one (84-rail.js).
+    if (section.closest(".book > *").getBoundingClientRect().top < innerHeight / 3) current = section.id;
     else break;
   }
   for (const link of tocDialog.querySelectorAll("[aria-current]")) link.removeAttribute("aria-current");

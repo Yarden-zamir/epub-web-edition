@@ -27,6 +27,11 @@ path.mf-line.slot-3 { stroke: var(--line-3); stroke-dasharray: 1 6.5; stroke-wid
 .mf-card { display: grid; gap: 0.15rem; padding: 0.6rem 0.9rem 0.65rem 2.6rem; font-size: 0.875rem; text-align: start; }
 .map-box.leaflet-container .mf-card a { color: var(--accent); }
 
+/* Image map: the size of the printed image (02-book.css, figure.inline > img), with its credit under it. */
+.book figure .mf-image { display: block; width: min(100%, calc(var(--w, 100%) * 1.5), calc(82vh * var(--ratio, 1))); height: auto; margin: 0 auto; cursor: auto; }
+.mf-credit { margin: 0.4rem 0 0; font-size: 0.75rem; line-height: 1.45; color: var(--muted); text-align: left; }
+.mf-credit a { color: inherit; }
+
 /* Then and now. */
 .tn-modes { margin: 0 0 0.6rem; }
 .tn-stage.side { aspect-ratio: auto !important; height: min(80vh, 44rem); max-height: none; border: 0; border-radius: 0; overflow: visible; background: none; }
@@ -55,7 +60,7 @@ path.mf-line.slot-3 { stroke: var(--line-3); stroke-dasharray: 1 6.5; stroke-wid
 /* Phones: inline figures run edge to edge (02-book.css), so the map does too and the text keeps the page gutter. */
 @media (max-width: 40rem) {
   .book figure.has-map > .view-toggle { margin-inline: var(--gutter); }
-  .map-figure > :not(.mf-map, .tn-stage) { margin-inline: var(--gutter); }
+  .map-figure > :not(.mf-map, .tn-stage, .mf-image) { margin-inline: var(--gutter); }
   .mf-map, .tn-stage:not(.side) { border-inline: 0; border-radius: 0; }
   .tn-stage.side { padding-inline: 0.5rem; }
 }

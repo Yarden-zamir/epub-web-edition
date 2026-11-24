@@ -82,6 +82,7 @@ Here (`books/eli-raz/scripts/check.py`, `check.yml`):
 | Merge queue | also axe on the whole page at every width and scheme, the explainers, tools/verify.py on the sample edition, the INGEST_INPUTS comparison when ingest runs, the PR text of each PR |
 | Nightly, by hand | `--full`, also videos and traces; by hand with `gh workflow run check.yml --ref <branch> [-f record=true]` |
 | Deploy (push to main) | `kitshn.yml`: `--gate` again, then kitshn deploys both apps |
+| PR that changes the site, advisory | `lighthouse.yml`: Lighthouse on the PR and its base, on one runner (scores in the job summary); never blocks the queue. The live site by hand: `gh workflow run lighthouse.yml -f url=https://eli-raz.yarden-zamir.com` |
 
 ## Flakes and failures
 

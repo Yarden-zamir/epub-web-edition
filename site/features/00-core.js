@@ -101,6 +101,7 @@ function position() {
 // height is only an estimate until they come near: scrollIntoView renders the target first (scroll-padding-top in
 // 00-base.css equals jumpOffset()), and a second pass on the next frames corrects any shift that rendering caused.
 function placeAtJumpLine(el, dy = 0) {
+  finishSizing(el);
   el.scrollIntoView({ block: "start", behavior: "instant" });
   if (dy) scrollBy({ top: -dy, behavior: "instant" });
   const correct = () => {
@@ -112,7 +113,7 @@ function placeAtJumpLine(el, dy = 0) {
 function restorePosition(state) {
   const block = state.anchor && document.getElementById(state.anchor);
   if (block) placeAtJumpLine(block, state.dy);
-  else scrollTo({ top: state.y, behavior: "instant" });
+  else { finishSizing(); scrollTo({ top: state.y, behavior: "instant" }); }
 }
 function scrollToElement(el) {
   placeAtJumpLine(el);
@@ -251,16 +252,45 @@ addEventListener("scroll", () => {
 // find-in-page, test tools). So render every document once, measure it, and keep that height as its estimate.
 // Again after fonts load and when the width changes. Later changes near the reader (a chart drawing) update by
 // themselves, because the estimate is "auto" (the last rendered size).
-function sizeDocuments() {
-  const root = document.documentElement;
-  root.setAttribute("data-sizing", "");
-  const docs = [...reading.querySelectorAll(":scope > .doc, :scope > .fx-set")];
+// One pass over the whole page is a long task (about 365 ms on a fast desktop CPU, more than a second on a phone). So
+// the load measures in slices of about 10 ms, one task each, after the first frame: a 60 fps frame still fits around
+// each slice. Only the documents above an element move it, so a jump first measures the ones above its target
+// that are left (finishSizing). Jumps, the arrival on a deep link and a reload land by exact sizes, as before.
+let unsized = []; // Documents that the slices did not measure yet, first to last.
+function measure(docs) {
+  for (const d of docs) d.setAttribute("data-sizing", "");
   const heights = docs.map((d) => d.getBoundingClientRect().height);
-  docs.forEach((d, i) => { d.style.containIntrinsicSize = `auto ${Math.ceil(heights[i])}px`; });
-  root.removeAttribute("data-sizing");
+  docs.forEach((d, i) => { d.style.containIntrinsicSize = `auto ${Math.ceil(heights[i])}px`; d.removeAttribute("data-sizing"); });
 }
-sizeDocuments();
-document.fonts.ready.then(sizeDocuments);
+const allDocuments = () => [...reading.querySelectorAll(":scope > .doc, :scope > .fx-set")];
+function sizeDocuments() {
+  unsized = [];
+  measure(allDocuments());
+}
+// Measure the documents that are left above `el` and the one that holds it; without `el`, all that are left.
+// Returns whether it measured any.
+function finishSizing(el = null) {
+  const below = el ? unsized.findIndex((d) => !d.contains(el) && d.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_PRECEDING) : -1;
+  const docs = unsized.splice(0, below === -1 ? unsized.length : below);
+  measure(docs);
+  return docs.length > 0;
+}
+// Two runs can overlap (a font arrives while the first one runs). They take from the same list, so they only finish
+// sooner.
+async function sizeDocumentsInSlices() {
+  unsized = allDocuments();
+  // The first slice waits for the next frame, so the page (or a deep link's target) paints before the slices start.
+  await new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve)));
+  while (unsized.length) {
+    await new Promise((resolve) => setTimeout(resolve));
+    const start = performance.now();
+    while (unsized.length && performance.now() - start < 10) measure([unsized.shift()]);
+  }
+}
+sizeDocumentsInSlices();
+// The fonts are preloaded and usually loaded before this deferred script runs. Then the first measure is final. When a
+// font still loads (a deep link can open on text that uses one first), measure again in slices once it is there.
+if (document.fonts.status !== "loaded") document.fonts.ready.then(sizeDocumentsInSlices);
 {
   let width = innerWidth, timer = 0;
   addEventListener("resize", () => {

@@ -205,11 +205,14 @@ for (const [chapter, list] of placesByChapter) {
     dots.className = "toc-places";
     dots.title = list.map((p) => p.name).join(", ");
     dots.setAttribute("aria-hidden", "true");
-    for (const p of list) {
+    // At most five marks, so a row never outgrows the panel: four dots and "+N" when there are more. The title names all.
+    const shown = list.length > 5 ? list.slice(0, 4) : list;
+    for (const p of shown) {
       const dot = document.createElement("i");
       dot.style.setProperty("--place", `var(--place-${p.n})`);
       dots.append(dot);
     }
+    if (shown.length < list.length) dots.append(`\u2066+${list.length - shown.length}\u2069`); // Isolated: reads "+4" in a right-to-left row.
     item.append(dots);
   }
   for (const link of reading.querySelectorAll(`ol.contents a[href="#${CSS.escape(chapter)}"]`)) {

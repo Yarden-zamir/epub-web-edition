@@ -414,6 +414,33 @@ class Thumbs:
         return self.made[src]
 
 
+HERO_WIDTHS = (480, 800)  # The hero cover shows at most 22rem (352 CSS px) wide (02-book.css); 800 covers 2x screens.
+HERO_BACKDROP_WIDTH = 160  # 02-book.css blurs the backdrop by 36px, so a small image looks the same as the full one.
+
+
+def hero_images(out: Path, cover: str) -> dict[str, str]:
+    """WebP copies of the cover for the hero, so the first screen does not load the full cover image."""
+    (out / "hero").mkdir()
+    with Image.open(out / cover) as im:
+        rgb = im.convert("RGB")
+    if rgb.width < HERO_WIDTHS[-1]:
+        raise BookError(f"{cover}: the cover is {rgb.width} px wide; the hero needs at least {HERO_WIDTHS[-1]} px")
+
+    def save(width: int, name: str) -> str:
+        height = round(rgb.height * width / rgb.width)
+        rgb.resize((width, height), Image.Resampling.LANCZOS).save(out / "hero" / name, "WEBP", quality=80, method=6)
+        return f"hero/{name}"
+
+    srcset = ", ".join(f"{save(w, f'cover-{w}.webp')} {w}w" for w in HERO_WIDTHS)
+    return {
+        "hero_srcset": srcset,
+        "hero_src": f"hero/cover-{HERO_WIDTHS[-1]}.webp",
+        "hero_width": str(HERO_WIDTHS[-1]),
+        "hero_height": str(round(rgb.height * HERO_WIDTHS[-1] / rgb.width)),
+        "hero_backdrop": save(HERO_BACKDROP_WIDTH, "backdrop.webp"),
+    }
+
+
 def fill(template: str, values: dict[str, str]) -> str:
     """Replace {{key}} markers in one pass, so marker text inside book content stays literal."""
     head, *parts = template.split("{{")
@@ -531,7 +558,7 @@ def build(epub: Path, out: Path, enhancements_file: Path | None = SITE / "enhanc
         "title": html.escape(book.title),
         "creator": html.escape(book.creator),
         "description": html.escape(book.description),
-        "cover": html.escape(f"book/{book.cover.path}"),
+        **{k: html.escape(v) for k, v in hero_images(out, f"book/{book.cover.path}").items()},
         "epub_href": html.escape(f"download/{epub.name}"),
         "epub_size": f"{len(epub_bytes) / 1_000_000:.1f} MB",
         "book_id": html.escape(book.identifier),
@@ -545,11 +572,15 @@ def build(epub: Path, out: Path, enhancements_file: Path | None = SITE / "enhanc
         "short_title": html.escape(book.creator),  # The bar shows the author's name when the title does not fit.
         "book": "\n".join(docs),
     }
+    reader_css = bundle(".css")
+    if "</style" in reader_css.lower():
+        raise BookError("site/features/*.css contains </style, which would end the inline style of index.html")
+    core["reader_css"] = reader_css
     if clash := core.keys() & values.keys():
         raise BookError(f"features fill core template markers {sorted(clash)}")
     page = fill((SITE / "index.html").read_text(encoding="utf-8"), core | values)
     (out / "index.html").write_text(page, encoding="utf-8")
-    (out / "reader.css").write_text(bundle(".css"), encoding="utf-8")
+    (out / "reader.css").write_text(reader_css, encoding="utf-8")  # For site/pages/; index.html has it inline.
     (out / "reader.js").write_text(bundle(".js"), encoding="utf-8")
     site.report.update({
         "epub": epub.name,
