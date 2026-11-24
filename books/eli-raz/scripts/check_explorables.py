@@ -251,15 +251,23 @@ with sync_playwright() as p:
             page.goto(f"{URL}#{fig_id}", wait_until="load", timeout=90000)
             fig = page.locator(f"#{fig_id}")
             top = lambda: page.evaluate("id => document.getElementById(id).getBoundingClientRect().top", fig_id)
-            first = top()
-            moved = 0.0
+            # Each sample: time (ms), the figure's top, scrollY, page height, explainer shown. On a failure they show
+            # what moved the page: the swap (height steps at the figure) or something else (scrollY jumps alone).
+            sample = lambda: page.evaluate("""id => { const f = document.getElementById(id);
+              return [Math.round(performance.now()), Math.round(f.getBoundingClientRect().top), Math.round(scrollY),
+                      document.documentElement.scrollHeight, !!f.querySelector('.explorable:not([hidden])')]; }""", fig_id)
+            samples = [sample()]
             for _ in range(20):  # The explainer loads as the figure nears the view, then swaps in.
                 page.wait_for_timeout(150)
-                moved = max(moved, abs(top() - first))
+                samples.append(sample())
+            moved = max(abs(s[1] - samples[0][1]) for s in samples)
             if not fig.locator("input[type=range]").is_visible():
                 problems.append(f"{where}: the explainer did not appear after a jump to its figure")
             elif moved > 2:
-                problems.append(f"{where}: the figure moved {moved:.0f} px while the explainer replaced the printed image")
+                changes = [s for i, s in enumerate(samples) if i == 0 or s[1:] != samples[i - 1][1:]]
+                problems.append(f"{where}: the figure moved {moved:.0f} px while the explainer replaced the printed image; "
+                                f"[ms, top, scrollY, height, shown] at each change: {changes}")
+                continue  # The toggle check below would only measure Playwright scrolling the moved figure into view.
             for name in ("האיור המודפס", "הדגמה אינטראקטיבית"):
                 before = top()
                 fig.get_by_role("button", name=name).click()
