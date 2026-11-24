@@ -2,7 +2,7 @@
 # desktop (books/eli-raz/scripts/lighthouse.py). It is not a required check and low scores do not fail it, so it
 # never blocks the merge queue. The job summary shows the scores; the artifact "lighthouse" holds the HTML and JSON
 # reports.
-# - pull request: builds the edition of the PR and of its base (check.py --ingest) and measures both on local servers.
+# - pull request: builds the edition of the PR and of its base (check.py) and measures both on local servers.
 #   Runners differ in speed by up to 2x, so only the two rows of one run compare; their runs take turns.
 # - by hand: the build of the branch, or the deployed site with
 #   gh workflow run lighthouse.yml -f url=https://eli-raz.yarden-zamir.com
@@ -48,14 +48,14 @@ jobs:
         uses: ./.github/actions/book-tools
       - name: Build
         if: inputs.url == ''
-        run: uv run books/eli-raz/scripts/check.py --ingest
+        run: uv run books/eli-raz/scripts/check.py
       - name: Build the base of the pull request
         if: github.event_name == 'pull_request'
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           git worktree add "$RUNNER_TEMP/base" "$BASE_SHA"
-          cd "$RUNNER_TEMP/base" && uv run books/eli-raz/scripts/check.py --ingest
+          cd "$RUNNER_TEMP/base" && uv run books/eli-raz/scripts/check.py
       - uses: actions/setup-node@v7
         with:
           node-version: 24
