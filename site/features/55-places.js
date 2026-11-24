@@ -1,19 +1,19 @@
-// Places map, right after the printed contents. The numbered list under it works without JavaScript.
+// Places map, right after the printed contents (build: tools/web/70_places.py). The list under it works without JavaScript.
+// API for other features: openPlace(id) scrolls to the map, flies to the place and opens its card. It returns a
+// promise that settles when the card is open, and rejects for an unknown place ID. Any open overlay closes first (goTo).
 const placesMap = document.getElementById("places-map");
 const places = placesMap ? JSON.parse(byId("places-data").textContent) : [];
 const placeById = new Map(places.map((p) => [p.id, p]));
 let placesReady = null;
-// A place card: name with its colour, the book's sentence about it, its chapters as pills and its photos.
+// A place card: the name, a sentence about the place, its chapters as pills and its photos.
 // Desktop shows it in a map popup; a phone shows it as a sheet at the bottom of the map.
 function placeCard(p, close) {
   const card = document.createElement("div");
   card.className = "place-card";
-  card.style.setProperty("--place", `var(--place-${p.n})`);
+  card.dir = "rtl";
   const title = document.createElement("h3");
   title.className = "pc-title";
-  const dot = document.createElement("i");
-  dot.setAttribute("aria-hidden", "true");
-  title.append(dot, p.name);
+  title.textContent = p.name;
   const text = document.createElement("p");
   text.className = "pc-desc";
   text.textContent = p.description;
@@ -21,7 +21,7 @@ function placeCard(p, close) {
   const source = document.createElement("a");
   source.className = "pc-source";
   if (p.description_kind === "edition") {
-    Object.assign(source, { href: p.description_url, target: "_blank", rel: "noopener", textContent: "מקור התיאור" });
+    Object.assign(source, { href: p.description_url, target: "_blank", rel: "noopener", textContent: "מקור התיאור ↗" });
   } else {
     Object.assign(source, { href: p.source, textContent: "מתוך הספר" });
   }
@@ -54,7 +54,7 @@ function placeCard(p, close) {
     if (!link) return;
     e.preventDefault();
     close();
-    // The description is a sentence from the book: highlight it at its source.
+    // Only a "book" description is the book's own text, so only it is highlighted at its source.
     // A quote cut short ends in "…", which is not in the book text.
     const quote = p.description.endsWith("…") ? p.description.slice(0, -1).trim() : p.description;
     goTo(link.getAttribute("href").slice(1), { marks: link === source ? [quote] : [] });
@@ -64,17 +64,15 @@ function placeCard(p, close) {
 if (placesMap) {
   placesReady = whenNear(byId("places"), () => { // The map box is hidden until drawn, so watch its section.
     placesMap.hidden = false;
-    const map = makeMap(placesMap);
+    const map = makeMap(placesMap, { label: "מפת המקומות בספר" });
     // The first view holds the Dead Sea region: the places within 75 km of the median place.
     // Places outside it stay on the map; a place marked "far" (abroad) also gets a chip that flies there.
     const near = places.filter((p) => !p.far);
     const median = (values) => values.toSorted((a, b) => a - b)[Math.floor(values.length / 2)];
     const middle = L.latLng(median(near.map((p) => p.lat)), median(near.map((p) => p.lon)));
     const core = near.filter((p) => middle.distanceTo([p.lat, p.lon]) < 75_000);
-    const home = L.latLngBounds(core.map((p) => [p.lat, p.lon])).pad(0.05);
+    const home = L.latLngBounds(core.map((p) => [p.lat, p.lon])).pad(0.08);
     map.fitBounds(home);
-    const markers = new Map();
-    const shift = new Map(); // Marker -> [dx, dy] from declutter, so the popup points at the drawn dot.
     const sheet = document.createElement("div");
     sheet.className = "map-sheet";
     sheet.hidden = true;
@@ -89,7 +87,7 @@ if (placesMap) {
     };
     const phone = () => placesMap.clientWidth < 560;
     const select = (p) => {
-      const marker = markers.get(p.id);
+      const marker = pins.markers.get(p.id);
       deselect();
       map.closePopup();
       selected = marker;
@@ -101,132 +99,85 @@ if (placesMap) {
         close.className = "sheet-close";
         close.textContent = "×";
         close.setAttribute("aria-label", "סגירה");
-        close.addEventListener("click", deselect);
+        close.addEventListener("click", () => { const m = selected; deselect(); m?.getElement()?.focus(); });
         sheet.replaceChildren(close, card);
         sheet.hidden = false;
-        if (!map.getBounds().pad(-0.15).contains(marker.getLatLng())) map.panTo(marker.getLatLng());
+        sheet.scrollTop = 0;
+        // Keep the pin in the part of the map above the sheet.
+        const room = placesMap.clientHeight - sheet.offsetHeight;
+        const at = map.latLngToContainerPoint(marker.getLatLng());
+        if (at.y > room - 24 || at.y < 24 || at.x < 24 || at.x > placesMap.clientWidth - 24) {
+          map.panBy([at.x - placesMap.clientWidth / 2, at.y - room / 2], { duration: mapMotion() || undefined, animate: mapMotion() > 0 });
+        }
         return;
       }
-      const [dx, dy] = shift.get(marker) ?? [0, 0];
-      L.popup({ maxWidth: 320, minWidth: 240, className: "place-popup", autoPanPadding: [24, 24], offset: [dx, dy - 6] })
+      const [dx, dy] = pins.offset(marker);
+      L.popup({ maxWidth: 320, minWidth: 260, className: "place-popup", autoPanPadding: [24, 24], offset: [dx, dy - 8] })
         .setLatLng(marker.getLatLng()).setContent(card).openOn(map);
     };
     map.on("popupclose", () => { if (!phone()) deselect(); });
     map.on("click", deselect);
-    for (const p of places) {
-      const icon = L.divIcon({ className: "place-pin", iconSize: [14, 14], iconAnchor: [7, 7],
-        html: `<span class="pin-dot" style="--place: var(--place-${p.n})"></span><span class="pin-label" dir="rtl"></span>` });
-      const marker = L.marker([p.lat, p.lon], { icon, keyboard: true, riseOnHover: true }).addTo(map);
-      const el = marker.getElement();
-      el.querySelector(".pin-label").textContent = p.name;
-      el.setAttribute("role", "button");
-      el.setAttribute("aria-label", p.name);
-      marker.on("click", () => select(p));
-      el.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(p); } });
-      markers.set(p.id, marker);
-    }
+    const pins = addPins(map, places.map((p) => ({ ...p, weight: p.chapters.length })), { className: "place-pin", onSelect: select });
     // Places outside the first view stay in reach: one button shows every place except those marked "far",
     // and each "far" place (abroad) gets a chip that flies there.
     const all = L.latLngBounds(near.map((p) => [p.lat, p.lon])).pad(0.05);
     const far = places.filter((p) => p.far);
-    const outside = near.some((p) => !map.getBounds().contains([p.lat, p.lon]));
+    const outside = near.some((p) => !home.contains([p.lat, p.lon]));
+    const fly = (target, zoom) => (mapMotion()
+      ? (Array.isArray(zoom) ? map.flyToBounds(target, { duration: 0.8 }) : map.flyTo(target, zoom, { duration: 1.2 }))
+      : (Array.isArray(zoom) ? map.fitBounds(target) : map.setView(target, zoom)));
     if (far.length || outside) {
-      const Chips = L.Control.extend({ options: { position: "bottomleft" }, onAdd() {
+      const Chips = L.Control.extend({ options: { position: "topleft" }, onAdd() {
         const box = L.DomUtil.create("div", "map-chips");
+        box.dir = "rtl";
         L.DomEvent.disableClickPropagation(box);
-        const back = document.createElement("button");
-        back.type = "button";
-        back.textContent = "חזרה לתצוגה הראשונה";
+        const chip = (text, onClick, dot) => {
+          const b = document.createElement("button");
+          b.type = "button";
+          if (dot) b.append(document.createElement("i"));
+          b.append(text);
+          b.addEventListener("click", onClick);
+          box.append(b);
+          return b;
+        };
+        const back = chip("חזרה לים המלח", () => { fly(home, []); back.hidden = true; });
         back.hidden = true;
-        back.addEventListener("click", () => { map.fitBounds(home); back.hidden = true; });
-        if (outside) {
-          const every = document.createElement("button");
-          every.type = "button";
-          every.textContent = "כל המקומות";
-          every.addEventListener("click", () => { map.fitBounds(all); back.hidden = false; });
-          box.append(every);
-        }
+        if (outside) chip("כל המקומות", () => { fly(all, []); back.hidden = false; });
         for (const p of far) {
-          const chip = document.createElement("button");
-          chip.type = "button";
-          chip.style.setProperty("--place", `var(--place-${p.n})`);
-          chip.append(document.createElement("i"), `מחוץ למפה: ${p.name}`);
-          chip.addEventListener("click", () => { map.setView([p.lat, p.lon], 9); select(p); back.hidden = false; });
-          box.append(chip);
+          chip(`מחוץ למפה: ${p.name}`, () => {
+            back.hidden = false;
+            if (mapMotion()) map.once("moveend", () => select(p));
+            fly([p.lat, p.lon], 9);
+            if (!mapMotion()) select(p);
+          }, true);
         }
         box.append(back);
         return box;
       } });
       new Chips().addTo(map);
     }
-    // Markers closer than a marker's width push each other apart a little, so each stays visible and tappable.
-    // The popup and tooltip keep the true position. Limit: a dense group at a far zoom spreads into a small cloud;
-    // zooming in brings every marker back to its true spot.
-    const declutter = () => {
-      const items = [...markers.values()].map((m) => {
-        const at = map.latLngToContainerPoint(m.getLatLng());
-        return { m, x: at.x, y: at.y, x0: at.x, y0: at.y };
-      });
-      const gap = 16;
-      for (let round = 0; round < 60; round++) {
-        let moved = false;
-        for (let i = 0; i < items.length; i++) for (let j = i + 1; j < items.length; j++) {
-          const a = items[i], b = items[j];
-          let dx = b.x - a.x, dy = b.y - a.y;
-          const d = Math.hypot(dx, dy);
-          if (d >= gap) continue;
-          if (d < 0.01) { dx = Math.cos(i + j); dy = Math.sin(i + j); } // Same spot: pick a direction.
-          const push = (gap - d) / 2 / Math.max(d, 0.01);
-          a.x -= dx * push; a.y -= dy * push; b.x += dx * push; b.y += dy * push;
-          moved = true;
-        }
-        if (!moved) break;
-      }
-      for (const it of items) {
-        shift.set(it.m, [it.x - it.x0, it.y - it.y0]);
-        it.m.getElement().style.translate = `${(it.x - it.x0).toFixed(1)}px ${(it.y - it.y0).toFixed(1)}px`;
-      }
-      layoutLabels();
-    };
-    // Name labels: places in more chapters first; a label that would overlap a shown label or another dot stays
-    // hidden, and shows on hover, focus or selection.
-    const byWeight = places.toSorted((a, b) => b.chapters.length - a.chapters.length || a.n - b.n);
-    const layoutLabels = () => {
-      const dots = [...markers.values()].map((m) => m.getElement().querySelector(".pin-dot").getBoundingClientRect());
-      const shown = [];
-      const hit = (a, b) => a.left < b.right + 2 && b.left < a.right + 2 && a.top < b.bottom + 1 && b.top < a.bottom + 1;
-      const box = placesMap.getBoundingClientRect();
-      for (const p of byWeight) {
-        const el = markers.get(p.id).getElement();
-        const label = el.querySelector(".pin-label");
-        el.classList.remove("label-hidden");
-        const r = label.getBoundingClientRect();
-        const own = el.querySelector(".pin-dot").getBoundingClientRect();
-        const inside = r.left >= box.left && r.right <= box.right && r.top >= box.top && r.bottom <= box.bottom;
-        const clash = !inside || shown.some((s) => hit(r, s)) || dots.some((d) => d.left !== own.left && hit(r, d));
-        el.classList.toggle("label-hidden", clash);
-        if (!clash) shown.push(r);
-      }
-    };
-    map.on("zoomend", declutter);
-    map.on("moveend", layoutLabels);
-    declutter();
-    return { map, markers, select };
+    return { map, markers: pins.markers, select };
   });
   placesReady.catch((err) => { placesMap.hidden = true; console.error(err); });
   byId("places").querySelector(".places-list").setAttribute("data-live", "");
 }
-// Show one place: scroll the map into view, centre it and open its popup.
+// Show one place: scroll the map into view, fly to the place and open its card.
 async function openPlace(id) {
   const p = placeById.get(id);
   if (!p) throw new Error(`reader.js: unknown place ${id}`);
   goTo("places");
   // The map draws when it comes near the viewport; scrolling there triggers it.
-  const { map, select } = await placesReady;
-  map.setView([p.lat, p.lon], Math.max(map.getZoom(), 11), { animate: false });
+  const { map, markers, select } = await placesReady;
+  const zoom = Math.max(map.getZoom(), 11);
+  if (mapMotion() && map.getBounds().contains([p.lat, p.lon])) {
+    await new Promise((resolve) => { map.once("moveend", resolve); map.flyTo([p.lat, p.lon], zoom, { duration: 0.6 }); });
+  } else {
+    map.setView([p.lat, p.lon], zoom, { animate: false });
+  }
   select(p);
+  markers.get(id).getElement().focus({ preventScroll: true });
 }
-// The numbered list: each name opens its place on the map.
+// The list: each name opens its place on the map.
 for (const li of document.querySelectorAll(".places-list[data-live] li")) {
   const name = li.querySelector(".place-name");
   const button = document.createElement("button");
@@ -285,4 +236,3 @@ for (const [chapter, list] of placesByChapter) {
     li.append(dots, pills);
   }
 }
-

@@ -2,59 +2,17 @@
 
 import html
 import json
-import math
 from pathlib import Path
 
 from build_web import BookError, Converter, Site, Thumbs, missing_id
 
 
-def oklch_hex(lightness: float, chroma: float, hue: float) -> str | None:
-    """sRGB hex for an OKLCH colour, or None when it is outside the sRGB gamut."""
-    a, b = chroma * math.cos(math.radians(hue)), chroma * math.sin(math.radians(hue))
-    l_ = (lightness + 0.3963377774 * a + 0.2158037573 * b) ** 3
-    m_ = (lightness - 0.1055613458 * a - 0.0638541728 * b) ** 3
-    s_ = (lightness - 0.0894841775 * a - 1.2914855480 * b) ** 3
-    rgb = (4.0767416621 * l_ - 3.3077115913 * m_ + 0.2309699292 * s_,
-           -1.2684380046 * l_ + 2.6097574011 * m_ - 0.3413193965 * s_,
-           -0.0041960863 * l_ - 0.7034186147 * m_ + 1.7076926715 * s_)
-    if any(not 0 <= c <= 1 for c in rgb):
-        return None
-    srgb = (12.92 * c if c <= 0.0031308 else 1.055 * c ** (1 / 2.4) - 0.055 for c in rgb)
-    return "#" + "".join(f"{round(255 * c):02x}" for c in srgb)
-
-
-def place_colours(count: int, lightness: tuple[float, float]) -> list[str]:
-    """One colour per place. Hues step by the golden angle and lightness alternates, so neighbours in the
-    list differ in hue and in lightness. Limit: with many places, some pairs far apart in the list look alike,
-    especially with colour blindness, so each place also shows its number and name. Revisit if places get a grouping."""
-    colours = []
-    for i in range(count):
-        hue, l_, chroma = (25 + i * 137.508) % 360, lightness[i % 2], 0.16
-        # Lower the chroma to fit sRGB, but not below 0.11 (grey territory); turn the hue a little instead.
-        while (colour := oklch_hex(l_, chroma, hue)) is None:
-            chroma -= 0.005
-            if chroma < 0.11:
-                hue, chroma = (hue + 7) % 360, 0.16
-        colours.append(colour)
-    return colours
-
-
-def number_ink(colour: str) -> str:
-    """White or near-black, whichever has more WCAG contrast on the colour, for the number on a place dot."""
-    channels = [int(colour[i:i + 2], 16) / 255 for i in (1, 3, 5)]
-    lum = sum(w * (c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4)
-              for w, c in zip((0.2126, 0.7152, 0.0722), channels))
-    return "#ffffff" if 1.05 / (lum + 0.05) >= (lum + 0.05) / 0.0617 else "#1c1a17"  # 0.0617: luminance of #1c1a17 + 0.05.
-
-
 def place_style(count: int) -> str:
-    """CSS custom properties --place-N (colour) and --place-ink-N (number colour) for light and dark mode."""
-    def props(colours: list[str]) -> str:
-        return " ".join(f"--place-{i}: {c}; --place-ink-{i}: {number_ink(c)};" for i, c in enumerate(colours, start=1))
-    light = props(place_colours(count, (0.48, 0.7)))
-    dark = props(place_colours(count, (0.5, 0.665)))
-    return (f":root {{ {light} }}\n@media (prefers-color-scheme: dark) {{ :root:not([data-theme=\"light\"]) {{ {dark} }} }}\n"
-            f":root[data-theme=\"dark\"] {{ {dark} }}")
+    """--place-N for each place, used by the contents dots, the navigator and search.
+    Every place takes the one pin colour (--pin, 50-maps.css): the map names each place, and 29 colours cannot stay
+    apart for colour-blind readers (the validated 8-colour palette of the dataviz rules keeps at most 3 hues apart
+    on a map; the Ein Gedi group alone has 7 places within 2 km). Revisit if places get a grouping with 3 or fewer kinds."""
+    return ":root { " + " ".join(f"--place-{i}: var(--pin);" for i in range(1, count + 1)) + " }"
 
 
 def places_html(data_dir: Path | None, conv: "Converter", thumbs: Thumbs) -> str:
@@ -102,7 +60,7 @@ def places_html(data_dir: Path | None, conv: "Converter", thumbs: Thumbs) -> str
                         for f in place["figures"]],
         })
         links = "".join(f'<a href="{html.escape(c["href"])}">{html.escape(c["title"])}</a>' for c in chapters)
-        items.append(f'<li id="place-{html.escape(pid)}" style="--place: var(--place-{n}); --ink: var(--place-ink-{n})">'
+        items.append(f'<li id="place-{html.escape(pid)}">'
                      f'<i class="place-dot" aria-hidden="true"></i>'
                      f'<span class="place-name">{html.escape(name)}</span><span class="place-chapters">{links}</span></li>')
     data = json.dumps(points, ensure_ascii=False).replace("</", "<\\/")

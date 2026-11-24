@@ -34,7 +34,4 @@
 .tl-major a::before { inset-inline-start: 0; top: 1.05rem; width: 0.8rem; height: 0.8rem; background: var(--accent); box-shadow: 0 0 0 3px var(--paper); }
 .tl-major .tl-date { color: var(--accent); font-size: 0.85rem; }
 .tl-major .tl-text { font-size: 1.02rem; font-weight: 600; }
-.map-chips { display: grid; gap: 6px; justify-items: start; direction: rtl; }
-.map-chips button { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: var(--radius-pill); background: rgb(255 255 255 / 0.94); color: #1c1a17; font: 600 12px/1.3 var(--sans); box-shadow: 0 1px 4px rgb(0 0 0 / 0.3); }
-.map-chips i { width: 9px; height: 9px; border-radius: 50%; background: var(--place); }
 

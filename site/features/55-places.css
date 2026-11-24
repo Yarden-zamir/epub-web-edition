@@ -1,80 +1,52 @@
-/* Places. build_web.py writes one colour per place (--place-N) for light and dark mode next to the map. */
+/* Places (55-places.js). Shared map parts (pins, popups, chips, hint, credit) are in 50-maps.css. */
 .book section.places { margin: clamp(3rem, 8vw, 5rem) 0 0; font-family: var(--sans); }
 .places-head { max-width: var(--measure); margin: 0 auto 1.25rem; }
 .places h2 { color: var(--ink); margin: 0 0 0.4rem; font-size: clamp(1.35rem, 1.2rem + 0.4vw, 1.6rem); } /* Like the contents heading. */
 .places-intro { margin: 0; color: var(--soft); font-size: 0.9rem; line-height: 1.55; }
 /* Edge to edge like a photo, but shorter. Its own stacking context keeps Leaflet's panes under the bar. */
-.places-map { position: relative; z-index: 0; isolation: isolate; width: 100vw; margin-inline: calc(50% - 50vw); height: clamp(18rem, 70vh, 46rem); direction: ltr; background: var(--mat); }
+.places-map { position: relative; z-index: 0; isolation: isolate; width: 100vw; margin-inline: calc(50% - 50vw); height: clamp(22rem, 72vh, 46rem); direction: ltr; background: var(--mat); }
 .places-all { max-width: var(--measure); margin: 0.75rem auto 0; font-size: 0.9rem; }
-.places-all summary { cursor: pointer; color: var(--muted); padding: 0.4rem 0; }
-.places-list { margin: 0.5rem 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 0.4rem 0.5rem; font-size: 0.85rem; }
-.places-list li { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.7rem 0.25rem 0.3rem; border: 1px solid var(--rule); border-radius: 999px; }
-[dir="rtl"] .places-list li { padding: 0.25rem 0.3rem 0.25rem 0.7rem; }
-.place-dot { width: 0.7rem; height: 0.7rem; border-radius: 50%; background: var(--place); box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.2); }
+.places-all summary { cursor: pointer; color: var(--muted); padding: 0.6rem 0; }
+.places-list { margin: 0.5rem 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 0.4rem 0.5rem; font-size: 0.875rem; }
+.places-list li { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 2.25rem; padding: 0 0.3rem 0 0.75rem; border: 1px solid var(--rule); border-radius: var(--radius-pill); }
+[dir="rtl"] .places-list li { padding: 0 0.75rem 0 0.3rem; }
+.place-dot { width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--pin); }
 .place-name { font-weight: 600; }
 .place-chapters { display: none; }
-.places-list button { font-weight: 600; padding: 0; }
+.places-list button { align-self: stretch; font-weight: 600; padding: 0 0.15rem; }
 .places-list button:hover { text-decoration: underline; }
 .places-list:not([data-live]) .place-chapters { display: inline; }
 .places-list:not([data-live]) .place-chapters a { margin-inline-start: 0.5rem; color: var(--muted); }
 
-/* Map markers: a numbered dot in the place colour with a paper ring. */
-/* Map pins: a colour dot with a ring, and the place name beside it when there is room for it. */
-.place-pin { overflow: visible; }
-.pin-dot { position: absolute; inset: 0; border-radius: 50%; background: var(--place); box-shadow: 0 0 0 2px #fff, 0 1px 4px rgb(0 0 0 / 0.4); transition: transform 150ms ease; }
-.pin-label { position: absolute; top: 50%; right: calc(100% + 5px); translate: 0 -50%; padding: 1px 6px; border-radius: 4px; background: #fff; color: #1c1a17; text-shadow: 0 0 2px #fff; font: 600 12px/1.35 var(--sans); white-space: nowrap; box-shadow: 0 1px 3px rgb(0 0 0 / 0.25); pointer-events: none; }
-.place-pin.label-hidden .pin-label { visibility: hidden; }
-.place-pin:is(:hover, :focus-visible, .selected) { z-index: 1000 !important; }
-.place-pin:is(:hover, :focus-visible, .selected) .pin-label { visibility: visible; }
-.place-pin.selected .pin-dot { transform: scale(1.45); box-shadow: 0 0 0 2px #fff, 0 0 0 5px var(--place), 0 2px 6px rgb(0 0 0 / 0.4); }
-.place-pin:focus-visible { outline: none; }
-.place-pin:focus-visible .pin-dot { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--accent); }
-/* Place card: in a popup on desktop and in a sheet on phones. Site tokens, so it follows dark mode. */
-.place-popup .leaflet-popup-content-wrapper, .place-popup .leaflet-popup-tip { background: var(--paper); color: var(--ink); box-shadow: 0 12px 32px rgb(0 0 0 / 0.28); }
-.place-popup .leaflet-popup-content-wrapper { border-radius: 12px; padding: 0; }
-.place-popup .leaflet-popup-content { margin: 0; }
-.place-popup a.leaflet-popup-close-button { right: auto; left: 4px; top: 6px; width: 28px; height: 28px; font: 20px/28px var(--sans); color: var(--muted); }
-.place-card { direction: rtl; text-align: right; padding: 14px 16px 16px; font-family: var(--sans); font-size: 13.5px; line-height: 1.5; color: var(--ink); }
-[dir="ltr"] .place-card { direction: ltr; text-align: left; }
-.pc-title { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; padding-inline-end: 22px; font-size: 16px; line-height: 1.3; color: var(--ink); }
-.pc-title i { flex: none; width: 11px; height: 11px; border-radius: 50%; background: var(--place); }
-.pc-desc { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin: 0; color: var(--soft); }
-.leaflet-container a.pc-source, .pc-source { display: inline-block; margin-top: 2px; font-size: 12.5px; color: var(--accent); }
-.pc-chapters { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-.leaflet-container .pc-chapters a, .pc-chapters a { padding: 3px 10px; border: 1px solid var(--rule); border-radius: 999px; background: var(--mat); color: var(--ink); font-size: 12.5px; text-decoration: none; line-height: 1.4; }
-.pc-chapters a:hover { border-color: var(--place); }
-.pc-thumbs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-.pc-thumbs button { padding: 0; border-radius: 6px; overflow: hidden; line-height: 0; }
+/* Place card: in a popup on desktop and in a sheet on phones. */
+.place-card { text-align: start; padding: 0.85rem 1rem 1rem; font: 0.875rem/1.5 var(--sans); color: var(--ink); }
+.pc-title { margin: 0 0 0.3rem; padding-inline-end: 2.25rem; font-size: 1.05rem; line-height: 1.3; color: var(--ink); }
+.pc-desc { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; margin: 0; color: var(--soft); }
+.map-box.leaflet-container a.pc-source { display: inline-block; margin-top: 0.15rem; font-size: 0.8rem; color: var(--accent); }
+.pc-chapters { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 0.65rem; }
+.map-box.leaflet-container .pc-chapters a { display: inline-flex; align-items: center; min-height: 2rem; padding: 0 0.7rem; border: 1px solid var(--rule); border-radius: var(--radius-pill); background: var(--mat); color: var(--ink); font-size: 0.8rem; text-decoration: none; line-height: 1.3; transition: border-color var(--motion-fast) var(--motion-ease); }
+.map-box.leaflet-container .pc-chapters a:hover { border-color: var(--accent); }
+.pc-thumbs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 0.65rem; }
+.pc-thumbs button { padding: 0; border-radius: var(--radius-s); overflow: hidden; line-height: 0; }
 .pc-thumbs img { width: 56px; height: 56px; object-fit: cover; }
 .pc-thumbs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 /* Phones: the card is a sheet along the bottom of the map. */
-.map-sheet { position: absolute; z-index: 1001; inset-inline: 8px; bottom: 8px; max-height: 70%; overflow-y: auto; border-radius: 12px; background: var(--paper); box-shadow: 0 10px 30px rgb(0 0 0 / 0.35); direction: rtl; }
-.map-sheet .place-card { padding-top: 12px; }
-.sheet-close { position: absolute; top: 4px; left: 4px; width: 2.25rem; height: 2.25rem; border-radius: 999px; font-size: 1.3rem; color: var(--muted); z-index: 1; }
-/* Hint shown when a gesture would scroll the page instead of moving the map. */
-.map-hint { position: absolute; inset: 0; z-index: 1001; display: grid; place-items: center; padding: 1rem; background: rgb(20 18 16 / 0.3); pointer-events: none; opacity: 0; transition: opacity 200ms ease; }
-.map-hint span { max-width: 22rem; padding: 0.6rem 1rem; border-radius: 10px; background: rgb(20 18 16 / 0.9); color: #fff; font: 600 0.95rem/1.4 var(--sans); text-align: center; direction: rtl; }
-[data-hint] > .map-hint { opacity: 1; }
-/* The folded map credit: a small © that opens on tap or hover. */
-.map-credit { display: flex; align-items: center; gap: 4px; margin: 0 6px 6px !important; font: 11px/1.4 var(--sans); direction: ltr; }
-.map-credit button { width: 22px; height: 22px; border-radius: 50%; background: rgb(255 255 255 / 0.9); color: #333; font-size: 13px; padding: 0; box-shadow: 0 1px 3px rgb(0 0 0 / 0.3); }
-.map-credit span { display: none; padding: 2px 6px; border-radius: 4px; background: rgb(255 255 255 / 0.92); color: #333; }
-.map-credit span a { color: #333; }
-.map-credit.open span, .map-credit:hover span { display: inline; }
+.map-sheet { position: absolute; z-index: 1001; inset-inline: 8px; bottom: 8px; max-height: 62%; overflow-y: auto; overscroll-behavior: contain; border: 1px solid var(--rule); border-radius: var(--radius-m); background: var(--paper); box-shadow: var(--map-shadow); direction: rtl; }
+.map-sheet::before { content: ""; display: block; width: 2.25rem; height: 4px; margin: 6px auto 0; border-radius: 2px; background: var(--rule); }
+@media (prefers-reduced-motion: no-preference) {
+  .map-sheet { transition: translate var(--motion) var(--motion-ease), opacity var(--motion) var(--motion-ease); }
+  @starting-style { .map-sheet { translate: 0 24px; opacity: 0; } }
+}
+.map-sheet .place-card { padding-top: 0.35rem; }
+.sheet-close { position: absolute; top: 2px; left: 2px; width: 2.75rem; height: 2.75rem; border-radius: var(--radius-pill); font-size: 1.4rem; color: var(--muted); z-index: 1; }
 
 /* Place dots in the printed contents: one dot per place; the button opens the place names. */
-.place-dots { display: inline-flex; align-items: center; gap: 3px; min-height: 1.75rem; padding: 0 0.35rem; border-radius: 999px; vertical-align: middle; }
+.place-dots { display: inline-flex; align-items: center; gap: 3px; min-height: 2.75rem; min-width: 2.75rem; justify-content: center; padding: 0 0.35rem; border-radius: var(--radius-pill); vertical-align: middle; }
 .place-dots:hover { background: var(--mat); }
-.place-dots i { width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--place); box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.2); }
-.place-pills { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 0.35rem; padding: 0.35rem 0 0.15rem; font-family: var(--sans); font-size: 0.8rem; }
+.place-dots i { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--place); }
+.place-pills { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 0.35rem; padding: 0.35rem 0 0.15rem; font-family: var(--sans); font-size: 0.85rem; }
 .place-pills[hidden] { display: none; }
-.place-pill { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.2rem 0.65rem 0.2rem 0.35rem; border: 1px solid var(--rule); border-radius: 999px; background: var(--paper); line-height: 1.3; }
-[dir="rtl"] .place-pill { padding: 0.2rem 0.35rem 0.2rem 0.65rem; }
-.place-pill:hover { border-color: var(--place); }
-.place-pill i { width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--place); }
-
-/* Quieter base tiles so the place dots lead; darker in dark mode, so the map is not the brightest thing on the page. */
-.places-map .leaflet-tile-pane { filter: saturate(0.6) contrast(0.95); }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .places-map .leaflet-tile-pane { filter: saturate(0.55) brightness(0.68) contrast(1.08); } }
-:root[data-theme="dark"] .places-map .leaflet-tile-pane { filter: saturate(0.55) brightness(0.68) contrast(1.08); }
-.map-chips button { background: var(--paper); color: var(--ink); }
+.place-pill { display: inline-flex; align-items: center; gap: 0.35rem; min-height: 2rem; padding: 0 0.65rem 0 0.4rem; border: 1px solid var(--rule); border-radius: var(--radius-pill); background: var(--paper); line-height: 1.3; }
+[dir="rtl"] .place-pill { padding: 0 0.4rem 0 0.65rem; }
+.place-pill:hover { border-color: var(--accent); }
+.place-pill i { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--place); }

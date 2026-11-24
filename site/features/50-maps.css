@@ -1,0 +1,69 @@
+/* Maps: parts shared by every map (50-maps.js). Pins, cards and controls use the site tokens, so they follow dark mode. */
+:root {
+  /* Motion for maps and their controls. mapMotion() in 50-maps.js keeps the same length for map moves. */
+  --motion-fast: 150ms; --motion: 350ms; --motion-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --pin: #8f3f22; --pin-ring: #ffffff; --halo: #fbf8f3;
+  --map-shadow: 0 1px 2px rgb(0 0 0 / 0.18), 0 4px 14px rgb(0 0 0 / 0.16);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --pin: #e3a07c; --pin-ring: #141312; --halo: #141312; --map-shadow: 0 1px 2px rgb(0 0 0 / 0.5), 0 6px 18px rgb(0 0 0 / 0.5); }
+}
+:root[data-theme="dark"] { --pin: #e3a07c; --pin-ring: #141312; --halo: #141312; --map-shadow: 0 1px 2px rgb(0 0 0 / 0.5), 0 6px 18px rgb(0 0 0 / 0.5); }
+@media (prefers-reduced-motion: reduce) { :root { --motion-fast: 0ms; --motion: 0ms; } }
+
+/* .leaflet-container in each selector: leaflet.css loads later and must not win ties. */
+.map-box.leaflet-container { font-family: var(--sans); font-size: 0.875rem; background: var(--mat); }
+.map-box:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+/* Quieter base tiles so pins and old maps lead; dimmed in dark mode, so the map is not the brightest thing on the page. */
+.map-box .map-tiles { filter: saturate(0.55) contrast(0.92) brightness(1.03); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .map-box .map-tiles { filter: saturate(0.5) brightness(0.62) contrast(1.1); } }
+:root[data-theme="dark"] .map-box .map-tiles { filter: saturate(0.5) brightness(0.62) contrast(1.1); }
+
+/* Pins: a dot with a ring, and the name beside it on a halo when there is room for it. */
+.map-pin { overflow: visible; }
+.map-pin .pin-dot { position: absolute; inset: 1px; border-radius: 50%; background: var(--pin); box-shadow: 0 0 0 2px var(--pin-ring), 0 1px 4px rgb(0 0 0 / 0.45); transition: scale var(--motion-fast) var(--motion-ease), box-shadow var(--motion-fast) var(--motion-ease); }
+.map-pin .pin-label {
+  position: absolute; top: 50%; right: calc(100% + 4px); translate: 0 -50%; color: var(--ink); font: 600 12.5px/1.3 var(--sans); white-space: nowrap; pointer-events: none;
+  text-shadow: 0 0 1px var(--halo), 0 0 2px var(--halo), 0 0 3px var(--halo), 0 0 4px var(--halo), 0 0 6px var(--halo);
+}
+.map-pin.label-hidden .pin-label { visibility: hidden; }
+.map-pin:is(:hover, :focus-visible, .selected) { z-index: 1000 !important; }
+.map-pin:is(:hover, :focus-visible, .selected) .pin-label { visibility: visible; }
+.map-pin:hover .pin-dot { scale: 1.2; }
+.map-pin.selected .pin-dot { scale: 1.45; box-shadow: 0 0 0 2px var(--pin-ring), 0 0 0 4.5px var(--pin), 0 2px 8px rgb(0 0 0 / 0.45); }
+.map-pin.selected .pin-label { font-weight: 700; }
+.map-pin:focus-visible { outline: none; }
+.map-pin:focus-visible .pin-dot { box-shadow: 0 0 0 2px var(--pin-ring), 0 0 0 4.5px var(--accent); }
+
+/* Popups: a compact card on paper. */
+.map-box .leaflet-popup-content-wrapper, .map-box .leaflet-popup-tip { background: var(--paper); color: var(--ink); box-shadow: var(--map-shadow); }
+.map-box .leaflet-popup-content-wrapper { border-radius: var(--radius-m); padding: 0; border: 1px solid var(--rule); }
+.map-box .leaflet-popup-content { margin: 0; font: inherit; }
+.map-box.leaflet-container a.leaflet-popup-close-button { right: auto; left: 2px; top: 2px; width: 2.75rem; height: 2.75rem; display: grid; place-items: center; font: 22px/1 var(--sans); color: var(--muted); }
+.map-box.leaflet-container a.leaflet-popup-close-button:hover { color: var(--ink); }
+@media (prefers-reduced-motion: no-preference) {
+  .map-box .leaflet-popup { animation: map-pop var(--motion) var(--motion-ease); }
+}
+@keyframes map-pop { from { opacity: 0; translate: 0 6px; } }
+
+/* Chips and small controls on the map. */
+.map-chips { display: grid; gap: 6px; justify-items: start; margin: 10px 0 0 10px !important; }
+.map-chips button, .map-control {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 2.25rem; padding: 0 0.8rem; border: 1px solid var(--rule); border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--paper) 94%, transparent); color: var(--ink); font: 600 0.8rem/1.2 var(--sans); box-shadow: var(--map-shadow);
+  transition: background var(--motion-fast) var(--motion-ease), border-color var(--motion-fast) var(--motion-ease);
+}
+.map-chips button:hover, .map-control:hover { border-color: var(--accent); }
+.map-chips i { width: 9px; height: 9px; border-radius: 50%; background: var(--pin); box-shadow: 0 0 0 1.5px var(--pin-ring); }
+
+/* Hint shown when a gesture would scroll the page instead of moving the map. */
+.map-hint { position: absolute; inset: 0; z-index: 1001; display: grid; place-items: center; padding: 1rem; background: rgb(20 18 16 / 0.28); pointer-events: none; opacity: 0; transition: opacity var(--motion) var(--motion-ease); }
+.map-hint span { max-width: 22rem; padding: 0.6rem 1rem; border-radius: var(--radius-s); background: rgb(20 18 16 / 0.9); color: #fff; font: 600 0.95rem/1.4 var(--sans); text-align: center; direction: rtl; }
+[data-hint] > .map-hint { opacity: 1; }
+
+/* The folded map credit: a small © that opens on tap or hover. */
+.map-credit { display: flex; align-items: center; gap: 4px; margin: 0 6px 6px !important; font: 11px/1.4 var(--sans); }
+.map-credit button { width: 1.5rem; height: 1.5rem; border-radius: 50%; background: color-mix(in srgb, var(--paper) 92%, transparent); color: var(--ink); font-size: 13px; padding: 0; box-shadow: var(--map-shadow); }
+.map-credit span { display: none; max-width: min(28rem, 80vw); padding: 2px 8px; border-radius: var(--radius-s); background: color-mix(in srgb, var(--paper) 94%, transparent); color: var(--ink); }
+.map-credit span a { color: inherit; }
+.map-credit.open span, .map-credit:hover span { display: inline; }
