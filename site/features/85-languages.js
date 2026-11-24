@@ -2,6 +2,9 @@
 // - a reading mode for the whole book: as printed, Hebrew, or English. Kept in ?lang= and localStorage;
 // - a switch at each translated chapter, and a small chip beside each element that shows a foreign language.
 // A translation replaces the inner HTML of elements by ID, so IDs, links, notes and highlights keep working.
+// Marks that the build adds to the printed text (glossary terms, cross-links) stay with the printed text: a translation
+// shows its own markup only, and switching back restores the printed content with its marks. The glossary is Hebrew and
+// its first-use marks follow the printed paragraphs, so marking a translation would need a second copy of that logic.
 const translationIndex = JSON.parse(document.getElementById("translations-data")?.textContent ?? "{}");
 const LANG_KEY = `reader-lang:${document.documentElement.dataset.bookId}`;
 const LANG_NAME = { he: "עברית", en: "English" };
