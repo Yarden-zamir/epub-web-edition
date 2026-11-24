@@ -125,15 +125,28 @@ function thenNow(box, spec, img) {
     return credit;
   };
 
-  // Fade mode. Every layer is on the map from the start, so moving the control never waits for an image.
+  // Fade mode. The first layer loads at once. The others load when the browser is idle after it, or at once when the
+  // reader moves the time control, so the first view waits for one image only. The note shows while a layer that
+  // the control shows is not in yet.
   const fadeMap = makeMap(fadeBox, { label: `${spec.title}: מעבר בזמן`, maxBounds: L.latLngBounds(layers[0].bounds).pad(0.6) });
   fadeMap.fitBounds(layers[0].bounds);
-  const overlay = (layer) => L.imageOverlay(layer.image, layer.bounds, { className: "tn-layer", interactive: false, alt: "" });
-  const fadeLayers = layers.map((layer) => overlay(layer).addTo(fadeMap));
+  const overlay = (layer, opacity = 1) => L.imageOverlay(layer.image, layer.bounds, { className: "tn-layer", interactive: false, alt: "", opacity });
   const loading = el("p", "tn-loading", "טוען את המפות…");
   stage.append(loading);
-  let waiting = layers.length;
-  for (const o of fadeLayers) o.once("load error", () => { if (--waiting === 0) loading.hidden = true; });
+  const fadeLayers = layers.map((layer) => overlay(layer, 0)); // Clear until render sets it, so a late layer never flashes.
+  const ready = new Set();
+  const add = (o) => {
+    o.once("load error", () => { ready.add(o); frame ||= requestAnimationFrame(render); });
+    o.addTo(fadeMap);
+  };
+  let restAdded = false;
+  const addRest = () => {
+    if (restAdded) return;
+    restAdded = true;
+    fadeLayers.slice(1).forEach(add);
+  };
+  add(fadeLayers[0]);
+  fadeLayers[0].once("load error", () => whenIdle(addRest));
   // Between layers i and i + 1 the newer one fades in first, then the older one fades out, so the middle of the
   // move never shows two half-clear maps. An older layer outside a newer one's bounds fades out with it.
   const ease = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
@@ -145,7 +158,8 @@ function thenNow(box, spec, img) {
   let t = 0, frame = 0, shown = -1;
   const render = () => {
     frame = 0;
-    fadeLayers.forEach((o, i) => o.getElement().style.opacity = opacity(i, t).toFixed(3));
+    fadeLayers.forEach((o, i) => { const img = o.getElement(); if (img) img.style.opacity = opacity(i, t).toFixed(3); });
+    loading.hidden = fadeLayers.every((o, i) => opacity(i, t) === 0 || ready.has(o));
     const near = Math.round(t);
     input.setAttribute("aria-valuetext", layers[near].label);
     stopButtons.forEach((b, i) => b.setAttribute("aria-pressed", String(i === near)));
@@ -156,6 +170,7 @@ function thenNow(box, spec, img) {
   };
   const setT = (value) => {
     t = Math.min(last, Math.max(0, value));
+    if (t > 0) addRest();
     input.value = String(t);
     frame ||= requestAnimationFrame(render);
   };
