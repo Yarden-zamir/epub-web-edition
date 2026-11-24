@@ -62,8 +62,10 @@ function placeCard(p, close) {
   return card;
 }
 if (placesMap) {
-  placesReady = whenNear(byId("places"), () => { // The map box is hidden until drawn, so watch its section.
-    placesMap.hidden = false;
+  // The box shows at once at its full size, in the mat colour, so the page does not move when the map draws.
+  // Without the script it stays hidden.
+  placesMap.hidden = false;
+  placesReady = whenNear(placesMap, () => {
     const map = makeMap(placesMap, { label: "מפת המקומות בספר" });
     // The first view holds the Dead Sea region: the places within 75 km of the median place.
     // Places outside it stay on the map; a place marked "far" (abroad) also gets a chip that flies there.
@@ -118,6 +120,9 @@ if (placesMap) {
     map.on("popupclose", () => { if (!phone()) deselect(); });
     map.on("click", deselect);
     const pins = addPins(map, places.map((p) => ({ ...p, weight: p.chapters.length })), { className: "place-pin", onSelect: select });
+    // Each place keeps its own colour on the map: its pin dot and selection ring take --place-N (70_places.py).
+    // Figure maps without places keep the one --pin colour of 50-maps.css.
+    for (const p of places) pins.markers.get(p.id).getElement().style.setProperty("--pin", `var(--place-${p.n})`);
     // Places outside the first view stay in reach: one button shows every place except those marked "far",
     // and each "far" place (abroad) gets a chip that flies there.
     const all = L.latLngBounds(near.map((p) => [p.lat, p.lon])).pad(0.05);
@@ -149,7 +154,7 @@ if (placesMap) {
             if (mapMotion()) map.once("moveend", () => select(p));
             fly([p.lat, p.lon], 9);
             if (!mapMotion()) select(p);
-          }, true);
+          }, true).style.setProperty("--pin", `var(--place-${p.n})`);
         }
         box.append(back);
         return box;

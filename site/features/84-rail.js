@@ -1,6 +1,7 @@
 // Chapter rail: one mark per chapter and part on the inline-start edge, the current one lit. Dragging along it scrubs
-// the page and shows the chapter under the finger; letting go jumps to that chapter's start, as one history entry,
-// so Back returns to where the scrub began. Pointer only: keyboard and screen-reader users have the navigator.
+// the page and shows the chapter under the finger; letting go keeps the page where it is, as one history entry,
+// so Back returns to where the scrub began. Touch only (84-rail.css): with a mouse the rail would cover the
+// scrollbar. Keyboard and screen-reader users have the navigator.
 const rail = document.createElement("div");
 rail.className = "rail";
 rail.setAttribute("aria-hidden", "true");
@@ -72,7 +73,8 @@ const endScrub = () => {
   scrubbing = false;
   document.documentElement.removeAttribute("data-scrubbing");
   railLabel.hidden = true;
-  if (scrubSection) goTo(scrubSection.id, { keepOrigin: true });
+  // Stay where the reader let go; a jump to the chapter start would move the page after the release.
+  if (scrubSection) history.pushState({ overlays: [], target: null, marks: [], back: null, ...position() }, "");
   showRail();
 };
 rail.addEventListener("pointerup", endScrub);
