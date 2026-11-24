@@ -8,6 +8,7 @@ Usage: uv run tools/check_coverage.py CONTENT_DIR [MIN_SHARE]
 
 Compares letters and digits as multisets (order-free), outside the running-head zone.
 Punctuation and whitespace are ignored, so word splitting (maqaf, gershayim) does not count.
+A book.toml [[correction]] changes the expected letters of its page; its edition note is not counted.
 The check finds dropped or extra text, not ordering. Writes CONTENT_DIR/inventory/coverage.csv and prints pages below MIN_SHARE.
 """
 
@@ -44,6 +45,8 @@ def epub_words_by_page(text_dir: Path) -> dict[int, list[str]]:
             pin = el.attrib.get("data-pdf-page")
             pinned = int(pin) if pin else pinned
             el_id = el.attrib.get("id", "")
+            if "edition-correction" in el.attrib.get("class", "").split() and el.tag == f"{XHTML}aside":
+                return  # Edition note with the printed form of a correction; not book text.
             if el.attrib.get(f"{OPS}type") == "pagebreak" and el_id.startswith("pg-"):
                 current = int(el_id[3:])
             if el.text:
@@ -83,6 +86,9 @@ def main() -> None:
         for src, dst in char_map.items():
             raw = raw.replace(src, dst)
         want = collections.Counter(norm_words(raw))
+        for corr in cfg.get("correction", []):
+            if corr["page"] == page.number + 1:
+                want = want - collections.Counter(norm_words(corr["find"])) + collections.Counter(norm_words(corr["replace"]))
         got = collections.Counter(epub.get(page.number + 1, []))
         missing = want - got
         share = 1.0 if not want else 1 - sum(missing.values()) / sum(want.values())

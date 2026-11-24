@@ -678,6 +678,7 @@ class Ingest:
         self.units = self.load_units()
         self.ids = IdRegistry(content / "ids.csv", content / "id-moves.csv")
         self.text_tables_used: set[str] = set()
+        self.corrections_used: set[int] = set()
         self.poem_taken: dict[int, set[tuple[float, str]]] = {}  # Lines that a poem from an earlier page took.
         self.poem_markers: set[int] = set()  # Pages whose marker sits inside a poem.
         self.poems_used: set[tuple[str, int]] = set()
@@ -750,6 +751,17 @@ class Ingest:
                     ln.html = ln.html.replace(html.escape(tf["find"], quote=False), html.escape(tf["replace"], quote=False))
                     self.text_fixes_used.add((pno, tf["find"]))
                     self.issue(pno, "intentional-change", f"Text fix {tf['find']!r} -> {tf['replace']!r}: {tf['reason']}")
+            for k, corr in enumerate(self.cfg.get("correction", []), start=1):
+                if corr["page"] != pno or corr["find"] not in ln.text:
+                    continue
+                esc = html.escape(corr["find"], quote=False)
+                if ln.text.count(corr["find"]) != 1 or ln.html.count(esc) != 1:
+                    raise IngestError(f"[[correction]] page {pno}: {corr['find']!r} must occur once in its printed line")
+                ln.text = ln.text.replace(corr["find"], corr["replace"])
+                # The marker resolves to a note reference in render_unit(), where the unit is known.
+                ln.html = ln.html.replace(esc, f'<span class="edition-correction">{html.escape(corr["replace"], quote=False)}</span>@@CORR{k}@@')
+                self.corrections_used.add(k)
+                self.issue(pno, "intentional-change", f"Correction {corr['find']!r} -> {corr['replace']!r}: {corr['reason']} Evidence: {corr['evidence']}")
             fix = next((f for f in self.cfg.get("note_ref_fix", []) if f["page"] == pno and f["contains"] in ln.text), None)
             if fix:
                 num = str(fix["number"])
@@ -1399,6 +1411,23 @@ class Ingest:
             tables.append((top[0].y0, table))
         return lines, tables
 
+    def link_corrections(self, parts: list[str]) -> list[str]:
+        """Turn each correction marker into a note reference, and add one edition note per correction at the
+        end of the unit. The note gives the printed form, so the reader sees what changed."""
+        out, notes = [], []
+        for part in parts:
+            while "@@CORR" in part:
+                k = int(part.split("@@CORR", 1)[1].split("@@", 1)[0])
+                corr = self.cfg["correction"][k - 1]
+                ref = (f'<a epub:type="noteref" role="doc-noteref" class="edition-mark" id="corr{k}-ref" '
+                       f'href="#corr{k}">†</a>')
+                part = part.replace(f"@@CORR{k}@@", ref, 1)
+                notes.append(f'<aside epub:type="footnote" role="doc-footnote" id="corr{k}" class="footnote edition-correction">'
+                             f'<p><a href="#corr{k}-ref" role="doc-backlink">†</a> {html.escape(self.cfg["correction_note"])} '
+                             f'<bdi>{html.escape(corr["find"], quote=False)}</bdi></p></aside>')
+            out.append(part)
+        return out + notes
+
     def render_unit(self, unit: Unit) -> tuple[str, list[str], str | None]:
         """Return XHTML body content, the IDs per page, and the unit heading text."""
         if unit.kind == "contents":
@@ -1531,6 +1560,7 @@ class Ingest:
             open_para = next_open
         self.page_ids.update(page_ids)
         parts = self.link_notes(unit, parts, notes)
+        parts = self.link_corrections(parts)
         first_content = next((x for x in parts if not x.startswith("<span epub:type")), "")
         self.opens_with_photo[unit.id] = 'class="figure photo"' in first_content
         return "\n".join(parts), [], heading
@@ -1575,6 +1605,8 @@ class Ingest:
             raise IngestError(f"book.toml [[poem]] entries match no page: {sorted(unused_poems)}")
         if unused_tables := {t["id"] for t in self.cfg.get("text_table", [])} - self.text_tables_used:
             raise IngestError(f"book.toml [[text_table]] entries match no page: {sorted(unused_tables)}")
+        if unused := sorted(set(range(1, len(self.cfg.get("correction", [])) + 1)) - self.corrections_used):
+            raise IngestError(f"book.toml [[correction]] entries (1-based) match no printed line: {unused}")
         stale = [(f["page"], f["find"]) for f in self.cfg.get("text_fix", []) if (f["page"], f["find"]) not in self.text_fixes_used]
         if stale:
             raise IngestError(f"book.toml [[text_fix]] entries match no text: {stale}")
