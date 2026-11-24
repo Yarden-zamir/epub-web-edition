@@ -213,8 +213,9 @@ async function setUp(figure, box) {
   box.prepend(head, stage, controls, readout, live);
   box.hidden = false;
 
-  {
-    // Slot widths: every value of the control, measured once with each slot's own font (no layout reads).
+  // Slot widths: measured at set-up and again once the site font has loaded (it may load after set-up).
+  function sizeSlots() {
+    // Every value of the control, with each slot's own font (canvas measure: no layout reads).
     // Tabular digits all take the width of "0", so digits are measured as "0".
     const probe = document.createElement("canvas").getContext("2d");
     const steps = Math.min(400, Math.round(span / c.step));
@@ -227,6 +228,7 @@ async function setUp(figure, box) {
     unitSlot.style.minWidth = `${widest(unitSlot, (p) => p.unit) + 1}px`;
     noteSlot.style.minWidth = `${widest(noteSlot, (p) => (p.note ? `(${p.note})` : "")) + 1}px`;
   }
+  sizeSlots();
   const env = makeEnv(box);
   env.scale = 1;
   env.view = kind.view;
@@ -358,8 +360,9 @@ async function setUp(figure, box) {
   }).observe(stage);
   const retheme = () => { env.reset(); canvasValue = NaN; scene.resize?.(env); show(value); };
   // The canvas draws with the site font; draw again once it has loaded, or labels keep a fallback font.
-  document.fonts.ready.then(retheme);
-  document.fonts.addEventListener("loadingdone", retheme);
+  const refont = () => { sizeSlots(); retheme(); };
+  document.fonts.ready.then(refont);
+  document.fonts.addEventListener("loadingdone", refont);
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", retheme);
   new MutationObserver(retheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
   commit();

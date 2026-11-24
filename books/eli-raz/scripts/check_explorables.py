@@ -145,7 +145,14 @@ with sync_playwright() as p:
                     problems.append(f"{where}: reset does not restore {start}")
                 if width > 600:
                     # Positions of the label, the unit and the explanation must not change in the middle of a drag.
-                    probe = "f => ['.xp-label-text', '.xp-unit', '.xp-readout'].map(s => { const r = f.querySelector(s).getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.width)]; })"
+                    # Positions inside the card (so a shift of the whole page is told apart), plus the card itself.
+                    probe = """f => { const card = f.querySelector('.explorable').getBoundingClientRect();
+                      const at = {card: [Math.round(card.left), Math.round(card.top)]};
+                      for (const s of ['.xp-label-text', '.xp-num', '.xp-unit', '.xp-readout']) {
+                        const r = f.querySelector(s).getBoundingClientRect();
+                        at[s] = [Math.round(r.left - card.left), Math.round(r.top - card.top), Math.round(r.width)];
+                      }
+                      return at; }"""
                     center_handle(page, fig)
                     before = fig.evaluate(probe)
                     box = fig.locator(".xp-handle").bounding_box()
@@ -155,11 +162,15 @@ with sync_playwright() as p:
                     for step in range(1, 13):
                         page.mouse.move(hx, hy + (step * 9 if fig_id == "fig-a14-07" else -step * 9))
                         page.wait_for_timeout(30)
-                        if fig.evaluate(probe) != before:
-                            shifted.append(step)
+                        now = fig.evaluate(probe)
+                        moved = [f"{k} {before[k]}->{now[k]}" for k in now if k != "card" and now[k] != before[k]]
+                        if moved:
+                            shifted.append(f"step {step}: {', '.join(moved)}")
+                        if now["card"] != before["card"]:
+                            print(f"note {where}: the whole card moved on the page at step {step}: {before['card']} -> {now['card']}")
                     page.mouse.up(); page.wait_for_timeout(300)
                     if shifted:
-                        problems.append(f"{where}: the value line or the explanation moved during a drag (steps {shifted})")
+                        problems.append(f"{where}: the value line or the explanation moved inside the card during a drag: {shifted[:3]}")
                 if not (drag(page, fig, 10, 12) or drag(page, fig, 10, -12)):
                     problems.append(f"{where}: dragging in the drawing does not change the value")
                 hit = page.evaluate("el => el.getBoundingClientRect().width", fig.locator(".xp-handle").first.element_handle())
