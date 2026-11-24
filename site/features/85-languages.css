@@ -1,6 +1,6 @@
 /* Languages: the chapter switch, the element chip and the reading mode button with its menu. */
 
-/* Chapter switch: a small segmented control above the chapter title, with the machine translation note. */
+/* Chapter switch: a small segmented control above the chapter title, with the AI translation note. */
 .lang-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.75rem; margin: 0 0 1.25rem; font-family: var(--sans); font-size: 0.8rem; line-height: 1.2; }
 .lang-switch { position: relative; isolation: isolate; display: inline-grid; grid-template-columns: repeat(var(--count, 2), 1fr); padding: 3px; border-radius: var(--radius-pill); background: var(--mat); box-shadow: inset 0 0 0 1px var(--rule); }
 .lang-switch::before {

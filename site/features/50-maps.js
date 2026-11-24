@@ -7,7 +7,7 @@
 // - A mouse drags the map. Arrow keys and + / - work when the map has focus (Leaflet's keyboard handler).
 // - On a touch screen one finger scrolls the page and two fingers pan and zoom.
 // - A blocked gesture shows a short hint.
-const LEAFLET = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/";
+const LEAFLET = "vendor/leaflet-1.9.4/"; // Copied by tools/web/50_maps.py; the service worker saves it with the shell.
 const MAP_CREDIT = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, SRTM · &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)';
 const WHEEL_HINT = "Ctrl + גלילה להגדלה · לחיצה על המפה כדי להזיז אותה";
 const TOUCH_HINT = "שתי אצבעות מזיזות ומגדילות את המפה";
@@ -16,25 +16,33 @@ const mapMotion = () => (reduceMotion.matches ? 0 : 0.3);
 let leafletReady = null;
 function loadLeaflet() {
   const load = (tag, attrs) => new Promise((resolve, reject) => {
-    const el = Object.assign(document.createElement(tag), attrs, { crossOrigin: "anonymous" });
+    const el = Object.assign(document.createElement(tag), attrs);
     el.onload = resolve;
     el.onerror = () => reject(new Error(`map: ${attrs.src ?? attrs.href} did not load`));
     document.head.append(el);
   });
   leafletReady ??= Promise.all([
-    load("link", { rel: "stylesheet", href: `${LEAFLET}leaflet.css`, integrity: "sha512-Zcn6bjR/8RZbLEpLIeOwNtzREBAJnUKESxces60Mpoj+2okopSAcSUIUOseddDm0cxnGQzxIR7vJgsLZbdLE3w==" }),
-    load("script", { src: `${LEAFLET}leaflet.js`, integrity: "sha512-BwHfrr4c9kmRkLw6iXFdzcdWV/PGkVgiIyIWLLlTSXzWQzxuSg4DiQUCpauz/EWjgk5TYQqX/kvn9pG1NpYfqg==" }),
+    load("link", { rel: "stylesheet", href: `${LEAFLET}leaflet.css` }),
+    load("script", { src: `${LEAFLET}leaflet.js` }),
   ]);
   return leafletReady;
 }
-// Draw a map once its box comes near the viewport. Returns a promise of the draw result.
+// The library loads when the browser is idle after the page loads, so a map that comes into view only fetches tiles.
+// Safari has no requestIdleCallback; it waits a short time instead.
+const whenIdle = (fn) => (window.requestIdleCallback ?? ((f) => setTimeout(f, 300)))(fn, { timeout: 4000 });
+if (document.querySelector(".places-map, figure.has-map")) {
+  addEventListener("load", () => whenIdle(() => loadLeaflet().catch((error) => console.error(error))), { once: true });
+}
+// Draw a map once its box comes within about two phone screens of the viewport, so tiles are often in before it shows.
+// Known limit: a box inside a chapter that content-visibility skips gets its layout only when the chapter renders, so
+// the early margin can be shorter there. Revisit if maps still show empty on a fast scroll.
 function whenNear(el, draw) {
   return new Promise((resolve, reject) => {
     new IntersectionObserver((entries, observer) => {
       if (!entries.some((e) => e.isIntersecting)) return;
       observer.disconnect();
       loadLeaflet().then(draw).then(resolve, reject);
-    }, { rootMargin: "400px" }).observe(el);
+    }, { rootMargin: "1500px" }).observe(el);
   });
 }
 // One map in el. label names the map for screen readers; credit is HTML for the folded © control.

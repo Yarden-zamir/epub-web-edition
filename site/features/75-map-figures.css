@@ -19,13 +19,18 @@ path.mf-line.slot-1 { stroke: var(--line-1); }
 path.mf-line.slot-2 { stroke: var(--line-2); stroke-dasharray: 9 6; }
 path.mf-line.slot-3 { stroke: var(--line-3); stroke-dasharray: 1 6.5; stroke-width: 4.5px; }
 .mf-area { fill: var(--area); fill-opacity: 0.12; stroke: var(--area); stroke-width: 2px; stroke-dasharray: 5 4; }
-.mf-area-label.leaflet-tooltip { padding: 0; border: 0; background: none; box-shadow: none; color: var(--ink); font: 600 12.5px/1.3 var(--sans); text-shadow: 0 0 2px var(--halo), 0 0 3px var(--halo), 0 0 5px var(--halo); }
+.mf-area-label.leaflet-tooltip { padding: 0; border: 0; background: none; box-shadow: none; color: var(--ink); font: 600 13px/1.3 var(--sans); text-shadow: 0 0 2px var(--halo), 0 0 3px var(--halo), 0 0 5px var(--halo); }
 .mf-legend { display: flex; flex-wrap: wrap; gap: 0.3rem 1.1rem; margin: 0.6rem 0 0; padding: 0; list-style: none; font-size: 0.85rem; color: var(--soft); }
 .mf-legend li { display: inline-flex; align-items: center; gap: 0.45rem; }
 .mf-legend svg { width: 1.75rem; height: 0.75rem; flex: none; overflow: visible; }
 .mf-legend path.mf-line { stroke-width: 3px; }
 .mf-card { display: grid; gap: 0.15rem; padding: 0.6rem 0.9rem 0.65rem 2.6rem; font-size: 0.875rem; text-align: start; }
 .map-box.leaflet-container .mf-card a { color: var(--accent); }
+
+/* Image map: the size of the printed image (02-book.css, figure.inline > img), with its credit under it. */
+.book figure .mf-image { display: block; width: min(100%, calc(var(--w, 100%) * 1.5), calc(82vh * var(--ratio, 1))); height: auto; margin: 0 auto; cursor: auto; }
+.mf-credit { margin: 0.4rem 0 0; font-size: 0.75rem; line-height: 1.45; color: var(--muted); text-align: left; }
+.mf-credit a { color: inherit; }
 
 /* Then and now. */
 .tn-modes { margin: 0 0 0.6rem; }
@@ -55,7 +60,7 @@ path.mf-line.slot-3 { stroke: var(--line-3); stroke-dasharray: 1 6.5; stroke-wid
 /* Phones: inline figures run edge to edge (02-book.css), so the map does too and the text keeps the page gutter. */
 @media (max-width: 40rem) {
   .book figure.has-map > .view-toggle { margin-inline: var(--gutter); }
-  .map-figure > :not(.mf-map, .tn-stage) { margin-inline: var(--gutter); }
+  .map-figure > :not(.mf-map, .tn-stage, .mf-image) { margin-inline: var(--gutter); }
   .mf-map, .tn-stage:not(.side) { border-inline: 0; border-radius: 0; }
   .tn-stage.side { padding-inline: 0.5rem; }
 }

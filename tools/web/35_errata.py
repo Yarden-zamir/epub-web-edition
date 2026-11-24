@@ -330,7 +330,9 @@ def write(site: Site) -> None:
         "book_css": esc(f"../book/{css}"),
         "verified": str(len(linked)),
         "total": str(len(STATE.rows)),
-        "translator": "ההסברים תורגמו לעברית בתרגום מכונה מתוך רשימת המחקר באנגלית, ועדיין לא נבדקו." if "machine" in STATE.translator else "",
+        # The note repeats the claim of errata-he.json "translator", so it shows exactly while no person reviewed the text.
+        "translator": ("ההסברים תורגמו לעברית מתוך רשימת המחקר באנגלית. תרגום בבינה מלאכותית, לא נבדק בידי אדם."
+                       if "not reviewed by a person" in STATE.translator else ""),
         "filters": "".join(filters),
         "sections": "".join(sections),
     })
@@ -354,9 +356,10 @@ def add_printed_search(site: Site, linked: dict[int, Correction]) -> None:
         text = entries[el]["text"]
         for c in linked.values():
             if c.element == el:
-                if f"{c.corrected}†" not in text:
-                    raise BookError(f"{el}: search text lacks {c.corrected!r} before its mark")
-                text = text.replace(f"{c.corrected}†", c.printed, 1)
+                # Search text has no note marks (build_web.reading_text), so the corrected words must be unique in the block.
+                if text.count(c.corrected) != 1:
+                    raise BookError(f"{el}: search text has {text.count(c.corrected)} copies of {c.corrected!r}; expected 1")
+                text = text.replace(c.corrected, c.printed, 1)
         variants.append({"id": el, "text": text})
     index["variants"] = variants
     path.write_text(json.dumps(index, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")

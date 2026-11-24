@@ -62,8 +62,10 @@ function placeCard(p, close) {
   return card;
 }
 if (placesMap) {
-  placesReady = whenNear(byId("places"), () => { // The map box is hidden until drawn, so watch its section.
-    placesMap.hidden = false;
+  // The box shows at once at its full size, in the mat colour, so the page does not move when the map draws.
+  // Without the script it stays hidden.
+  placesMap.hidden = false;
+  placesReady = whenNear(placesMap, () => {
     const map = makeMap(placesMap, { label: "מפת המקומות בספר" });
     // The first view holds the Dead Sea region: the places within 75 km of the median place.
     // Places outside it stay on the map; a place marked "far" (abroad) also gets a chip that flies there.

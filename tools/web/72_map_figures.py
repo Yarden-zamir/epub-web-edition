@@ -1,24 +1,36 @@
-"""Maps inside printed figures: figure maps (figure-maps/<figure ID>.json) and the then-and-now view (then-now.json).
+"""Maps inside printed figures: figure maps and image maps (figure-maps/<figure ID>.json), and the then-and-now view (then-now.json).
 
 Both files sit next to the enhancements file; their formats are in books/eli-raz/AGENTS-BRIEF.md and the files' own notes.
 The build checks every figure and element ID against the EPUB, writes the browser data to data/maps/<figure ID>.json,
-copies the then-and-now images to media/then-now/, and puts a hidden box inside each figure.
+writes the then-and-now images to media/then-now/ at the size the view needs, and puts a hidden box inside each figure.
+It copies the image of each image map to media/maps/ as it is.
 site/features/75-map-figures.js fills the box and adds a toggle between the map and the printed image.
+An image map is a static map drawn for the edition, for example a modern map of the same ground as a printed map.
+Its spec has "image" instead of "base"; the printed image stays the first and default view.
 """
 
-import html
 import json
 import shutil
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-from build_web import BookError, Site, missing_id
+from PIL import Image
+
+from build_web import BookError, Site, credit_html, missing_id
 
 # Line colours for figure maps: the first three slots of the dataviz reference palette, the only slots that stay apart
 # for colour-blind readers when all pairs can meet (site/features/75-map-figures.css). Each slot also has its own dash.
 LINE_SLOTS = 3
 BOXES: dict[str, ET.Element] = {}  # Printed figure ID -> map box placed inside it.
 IMAGES: list[tuple[Path, str]] = []  # Then-and-now images: (source file, path in the site).
+COPIES: list[tuple[Path, str]] = []  # Image map images, copied as they are: (source file, path in the site).
+IMAGE_MAP_MAX_BYTES = 400_000
+IMAGE_MAP_TYPES = (".webp", ".avif")
+# The long side of a then-and-now image in the site: about twice the largest map box (44rem), for sharp screens.
+# Known limit: a reader who zooms in far sees the image soften. Revisit if the view gets a zoom past the fitted layer.
+THEN_NOW_SIDE = 1600
+THEN_NOW_QUALITY = 68  # WebP quality: each layer lands between 80 and 400 KB.
+# WebP effort: 6 saves 4% more bytes but takes 4 times as long (about 15 s for the three layers).
 
 
 def check_lat_lon(lat: float, lon: float, where: str) -> None:
@@ -43,22 +55,38 @@ def book_path(site: Site, path: str, where: str) -> Path:
     return site.data_dir / path.removeprefix("site/")
 
 
-def credit_html(lines: list[str], links: dict[str, str], where: str) -> str:
-    """The attribution lines as HTML, with the first use of each linked word made a link."""
-    text = " · ".join(html.escape(line) for line in lines)
-    for word, url in links.items():
-        if not url.startswith("https://"):
-            raise BookError(f"{where}: attribution link for {word!r} must be https")
-        key = html.escape(word)
-        if key not in text:
-            raise BookError(f"{where}: attribution_links names {word!r}, which no attribution line has")
-        text = text.replace(key, f'<a href="{html.escape(url)}" rel="noopener">{key}</a>', 1)
-    return text
+def map_box(spec: dict) -> ET.Element:
+    """Hidden until 75-map-figures.js fills it, so a page without JavaScript shows only the printed figure.
+    The toggle needs the tab name before the spec loads, so an image map carries it here."""
+    attrs = {"class": "map-figure", "data-map": f"data/maps/{spec['figure']}.json", "data-kind": spec["kind"], "hidden": "hidden"}
+    if spec["kind"] == "image-map":
+        attrs["data-tab"] = spec["tab"]
+    return ET.Element("div", attrs)
 
 
-def map_box(figure: str, kind: str) -> ET.Element:
-    """Hidden until 75-map-figures.js fills it, so a page without JavaScript shows only the printed figure."""
-    return ET.Element("div", {"class": "map-figure", "data-map": f"data/maps/{figure}.json", "data-kind": kind, "hidden": "hidden"})
+def load_image_map(site: Site, spec: dict, where: str) -> dict:
+    image = book_path(site, spec["image"], where)
+    if not image.is_file():
+        raise BookError(f"{where}: {image} does not exist")
+    if image.suffix not in IMAGE_MAP_TYPES:
+        raise BookError(f"{where}: {image.name} must be one of {IMAGE_MAP_TYPES}")
+    size = image.stat().st_size
+    if size != spec["bytes"] or size > IMAGE_MAP_MAX_BYTES:
+        raise BookError(f"{where}: {image.name} has {size} bytes; the spec says {spec['bytes']}, the limit is {IMAGE_MAP_MAX_BYTES}")
+    with Image.open(image) as im:
+        if im.size != (spec["width"], spec["height"]):
+            raise BookError(f"{where}: {image.name} is {im.size}, the spec says {(spec['width'], spec['height'])}")
+    for key in ("title", "tab", "alt"):
+        if not spec[key].strip():
+            raise BookError(f"{where}: {key} is empty")
+    check_bounds(spec["bounds"], where)
+    url = f"media/maps/{image.name}"
+    COPIES.append((image, url))
+    return {
+        "kind": "image-map", "figure": spec["figure"], "title": spec["title"], "tab": spec["tab"], "image": url,
+        "width": spec["width"], "height": spec["height"], "alt": spec["alt"],
+        "credit": credit_html(spec["attribution"], spec.get("attribution_links", {}), where),
+    }
 
 
 def load_figure_map(site: Site, path: Path) -> dict:
@@ -67,6 +95,8 @@ def load_figure_map(site: Site, path: Path) -> dict:
     figure = spec["figure"]
     if figure != path.stem:
         raise BookError(f"{where}: figure {figure!r} does not match the file name")
+    if "image" in spec:
+        return load_image_map(site, spec, where)
     if spec["base"] != "opentopomap":
         raise BookError(f"{where}: base {spec['base']!r}: only opentopomap is drawn")
     markers = []
@@ -126,7 +156,9 @@ def load_then_now(site: Site, path: Path) -> dict:
             level |= {"source": data["source"]["label"], "url": data["source"]["url"]}
         if not level.get("url", "").startswith("https://"):
             raise BookError(f"{lw}: the level needs an https source url")
-        url = f"media/then-now/{image.name}"
+        url = f"media/then-now/{image.stem}.webp"
+        if any(url == used for _, used in IMAGES):
+            raise BookError(f"{lw}: two layer images give the same site file {url}")
         IMAGES.append((image, url))
         layers.append({
             "id": layer["id"], "label": layer["label"], "year": layer["date"][:4], "image": url,
@@ -158,7 +190,7 @@ def load(site: Site) -> None:
         if figure in DATA:
             raise BookError(f"{figure}: two maps for one figure")
         DATA[figure] = spec
-        BOXES[figure] = map_box(figure, spec["kind"])
+        BOXES[figure] = map_box(spec)
 
 
 def transform(site: Site, body: ET.Element, top: ET.Element | None, kind: str) -> None:
@@ -184,7 +216,17 @@ def write(site: Site) -> None:
     (site.out / "data" / "maps").mkdir(parents=True, exist_ok=True)
     for figure, spec in DATA.items():
         (site.out / "data" / "maps" / f"{figure}.json").write_text(json.dumps(spec, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-    for source, url in IMAGES:
+    for source, url in COPIES:
         (site.out / url).parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(source, site.out / url)
+    sizes = {}
+    for source, url in IMAGES:
+        dest = site.out / url
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        with Image.open(source) as im:
+            im.thumbnail((THEN_NOW_SIDE, THEN_NOW_SIDE), Image.Resampling.LANCZOS)  # Never enlarges; keeps transparency.
+            im.save(dest, "WEBP", quality=THEN_NOW_QUALITY, method=4)
+        sizes[url] = {"source_bytes": source.stat().st_size, "bytes": dest.stat().st_size}
     site.report["map_figures"] = sorted(DATA)
+    if sizes:
+        site.report["then_now_images"] = sizes

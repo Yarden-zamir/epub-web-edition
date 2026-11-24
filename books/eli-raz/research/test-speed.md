@@ -46,7 +46,7 @@ Local, `uv run books/eli-raz/scripts/check.py` (load 24 to 31):
 | preview.html | under 1 s |
 | Total | 36 to 41 s |
 
-The same for every kind of change in the table above: the default runs no ingest, no EPUBCheck and no browser. When ingest inputs changed, the local build uses the last ingest, and CI ingests the change. `--ingest` runs both ingests in parallel (176 s at load 31 instead of 267 s in turn), once per input hash on the machine; every other worktree then reuses it.
+The same for every kind of change in the table above: the default runs no ingest, no EPUBCheck and no browser. When ingest inputs changed, the light run ingests once (both ingests in parallel: 176 s at load 31 instead of 267 s in turn), once per input hash on the machine; every other worktree then reuses it. An older ingest is never used (it caused "a10-p054 is not an ID" in other worktrees).
 
 Measured while building the change (local, load 21 to 35):
 

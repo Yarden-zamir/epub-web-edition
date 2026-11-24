@@ -69,7 +69,7 @@ jobs:
         run: |
           case "$EVENT" in
             pull_request) flags="--gate" ;;
-            merge_group) flags="--ingest --compare-ingest --epubcheck --axe-full --explorables --sample" ;;
+            merge_group) flags="--compare-ingest --epubcheck --axe-full --explorables --sample" ;;
             *) flags="--full" ;;
           esac
           [[ "$RECORD" == true ]] && flags="$flags --record"

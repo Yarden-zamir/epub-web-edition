@@ -56,6 +56,32 @@ SECTION_HASHES = """async () => {
 LOAD_TIMEOUT_MS = 120_000
 FULL_AT_ONCE = 3  # Fresh full-page loads at the same time in --axe-full; six at once time out on a busy machine.
 OVERFLOW = "document.documentElement.scrollWidth - document.documentElement.clientWidth"
+# Width guard. body { overflow-x: clip } hides sideways overflow from OVERFLOW, and headless Chromium has no classic
+# scrollbar, under which a 100vw block overhangs. So the guard narrows body by SCROLLBAR px (a classic scrollbar
+# narrows the page, not 100vw) and lists the elements that pass the page edge, widest first. It skips fixed parts and
+# everything inside a box that scrolls or clips on purpose (errata chips, table scroll boxes, maps).
+SCROLLBAR = 15
+WIDE = """(scrollbar) => {
+  document.documentElement.setAttribute('data-render-all', '');
+  document.body.style.marginRight = scrollbar + 'px';
+  const page = document.body.getBoundingClientRect();
+  const contained = (el) => {
+    for (let a = el; a && a !== document.body; a = a.parentElement) {
+      const s = getComputedStyle(a);
+      if (s.position === 'fixed' || (a !== el && ['auto', 'scroll', 'hidden', 'clip'].includes(s.overflowX))) return true;
+    }
+    return false;
+  };
+  const out = [];
+  for (const el of document.body.querySelectorAll('*')) {
+    const r = el.getBoundingClientRect();
+    const over = Math.max(r.right - page.right, page.left - r.left);
+    if (!r.width || over <= 1 || getComputedStyle(el).visibility === 'hidden' || contained(el)) continue;
+    out.push(Math.round(over) + ' px ' + el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') + [...el.classList].map(c => '.' + c).join(''));
+  }
+  document.body.style.marginRight = '';
+  return out.sort((a, b) => parseInt(b) - parseInt(a)).slice(0, 5);
+}"""
 # axe builds its tree of the whole document before it looks at `include`, which costs most of a run on this long page.
 # So after the overflow checks, the quick test removes the book parts that hold no target from the open page. The
 # colours of a target come from its ancestors and the fixed bars, which stay.
@@ -86,12 +112,28 @@ async def full_check(browser: Browser, url: str, width: int, height: int, scheme
         start = time.monotonic()
         page, errors = await open_page(browser, url, width, height, scheme)
         overflow = await page.evaluate(OVERFLOW)
+        wide = await page.evaluate(WIDE, SCROLLBAR)
         violations = await page.evaluate(AXE_RUN, None)
         await page.close()
     print(f"{width} {scheme}: {time.monotonic() - start:.0f} s", flush=True)
-    if errors or overflow > 0 or violations:
-        return [f"{width} {scheme}: errors {errors[:2]} overflow {overflow} axe {violations}"]
+    if errors or overflow > 0 or wide or violations:
+        return [f"{width} {scheme}: errors {errors[:2]} overflow {overflow} wide {wide} axe {violations}"]
     return []
+
+
+async def errata_widths(browser: Browser, url: str) -> list[str]:
+    """The width guard on the errata page, at every width. A book without errata has no such page."""
+    page = await browser.new_page(viewport={"width": SIZES[0][0], "height": SIZES[0][1]})
+    response = await page.goto(url + "errata/", wait_until="load", timeout=LOAD_TIMEOUT_MS)
+    problems = []
+    if response and response.ok:
+        for width, height in SIZES:
+            await page.set_viewport_size({"width": width, "height": height})
+            await page.wait_for_timeout(300)
+            if wide := await page.evaluate(WIDE, SCROLLBAR):
+                problems.append(f"errata {width}: wider than the page with a {SCROLLBAR} px scrollbar: {wide}")
+    await page.close()
+    return problems
 
 
 async def quick_check(browser: Browser, url: str, sizes: list[tuple[int, int]], targets: list[str] | None) -> tuple[list[str], dict[str, str]]:
@@ -108,6 +150,8 @@ async def quick_check(browser: Browser, url: str, sizes: list[tuple[int, int]], 
         await page.wait_for_timeout(300)
         if (overflow := await page.evaluate(OVERFLOW)) > 0:
             problems.append(f"{width}: overflow {overflow}")
+        if wide := await page.evaluate(WIDE, SCROLLBAR):
+            problems.append(f"{width}: wider than the page with a {SCROLLBAR} px scrollbar: {wide}")
         split.append(f"{width} {time.monotonic() - start:.0f}")
     width = sizes[-1][0]
     await page.evaluate(KEEP_ONLY, targets)
@@ -129,14 +173,15 @@ async def main(url: str) -> list[str]:
         if FULL:
             gate = asyncio.Semaphore(FULL_AT_ONCE)
             results = await asyncio.gather(*(full_check(browser, url, w, h, s, gate) for w, h in SIZES for s in SCHEMES))
-            problems = [line for r in results for line in r]
+            problems = [line for r in results for line in r] + await errata_widths(browser, url)
             passed = {} if problems else await all_hashes(browser, url)
         else:
-            phone, desktop = await asyncio.gather(
+            phone, desktop, errata = await asyncio.gather(
                 quick_check(browser, url, [SIZES[0], SIZES[1]], None),
                 quick_check(browser, url, [SIZES[2]], None),
+                errata_widths(browser, url),
             )
-            problems = phone[0] + desktop[0]
+            problems = phone[0] + desktop[0] + errata
             # A section counts as passed only when both pages checked it.
             passed = {sel: h for sel, h in phone[1].items() if desktop[1].get(sel) == h}
         await browser.close()

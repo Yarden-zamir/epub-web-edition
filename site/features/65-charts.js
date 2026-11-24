@@ -95,7 +95,7 @@ function drawFigureChart(area, panels, width) {
       const [a, z] = b.axis === "x" ? [x(b.from), x(b.to)] : [y(b.to), y(b.from)];
       const rect = b.axis === "x" ? { x: a, width: z - a, y: M.top, height: H - M.top - M.bottom } : { y: a, height: z - a, x: M.left, width: W - M.left - M.right };
       svg("rect", { ...rect, class: "band" }, root);
-      if (b.axis === "x") svg("text", { x: (a + z) / 2, y: M.top + 12, class: "band-label", "text-anchor": "middle" }, root).textContent = b.label;
+      if (b.axis === "x") svg("text", { x: (a + z) / 2, y: M.top + 14, class: "band-label", "text-anchor": "middle" }, root).textContent = b.label;
     }
     for (const v of yt.ticks) {
       svg("line", { x1: M.left, x2: W - M.right, y1: y(v), y2: y(v), class: "grid" }, root);
@@ -108,7 +108,7 @@ function drawFigureChart(area, panels, width) {
       const line = m.axis === "x" ? { x1: x(m.at), x2: x(m.at), y1: M.top, y2: H - M.bottom } : { x1: M.left, x2: W - M.right, y1: y(m.at), y2: y(m.at) };
       svg("line", { ...line, class: "marker" }, root);
       const at = m.axis === "x" ? { cx: x(m.at), cy: H - M.bottom - 9 } : { cx: W - M.right - 8, cy: y(m.at) };
-      svg("circle", { ...at, r: 8, class: "marker-badge" }, root);
+      svg("circle", { ...at, r: 9, class: "marker-badge" }, root);
       svg("text", { x: at.cx, y: at.cy, class: "marker-n", "text-anchor": "middle", "dominant-baseline": "central" }, root).textContent = mi + 1;
     });
     panel.series.forEach((s, si) => {
