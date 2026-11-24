@@ -109,17 +109,21 @@ function create(spec) {
     const yI = (x) => yI0 - K * x;
     const u = env.unit;
 
-    ctx.fillStyle = env.gradient("sky", 0, 0, 0, H, [[0, "--xp-sky-top"], [1, "--xp-sky"]]);
-    ctx.fillRect(0, 0, W, H);
+    const small = u > 1.3; // Phones: fewer labels.
+    // Fixed parts come from cached bitmaps; only water, salt dissolving, cavities, arrows and moving labels are drawn.
+    ctx.drawImage(env.layer("back", [0, 0, W, H], (c) => {
+      c.fillStyle = env.gradient("sky", 0, 0, 0, H, [[0, "--xp-sky-top"], [1, "--xp-sky"]]);
+      c.fillRect(0, 0, W, H);
+      c.clip(below);
+      c.fillStyle = env.gradient("land", 0, 0, 0, H, [[0, "--xp-land"], [1, "--xp-land-deep"]]);
+      c.fillRect(0, 0, W, H);
+      c.globalAlpha = 0.16;
+      c.strokeStyle = env.color("--xp-land-edge");
+      c.lineWidth = 1;
+      c.stroke(beds);
+    }), 0, 0, W, H);
     ctx.save();
     ctx.clip(below);
-    ctx.fillStyle = env.gradient("land", 0, 0, 0, H, [[0, "--xp-land"], [1, "--xp-land-deep"]]);
-    ctx.fillRect(0, 0, W, H);
-    ctx.globalAlpha = 0.16;
-    ctx.strokeStyle = env.color("--xp-land-edge");
-    ctx.lineWidth = 1;
-    ctx.stroke(beds);
-    ctx.globalAlpha = 1;
     ctx.fillStyle = env.color("--xp-fresh");
     ctx.fill(shape([[0, wt0], [W, wt(W)], [W, H], [0, H]]));
     ctx.fillStyle = env.color("--xp-brine");
@@ -135,8 +139,10 @@ function create(spec) {
     ctx.stroke(shape([[0, yI0], [xs, yL]], false));
     ctx.restore();
 
-    ctx.fillStyle = env.gradient("salt", 0, Y(saltTop(SALT.from)), 0, Y(saltTop(SALT.to) - SALT.thick), [[0, "--xp-salt"], [1, "--xp-salt-shade"]]);
-    ctx.fill(salt);
+    ctx.drawImage(env.layer("salt", [0, 0, W, H], (c) => {
+      c.fillStyle = env.gradient("salt", 0, Y(saltTop(SALT.from)), 0, Y(saltTop(SALT.to) - SALT.thick), [[0, "--xp-salt"], [1, "--xp-salt-shade"]]);
+      c.fill(salt);
+    }), 0, 0, W, H);
     ctx.save();
     ctx.clip(salt);
     ctx.clip(shape([[0, yI0], [xs, yL], [xs, 0], [0, 0]])); // Salt above the interface, in fresh water.
@@ -144,9 +150,6 @@ function create(spec) {
     ctx.fillStyle = env.color("--xp-dissolve");
     ctx.fillRect(0, 0, W, H);
     ctx.restore();
-    ctx.strokeStyle = env.color("--xp-salt-edge");
-    ctx.lineWidth = 1.2;
-    ctx.stroke(salt);
 
     let open = 0, fallen = 0;
     for (const h of holes) {
@@ -164,7 +167,6 @@ function create(spec) {
         ctx.save();
         ctx.translate(h.x, h.g);
         ctx.scale(1, 0.35 + 0.65 * down);
-        ctx.globalAlpha = down;
         ctx.fillStyle = env.color("--xp-land-edge");
         ctx.globalAlpha = down * 0.32;
         ctx.fill(h.cone);
@@ -197,21 +199,30 @@ function create(spec) {
       const y = yL + 7 + ((i * 11) % 22);
       if (y < Y(ground(x)) - 3) ctx.stroke(shape([[x - 6, y], [x + 6, y]], false));
     }
-    ctx.globalAlpha = 1;
-    ctx.lineCap = "butt";
     ctx.restore();
-    ctx.save();
-    ctx.translate(0, 2);
-    ctx.globalAlpha = 0.5;
-    ctx.strokeStyle = env.color("--xp-shadow");
-    ctx.lineWidth = 5;
-    ctx.lineJoin = "round";
-    ctx.stroke(groundPath);
-    ctx.restore();
-    ctx.strokeStyle = env.color("--xp-land-edge");
-    ctx.lineWidth = 2;
-    ctx.lineJoin = "round";
-    ctx.stroke(groundPath);
+    ctx.drawImage(env.layer("top", [0, 0, W, H], (c) => {
+      c.strokeStyle = env.color("--xp-salt-edge");
+      c.lineWidth = 1.2;
+      c.stroke(salt);
+      c.save();
+      c.translate(0, 2);
+      c.globalAlpha = 0.5;
+      c.strokeStyle = env.color("--xp-shadow");
+      c.lineWidth = 5;
+      c.lineJoin = "round";
+      c.stroke(groundPath);
+      c.restore();
+      c.strokeStyle = env.color("--xp-land-edge");
+      c.lineWidth = 2;
+      c.lineJoin = "round";
+      c.stroke(groundPath);
+      env.label(c, L.west, 6, 14, { align: "left", size: 12, weight: 500, color: "--muted" });
+      env.label(c, L.east, W - 6, 14, { align: "right", size: 12, weight: 500, color: "--muted" });
+      if (!small) env.label(c, L.slope, 70, Y(ground(70)) - 9);
+      // Along the slab, at its east end, where the interface never reaches within the control range.
+      env.label(c, L.salt, 405, Y(saltTop(405) - SALT.thick / 2) + 5, { rotate: saltAngle });
+      env.label(c, L.brine, W * 0.3, H - 14); // Below the interface at every level of the control.
+    }), 0, 0, W, H);
 
     ctx.lineWidth = 2.5;
     ctx.lineCap = "round";
@@ -223,14 +234,6 @@ function create(spec) {
       ctx.save(); ctx.translate(xb, yI(xb) + 18); ctx.strokeStyle = env.color("--xp-brine-ink"); ctx.stroke(arrowLeft); ctx.restore();
     }
     ctx.lineCap = "butt";
-
-    const small = u > 1.3; // Phones: fewer labels.
-    env.label(ctx, L.west, 6, 14, { align: "left", size: 12, weight: 500, color: "--muted" });
-    env.label(ctx, L.east, W - 6, 14, { align: "right", size: 12, weight: 500, color: "--muted" });
-    if (!small) env.label(ctx, L.slope, 70, Y(ground(70)) - 9);
-    // Along the slab, at its east end, where the interface never reaches within the control range.
-    env.label(ctx, L.salt, 405, Y(saltTop(405) - SALT.thick / 2) + 5, { rotate: saltAngle });
-    env.label(ctx, L.brine, W * 0.3, H - 14); // Below the interface at every level of the control.
     if (!small) env.label(ctx, L.water_table, xs * 0.5, wt(xs * 0.5) - 7);
     const ix = Math.max(60, xs * 0.3);
     env.label(ctx, L.interface, ix, yI(ix) + 18);

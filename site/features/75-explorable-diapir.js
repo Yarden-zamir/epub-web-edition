@@ -43,8 +43,11 @@ function create(spec) {
     const capH = capM * CAP_SCALE;
     const drain = ramp(rise, lakeRise - 4, lakeRise + 12); // The lake drains as the rise passes Lake Lisan's end.
 
-    ctx.fillStyle = env.gradient("sky", 0, TOP, 0, H, [[0, "--xp-sky-top"], [1, "--xp-sky"]]);
-    ctx.fillRect(0, TOP, W, H - TOP);
+    const view = [0, TOP, W, H - TOP];
+    ctx.drawImage(env.layer("sky", view, (c) => {
+      c.fillStyle = env.gradient("sky", 0, TOP, 0, H, [[0, "--xp-sky-top"], [1, "--xp-sky"]]);
+      c.fillRect(0, TOP, W, H - TOP);
+    }), ...view);
     if (drain < 0.99) {
       const surface = TOP + 10 + drain * 90;
       ctx.globalAlpha = 1 - drain;
@@ -84,31 +87,42 @@ function create(spec) {
       top = Math.min(top, MIRROR - capH - lift);
     });
 
-    ctx.fillStyle = env.gradient("land", 0, MIRROR, 0, H, [[0, "--xp-land"], [1, "--xp-land-deep"]]);
-    ctx.fill(westBlock);
-    ctx.fill(eastBlock);
-    ctx.strokeStyle = env.color("--xp-land-edge");
-    ctx.lineWidth = 1.2;
-    ctx.stroke(westBlock);
-    ctx.stroke(eastBlock);
-    ctx.globalAlpha = 0.18;
-    ctx.lineWidth = 1;
-    ctx.stroke(strata);
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = env.gradient("salt", 0, 0, W, 0, [[0, "--xp-salt"], [1, "--xp-salt-shade"]]);
-    ctx.fill(westSalt);
-    ctx.fill(eastSalt);
-    ctx.strokeStyle = env.color("--xp-salt-edge");
-    ctx.stroke(westSalt);
-    ctx.stroke(eastSalt);
-    ctx.globalAlpha = 0.6;
-    ctx.stroke(beds);
-    ctx.globalAlpha = 1;
-    ctx.strokeStyle = env.color("--ink");
-    ctx.lineWidth = 2;
+    const small = env.unit > 1.3;
+    ctx.drawImage(env.layer("frame", view, (c) => {
+      c.fillStyle = env.gradient("land", 0, MIRROR, 0, H, [[0, "--xp-land"], [1, "--xp-land-deep"]]);
+      c.fill(westBlock);
+      c.fill(eastBlock);
+      c.strokeStyle = env.color("--xp-land-edge");
+      c.lineWidth = 1.2;
+      c.stroke(westBlock);
+      c.stroke(eastBlock);
+      c.globalAlpha = 0.18;
+      c.lineWidth = 1;
+      c.stroke(strata);
+      c.globalAlpha = 1;
+      c.fillStyle = env.gradient("salt", 0, 0, W, 0, [[0, "--xp-salt"], [1, "--xp-salt-shade"]]);
+      c.fill(westSalt);
+      c.fill(eastSalt);
+      c.strokeStyle = env.color("--xp-salt-edge");
+      c.stroke(westSalt);
+      c.stroke(eastSalt);
+      c.globalAlpha = 0.6;
+      c.stroke(beds);
+      c.globalAlpha = 1;
+      c.strokeStyle = env.color("--ink");
+      c.lineWidth = 2;
+      c.lineCap = "round";
+      c.lineJoin = "round";
+      c.stroke(flow);
+      env.label(c, L.west, 6, H - 8, { align: "left", size: 12, weight: 500, color: "--muted" });
+      env.label(c, L.east, W - 6, H - 8, { align: "right", size: 12, weight: 500, color: "--muted" });
+      env.label(c, L.amiaz, 120, MIRROR - 8);
+      env.label(c, L.rift, 480, 130);
+      if (!small) { env.label(c, L.sand, 120, 175); env.label(c, L.sand, 480, 215); }
+      env.label(c, L.salt, 85, 246);
+      env.label(c, L.salt, 500, 278);
+    }), ...view);
     ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    ctx.stroke(flow);
     // Salt creeps up the neck: a dashed line that moves slowly toward the mountain.
     ctx.strokeStyle = env.color("--xp-salt-edge");
     ctx.lineWidth = 1.2;
@@ -129,14 +143,6 @@ function create(spec) {
       env.label(ctx, L.mirror, COLUMN.x - 34, MIRROR + 4, { align: "right" });
       ctx.globalAlpha = 1;
     }
-    const small = env.unit > 1.3;
-    env.label(ctx, L.west, 6, H - 8, { align: "left", size: 12, weight: 500, color: "--muted" });
-    env.label(ctx, L.east, W - 6, H - 8, { align: "right", size: 12, weight: 500, color: "--muted" });
-    env.label(ctx, L.amiaz, 120, MIRROR - 8);
-    env.label(ctx, L.rift, 480, 130);
-    if (!small) { env.label(ctx, L.sand, 120, 175); env.label(ctx, L.sand, 480, 215); }
-    env.label(ctx, L.salt, 85, 246);
-    env.label(ctx, L.salt, 500, 278);
     const capAlpha = ramp(capM, 6, 12);
     if (capAlpha > 0.01) {
       ctx.globalAlpha = capAlpha;

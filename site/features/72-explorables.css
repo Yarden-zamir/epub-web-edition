@@ -86,10 +86,14 @@
 .xp-num { font-variant-numeric: tabular-nums; text-align: right; unicode-bidi: isolate; font-weight: 700; color: var(--ink); }
 .xp-note { text-align: start; }
 .xp-track { position: relative; min-width: 0; }
-.xp-range { --fill: 0%; display: block; width: 100%; height: 2.75rem; margin: 0; background: transparent; -webkit-appearance: none; appearance: none; cursor: pointer; }
-.xp-range::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: linear-gradient(to right, var(--accent) var(--fill), var(--rule) var(--fill)); }
-.xp-range::-moz-range-track { height: 6px; border-radius: 3px; background: var(--rule); }
-.xp-range::-moz-range-progress { height: 6px; border-radius: 3px; background: var(--accent); }
+.xp-range { display: block; width: 100%; height: 2.75rem; margin: 0; background: transparent; -webkit-appearance: none; appearance: none; cursor: pointer; }
+/* The rail and the fill sit under a transparent track; the fill moves by transform only. 14px: half the thumb. */
+.xp-rail, .xp-fill { position: absolute; left: 14px; right: 14px; top: calc(1.375rem - 3px); height: 6px; border-radius: 3px; pointer-events: none; }
+.xp-rail { background: var(--rule); }
+.xp-fill { background: var(--accent); transform-origin: left center; transform: scaleX(0); will-change: transform; }
+.xp-range { position: relative; }
+.xp-range::-webkit-slider-runnable-track { height: 6px; background: transparent; }
+.xp-range::-moz-range-track { height: 6px; background: transparent; }
 .xp-range::-webkit-slider-thumb {
   -webkit-appearance: none; appearance: none; width: 28px; height: 28px; margin-top: -11px; border-radius: 50%;
   background: var(--paper); border: 2px solid var(--accent); box-shadow: 0 2px 6px var(--xp-shadow);

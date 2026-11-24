@@ -83,46 +83,55 @@ function create(spec) {
 
   function draw(ctx, km, env) {
     const u = env.unit;
-    ctx.fillStyle = env.gradient("sea", 0, 0, W, 0, [[0, "--xp-basin-light"], [1, "--xp-basin"]]);
-    ctx.fillRect(0, 0, W, H);
-    ctx.strokeStyle = "rgb(255 255 255 / 0.16)";
-    ctx.lineWidth = 1;
-    ctx.save();
-    ctx.translate((env.time * 3) % 12 - 12, Math.sin(env.time * 0.8) * 2); // Ripples drift slowly in the basins.
-    ctx.stroke(ripples);
-    ctx.restore();
-    plate(ctx, env, westShape, "west", "--xp-plate-a", "--xp-plate-a-deep");
-    ore(ctx, env, westShape);
-    ctx.lineJoin = "round";
-
-    ctx.save();
-    ctx.translate(0, -km * S);
-    ctx.save();
-    ctx.translate(3, 0);
-    ctx.strokeStyle = env.color("--xp-shadow");
-    ctx.lineWidth = 6;
-    ctx.stroke(faultLine);
-    ctx.restore();
-    plate(ctx, env, eastShape, "east", "--xp-plate-b", "--xp-plate-b-deep");
-    ctx.strokeStyle = env.color("--ink");
-    ctx.lineWidth = 1.5;
-    ctx.stroke(faultLine);
-    ore(ctx, env, eastShape);
-    ctx.fillStyle = env.color("--ink");
-    ctx.fill(arrow);
-    lines(ctx, env, L.east_plate, 290, Y(250));
-    env.label(ctx, L.feinan, COPPER.x + 30, Y(COPPER.km) + 4, { align: "left" });
-    ctx.restore();
-    ctx.strokeStyle = env.color("--ink");
-    ctx.lineWidth = 1.5;
-    ctx.stroke(faultLine);
-
-    lines(ctx, env, L.west_plate, 72, Y(260));
-    env.label(ctx, L.timna, COPPER.x - 26, Y(COPPER.km) + 4, { align: "right" });
-    ctx.fillStyle = env.color("--ink");
-    ctx.beginPath(); ctx.arc(faultX(EILAT_KM) - 5, Y(EILAT_KM), 3.5, 0, Math.PI * 2); ctx.fill();
-    if (u <= 1.3) env.label(ctx, L.eilat, faultX(EILAT_KM) - 12, Y(EILAT_KM) + 4, { align: "right" });
-    env.label(ctx, `↑ ${L.north}`, 12, 18, { align: "left", size: 12, weight: 500, color: "--muted" });
+    // Fixed parts are cached bitmaps: the sea, the ripples, the west block, the whole east block and the labels.
+    // A frame copies them and moves two of them (ripples, east block); only the basin labels are drawn.
+    ctx.drawImage(env.layer("sea", [0, 0, W, H], (c) => {
+      c.fillStyle = env.gradient("sea", 0, 0, W, 0, [[0, "--xp-basin-light"], [1, "--xp-basin"]]);
+      c.fillRect(0, 0, W, H);
+    }), 0, 0, W, H);
+    const rippleBox = [-12, -4, W + 24, H + 8];
+    const rippleLayer = env.layer("ripples", rippleBox, (c) => {
+      c.strokeStyle = "rgb(255 255 255 / 0.16)";
+      c.lineWidth = 1;
+      c.stroke(ripples);
+    });
+    // Ripples drift slowly in the basins.
+    ctx.drawImage(rippleLayer, rippleBox[0] + (env.time * 3) % 12, rippleBox[1] + Math.sin(env.time * 0.8) * 2, rippleBox[2], rippleBox[3]);
+    ctx.drawImage(env.layer("west", [0, 0, W, H], (c) => {
+      plate(c, env, westShape, "west", "--xp-plate-a", "--xp-plate-a-deep");
+      ore(c, env, westShape);
+    }), 0, 0, W, H);
+    const eastBox = [0, -20, W, H + extra + 20];
+    ctx.drawImage(env.layer("east", eastBox, (c) => {
+      c.lineJoin = "round";
+      c.save();
+      c.translate(3, 0);
+      c.strokeStyle = env.color("--xp-shadow");
+      c.lineWidth = 6;
+      c.stroke(faultLine);
+      c.restore();
+      plate(c, env, eastShape, "east", "--xp-plate-b", "--xp-plate-b-deep");
+      c.strokeStyle = env.color("--ink");
+      c.lineWidth = 1.5;
+      c.stroke(faultLine);
+      ore(c, env, eastShape);
+      c.fillStyle = env.color("--ink");
+      c.fill(arrow);
+      lines(c, env, L.east_plate, 290, Y(250));
+      env.label(c, L.feinan, COPPER.x + 30, Y(COPPER.km) + 4, { align: "left" });
+    }), eastBox[0], eastBox[1] - km * S, eastBox[2], eastBox[3]);
+    ctx.drawImage(env.layer("labels", [0, 0, W, H], (c) => {
+      c.lineJoin = "round";
+      c.strokeStyle = env.color("--ink");
+      c.lineWidth = 1.5;
+      c.stroke(faultLine);
+      lines(c, env, L.west_plate, 72, Y(260));
+      env.label(c, L.timna, COPPER.x - 26, Y(COPPER.km) + 4, { align: "right" });
+      c.fillStyle = env.color("--ink");
+      c.beginPath(); c.arc(faultX(EILAT_KM) - 5, Y(EILAT_KM), 3.5, 0, Math.PI * 2); c.fill();
+      if (u <= 1.3) env.label(c, L.eilat, faultX(EILAT_KM) - 12, Y(EILAT_KM) + 4, { align: "right" });
+      env.label(c, `↑ ${L.north}`, 12, 18, { align: "left", size: 12, weight: 500, color: "--muted" });
+    }), 0, 0, W, H);
 
     // One label per basin, west of it: it follows the basin's middle and fades in as the basin opens.
     const open = [];

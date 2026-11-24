@@ -17,6 +17,7 @@
 //   }
 // }
 // env: unit (drawing units per CSS pixel), time (seconds, for slow motion), color(token), gradient(key, x0, y0, x1, y1, stops),
+//      layer(key, [x, y, w, h], draw) -> a bitmap of draw() for parts that never change (copy it with ctx.drawImage),
 //      label(ctx, text, x, y, options), figures(ctx, text, x, y, options) for a number with fixed-width digits.
 // All feature scripts share one scope (site/features/README.md): only explorableKit is global here.
 const explorableKit = (() => {
@@ -63,13 +64,29 @@ function markHintSeen(id) {
 
 // Colours, gradients and fonts come from the CSS tokens. A theme change clears them and redraws.
 function makeEnv(box) {
-  const colors = new Map(), gradients = new Map();
+  const colors = new Map(), gradients = new Map(), layers = new Map();
   let ctx = null, family = "";
   const env = {
     unit: 1,
     time: 0,
     bind(context) { ctx = context; },
-    reset() { colors.clear(); gradients.clear(); family = getComputedStyle(box).fontFamily; },
+    pixel: 1, // Device pixels per drawing unit.
+    reset() { colors.clear(); gradients.clear(); layers.clear(); family = getComputedStyle(box).fontFamily; },
+    // Static parts are drawn once into a bitmap at the current size and theme; a frame only copies it.
+    layer(key, [x, y, w, h], draw) {
+      const id = `${key}@${env.pixel.toFixed(4)}`;
+      if (!layers.has(id)) {
+        const bitmap = document.createElement("canvas");
+        bitmap.width = Math.max(1, Math.ceil(w * env.pixel));
+        bitmap.height = Math.max(1, Math.ceil(h * env.pixel));
+        const lc = bitmap.getContext("2d");
+        lc.setTransform(env.pixel, 0, 0, env.pixel, -x * env.pixel, -y * env.pixel);
+        draw(lc);
+        for (const old of layers.keys()) if (old.startsWith(`${key}@`)) layers.delete(old);
+        layers.set(id, bitmap);
+      }
+      return layers.get(id);
+    },
     color(token) {
       if (!colors.has(token)) {
         const value = getComputedStyle(box).getPropertyValue(token).trim();
@@ -164,7 +181,8 @@ async function setUp(figure, box) {
   track.dir = "ltr"; // Same direction as the chart axes on this site: the start of the process on the left.
   const input = el("input", "xp-range");
   Object.assign(input, { type: "range", id, min: c.min, max: c.max, step: c.step, value: c.start });
-  track.append(input);
+  const fill = el("span", "xp-fill");
+  track.append(el("span", "xp-rail"), fill, input);
   const marks = el("div", "xp-marks");
   for (const mark of spec.marks ?? []) {
     const b = el("button", "xp-mark", mark.label);
@@ -226,7 +244,7 @@ async function setUp(figure, box) {
     if (unitSlot.textContent !== parts.unit) unitSlot.textContent = parts.unit;
     const note = parts.note ? `(${parts.note})` : "";
     if (noteSlot.textContent !== note) noteSlot.textContent = note;
-    input.style.setProperty("--fill", `${(((v - c.min) / span) * 100).toFixed(2)}%`);
+    fill.style.transform = `scaleX(${((v - c.min) / span).toFixed(4)})`;
     // The paragraph changes when a move ends, so a drag does not reflow the page on every frame.
     if (!moving && readout.textContent !== summary) readout.textContent = summary;
   }
@@ -310,6 +328,7 @@ async function setUp(figure, box) {
     if (!width) return;
     scale = width / vw;
     env.unit = 1 / scale;
+    env.pixel = scale * (devicePixelRatio || 1);
     const dpr = devicePixelRatio || 1;
     canvas.width = Math.round(width * dpr);
     canvas.height = Math.round(width * (vh / vw) * dpr);
