@@ -69,7 +69,7 @@ body:has(.resume:not(.leaving), .back-chip:not([hidden])) .lang-chip.docked { bo
 .lang-modes { display: grid; gap: 2px; }
 .lang-modes button { display: grid; gap: 0.15rem; padding: 0.55rem 0.6rem; padding-inline-start: 2.1rem; position: relative; border-radius: calc(var(--radius-m) - 0.75rem); /* Inside the menu's 0.75rem padding. */ text-align: start; }
 .lang-modes button:hover, .lang-modes button:focus-visible { background: var(--mat); outline: none; }
-.lang-modes button::before { content: ""; position: absolute; inset-inline-start: 0.65rem; top: 0.8rem; width: 0.85rem; height: 0.85rem; box-sizing: border-box; border-radius: 50%; border: 1.5px solid var(--muted); transition: border-width var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease); }
+.lang-modes button::before { content: ""; position: absolute; inset-inline-start: 0.65rem; top: 0.8rem; width: 0.85rem; height: 0.85rem; border-radius: 50%; border: 1.5px solid var(--muted); transition: border-width var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease); }
 .lang-modes button[aria-checked="true"]::before { border: 0.28rem solid var(--accent); }
 .lang-mode-title { font-weight: 600; }
 /* Lines in the other direction sit at the same edge as the others. */

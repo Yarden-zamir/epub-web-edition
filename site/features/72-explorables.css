@@ -78,7 +78,7 @@
   position: absolute; left: -24px; top: -24px; width: 48px; height: 48px; display: grid; place-items: center;
   cursor: grab; touch-action: none; will-change: transform;
 }
-.xp-grip, .xp-grip-ring { grid-area: 1 / 1; width: 26px; height: 26px; border-radius: 50%; box-sizing: border-box; }
+.xp-grip, .xp-grip-ring { grid-area: 1 / 1; width: 26px; height: 26px; border-radius: 50%; }
 .xp-grip {
   display: block; background: var(--paper); border: 1.5px solid var(--ink); box-shadow: 0 2px 6px var(--xp-shadow);
   transition: transform var(--dur-quick) var(--ease-out), border-color var(--dur-quick) var(--ease-out);
