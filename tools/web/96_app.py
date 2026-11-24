@@ -1,4 +1,4 @@
-"""Site identity: link previews (Open Graph and Twitter tags with a 1200x630 crop of the enhancements.json "hero"
+"""Site identity: link previews (Open Graph and Twitter tags with a 1200x630 crop of the enhancements.json "feature_photo"
 photo) and the web app manifest.
 
 app.json next to the enhancements file gives the public address and the short app name. Preview services need
@@ -48,8 +48,8 @@ def read_app(data_dir: Path | None) -> App | None:
 
 
 def preview_image(site: Site) -> str | None:
-    """The 1200x630 crop of the hero photo, as alt text. None when the book has no hero photo."""
-    photo = json.loads(site.enhancements_file.read_text(encoding="utf-8")).get("hero") if site.enhancements_file else None
+    """The 1200x630 crop of the feature photo, as alt text. None when the book has no feature photo."""
+    photo = json.loads(site.enhancements_file.read_text(encoding="utf-8")).get("feature_photo") if site.enhancements_file else None
     if not photo:
         return None
     (site.out / "media").mkdir(exist_ok=True)

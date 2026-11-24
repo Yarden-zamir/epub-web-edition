@@ -1,4 +1,4 @@
-"""Feature photo: enhancements.json "hero" is a credited photograph that closes the book. 96_app.py makes the link preview from it."""
+"""Feature photo: enhancements.json "feature_photo" is a credited photograph that closes the book. 96_app.py makes the link preview from it."""
 
 import html
 import json
@@ -13,13 +13,13 @@ PHOTO_WIDTHS = (960, 1920)
 
 
 def feature_photo(enhancements_file: Path | None, out: Path) -> str:
-    """The enhancements "hero" block {image, alt, credit, caption, source}: a credited photograph that closes the
+    """The enhancements "feature_photo" block {image, alt, credit, caption, source}: a credited photograph that closes the
     book above the footer. Returns the closing figure HTML; an empty string when the block is absent."""
-    photo = json.loads(enhancements_file.read_text(encoding="utf-8")).get("hero") if enhancements_file else None
+    photo = json.loads(enhancements_file.read_text(encoding="utf-8")).get("feature_photo") if enhancements_file else None
     if not photo:
         return ""
     if not (photo["alt"] and photo["credit"] and photo["caption"] and photo["source"]):
-        raise BookError("enhancements.json: hero needs alt, caption, credit and source")
+        raise BookError("enhancements.json: feature_photo needs alt, caption, credit and source")
     (out / "media").mkdir(exist_ok=True)
     with Image.open(enhancements_file.resolve().parent.parent / photo["image"]) as im:
         rgb = im.convert("RGB")
