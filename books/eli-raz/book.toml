@@ -525,6 +525,286 @@ page = 22
 contains = "The English text continues from the left page"
 reason = "Print-only reading note for the two-page spreads. The EPUB puts the English pages in reading order, so the note would mislead."
 
+[[omit]]
+page = 135
+contains = "המספרים בסוגריים מפנים אל המקורות בסוף הספר"
+reason = "Print-only reading note of a16. In the editions each source number is a link to its entry ([[cite]]), so the note is not needed."
+[[text_fix]]
+page = 135
+find = "ספנות בים המלח*"
+replace = "ספנות בים המלח"
+reason = "The star of the a16 title pointed to the note left out above ([[omit]] page 135)."
+
+# Source citations as links. The source list (sources.xhtml, PDF pages 309-312) numbers its entries 1-88 once for
+# the whole book, in one section per chapter. a16 cites by number "(17)"; a07, a14, a15, a16 (captions), a18, a34,
+# a35 and a36 cite by author and year "(Masterman, 1913)". Each citation links to the entry of its chapter's
+# section; the entry links back to each printed page that cites it.
+# Left as printed, without a link: a17 (1)-(68) cite the list of the original article (Cathedra 101), which this
+# book does not print; citations with no matching entry ("Steinhorn, 1983": the list has 1981; "ביין וחובריו, 2020";
+# "אבלסון ואחרים, 2009"; "Oren & Shilo, 1982"; "Consolidated Consultants, 2008"; "אלטנוילד, 1902"; "Hiorth (1919)";
+# "Ken-Tor ... ,2008" and "מרקו"); "אורן, 2008" (a35: the Hebrew paper is only inside entry 54, the English one is 67);
+# "רז, 1993" (a18 caption: entry 34 is in the a34 section). Buchalo et al. 2000 is printed twice (47, 51): links go to 47.
+# Each text must occur in its element, outside other links, as many times as it is listed.
+[sources]
+note = "תוספת של מהדורה זו: ההפניות למקורות בפרקים הן קישורים לרשימה זו. ליד כל מקור מופיעים העמודים שבהם הוא מצוטט, כקישורים חזרה."
+cited_label = "מצוטט בעמ'"
+
+# Printed references to a page or to a figure ("ראו איור בעמוד 301") as links to that figure. Only where the
+# target is certain: the named page holds exactly one figure, or the caption names it.
+# Left as text: "ראו תמונה בעמוד הקודם" (a18-p021; the previous page shows the Byzantine reservoir, not the transform);
+# "ראה תצלומים" (a14-p053; several photos fit); "ראה פרק א'" (a16; no part or chapter is named א');
+# "בפרק שירות נוף" (a35; no section has that name); "ראו להלן", "ראה למעלה" (no single target).
+[[see]]
+element = "a06-p036"
+targets = [["107", "fig-a14-06"], ["108", "fig-a14-07"]]
+[[see]]
+element = "a07-p025"
+targets = [["בעמוד 301", "fig-a36-12"]]
+[[see]]
+element = "a10-p010"
+targets = [["בסוף המאמר", "fig-a10-14"]]  # The QR code of the film made by the climbers before the disaster.
+[[see]]
+element = "a34-p009"
+targets = [["צילום פטריית הסחף השטפוני", "fig-a34-03"]]
+[[see]]
+element = "a34-p035"
+targets = [["בעמוד 301", "fig-a36-12"]]
+[[see]]
+element = "a35-p006"
+targets = [["בעמוד 301", "fig-a36-12"]]
+[[see]]
+element = "a35-p055"
+targets = [["בעמ' 301", "fig-a36-12"]]
+[[see]]
+element = "a36-p078"
+targets = [["בעמוד 300", "fig-a36-11"]]
+
+[[cite]]
+element = "a07-p008"
+sources = [["Nissenbaum 1979", 8], ["שווארץ, 1845", 4]]
+[[cite]]
+element = "a07-p009"
+sources = [["ג'ויס, 1985", 2]]
+[[cite]]
+element = "a07-p019"
+sources = [["לינטש 1984", 3]]
+[[cite]]
+element = "a07-p022"
+sources = [["Masterman, 1913", 6]]
+[[cite]]
+element = "a07-p024"
+sources = [["1936; Elazari-Volcani, B", 5]]
+[[cite]]
+element = "a07-p025"
+sources = [["Neev and Emery, 1967", 7], ["1981; Steinhorn", 9]]
+[[cite]]
+element = "a14-p013"
+sources = [["Yechieli et al. 1993", 14], ["Wachs et al, 2000", 13]]
+[[cite]]
+element = "a14-p016"
+sources = [["רז 2000", 10], ["Abelson et al 2003", 11]]
+[[cite]]
+element = "a14-p049"
+sources = [["Wachs et al., 2000", 13]]
+[[cite]]
+element = "a14-p055"
+sources = [["Nof et al., 2019", 12]]
+[[cite]]
+element = "a15-p015"
+sources = [["חסון 2020", 16]]
+[[cite]]
+element = "a15-p018"
+sources = [["אבידב 1959", 15]]
+[[cite]]
+element = "a16-p004"
+sources = [["17", 17], ["21", 21]]
+[[cite]]
+element = "fig-a16-03"
+sources = [["Hadas et al. 2005", 23]]
+[[cite]]
+element = "fig-a16-02"
+sources = [["Nissenbaum & Hadas 1990", 22]]
+[[cite]]
+element = "a16-p008"
+sources = [["22", 22]]
+[[cite]]
+element = "a16-p011"
+sources = [["19", 19]]
+[[cite]]
+element = "a16-p013"
+sources = [["18", 18]]
+[[cite]]
+element = "a16-p018"
+sources = [["20", 20]]
+[[cite]]
+element = "a18-p023"
+sources = [["Hauptmann, 2007", 27], ["Barker, et al. 2007", 24], ["Levy et al., 2014", 29]]
+[[cite]]
+element = "a18-p042"
+sources = [["Ben-Yosef et al., 2012", 26]]
+[[cite]]
+element = "a18-p045"
+sources = [["Levy et al. 2014", 29]]
+[[cite]]
+element = "a34-p003"
+sources = [["בן אברהם ולזר, 2008", 38]]
+[[cite]]
+element = "a34-p005"
+sources = [["1967", 32]]
+[[cite]]
+element = "a34-p010"
+sources = [["ברטוב 2005", 31]]
+[[cite]]
+element = "fig-a34-05"
+sources = [["ברטוב 2005", 31]]
+[[cite]]
+element = "a34-p023"
+sources = [["Begin et al. 1974", 41], ["Neev and Hall, 1979", 37], ["Katz et al. 1977", 35]]
+[[cite]]
+element = "a34-p025"
+sources = [["Begin et al. 1974", 41]]
+[[cite]]
+element = "a34-p036"
+sources = [["Ken-Tor et al, 2001", 42]]
+[[cite]]
+element = "a34-p038"
+sources = [["וינברג ובגין 2005", 39]]
+[[cite]]
+element = "a34-p039"
+sources = [["פרומקין 1992", 33]]
+[[cite]]
+element = "fig-a34-15"
+sources = [["ניב והול, 1979", 37]]
+[[cite]]
+element = "a34-p041"
+sources = [["וינברג ובגין, 2005", 39]]
+[[cite]]
+element = "a34-p042"
+sources = [["1967", 32]]
+[[cite]]
+element = "a34-p044"
+sources = [["רז, 1983", 40]]
+[[cite]]
+element = "a34-p046"
+sources = [["בן אברהם ולזר, 2008", 38]]
+[[cite]]
+element = "fig-a34-17"
+sources = [["וינברג ובגין, 2005", 39]]
+[[cite]]
+element = "a34-p051"
+sources = [["וינברג ובגין 2005", 39]]
+[[cite]]
+element = "a34-p055"
+sources = [["Neev and Hall 1979", 37]]
+[[cite]]
+element = "a35-p005"
+sources = [["Bodaker et al., 2010", 46]]
+[[cite]]
+element = "a35-p006"
+sources = [["Neev & Emery, 1967", 74]]
+[[cite]]
+element = "a35-p011"
+sources = [["Wilkansky, 1936", 76]]
+[[cite]]
+element = "a35-p013"
+sources = [["Oren, 2010", 68], ["Oren, 1983b", 63]]
+[[cite]]
+element = "a35-p014"
+sources = [["Ionescu et al., 2012", 58]]
+[[cite]]
+element = "a35-p015"
+sources = [["Kis-papo et al.,2003", 60], ["Buchalo et al., 2000", 47]]
+[[cite]]
+element = "a35-p016"
+sources = [["1934", 45]]
+[[cite]]
+element = "a35-p022"
+sources = [["Wilkansky, 1936", 76], ["2009", 49], ["Oren, 1999", 66]]
+[[cite]]
+element = "a35-p029"
+sources = [["Calo, 2011", 52], ["Oren, 2008", 67]]
+[[cite]]
+element = "a35-p032"
+sources = [["Yonat, 2009", 78], ["von Bohlen et al., 1991", 50], ["Yonat, 2005", 77]]
+[[cite]]
+element = "a35-p034"
+sources = [["Buchalo et al., 2000", 47]]
+[[cite]]
+element = "a35-p041"
+sources = [["Oren et al.,2004", 70], ["2005b", 71], ["2006", 72], ["2009", 73]]
+[[cite]]
+element = "a35-p043"
+sources = [["אלעזרי־וולקני, 1940", 43]]
+[[cite]]
+element = "a35-p045"
+sources = [["Gay-Lussac, 1819", 55], ["Ehrenberg, 1848", 54], ["Lortet, 1891", 61], ["Bass-Becking,1934", 45], ["יוליסס, ג' ג'ויס, תרגום: יעל רנן 1985", 44]]
+[[cite]]
+element = "a35-p051"
+sources = [["Oren and Shilo, 1985", 69]]
+[[cite]]
+element = "a35-p056"
+sources = [["Kaplan & Friedman, 1970", 59], ["Oren,1983a", 62], ["1993", 65]]
+[[cite]]
+element = "a35-p058"
+sources = [["Bodaker et al., 2010", 46]]
+[[cite]]
+element = "a35-p070"
+sources = [["Coyne & Bellier", 53]]
+[[cite]]
+element = "a35-p071"
+sources = [["Ionescu et al., 2012", 58]]
+[[cite]]
+element = "a36-p005"
+sources = [["Bourcart, 1899", 84]]
+[[cite]]
+element = "fig-a36-02"
+sources = [["Bourcart 1899", 84]]
+[[cite]]
+element = "a36-p009"
+sources = [["Wachs et al., 2000", 88]]
+[[cite]]
+element = "a36-p013"
+sources = [["ביין וחובריו, 2022", 82]]
+[[cite]]
+element = "a36-p016"
+sources = [["אידלמן וחובריו, 2006", 80]]
+[[cite]]
+element = "a36-p025"
+sources = [["אבנימלך וחובריו 2007", 79]]
+[[cite]]
+element = "a36-p032"
+sources = [["ביין 2011", 81]]
+[[cite]]
+element = "a36-p034"
+sources = [["Harza JRV Group, 1998", 85]]
+[[cite]]
+element = "a36-p039"
+sources = [["ביין וחובריו, 2022", 82], ["אבנימלך, 2007", 79]]
+[[cite]]
+element = "a36-p041"
+sources = [["ביין וחובריו, 2022", 82], ["ביין וחובריו, 2022", 82]]
+[[cite]]
+element = "a36-p042"
+sources = [["ביין וחובריו, 2022", 82]]
+[[cite]]
+element = "a36-p045"
+sources = [["ביין וחובריו 2022", 82]]
+[[cite]]
+element = "a36-p049"
+sources = [["סלאמה ואייכנר 2019", 83]]
+[[cite]]
+element = "a36-p057"
+sources = [["GSI & Tahal Reports, 2011", 86]]
+[[cite]]
+element = "fig-a36-11"
+sources = [["GSI & Tahal Reports, 2011", 86]]
+[[cite]]
+element = "fig-a36-12"
+sources = [["Neev and Emery, 1967", 87]]
+[[cite]]
+element = "a36-p063"
+sources = [["Neev & Emery 1967", 87]]
+
 [char_map]
 "\u0007" = " "
 "\u001a" = "\u05b0"

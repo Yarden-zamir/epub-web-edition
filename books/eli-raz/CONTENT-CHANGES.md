@@ -12,6 +12,8 @@ Add an entry in the same change that makes it. Newest first within each section.
 
 | Where | Change | Why |
 |---|---|---|
+| a16 (PDF page 135) | Left out the note "*המספרים בסוגריים מפנים אל המקורות בסוף הספר" and the star after the title "ספנות בים המלח" that pointed to it. The other nine starred notes (a10, a11, a17, a18, a28, a30, a31, a32, a35) say where an article was first published; they stay | In the editions each source number is a link to its entry (section 3, source citations). book.toml [[omit]] and [[text_fix]] page 135 |
+| Source list, entry 86 (PDF page 312) | The second printed line "p. 6; p. 88." is part of entry 86 again (sources-p094 joined sources-p093; id-moves.csv) | Conversion fault: small print low on the page counted as a footnote, and the change of role split the entry. Ingest now gives all small print of a source list one role |
 | Part titles s01-s03, chapter a29, the cover subtitle; chapters a10 and a31 (PDF pages 65, 245) | A title printed on two lines is one heading (part titles keep the printed line break). In a10 and a31 the smaller subtitle under the title is its own subtitle paragraph (a10-p054 is new), and the source-note star stays a note mark where print sets it. Old IDs of the second lines: id-moves.csv | Design review items 13 and 14; the page review (PDF pages 17, 51, 233) |
 | PDF page 183 (release) | The box of the withheld image shows its edition note inside it as text, instead of an empty box with the note only for screen readers | Design review item 3 |
 | Chapters a10, a11, a13-a18, a21, a22, a27, a30, a31, a34-a36 | Section subheadings (bold, a rule above in print) are headings (h3) instead of author lines; a line-end hyphen or maqaf inside a word joins without a space ("קלעת-סלע", "Long-Term") | Page review 2026-11-24 (inventory/pages.csv) |
@@ -80,6 +82,8 @@ The reader sees the corrected text with a dagger (†) that opens an edition not
 
 | What | Where |
 |---|---|
+| Source citations as links: 102 printed citations of the source list link to their entry, "(17)" in a16 and author and year, for example "(Masterman, 1913)", elsewhere. The printed text stays as it is; the link is the text inside the brackets. Each cited entry (76 of 88) ends with "מצוטט בעמ'" and the printed pages that cite it, as back links. A note at the top of the list says so. Not linked: a17 (1)-(68), which cite the list of the original article in Cathedra 101 (not printed in this book), and citations with no matching entry (list in book.toml, comment above [sources]) | a07, a14, a15, a16, a18, a34, a35, a36, sources; book.toml [[cite]], [sources] |
+| Page references as links: 9 printed references to a page or a figure link to that figure: "בעמודים 107, 108" (a06), "בעמוד 301" (a07, a34, a35 twice), "בעמוד 300" (a36), "בסוף המאמר" (a10, the film QR code), "צילום פטריית הסחף השטפוני" (a34). Only where the target is certain; the others are listed in book.toml (comment above [[see]]) | a06, a07, a10, a34, a35, a36; book.toml [[see]] |
 | Cover page: the render of the printed cover opens the book; hidden landmarks nav (cover, printed contents, start of text) for Kindle | Start of the book, nav.xhtml |
 | Tables of PDF pages 281, 282, 285 as text tables after their printed images, with an edition caption (from site/enhancements.json "tables", transcribed from print) | a35, after fig-a35-02, fig-a35-03, fig-a35-04 |
 | 17 cross-references: the printed words that name another chapter link to that chapter (site/crosslinks.json) | a09, a10, a14, a22, a27, a29, a34, a35, a36 |

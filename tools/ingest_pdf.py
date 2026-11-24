@@ -226,6 +226,78 @@ def id_key(text: str) -> str:
     return squash(text)[:40]
 
 
+LINKABLE_TAGS = ("p", "h3", "figure")  # Elements that a [[cite]] or [[see]] entry can name; none of them nests in itself.
+
+
+def element_range(doc: str, eid: str) -> tuple[int, int]:
+    """Offsets of the content of the element with this ID: after its start tag, up to its end tag."""
+    at = doc.index(f' id="{eid}"')
+    tag = doc[doc.rindex("<", 0, at) + 1:at].split(" ", 1)[0]
+    if tag not in LINKABLE_TAGS:
+        raise IngestError(f"{eid}: a <{tag}> element; only {LINKABLE_TAGS} take reference links")
+    start = doc.index(">", at) + 1
+    return start, doc.index(f"</{tag}>", start)
+
+
+def text_hits(doc: str, start: int, end: int, esc: str) -> list[int]:
+    """Offsets of esc (escaped text) in the text runs of doc[start:end], outside tags and outside links."""
+    hits, i, in_link = [], start, 0
+    while i < end:
+        if doc[i] == "<":
+            close = doc.index(">", i) + 1
+            if doc.startswith("<a ", i):
+                in_link += 1
+            elif doc.startswith("</a>", i):
+                in_link -= 1
+            i = close
+            continue
+        run_end = doc.find("<", i, end)
+        run_end = end if run_end < 0 else run_end
+        if not in_link:
+            k = doc.find(esc, i, run_end)
+            while k >= 0:
+                hits.append(k)
+                k = doc.find(esc, k + len(esc), run_end)
+        i = run_end
+    return hits
+
+
+def page_before(doc: str, at: int) -> str:
+    """Printed page label of the page marker last before offset at."""
+    marker = doc.rindex('role="doc-pagebreak"', 0, at)
+    return doc[marker:].split('title="', 1)[1].split('"', 1)[0]
+
+
+def insert_links(doc: str, eid: str, links: list[tuple[str, str]]) -> tuple[str, list[int]]:
+    """Wrap each listed text of the element in a link: (text, <a …> start tag). A text listed k times must occur
+    exactly k times (outside other links); the k-th listing links the k-th occurrence. Returns the new document
+    and the offset of each link start tag in it, in listing order."""
+    start, end = element_range(doc, eid)
+    per_text: dict[str, list[int]] = {}
+    for n, (text, _) in enumerate(links):
+        per_text.setdefault(text, []).append(n)
+    places: list[tuple[int, int]] = []  # (offset of the text, listing index)
+    for text, listed in per_text.items():
+        hits = text_hits(doc, start, end, html.escape(text, quote=False))
+        if len(hits) != len(listed):
+            raise IngestError(f"{eid}: {text!r} occurs {len(hits)} times outside links; listed {len(listed)} times")
+        places += zip(hits, listed)
+    ordered = sorted(places)
+    for (a, n), (b, _) in zip(ordered, ordered[1:]):
+        if a + len(html.escape(links[n][0], quote=False)) > b:
+            raise IngestError(f"{eid}: link texts overlap: {links[n][0]!r}")
+    offsets = [0] * len(links)
+    for at, n in sorted(places, reverse=True):  # From the end, so earlier offsets stay valid.
+        text, tag = links[n]
+        esc = html.escape(text, quote=False)
+        doc = doc[:at] + tag + esc + "</a>" + doc[at + len(esc):]
+    shift = 0
+    for at, n in sorted(places):
+        offsets[n] = at + shift
+        shift += len(links[n][1]) + len("</a>")
+    return doc, offsets
+
+
 class IdRegistry:
     """Paragraph IDs that stay stable when ingestion changes where paragraphs start and end.
 
@@ -1533,6 +1605,92 @@ class Ingest:
             f.write_text(doc, encoding="utf-8")
             self.issue(0, "intentional-change", f"{link['element']}: cross-reference to {link['target']} is a link")
 
+    def add_source_links(self) -> None:
+        """book.toml [[cite]]: printed citations of the source list link to their entry (src-N), and each cited entry
+        links back to every printed page that cites it. book.toml [[see]]: printed page references link to their figure."""
+        cites, sees = self.cfg.get("cite", []), self.cfg.get("see", [])
+        if not cites and not sees:
+            return
+        text_dir = self.out / "OEBPS" / "text"
+        docs = self.element_docs()
+        bib = [u.id for u in self.units if u.kind == "bibliography"]
+        if len(bib) != 1:
+            raise IngestError(f"[[cite]] needs exactly one bibliography unit, found {bib}")
+        bib_file = text_dir / f"{bib[0]}.xhtml"
+        bib_doc = bib_file.read_text(encoding="utf-8")
+        entries: dict[int, str] = {}  # Printed entry number -> paragraph ID.
+        for chunk in bib_doc.split('<p id="')[1:]:
+            pid, _, rest = chunk.partition('"')
+            number = rest.split(">", 1)[1].split(".", 1)[0]
+            if number.isdigit():
+                if int(number) in entries:
+                    raise IngestError(f"source list: entry {number} printed twice ({entries[int(number)]}, {pid})")
+                entries[int(number)] = pid
+        cited: dict[int, list[tuple[str, str, str]]] = {}  # Entry -> (document, link ID, printed page) per citation.
+        texts: dict[str, str] = {}
+        ref_count: dict[int, int] = {}
+        for spec in cites + sees:
+            eid = spec["element"]
+            if eid not in docs:
+                raise IngestError(f"[[cite]]/[[see]] {eid}: not in the EPUB")
+            name = docs[eid]
+            doc = texts.get(name) or (text_dir / name).read_text(encoding="utf-8")
+            links: list[tuple[str, str]] = []
+            refs: list[tuple[int, str] | None] = []  # (entry, link ID) per link; None for a page reference.
+            for text, number in spec.get("sources", []):
+                if number not in entries:
+                    raise IngestError(f"[[cite]] {eid} {text!r}: the source list has no entry {number}")
+                ref_count[number] = ref_count.get(number, 0) + 1
+                ref = f"src{number}-ref{ref_count[number]}"
+                refs.append((number, ref))
+                links.append((text, f'<a epub:type="biblioref" role="doc-biblioref" class="source-ref" id="{ref}" '
+                                    f'href="{bib_file.name}#src-{number}">'))
+            for text, target in spec.get("targets", []):
+                if target not in docs:
+                    raise IngestError(f"[[see]] {eid} {text!r}: target {target} is not in the EPUB")
+                href = f"#{target}" if docs[target] == name else f"{docs[target]}#{target}"
+                refs.append(None)
+                links.append((text, f'<a class="crosslink" href="{href}">'))
+            if not links:
+                raise IngestError(f"[[cite]]/[[see]] {eid}: no sources and no targets")
+            doc, offsets = insert_links(doc, eid, links)
+            for at, r in zip(offsets, refs):
+                if r is not None:
+                    cited.setdefault(r[0], []).append((name, r[1], page_before(doc, at)))
+            texts[name] = doc
+        if bib_file.name in texts:
+            raise IngestError("[[cite]] entries in the source list itself are not supported")
+        for name, doc in texts.items():
+            (text_dir / name).write_text(doc, encoding="utf-8")
+        # The source list: an ID on each printed entry number, then one back link per citing page.
+        label = html.escape(self.cfg["sources"]["cited_label"], quote=False)
+        for number, pid in entries.items():
+            start, end = element_range(bib_doc, pid)
+            lead = f"{number}."
+            if not bib_doc.startswith(lead, start):
+                raise IngestError(f"source list: {pid} does not start with {lead!r}")
+            backs = ""
+            if number in cited:
+                pages: dict[str, str] = {}  # Printed page -> back link, first citation on that page.
+                for name, ref, page in cited[number]:
+                    pages.setdefault(page, f'<a href="{name}#{ref}" role="doc-backlink">{page}</a>')
+                # The label is in the book language, also after an English entry (DOC sets the book direction, rtl).
+                backs = (f' <span class="source-cited" lang="{self.cfg["meta"]["language"]}" dir="rtl">'
+                         f'{label} {", ".join(pages.values())}</span>')
+            bib_doc = (bib_doc[:start] + f'<span id="src-{number}" class="source-num">{lead}</span>'
+                       + bib_doc[start + len(lead):end] + backs + bib_doc[end:])
+        first_marker = bib_doc.index("/>", bib_doc.index('role="doc-pagebreak"')) + 2
+        note = html.escape(self.cfg["sources"]["note"], quote=False)
+        bib_doc = bib_doc[:first_marker] + f'\n<p id="{bib[0]}-note" class="edition-note">{note}</p>' + bib_doc[first_marker:]
+        bib_file.write_text(bib_doc, encoding="utf-8")
+        uncited = sorted(set(entries) - set(cited))
+        total = sum(len(v) for v in cited.values())
+        self.issue(0, "intentional-change", f"source list: {total} citations link to {len(cited)} entries; back links on each")
+        if uncited:
+            self.issue(0, "info", f"source list: entries without a linked citation: {uncited}")
+        print(f"source links: {total} citations -> {len(cited)} of {len(entries)} entries; "
+              f"{sum(len(s.get('targets', [])) for s in sees)} page references; uncited entries {uncited}")
+
     def write_additions(self) -> list[tuple[str, str, str]]:
         """Edition appendices from site data: glossary and timeline. Returns (id, href, title) per document.
         Both are marked epub-only: the web edition has its own. Each entry links to its place in the book."""
@@ -1588,6 +1746,12 @@ class Ingest:
             lines, tables = self.text_tables(unit, pno, self.lines(pno))
             lines, poems = self.poems(unit, pno, lines, page_ids)
             lines = self.attach_captions(figs, lines)
+            if unit.kind == "bibliography":
+                # A source list has no page notes: small print low on the page is a source entry like the rest.
+                # Without this, the footnote line splits an entry in two (entry 86, PDF page 312).
+                for ln in lines:
+                    if ln.role == "footnote":
+                        ln.role = "caption"
             flow: list[tuple[float, str]] = list(tables) + poems
             ids.extend(t.split('id="', 1)[1].split('"', 1)[0] for _, t in tables)
             paras = self.paragraphs(lines, figs)
@@ -1770,6 +1934,7 @@ class Ingest:
             (self.out / "OEBPS" / "text" / f"{unit.id}.xhtml").write_text(xhtml, encoding="utf-8")
             docs.append((unit, f"text/{unit.id}.xhtml", heading))
         self.add_crosslinks()
+        self.add_source_links()
         if unused_tables := sorted(set(self.add_tables) - self.add_tables_used):
             raise IngestError(f"enhancements.json tables match no figure: {unused_tables}")
         self.write_package(docs, self.write_cover(), self.write_additions(), self.write_facsimile())
