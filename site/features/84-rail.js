@@ -18,7 +18,6 @@ const railSections = [...reading.querySelectorAll(".doc > section[id]")]
 const railName = (s) => tocDialog.querySelector(`[data-chapter="${CSS.escape(s.id)}"] :is(.toc-name, .toc-part-title)`)?.textContent ?? "";
 let railMarks = [];
 function layoutRail() {
-  finishSizing(); // Marks sit by exact chapter positions (00-core.js).
   const height = document.documentElement.scrollHeight;
   railMarks = railSections.map((s) => ({ s, at: (s.getBoundingClientRect().top + scrollY) / height }));
   railTrack.replaceChildren(...railMarks.map(({ s, at }) => {
@@ -65,6 +64,8 @@ rail.addEventListener("pointerdown", (e) => {
   scrubbing = true;
   document.documentElement.setAttribute("data-scrubbing", "");
   rail.setPointerCapture(e.pointerId);
+  // Right after a load some chapters may still have estimated sizes (00-core.js); a scrub needs exact ones.
+  if (finishSizing()) layoutRail();
   history.replaceState({ ...history.state, ...position(), back: null }, ""); // Back returns here.
   scrubSection = scrubTo(e.clientY);
 });

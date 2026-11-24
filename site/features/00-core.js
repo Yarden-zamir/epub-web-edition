@@ -257,9 +257,12 @@ function sizeDocuments() {
   measure(allDocuments());
 }
 // Measure the documents that are left above `el` and the one that holds it; without `el`, all that are left.
+// Returns whether it measured any.
 function finishSizing(el = null) {
   const below = el ? unsized.findIndex((d) => !d.contains(el) && d.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_PRECEDING) : -1;
-  measure(unsized.splice(0, below === -1 ? unsized.length : below));
+  const docs = unsized.splice(0, below === -1 ? unsized.length : below);
+  measure(docs);
+  return docs.length > 0;
 }
 async function sizeDocumentsInSlices() {
   unsized = allDocuments();
