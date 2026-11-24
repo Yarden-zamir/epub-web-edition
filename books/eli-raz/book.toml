@@ -713,6 +713,19 @@ kind = "backcover"
 render_page = 1
 height_px = 1600
 
+[additions]
+# Edition additions from the web data (read only; owners in AGENTS-BRIEF.md). EPUB only where the web has its own form.
+# Tables: site/enhancements.json "tables" after their printed images. Cross-references: site/crosslinks.json as links.
+# Glossary and timeline (site/glossary.json, site/timeline.json) as appendices before the facsimile pages.
+# Decision: no glossary links on words in the text (text stays as printed; Kindle has its own dictionary lookup).
+data = "site"
+table_caption = "תוספת של מהדורה זו: הטבלה שבאיור כטקסט, כפי שהועתקה מהאיור המודפס."
+glossary_title = "מילון מונחים"
+glossary_note = "תוספת של מהדורה זו: מונחים שהספר מסביר, בניסוח קצר לפי הספר. כל מונח מקשר למקום בספר שבו הוא מוסבר."
+timeline_title = "ציר זמן"
+timeline_note = "תוספת של מהדורה זו: תאריכים שהספר מזכיר, לפי סדר הזמן, בניסוח קצר. כל אירוע מקשר למשפט בספר שממנו נלקח."
+source_link = "במקום בספר"
+
 [facsimile]
 # Appendix with a page image of every PDF page, one document per page, with a Return link to the text.
 # Derived images, rendered from source.pdf. They are not scans of paper.

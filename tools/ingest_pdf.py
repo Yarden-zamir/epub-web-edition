@@ -28,6 +28,7 @@ import csv
 import hashlib
 import html
 import io
+import json
 import logging
 import shutil
 import sys
@@ -712,6 +713,11 @@ class Ingest:
         self.ids = IdRegistry(content / "ids.csv", content / "id-moves.csv")
         self.text_tables_used: set[str] = set()
         self.corrections_used: set[int] = set()
+        add = self.cfg.get("additions")
+        self.add_dir = content / add["data"] if add else None
+        self.add_tables: dict[str, dict] = (json.loads((self.add_dir / "enhancements.json").read_text(encoding="utf-8")).get("tables", {})
+                                            if self.add_dir else {})
+        self.add_tables_used: set[str] = set()
         self.poem_taken: dict[int, set[tuple[float, str]]] = {}  # Lines that a poem from an earlier page took.
         self.poem_markers: set[int] = set()  # Pages whose marker sits inside a poem.
         self.poems_used: set[tuple[str, int]] = set()
@@ -1465,6 +1471,81 @@ class Ingest:
             out.append(part)
         return out + notes
 
+    def addition_table(self, fid: str, spec: dict) -> str:
+        """The table in a printed table image as a real table, right after the figure (EPUB only; the web
+        builds its own sortable table from the same data). Cells come from site data, transcribed from print."""
+        self.add_tables_used.add(fid)
+        esc = lambda c: html.escape(c, quote=False)
+        ltr = set(spec.get("ltr", []))
+        cell = lambda tag, i, c: f'<{tag}{" dir=\"ltr\"" if i in ltr else ""}>{esc(c)}</{tag}>'
+        head = "".join(f'<th scope="col">{esc(c)}</th>' for c in spec["columns"])
+        rows = "".join("<tr>" + "".join(cell("td", i, c) for i, c in enumerate(r)) + "</tr>" for r in spec["rows"])
+        note = esc(self.cfg["additions"]["table_caption"])
+        return (f'<table id="{fid}-table" class="edition-table epub-only"><caption>{note}</caption>'
+                f"<thead><tr>{head}</tr></thead><tbody>{rows}</tbody></table>")
+
+    def element_docs(self) -> dict[str, str]:
+        """Element ID -> file name of the written unit document that holds it."""
+        out: dict[str, str] = {}
+        for f in (self.out / "OEBPS" / "text").glob("*.xhtml"):
+            for el in ET.parse(f).getroot().iter():
+                if el.get("id"):
+                    out[el.get("id")] = f.name
+        return out
+
+    def add_crosslinks(self) -> None:
+        """Cross-references from site data: the printed words that name another chapter link to its heading."""
+        path = self.add_dir / "crosslinks.json" if self.add_dir else None
+        if not path or not path.exists():
+            return
+        docs = self.element_docs()
+        for link in json.loads(path.read_text(encoding="utf-8"))["links"]:
+            src, dst = docs.get(link["element"]), docs.get(link["target"])
+            if src is None or dst is None:
+                raise IngestError(f"crosslinks.json: {link['element']} or {link['target']} is not in the EPUB")
+            f = self.out / "OEBPS" / "text" / src
+            doc = f.read_text(encoding="utf-8")
+            start = doc.index(f'id="{link["element"]}"')
+            end = doc.index("</p>", start)
+            esc = html.escape(link["text"], quote=False)
+            if doc.count(esc, start, end) != 1:
+                raise IngestError(f"crosslinks.json: {link['text']!r} must occur once in {link['element']}")
+            href = (f"{dst}#{link['target']}" if dst != src else f"#{link['target']}")
+            i = doc.index(esc, start, end)
+            doc = doc[:i] + f'<a class="crosslink" href="{href}">{esc}</a>' + doc[i + len(esc):]
+            f.write_text(doc, encoding="utf-8")
+            self.issue(0, "intentional-change", f"{link['element']}: cross-reference to {link['target']} is a link")
+
+    def write_additions(self) -> list[tuple[str, str, str]]:
+        """Edition appendices from site data: glossary and timeline. Returns (id, href, title) per document.
+        Both are marked epub-only: the web edition has its own. Each entry links to its place in the book."""
+        if not self.add_dir:
+            return []
+        add, lang, docs_of = self.cfg["additions"], self.cfg["meta"]["language"], self.element_docs()
+        esc = lambda t: html.escape(t, quote=False)
+
+        def link(eid: str) -> str:
+            if eid not in docs_of:
+                raise IngestError(f"additions: {eid} is not in the EPUB")
+            return f'<a href="{docs_of[eid]}#{eid}">{esc(add["source_link"])}</a>'
+
+        made = []
+        glossary = json.loads((self.add_dir / "glossary.json").read_text(encoding="utf-8"))["terms"]
+        items = "\n".join(f'<dt id="gl-{n}">{esc(t["term"])}</dt><dd>{esc(t["definition"])} {link(t["source"])}</dd>'
+                          for n, t in enumerate(sorted(glossary, key=lambda t: t["term"]), start=1))
+        made.append(("glossary", add["glossary_title"], add["glossary_note"], f'<dl class="glossary">\n{items}\n</dl>'))
+        events = json.loads((self.add_dir / "timeline.json").read_text(encoding="utf-8"))["events"]
+        rows = "\n".join(f'<li id="tl-{n}"{" class=\"major\"" if e.get("major") else ""}><span class="tl-date">{esc(e["label"])}</span> '
+                         f'{esc(e["text"])} {link(e["target"])}</li>' for n, e in enumerate(events, start=1))
+        made.append(("timeline", add["timeline_title"], add["timeline_note"], f'<ol class="timeline">\n{rows}\n</ol>'))
+        out = []
+        for doc_id, title, note, body in made:
+            section = (f'<section id="{doc_id}" class="appendix edition-addition epub-only" epub:type="appendix" aria-labelledby="{doc_id}-h">\n'
+                       f'<h2 id="{doc_id}-h">{esc(title)}</h2>\n<p id="{doc_id}-note" class="edition-note">{esc(note)}</p>\n{body}\n</section>')
+            (self.out / "OEBPS" / "text" / f"{doc_id}.xhtml").write_text(DOC.format(lang=lang, title=esc(title), body=section), encoding="utf-8")
+            out.append((doc_id, f"text/{doc_id}.xhtml", title))
+        return out
+
     def render_unit(self, unit: Unit) -> tuple[str, list[str], str | None]:
         """Return XHTML body content, the IDs per page, and the unit heading text."""
         if unit.kind == "contents":
@@ -1569,7 +1650,10 @@ class Ingest:
                 if link:
                     img = f'<a href="{html.escape(link)}" class="qr-link">{img}</a>'
                     self.issue(pno, "intentional-change", f"{fid}: QR code image links to its decoded target")
-                flow.append((fig.bbox[1], f'<figure id="{fid}" class="figure {kind}" data-pdf-page="{pno}">{img}{caption}</figure>'))
+                figure_html = f'<figure id="{fid}" class="figure {kind}" data-pdf-page="{pno}">{img}{caption}</figure>'
+                if fid in self.add_tables:
+                    figure_html += self.addition_table(fid, self.add_tables[fid])
+                flow.append((fig.bbox[1], figure_html))
                 ids.append(fid)
                 if alt is None and not fig.change:
                     self.issue(pno, "alt-text", f"{fid} ({stem}): needs alt text written from the image (not in the PDF)")
@@ -1638,7 +1722,10 @@ class Ingest:
                                body=f'<section id="{unit.id}" class="{unit.kind}{" chapter" if unit.kind == "article" else ""}{" opens-with-photo" if self.opens_with_photo.get(unit.id) else ""}"{type_attr}{labelled}>\n{body}\n</section>')
             (self.out / "OEBPS" / "text" / f"{unit.id}.xhtml").write_text(xhtml, encoding="utf-8")
             docs.append((unit, f"text/{unit.id}.xhtml", heading))
-        self.write_package(docs, self.write_cover(), self.write_facsimile())
+        self.add_crosslinks()
+        if unused_tables := sorted(set(self.add_tables) - self.add_tables_used):
+            raise IngestError(f"enhancements.json tables match no figure: {unused_tables}")
+        self.write_package(docs, self.write_cover(), self.write_additions(), self.write_facsimile())
         poem_count: dict[str, int] = {}
         for spec in self.cfg.get("poem", []):
             poem_count[spec["unit"]] = poem_count.get(spec["unit"], 0) + 1
@@ -1708,7 +1795,7 @@ class Ingest:
         return docs
 
     def write_package(self, docs: list[tuple[Unit, str, str | None]], cover: str | None,
-                      facsimile: list[tuple[str, str]]) -> None:
+                      additions: list[tuple[str, str, str]], facsimile: list[tuple[str, str]]) -> None:
         m = self.cfg["meta"]
         images = sorted((self.out / "OEBPS" / "images").iterdir())
         media = {"jpeg": "image/jpeg", "jpg": "image/jpeg", "png": "image/png", "jpx": "image/jp2"}
@@ -1737,6 +1824,9 @@ class Ingest:
         for unit, href, _ in docs:
             manifest.append(f'<item id="x-{unit.id}" href="{href}" media-type="application/xhtml+xml"/>')
             spine.append(f'<itemref idref="x-{unit.id}"/>')
+        for aid, href, _ in additions:
+            manifest.append(f'<item id="x-{aid}" href="{href}" media-type="application/xhtml+xml"/>')
+            spine.append(f'<itemref idref="x-{aid}"/>')
         for fid, href in facsimile:
             manifest.append(f'<item id="x-{fid}" href="{href}" media-type="application/xhtml+xml"/>')
             spine.append(f'<itemref idref="x-{fid}"/>')
@@ -1749,6 +1839,8 @@ class Ingest:
                          manifest="\n    ".join(manifest), spine="\n    ".join(spine))
         (self.out / "OEBPS" / "package.opf").write_text(opf, encoding="utf-8")
         toc = "\n      ".join(f'<li><a href="{href}#{u.id}">{html.escape(h)}</a></li>' for u, href, h in docs if h)
+        for aid, href, title in additions:
+            toc += f'\n      <li><a href="{href}#{aid}">{html.escape(title)}</a></li>'
         if facsimile:
             toc += f'\n      <li><a href="text/facsimile.xhtml#facsimile">{html.escape(self.cfg["facsimile"]["title"])}</a></li>'
         pages = "\n      ".join(

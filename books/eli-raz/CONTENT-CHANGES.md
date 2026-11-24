@@ -69,6 +69,11 @@ The reader sees the corrected text with a dagger (†) that opens an edition not
 
 | What | Where |
 |---|---|
+| Cover page: the render of the printed cover opens the book; hidden landmarks nav (cover, printed contents, start of text) for Kindle | Start of the book, nav.xhtml |
+| Tables of PDF pages 281, 282, 285 as text tables after their printed images, with an edition caption (from site/enhancements.json "tables", transcribed from print) | a35, after fig-a35-02, fig-a35-03, fig-a35-04 |
+| 17 cross-references: the printed words that name another chapter link to that chapter (site/crosslinks.json) | a09, a10, a14, a22, a27, a29, a34, a35, a36 |
+| Glossary appendix: 51 terms the book explains, short wording after the book, each linked to its place in the book (site/glossary.json). No links on words in the text: the text stays as printed, and Kindle has its own dictionary | Before the facsimile appendix |
+| Timeline appendix: 62 dates from the book, each linked to its sentence (site/timeline.json) | Before the facsimile appendix |
 | Facsimile appendix: one 56 dpi image (JPEG quality 55) of every printed page, with a Return link. Lowered from 64 dpi on 2026-11-24 to keep the release EPUB at most 24 MB | End of the book |
 | Alt text for all 217 images | book.toml [alt]; written from the images, not printed |
 | QR codes link to their decoded targets | book.toml [qr_links] |

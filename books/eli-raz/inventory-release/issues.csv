@@ -222,3 +222,20 @@ A-0220,311,intentional-change,Correction 'Coyn and Bellier' -> 'Coyne and Bellie
 A-0221,311,intentional-change,"Correction 'pp. 31–41' -> 'pp. 33–41': Oren 1983, Limnology and Oceanography 28(1): pages 33-41 (Crossref). Evidence: https://api.crossref.org/works/10.4319/lo.1983.28.1.0033",open
 A-0222,316,reuse,Image xref 1379 repeats; first file p001-x1379.jpeg,open
 A-0223,316,info,p316-x1379.jpeg: no caption next to this image in print,open
+A-0224,0,intentional-change,a09-p011: cross-reference to a20-h is a link,open
+A-0225,0,intentional-change,a10-p003: cross-reference to a09-h is a link,open
+A-0226,0,intentional-change,a10-p029: cross-reference to a11-h is a link,open
+A-0227,0,intentional-change,a14-p008: cross-reference to a13-h is a link,open
+A-0228,0,intentional-change,a14-p013: cross-reference to a34-h is a link,open
+A-0229,0,intentional-change,a14-p024: cross-reference to a31-h is a link,open
+A-0230,0,intentional-change,a22-p013: cross-reference to a10-h is a link,open
+A-0231,0,intentional-change,a22-p017: cross-reference to a13-h is a link,open
+A-0232,0,intentional-change,a27-p008: cross-reference to a18-h is a link,open
+A-0233,0,intentional-change,a27-p039: cross-reference to a17-h is a link,open
+A-0234,0,intentional-change,a29-p007: cross-reference to a33-h is a link,open
+A-0235,0,intentional-change,a34-p018: cross-reference to a14-h is a link,open
+A-0236,0,intentional-change,a35-p038: cross-reference to a36-h is a link,open
+A-0237,0,intentional-change,a35-p048: cross-reference to a36-h is a link,open
+A-0238,0,intentional-change,a36-p009: cross-reference to a14-h is a link,open
+A-0239,0,intentional-change,a36-p042: cross-reference to a14-h is a link,open
+A-0240,0,intentional-change,a36-p063: cross-reference to a35-h is a link,open

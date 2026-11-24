@@ -108,3 +108,14 @@ section.cover-image img { max-width: 100%; max-height: 100vh; height: auto; }
 
 /* Legal notice of the release edition on the title page. No colour: the web shows the title page in its dark footer. */
 p.edition-notice { font-size: 0.85em; text-align: center; }
+
+/* Edition additions (book.toml [additions]): tables from printed table images, glossary, timeline, cross-reference links. */
+table.edition-table caption { caption-side: top; font-size: 0.8em; color: #555659; margin-bottom: 0.3em; }
+dl.glossary dt { font-weight: bold; margin-top: 0.8em; page-break-after: avoid; break-after: avoid; }
+dl.glossary dd { margin: 0.2em 0 0; }
+ol.timeline { list-style: none; padding: 0; }
+ol.timeline li { margin: 0.5em 0; }
+ol.timeline li.major { font-weight: bold; }
+span.tl-date { font-weight: bold; }
+/* The printed contents: page numbers and titles are in the text; the reader adds no list numbers. */
+ol.contents, ol.contents ol { list-style: none; padding: 0; }

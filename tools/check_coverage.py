@@ -45,8 +45,9 @@ def epub_words_by_page(text_dir: Path) -> dict[int, list[str]]:
             pin = el.attrib.get("data-pdf-page")
             pinned = int(pin) if pin else pinned
             el_id = el.attrib.get("id", "")
-            if "edition-correction" in el.attrib.get("class", "").split() and el.tag == f"{XHTML}aside":
-                return  # Edition note with the printed form of a correction; not book text.
+            classes = el.attrib.get("class", "").split()
+            if ("edition-correction" in classes and el.tag == f"{XHTML}aside") or "edition-table" in classes:
+                return  # Edition note or edition table (book.toml [additions]); not book text.
             if el.attrib.get(f"{OPS}type") == "pagebreak" and el_id.startswith("pg-"):
                 current = int(el_id[3:])
             if el.text:
