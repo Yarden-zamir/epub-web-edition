@@ -1,0 +1,97 @@
+{
+ "figure": "fig-a10-02",
+ "title": "מפת אזור האסון: מדושנבה אל פסגת לנין",
+ "base": "opentopomap",
+ "bounds": [
+  [
+   38.15,
+   68.25
+  ],
+  [
+   40.15,
+   73.75
+  ]
+ ],
+ "markers": [
+  {
+   "name": "דושנבה",
+   "lat": 38.576704,
+   "lon": 68.785433,
+   "source": "OSM node 27547977 (© OpenStreetMap contributors, ODbL)",
+   "target": "a10-p007",
+   "wikidata": "Q9365"
+  },
+  {
+   "name": "ג'ירגיטל (מנחת)",
+   "lat": 39.22124,
+   "lon": 71.205278,
+   "source": "OSM node 1042088758, Jirgatol Airport (© OpenStreetMap contributors, ODbL)",
+   "target": "a10-p008"
+  },
+  {
+   "name": "מחנה הבסיס באצ'יקטש",
+   "lat": 39.479708,
+   "lon": 72.909329,
+   "source": "OSM node 9355212381, IMC Pamir base camp in the Achik-Tash valley (Wikidata Q65038131) (© OpenStreetMap contributors, ODbL)",
+   "target": "a10-p010",
+   "wikidata": "Q65038131"
+  },
+  {
+   "name": "המחנה הראשון",
+   "lat": 39.4057,
+   "lon": 72.866019,
+   "source": "OSM node 2439609423, Camp 1 (© OpenStreetMap contributors, ODbL)",
+   "target": "a10-p018"
+  },
+  {
+   "name": "המחבת, אתר האסון",
+   "lat": 39.369371,
+   "lon": 72.849458,
+   "source": "Centre of OSM way 368181500, Сковородка / The Frying Pan (© OpenStreetMap contributors, ODbL)",
+   "target": "a10-p002"
+  },
+  {
+   "name": "פסגת לנין",
+   "lat": 39.346984,
+   "lon": 72.879179,
+   "source": "OSM node 349008747 (© OpenStreetMap contributors, ODbL)",
+   "target": "a10-p002",
+   "wikidata": "Q838587"
+  }
+ ],
+ "lines": [
+  {
+   "name": "טיסה מדושנבה לג'ירגיטל (קו ישר, סכמטי)",
+   "coords": [
+    [
+     38.576704,
+     68.785433
+    ],
+    [
+     39.22124,
+     71.205278
+    ]
+   ],
+   "source": "Route as told in a10-p008; straight line between the OSM points, not the flight path"
+  },
+  {
+   "name": "מסוק מג'ירגיטל למחנה הבסיס (קו ישר, סכמטי)",
+   "coords": [
+    [
+     39.22124,
+     71.205278
+    ],
+    [
+     39.479708,
+     72.909329
+    ]
+   ],
+   "source": "Route as told in a10-p008 and a10-p010; straight line between the OSM points"
+  }
+ ],
+ "attribution": [
+  "© OpenStreetMap contributors (ODbL)",
+  "Map style: © OpenTopoMap (CC BY-SA)"
+ ],
+ "note": "Places from OpenStreetMap (element IDs in each marker source). The book gives heights that differ from OSM; the map shows no heights. The static EPUB image (replacements/p066-x251-open-map.png, scripts/pamir_map.py) adds Copernicus DEM relief and Natural Earth borders. Relief produced using Copernicus WorldDEM-90 and WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved."
+}
