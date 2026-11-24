@@ -420,6 +420,24 @@ function create(spec) {
       ctx.globalAlpha = 1;
     }
     const open = deepest > 0.05 ? 1 : 0;
+    // Once a second sinkhole opens: a short explanation above the largest open crater, with a pointer down to it.
+    const opened = holes.reduce((total, h) => total + h.p, 0);
+    const explain = ramp(opened, 1.3, 1.9);
+    if (explain > 0.01) {
+      const h = holes.filter((hole) => !hole.closing && hole.p > 0).sort((h1, h2) => h2.size - h1.size)[0];
+      if (h) {
+        const look = { weight: 700, size: small ? 11 : 12 };
+        const [first, second] = L.sinkhole.split(" / ");
+        const g = h.surface(0), y = g - 34 * Math.max(1, u * 0.8);
+        ctx.globalAlpha = explain;
+        ctx.strokeStyle = env.color("--ink");
+        ctx.lineWidth = 1;
+        ctx.stroke(shape([[h.x, y + 6 * u], [h.x, g + h.crater * 0.4]], false));
+        env.label(ctx, first, h.x, y - 14 * u, look);
+        env.label(ctx, second, h.x, y, look);
+        ctx.globalAlpha = 1;
+      }
+    }
 
     ctx.save();
     ctx.clip(above);

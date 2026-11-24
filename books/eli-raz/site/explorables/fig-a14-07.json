@@ -42,7 +42,8 @@
     "west": "מערב",
     "east": "מזרח",
     "drag": "גררו",
-    "fresh_dissolves": "מי תהום מתוקים ממיסים את המלח"
+    "fresh_dissolves": "מי תהום מתוקים ממיסים את המלח",
+    "sinkhole": "בולען: הקרקע קורסת / אל החלל שהמלח הותיר"
   },
   "texts": {
     "protected": "במפלס גבוה, אופפים מי ים המלח הרוויים (שאינם יכולים להמס מלח) את שכבת המלח, ומגינים עליה מפני המסה על ידי מי התהום.",
@@ -89,7 +90,8 @@
     }
   },
   "label_notes": {
-    "fresh_dissolves": "Plain wording of the printed figure: the salt layer is exposed to dissolution by the undersaturated groundwater (fig-a14-07), while the saturated Dead Sea water cannot dissolve salt."
+    "fresh_dissolves": "Plain wording of the printed figure: the salt layer is exposed to dissolution by the undersaturated groundwater (fig-a14-07), while the saturated Dead Sea water cannot dissolve salt.",
+    "sinkhole": "Plain wording of a14-p012 (sinkholes are gravitational collapses of the surface into a volume deficit below it) and of the fig-a14-06 caption (collapse into dissolution cavities in the salt). ' / ' splits the two lines."
   },
   "legend": [
     {
