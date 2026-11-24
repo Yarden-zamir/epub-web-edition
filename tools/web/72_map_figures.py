@@ -2,14 +2,15 @@
 
 Both files sit next to the enhancements file; their formats are in books/eli-raz/AGENTS-BRIEF.md and the files' own notes.
 The build checks every figure and element ID against the EPUB, writes the browser data to data/maps/<figure ID>.json,
-copies the then-and-now images to media/then-now/, and puts a hidden box inside each figure.
+writes the then-and-now images to media/then-now/ at the size the view needs, and puts a hidden box inside each figure.
 site/features/75-map-figures.js fills the box and adds a toggle between the map and the printed image.
 """
 
 import json
-import shutil
 import xml.etree.ElementTree as ET
 from pathlib import Path
+
+from PIL import Image
 
 from build_web import BookError, Site, credit_html, missing_id
 
@@ -18,6 +19,11 @@ from build_web import BookError, Site, credit_html, missing_id
 LINE_SLOTS = 3
 BOXES: dict[str, ET.Element] = {}  # Printed figure ID -> map box placed inside it.
 IMAGES: list[tuple[Path, str]] = []  # Then-and-now images: (source file, path in the site).
+# The long side of a then-and-now image in the site: about twice the largest map box (44rem), for sharp screens.
+# Known limit: a reader who zooms in far sees the image soften. Revisit if the view gets a zoom past the fitted layer.
+THEN_NOW_SIDE = 1600
+THEN_NOW_QUALITY = 68  # WebP quality: each layer lands between 80 and 400 KB.
+# WebP effort: 6 saves 4% more bytes but takes 4 times as long (about 15 s for the three layers).
 
 
 def check_lat_lon(lat: float, lon: float, where: str) -> None:
@@ -112,7 +118,9 @@ def load_then_now(site: Site, path: Path) -> dict:
             level |= {"source": data["source"]["label"], "url": data["source"]["url"]}
         if not level.get("url", "").startswith("https://"):
             raise BookError(f"{lw}: the level needs an https source url")
-        url = f"media/then-now/{image.name}"
+        url = f"media/then-now/{image.stem}.webp"
+        if any(url == used for _, used in IMAGES):
+            raise BookError(f"{lw}: two layer images give the same site file {url}")
         IMAGES.append((image, url))
         layers.append({
             "id": layer["id"], "label": layer["label"], "year": layer["date"][:4], "image": url,
@@ -170,7 +178,14 @@ def write(site: Site) -> None:
     (site.out / "data" / "maps").mkdir(parents=True, exist_ok=True)
     for figure, spec in DATA.items():
         (site.out / "data" / "maps" / f"{figure}.json").write_text(json.dumps(spec, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    sizes = {}
     for source, url in IMAGES:
-        (site.out / url).parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(source, site.out / url)
+        dest = site.out / url
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        with Image.open(source) as im:
+            im.thumbnail((THEN_NOW_SIDE, THEN_NOW_SIDE), Image.Resampling.LANCZOS)  # Never enlarges; keeps transparency.
+            im.save(dest, "WEBP", quality=THEN_NOW_QUALITY, method=4)
+        sizes[url] = {"source_bytes": source.stat().st_size, "bytes": dest.stat().st_size}
     site.report["map_figures"] = sorted(DATA)
+    if sizes:
+        site.report["then_now_images"] = sizes

@@ -2,7 +2,7 @@
  "fig-a06-01": {
   "tag": "figure",
   "lang": "he",
-  "inner": "<img src=\"../images/p021-x103.jpeg\" width=\"1009\" height=\"477\" alt=\"מבט מגובה על מפרץ ים המלח: כתם מים חום־כתום עגול בתוך המים הטורקיזיים, בין מצוקים.\"/><figcaption><span class=\"caption\">הפטרייה השיטפונית של נחל קדם.</span> <span class=\"credit\">צילום: משה ברנשטיין</span></figcaption>"
+  "inner": "<img src=\"../images/p021-x103-replacement.jpg\" width=\"1942\" height=\"1019\" alt=\"מבט מגובה על מפרץ ים המלח: כתם מים חום־כתום עגול בתוך המים הטורקיזיים, בין מצוקים.\"/><figcaption><span class=\"caption\">הפטרייה השיטפונית של נחל קדם.</span> <span class=\"credit\">צילום: משה ברנשטיין</span><span class=\"edition-note\">במהדורה זו: הקובץ של הצלם, ברזולוציה גבוהה יותר, של אותו תצלום. המסגרת צרה מעט בצד ימין, כי הקובץ נגמר שם.</span></figcaption>"
  },
  "a06-h": {
   "tag": "h2",
@@ -64,46 +64,6 @@
   "lang": "en",
   "inner": "<b>Table 1.</b> Increase over time in Dead Sea water salinity (g/l)"
  },
- "a06-p007": {
-  "tag": "p",
-  "lang": "en",
-  "inner": "1935"
- },
- "a06-p008": {
-  "tag": "p",
-  "lang": "en",
-  "inner": "1967"
- },
- "a06-p009": {
-  "tag": "p",
-  "lang": "en",
-  "inner": "1995"
- },
- "a06-p010": {
-  "tag": "p",
-  "lang": "en",
-  "inner": "2010"
- },
- "a06-p011": {
-  "tag": "p",
-  "lang": "en",
-  "inner": "300"
- },
- "a06-p012": {
-  "tag": "p",
-  "lang": "en",
-  "inner": "339"
- },
- "a06-p013": {
-  "tag": "p",
-  "lang": "en",
-  "inner": "347"
- },
- "a06-p014": {
-  "tag": "p",
-  "lang": "en",
-  "inner": "245"
- },
  "a06-p015": {
   "tag": "p",
   "lang": "en",
@@ -162,7 +122,7 @@
  "a06-p021": {
   "tag": "p",
   "lang": "en",
-  "inner": "Several archeological sites in Canaan and Egypt, dating from 3900– 2200 BC, show indications of trade in Dead Sea asphalt for various uses, albeit in small quantities.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref9\" href=\"#a06-fn9\">9</a> The conquests of Alexander the Great in the 4th century BC created a new cultural and economic space that encompassed both areas. While the embalming tradition of Ancient Egypt was based mostly on materials processed from flora and fauna, such as beeswax, resins, concentrates and perfumes, these geopolitical upheavals exposed Hellenistic Egypt, which continued with the embalming tradition, to an appropriate inorganic substitute: the asphalt of the Dead Sea.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref10\" href=\"#a06-fn10\">10</a> The high demand for Dead Sea asphalt by the Egyptians caused its price to rise steeply, and led to struggles between Alexander’s heirs and the Nabateans, and among the latter, over collecting it and trading in it. Writing in 50 BC, Greek historian Diodorus Siculus (flourished 1st century BC) describes a naval battle that occurred in 312 BC on the lake itself, as part of this struggle. Pedanius Dioscorides (ca. AD 40–90), author of most of the authoritative pharmacological literature of the ancient world, referred to the medical uses of Dead Sea asphalt and stated that its therapeutic qualities are higher than those of <span epub:type=\"pagebreak\" role=\"doc-pagebreak\" id=\"pg-26\" title=\"22\"/>salts form any other source. Roman-Jewish scholar Flavius Josephus (AD 37–100) also described the appearance and collection of chunks of asphalt (also translated as bitumen), their medical usage and their use for sealing naval vessels. Further evidence of collecting asphalt from the lake’s shores appeared occasionally in the following centuries. Only two cases of (particularly large) discharges of chunks were reported in the nineteenth century, in conjunction with powerful earthquakes, and consequently, the rarity of asphalt chunks in modern times was associated with seismic lulls.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref11\" href=\"#a06-fn11\">11</a> Sightings of floating chunks were reported again in 1956, immediately upon the establishment of Kibbutz Ein Gedi on the shore of the Dead Sea. Apparently, the infrequent reports beforehand were related to the lack of human settlements along the western coast of the lake. At any rate, since the late 1950s the new kibbutz has supplied asphalt to the Teva pharmaceutical plant. The last documented observation of a large chunk was in 1969.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref12\" href=\"#a06-fn12\">12</a>"
+  "inner": "Several archeological sites in Canaan and Egypt, dating from 3900– 2200 BC, show indications of trade in Dead Sea asphalt for various uses, albeit in small quantities.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref9\" href=\"#a06-fn9\">9</a> The conquests of Alexander the Great in the 4th century BC created a new cultural and economic space that encompassed both areas. While the embalming tradition of Ancient Egypt was based mostly on materials processed from flora and fauna, such as beeswax, resins, concentrates and perfumes, these geopolitical upheavals exposed Hellenistic Egypt, which continued with the embalming tradition, to an appropriate inorganic substitute: the asphalt of the Dead Sea.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref10\" href=\"#a06-fn10\">10</a> The high demand for Dead Sea asphalt by the Egyptians caused its price to rise steeply, and led to struggles between Alexander’s heirs and the Nabateans, and among the latter, over collecting it and trading in it. Writing in 50 BC, Greek historian Diodorus Siculus (flourished 1st century BC) describes a naval battle that occurred in 312 BC on the lake itself, as part of this struggle. Pedanius Dioscorides (ca. AD 40–90), author of most of the authoritative pharmacological literature of the ancient world, referred to the medical uses of Dead Sea asphalt and stated that its therapeutic qualities are higher than those of <span epub:type=\"pagebreak\" role=\"doc-pagebreak\" id=\"pg-26\" title=\"22\"/><span class=\"edition-correction\" data-printed=\"salts form any other source\">salts from any other source</span><a epub:type=\"noteref\" role=\"doc-noteref\" class=\"edition-mark\" id=\"corr3-ref\" href=\"#corr3\">†</a>. Roman-Jewish scholar Flavius Josephus (AD 37–100) also described the appearance and collection of chunks of asphalt (also translated as bitumen), their medical usage and their use for sealing naval vessels. Further evidence of collecting asphalt from the lake’s shores appeared occasionally in the following centuries. Only two cases of (particularly large) discharges of chunks were reported in the nineteenth century, in conjunction with powerful earthquakes, and consequently, the rarity of asphalt chunks in modern times was associated with seismic lulls.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref11\" href=\"#a06-fn11\">11</a> Sightings of floating chunks were reported again in 1956, immediately upon the establishment of Kibbutz Ein Gedi on the shore of the Dead Sea. Apparently, the infrequent reports beforehand were related to the lack of human settlements along the western coast of the lake. At any rate, since the late 1950s the new kibbutz has supplied asphalt to the Teva pharmaceutical plant. The last documented observation of a large chunk was in 1969.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref12\" href=\"#a06-fn12\">12</a>"
  },
  "a06-fn9": {
   "tag": "aside",
@@ -177,7 +137,7 @@
  "a06-p022": {
   "tag": "p",
   "lang": "en",
-  "inner": "Another valuable mineral harvested from the Dead Sea is salt. Until the twentieth century, table salt was a precious commodity. Supply and demand gaps resulted in handsome profits for its harvesters and high taxes for the governments controlling them. While the Dead Sea asphalt was unique, salt was also harvested in other locations along the Mediterranean shores. However, the lake was an attractive and convenient source. It supplied adjacent areas but not only them, thanks to a combination of three factors: a body of water highly saturated with salt, a climate with a high evaporation rate, and natural lagoons that served as evaporation pools. Evidence of production and usage of salt from the Dead Sea in ancient times is infrequent. The earliest appears in the Old Testament: “Surely Moab shall be as Sodom, and the children of Ammon as Gomorrah, even the breeding of nettles, and saltpits” (Zephaniah 2:9, KJV); <span epub:type=\"pagebreak\" role=\"doc-pagebreak\" id=\"pg-29\" title=\"25\"/>in Ezekiel’s vision, the Dead Sea shall be “healed” (sweetened) and filled with fish, “But the miry places thereof and the marshes thereof shall not be healed; they shall be given to salt” (47:9–11, KJV). The exclusion of the “miry places and marshes” (lagoons) from the grand vision is an indirect testimony to the importance of salt. The Book of Leviticus commands: “And every oblation of thy meat offering shalt though season with salt,” and demands to prevent any shortage of salt for this purpose: “neither shalt thou suffer the salt of the covenant of thy God to be lacking from thy meat offering” (2:23, KJV). In order to comply with this commandment, a salt storeroom was built in the Temple. Later, in a document from the time of the Bar Kokhba Revolt (AD 135), the leader demands that his people in Ein Gedi send him loads of salt.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref13\" href=\"#a06-fn13\">13</a>"
+  "inner": "Another valuable mineral harvested from the Dead Sea is salt. Until the twentieth century, table salt was a precious commodity. Supply and demand gaps resulted in handsome profits for its harvesters and high taxes for the governments controlling them. While the Dead Sea asphalt was unique, salt was also harvested in other locations along the Mediterranean shores. However, the lake was an attractive and convenient source. It supplied adjacent areas but not only them, thanks to a combination of three factors: a body of water highly saturated with salt, a climate with a high evaporation rate, and natural lagoons that served as evaporation pools. Evidence of production and usage of salt from the Dead Sea in ancient times is infrequent. The earliest appears in the Old Testament: “Surely Moab shall be as Sodom, and the children of Ammon as Gomorrah, even the breeding of nettles, and saltpits” (Zephaniah 2:9, KJV); <span epub:type=\"pagebreak\" role=\"doc-pagebreak\" id=\"pg-29\" title=\"25\"/>in Ezekiel’s vision, the Dead Sea shall be “healed” (sweetened) and filled with fish, “But the miry places thereof and the marshes thereof shall not be healed; they shall be given to salt” (47:9–11, KJV). The exclusion of the “miry places and marshes” (lagoons) from the grand vision is an indirect testimony to the importance of salt. The Book of Leviticus commands: “And every oblation of thy meat offering <span class=\"edition-correction\" data-printed=\"shalt though season\">shalt thou season</span><a epub:type=\"noteref\" role=\"doc-noteref\" class=\"edition-mark\" id=\"corr2-ref\" href=\"#corr2\">†</a> with salt,” and demands to prevent any shortage of salt for this purpose: “neither shalt thou suffer the salt of the covenant of thy God to be lacking from thy meat offering” <span class=\"edition-correction\" data-printed=\"(2:23, KJV)\">(2:13, KJV)</span><a epub:type=\"noteref\" role=\"doc-noteref\" class=\"edition-mark\" id=\"corr1-ref\" href=\"#corr1\">†</a>. In order to comply with this commandment, a salt storeroom was built in the Temple. Later, in a document from the time of the Bar Kokhba Revolt (AD 135), the leader demands that his people in Ein Gedi send him loads of salt.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref13\" href=\"#a06-fn13\">13</a>"
  },
  "a06-fn11": {
   "tag": "aside",
@@ -192,7 +152,7 @@
  "a06-p023": {
   "tag": "p",
   "lang": "en",
-  "inner": "Since the Temple was no longer active, it appears this salt was used for daily consumption, and perhaps also for financing the revolt. In the Baraita “The Compounding of Incense” quoted in the Talmud, “Sodomic salt” is mentioned. Although its purpose is not clear from the sources, it was obviously produced in the Dead Sea.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref14\" href=\"#a06-fn14\">14</a> Finally, in a 1138 document, the Crusader King Fulk d’Anjou grants rights to revenues from the salt and asphalt supplied by the villagers of Tekoa, located south of Hebron, from the Dead Sea.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref15\" href=\"#a06-fn15\">15</a>"
+  "inner": "Since the Temple was no longer active, it appears this salt was used for daily consumption, and perhaps also for financing the revolt. In the Baraita “The Compounding of Incense” quoted in the Talmud, “Sodomic salt” is mentioned. Although its purpose is not clear from the sources, it was obviously produced in the Dead Sea.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref14\" href=\"#a06-fn14\">14</a> Finally, in a 1138 document, the Crusader King Fulk d’Anjou grants rights to revenues from the salt and asphalt supplied by the villagers of Tekoa, located <span class=\"edition-correction\" data-printed=\"south of Hebron\">south of Bethlehem</span><a epub:type=\"noteref\" role=\"doc-noteref\" class=\"edition-mark\" id=\"corr4-ref\" href=\"#corr4\">†</a>, from the Dead Sea.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref15\" href=\"#a06-fn15\">15</a>"
  },
  "a06-fn13": {
   "tag": "aside",
@@ -207,27 +167,27 @@
  "a06-fn15": {
   "tag": "aside",
   "lang": "en",
-  "inner": "<p><a href=\"#a06-fnref15\" role=\"doc-backlink\">15</a> Regesta Regni Hierosolymitani (RRH), ed. R. Rohricht (Innsbruck, 1893), pp. 43–44, n. 173.</p>"
+  "inner": "<p><a href=\"#a06-fnref15\" role=\"doc-backlink\">15</a> Regesta Regni Hierosolymitani (RRH), ed. R. Rohricht (Innsbruck, 1893), pp. 43–44, <span class=\"edition-correction\" data-printed=\"n. 173.\">n. 174.</span><a epub:type=\"noteref\" role=\"doc-noteref\" class=\"edition-mark\" id=\"corr6-ref\" href=\"#corr6\">†</a></p>"
  },
  "fig-a06-04": {
   "tag": "figure",
   "lang": "he",
-  "inner": "<img src=\"../images/p028-x126-render.jpg\" width=\"431\" height=\"261\" alt=\"פרט מפסיפס עתיק: סירה ועליה גושי מלח צבעוניים על מים מסוגננים בקווים גליים.\"/><figcaption><span class=\"caption\">סירה נושאת מלח על ים המלח. מפת מידבא, שנת 560 ~ לספירה (הוצאת מחלקת המדידות והחברה לחקירת</span><span class=\"caption\">ארץ ישראל ועתיקותיה). דמויות המלחים הושחתו במסגרת איקונוקלאזם.</span></figcaption>"
+  "inner": "<img src=\"../images/p028-x126-render.jpg\" width=\"431\" height=\"261\" alt=\"פרט מפסיפס עתיק: סירה ועליה גושי מלח צבעוניים על מים מסוגננים בקווים גליים.\"/><figcaption><span class=\"caption\">סירה נושאת מלח על ים המלח. מפת מידבא, שנת 560~ לספירה (הוצאת מחלקת המדידות והחברה לחקירת</span><span class=\"caption\">ארץ ישראל ועתיקותיה). דמויות המלחים הושחתו במסגרת איקונוקלאזם.</span></figcaption>"
  },
  "a06-p024": {
   "tag": "p",
   "lang": "en",
   "inner": "In the past, seasonal and periodical rises in the Dead Sea water level formed lagoons. Caused by the flow of the rising waters (from water currents and winter storms) through and above natural pebble dams along the shore, the seasonal ebbing would leave lagoons behind, which would partially or fully evaporate through the summer and autumn, making it easy to mine salt until the next rainy season. Currently, however, without the cyclic changes in the water level, which is only dropping, and because the waterline is not surrounded by pebbles but with mud planes (the exposed bottom of the lake), the lagoons – once a common feature of the Dead Sea landscape – have disappeared."
  },
- "fig-a06-06": {
-  "tag": "figure",
-  "lang": "he",
-  "inner": "<img src=\"../images/p031-x139.jpeg\" width=\"358\" height=\"537\" alt=\"תצלום שחור־לבן ישן: אנשים אוספים מלח במים רדודים, וערמות מלח לבנות על החוף לרגלי ההרים.\"/><figcaption><span class=\"caption\">איסוף מלח מהלגונות.</span> <span class=\"credit\">צילום: המושבה האמריקאית בירושלים. אוסף מטסון בספריית הקונגרס, וושינגטון.</span></figcaption>"
- },
  "fig-a06-05": {
   "tag": "figure",
   "lang": "he",
   "inner": "<img src=\"../images/p031-x137.jpeg\" width=\"355\" height=\"535\" alt=\"תצלום שחור־לבן ישן: אנשים עומדים במים רדודים ליד ערמות מלח לבנות, ובאופק רכס הרים.\"/>"
+ },
+ "fig-a06-06": {
+  "tag": "figure",
+  "lang": "he",
+  "inner": "<img src=\"../images/p031-x139.jpeg\" width=\"358\" height=\"537\" alt=\"תצלום שחור־לבן ישן: אנשים אוספים מלח במים רדודים, וערמות מלח לבנות על החוף לרגלי ההרים.\"/><figcaption><span class=\"caption\">איסוף מלח מהלגונות.</span> <span class=\"credit\">צילום: המושבה האמריקאית בירושלים. אוסף מטסון בספריית הקונגרס, וושינגטון.</span></figcaption>"
  },
  "a06-p025": {
   "tag": "p",
@@ -262,7 +222,7 @@
  "a06-p030": {
   "tag": "p",
   "lang": "en",
-  "inner": "For 3,300 years, from Aristotle’s time to the 1930s, discovering life in the Dead Sea has posed a challenge to a series of scholars and scientists, all of whom have failed. A number of factors – such as the lake’s name, the biblical myth, and the terrain itself – continued to hold sway over scholarly and literary minds <span epub:type=\"pagebreak\" role=\"doc-pagebreak\" id=\"pg-32\" title=\"28\"/>until well into the twentieth century. As James Joyce writes, “A barren land, bare waste. Volcanic lake, the dead sea: no fish, weedless, sunk deep in the earth... poisonous foggy waters... the cities of the plain: Sodom, Gomorrah, Edom. All dead names. A dead sea in a dead land... Dead: an old woman’s: the grey sunken cunt of the world. Desolation.”<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref19\" href=\"#a06-fn19\">19</a> Then, in 1934, a new explanation was offered by Dutch botanist and microbiologist Lourens Baas- Becking, who argued that it was not the overall high salinity that was responsible for the lake’s barrenness, but rather the composition of its salts, specifically the extremely high concentration of calcium ions (Ca+2).<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref20\" href=\"#a06-fn20\">20</a> But only two years later, all that changed, when Benjamin Wilkansky, a young doctoral student at the Hebrew University of Jerusalem, discovered life in the Dead Sea.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref21\" href=\"#a06-fn21\">21</a> This discovery of life in an environment previously thought to be completely devoid of it opened a new avenue for the study of life on Earth."
+  "inner": "<span class=\"edition-correction\" data-printed=\"For 3,300 years\">For 2,300 years</span><a epub:type=\"noteref\" role=\"doc-noteref\" class=\"edition-mark\" id=\"corr5-ref\" href=\"#corr5\">†</a>, from Aristotle’s time to the 1930s, discovering life in the Dead Sea has posed a challenge to a series of scholars and scientists, all of whom have failed. A number of factors – such as the lake’s name, the biblical myth, and the terrain itself – continued to hold sway over scholarly and literary minds <span epub:type=\"pagebreak\" role=\"doc-pagebreak\" id=\"pg-32\" title=\"28\"/>until well into the twentieth century. As James Joyce writes, “A barren land, bare waste. Volcanic lake, the dead sea: no fish, weedless, sunk deep in the earth... poisonous foggy waters... the cities of the plain: Sodom, Gomorrah, Edom. All dead names. A dead sea in a dead land... Dead: an old woman’s: the grey sunken cunt of the world. Desolation.”<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref19\" href=\"#a06-fn19\">19</a> Then, in 1934, a new explanation was offered by Dutch botanist and microbiologist Lourens Baas-Becking, who argued that it was not the overall high salinity that was responsible for the lake’s barrenness, but rather the composition of its salts, specifically the extremely high concentration of calcium ions (Ca+2).<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref20\" href=\"#a06-fn20\">20</a> But only two years later, all that changed, when Benjamin Wilkansky, a young doctoral student at the Hebrew University of Jerusalem, discovered life in the Dead Sea.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref21\" href=\"#a06-fn21\">21</a> This discovery of life in an environment previously thought to be completely devoid of it opened a new avenue for the study of life on Earth."
  },
  "a06-fn17": {
   "tag": "aside",
@@ -337,12 +297,7 @@
  "a06-p036": {
   "tag": "p",
   "lang": "en",
-  "inner": "There are currently estimated to be more than 6,500 of them, their numbers increasing at an incomparable rate to any other sinkhole"
- },
- "a06-p037": {
-  "tag": "p",
-  "lang": "he",
-  "inner": ".)ראו איורים בעמודים site in the world (108,107"
+  "inner": "There are currently estimated to be more than 6,500 of them, their numbers increasing at an incomparable rate to any other sinkhole site in the world (ראו איורים בעמודים 107, 108)."
  },
  "fig-a06-08": {
   "tag": "figure",
@@ -388,5 +343,35 @@
   "tag": "figure",
   "lang": "he",
   "inner": "<img src=\"../images/p038-x161.jpeg\" width=\"589\" height=\"441\" alt=\"תקריב של גבישי מלח עגולים ולבנים, דמויי פנינים.\"/>"
+ },
+ "corr3": {
+  "tag": "aside",
+  "lang": "he",
+  "inner": "<p><a href=\"#corr3-ref\" role=\"doc-backlink\">†</a> תיקון של מהדורה זו. בדפוס: <bdi>salts form any other source</bdi></p>"
+ },
+ "corr2": {
+  "tag": "aside",
+  "lang": "he",
+  "inner": "<p><a href=\"#corr2-ref\" role=\"doc-backlink\">†</a> תיקון של מהדורה זו. בדפוס: <bdi>shalt though season</bdi></p>"
+ },
+ "corr1": {
+  "tag": "aside",
+  "lang": "he",
+  "inner": "<p><a href=\"#corr1-ref\" role=\"doc-backlink\">†</a> תיקון של מהדורה זו. בדפוס: <bdi>(2:23, KJV)</bdi></p>"
+ },
+ "corr4": {
+  "tag": "aside",
+  "lang": "he",
+  "inner": "<p><a href=\"#corr4-ref\" role=\"doc-backlink\">†</a> תיקון של מהדורה זו. בדפוס: <bdi>south of Hebron</bdi></p>"
+ },
+ "corr6": {
+  "tag": "aside",
+  "lang": "he",
+  "inner": "<p><a href=\"#corr6-ref\" role=\"doc-backlink\">†</a> תיקון של מהדורה זו. בדפוס: <bdi>n. 173.</bdi></p>"
+ },
+ "corr5": {
+  "tag": "aside",
+  "lang": "he",
+  "inner": "<p><a href=\"#corr5-ref\" role=\"doc-backlink\">†</a> תיקון של מהדורה זו. בדפוס: <bdi>For 3,300 years</bdi></p>"
  }
 }

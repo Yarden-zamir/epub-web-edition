@@ -19,7 +19,7 @@ from pathlib import Path
 from extract import holders
 
 ROOT = Path(__file__).resolve().parents[1]
-TRANSLATOR = "machine translation (Claude), not reviewed"
+TRANSLATOR = "AI translation (Claude Opus 5.5) with the full book as context, not reviewed by a person"
 
 
 def tags(html: str) -> list[str]:

@@ -4,7 +4,8 @@
 //   answer within NETWORK_WAIT, the copy that this version of the worker saved at install.
 // - Book images ("media"): from the cache once read. A cached image is kept under its content hash, so a
 //   changed image is fetched again and the old one is deleted when the new version activates.
-// - Map tiles and the map library from other hosts: from the cache once read, at most REMOTE_LIMIT entries.
+// - Map tiles and video thumbnails from other hosts: from the cache once read, at most REMOTE_LIMIT entries.
+//   The map library is a site file (shell).
 // - The EPUB download and every file the build did not list: network only, never cached.
 // - An app installed to the home screen asks the worker to save every book image ("save-all").
 "use strict";
@@ -163,21 +164,17 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(file[1] === "shell" ? networkFirst(request, path, event.clientId) : cacheFirst(request, path));
     return;
   }
-  // Map tiles, the map library and video thumbnails. YouTube players (frames) are not cached.
-  if (request.destination === "image" || url.hostname === "cdnjs.cloudflare.com") event.respondWith(remote(request));
+  // Map tiles and video thumbnails. YouTube players (frames) are not cached.
+  if (request.destination === "image") event.respondWith(remote(request));
 });
 
-// Save every book image and the given extra addresses (the map library), skipping what is cached already.
+// Save every book image, skipping what is cached already.
 // The page sends "save-all" on each start of the installed app, so an interrupted save resumes there.
-async function saveAll(extra, source) {
+async function saveAll(source) {
   const media = await caches.open(MEDIA);
-  const remoteCache = await caches.open(REMOTE);
   const todo = [];
   for (const path of Object.keys(FILES).filter((p) => FILES[p][1] === "media")) {
     if (!(await media.match(key(path)))) todo.push(() => fetch(new URL(path, scope)).then((r) => r.ok && media.put(key(path), r)));
-  }
-  for (const href of extra) {
-    if (!(await remoteCache.match(href))) todo.push(() => fetch(href, { mode: "cors" }).then((r) => r.ok && remoteCache.put(href, r)));
   }
   const total = todo.length;
   let done = 0, failed = 0;
@@ -206,6 +203,6 @@ async function savePaths(paths) {
 }
 
 self.addEventListener("message", (event) => {
-  if (event.data?.type === "save-all") event.waitUntil(saveAll(event.data.extra ?? [], event.source));
+  if (event.data?.type === "save-all") event.waitUntil(saveAll(event.source));
   if (event.data?.type === "save-read") event.waitUntil(savePaths(event.data.paths));
 });
