@@ -18,6 +18,7 @@ ingest. CI keeps it with epub-src/ and epub-src-release/ in its cache between ru
 import hashlib
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 CONTENT = Path(__file__).resolve().parent.parent
@@ -55,9 +56,10 @@ def command(cmd: list[str | Path]) -> list[str]:
     return [str(c) for c in cmd]
 
 
-def finish(cmd: list[str], res: subprocess.CompletedProcess[str] | subprocess.Popen[str], out: str) -> str:
-    """Print a command's output; exit when it failed."""
+def finish(cmd: list[str], res: subprocess.CompletedProcess[str] | subprocess.Popen[str], out: str, start: float) -> str:
+    """Print a command's output and time; exit when it failed."""
     print(out[-4000:], flush=True)
+    print(f"({time.monotonic() - start:.0f} s: {' '.join(cmd[:3])[-80:]})", flush=True)
     if res.returncode != 0:
         sys.exit(f"{cmd[:3]} failed with exit code {res.returncode}")
     return out
@@ -65,16 +67,21 @@ def finish(cmd: list[str], res: subprocess.CompletedProcess[str] | subprocess.Po
 
 def run(cmd: list[str | Path], cwd: Path | None = None) -> str:
     """Run a command with its output on the console; exit when it fails."""
-    args = command(cmd)
+    args, start = command(cmd), time.monotonic()
     res = subprocess.run(args, cwd=cwd, stdout=subprocess.PIPE, text=True)
-    return finish(args, res, res.stdout)
+    return finish(args, res, res.stdout, start)
 
 
 def run_parallel(cmds: list[list[str | Path]]) -> list[str]:
     """Run independent commands at the same time; exit when one fails, after all ended."""
+    start = time.monotonic()
     started = [(args, subprocess.Popen(args, stdout=subprocess.PIPE, text=True)) for args in map(command, cmds)]
-    outs = [(args, proc, proc.communicate()[0]) for args, proc in started]
-    return [finish(args, proc, out) for args, proc, out in outs]
+    outs = []
+    for args, proc in started:
+        out = proc.communicate()[0]
+        print(f"({time.monotonic() - start:.0f} s until {' '.join(args[:3])[-60:]} ended)", flush=True)
+        outs.append((args, proc, out))
+    return [finish(args, proc, out, start) for args, proc, out in outs]
 
 
 def main() -> None:

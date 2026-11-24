@@ -15,6 +15,7 @@ import functools
 import http.server
 import sys
 import threading
+import time
 from pathlib import Path
 
 from playwright.async_api import Browser, async_playwright
@@ -35,6 +36,7 @@ class Quiet(http.server.SimpleHTTPRequestHandler):
 
 async def check(browser: Browser, url: str, width: int, height: int, scheme: str) -> str | None:
     """One width and colour scheme: the problem line, or None when the page passes."""
+    start = time.monotonic()
     page = await browser.new_page(viewport={"width": width, "height": height}, color_scheme=scheme, reduced_motion="reduce")
     errors: list[str] = []
     page.on("pageerror", lambda e: errors.append(str(e)))
@@ -42,8 +44,10 @@ async def check(browser: Browser, url: str, width: int, height: int, scheme: str
     await page.wait_for_timeout(1500)
     overflow = await page.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth")
     await page.add_script_tag(path=str(AXE))
+    loaded = time.monotonic()
     violations = await page.evaluate(AXE_RUN)
     await page.close()
+    print(f"{width} {scheme}: load {loaded - start:.0f} s, axe {time.monotonic() - loaded:.0f} s", flush=True)
     if errors or overflow > 0 or violations:
         return f"{width} {scheme}: errors {errors[:2]} overflow {overflow} axe {violations}"
     return None
