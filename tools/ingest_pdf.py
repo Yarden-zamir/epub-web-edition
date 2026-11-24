@@ -656,7 +656,7 @@ class Ingest:
         self.release_used: set[str] = set()
         # PDF page -> (image box in points, edition note): regions that the facsimile page masks.
         self.facsimile_masks: dict[int, list[tuple[tuple[float, float, float, float], str]]] = {}
-        pdf = Path(str(self.cfg["pdf"])).expanduser()
+        pdf = content / str(self.cfg["pdf"])  # book.toml names the PDF relative to the content folder.
         digest = hashlib.sha256(pdf.read_bytes()).hexdigest()
         if digest != self.cfg["pdf_sha256"]:
             raise IngestError(f"{pdf}: sha256 {digest} does not match book.toml")

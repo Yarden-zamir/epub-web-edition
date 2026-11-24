@@ -28,7 +28,7 @@ def main() -> None:
     content, out = Path(sys.argv[1]), Path(sys.argv[2])
     out.mkdir(parents=True, exist_ok=True)
     cfg = tomllib.loads((content / "book.toml").read_text(encoding="utf-8"))
-    doc = pymupdf.open(Path(cfg["pdf"]).expanduser())
+    doc = pymupdf.open(content / cfg["pdf"])
     small_rule = next(r for r in cfg["role"] if r["role"] == "small")
     by_page: dict[int, list[dict[str, str]]] = defaultdict(list)
     with (content / "inventory" / "figures.csv").open(encoding="utf-8") as f:

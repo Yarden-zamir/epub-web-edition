@@ -64,7 +64,7 @@ def main() -> None:
     content = Path(sys.argv[1]).resolve()
     min_share = float(sys.argv[2]) if len(sys.argv) > 2 else 0.98
     cfg = tomllib.loads((content / "book.toml").read_text(encoding="utf-8"))
-    doc = pymupdf.open(Path(cfg["pdf"]).expanduser())
+    doc = pymupdf.open(content / cfg["pdf"])
     header = float(cfg["layout"]["header_max_y"])
     char_map = cfg.get("char_map", {})
     epub = epub_words_by_page(content / "epub-src" / "OEBPS" / "text")

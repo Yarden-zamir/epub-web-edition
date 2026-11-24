@@ -35,7 +35,7 @@ def main() -> None:
     content, epub, web = (Path(a).resolve() for a in sys.argv[1:4])
     cfg = tomllib.loads((content / "book.toml").read_text(encoding="utf-8"))
     release = cfg["release"]
-    doc = pymupdf.open(Path(cfg["pdf"]).expanduser())
+    doc = pymupdf.open(content / cfg["pdf"])
     banned: dict[str, str] = {}
     for change in release.get("change", []):
         stem = change["image"]
