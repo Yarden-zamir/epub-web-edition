@@ -20,6 +20,123 @@ reason = "Print sets reference 3 as a full-size digit (typesetting slip). Note 3
 # Bracket order in mixed Hebrew and Latin lines. The PDF stores brackets differently in Hebrew and Latin
 # fonts, so the extracted order can be wrong. Each fix was checked against a render of the printed line.
 
+[[text_fix]]
+page = 34
+find = "site in the world (108,107 ראו איורים בעמודים)."
+replace = "site in the world (ראו איורים בעמודים 107, 108)."
+reason = "Page numbers after a Hebrew run inside an English line: logical order, so the line displays like the print."
+[[text_fix]]
+page = 127
+find = "וסביבתו) Siwa,"
+replace = "וסביבתו (Siwa,"
+reason = "Opening bracket before a Latin run."
+[[text_fix]]
+page = 279
+find = "ואילו 1934(Bass-Becking)"
+replace = "ואילו Bass-Becking (1934)"
+reason = "Name and year order inside a Hebrew line."
+[[text_fix]]
+page = 280
+find = "האמירה של 2009) Boetius and Joye):"
+replace = "האמירה של Boetius and Joye (2009):"
+reason = "Citation run with a year in brackets."
+[[text_fix]]
+page = 283
+find = "החיפוש) Google Scholar, 2016)."
+replace = "החיפוש (Google Scholar, 2016)."
+reason = "Opening bracket before a Latin run."
+[[text_fix]]
+page = 283
+find = "(, Gay-Lussac, 1819; Ehrenberg, 1848; Lortet"
+replace = "(Gay-Lussac, 1819; Ehrenberg, 1848; Lortet,"
+reason = "One citation run over two lines; print breaks it at the line end."
+[[text_fix]]
+page = 283
+find = "Bass-Becking,1934; 1891),"
+replace = "1891; Bass-Becking,1934),"
+reason = "End of the same citation run."
+[[text_fix]]
+page = 284
+find = "יתר(ולכן"
+replace = "יתר) ולכן"
+reason = "Closing bracket of the note that opens with (מלבד; print shows it after יתר."
+[[text_fix]]
+page = 286
+find = "(, Kaplan & Friedman, 1970; Oren & Shilo"
+replace = "(Kaplan & Friedman, 1970; Oren & Shilo,"
+reason = "One citation run over two lines; print breaks it at the line end."
+[[text_fix]]
+page = 286
+find = "Oren,1983a, 1993; 1982)."
+replace = "1982; Oren,1983a, 1993)."
+reason = "End of the same citation run."
+[[text_fix]]
+page = 291
+find = ") Bourcart, 1899)."
+replace = "(Bourcart, 1899)."
+reason = "Opening bracket at the start of a line before a Latin run."
+[[text_fix]]
+page = 291
+find = "הנורווגי 1919(Hiorth) הציע"
+replace = "הנורווגי Hiorth (1919) הציע"
+reason = "Name and year order inside a Hebrew line."
+[[text_fix]]
+page = 294
+find = ") Wachs et al., 2000,"
+replace = "(Wachs et al., 2000,"
+reason = "Opening bracket at the start of a line before a Latin run."
+[[text_fix]]
+page = 303
+find = "(RB (."
+replace = "(RB)."
+reason = "Closing bracket after a Latin abbreviation."
+
+# Lines where tools/check_bidi.py reports a different order than the print, reviewed against a render of the
+# print and of the EPUB text in Chromium. The check skips them.
+# Name and year: print shows "(1934) Bass-Becking" right to left; Unicode keeps "Bass-Becking (1934)" as one left-to-right run. Same reading.
+# A citation over two lines: the check sees each line alone; in the paragraph the run is one, and it displays like the print.
+[[bidi_reviewed]]
+page = 279
+contains = "ואילו Bass-Becking (1934)"
+[[bidi_reviewed]]
+page = 280
+contains = "האמירה של Boetius and Joye (2009):"
+[[bidi_reviewed]]
+page = 283
+contains = "1891; Bass-Becking,1934),"
+[[bidi_reviewed]]
+page = 283
+contains = "(Gay-Lussac, 1819; Ehrenberg, 1848; Lortet,"
+[[bidi_reviewed]]
+page = 286
+contains = "(Kaplan & Friedman, 1970; Oren & Shilo,"
+[[bidi_reviewed]]
+page = 286
+contains = "1982; Oren,1983a, 1993)."
+[[bidi_reviewed]]
+page = 291
+contains = "הנורווגי Hiorth (1919) הציע"
+
+# Bracket defects that are in the print. tools/check_text.py skips paragraphs that contain these texts.
+[[print_quirk]]
+contains = "(בעברית: 'חורבת הנחושת' שוכנת"
+reason = "PDF page 176: print opens a bracket and never closes it."
+[[print_quirk]]
+contains = "(למיקום שטחי החפירה של"
+reason = "PDF page 178: print opens two brackets and closes one."
+[[print_quirk]]
+contains = "(מעבר ל־ 100"
+reason = "PDF page 300: print opens a bracket and never closes it."
+[[print_quirk]]
+contains = "באתר (Hebrewbooks."
+reason = "PDF page 309: print shows the closing bracket before Hebrewbooks; kept as printed."
+[[print_quirk]]
+contains = "(לעומת 25 אלף ל- Great Salt Lake"
+reason = "PDF page 283: print opens this bracket and closes only the inner (Google Scholar, 2016)."
+[[print_quirk]]
+contains = "(1934(."
+reason = "PDF page 310: print shows two opening brackets around the year; kept as printed."
+
 # Text left out on purpose. Each entry is logged as an intentional change.
 [[omit]]
 page = 22
@@ -54,6 +171,7 @@ running_head_fonts = [["Extrim", 12.0], ["FbTubic", 9.8]]
 footnote_min_y = 0.62    # Small notes below this share of the height are footnotes.
 indent_tolerance = 6.0   # Points. A line this far in from the column edge starts a paragraph.
 short_tolerance = 20.0   # Points. A line that ends this far short of the far edge ends a paragraph.
+paragraph_gap = 3.0      # Points of extra space above a body line that starts a paragraph (print: 3-4; lines: up to 2.8 with points).
 caption_gap = 30.0       # Points between an image edge and a caption line.
 credit_prefixes = ["צילום", "צלם", "צילומים", "באדיבות", "Photo", "Courtesy", "Source", "מקור"]
 
