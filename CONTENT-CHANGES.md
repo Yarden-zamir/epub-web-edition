@@ -12,6 +12,10 @@ Add an entry in the same change that makes it. Newest first within each section.
 
 | Where | Change | Why |
 |---|---|---|
+| PDF pages 25, 181, 287 | Three tables printed as text (Dead Sea salinity by year twice, copper and slag by period) set as XHTML tables (a06-t1, a18-t1, a35-t1) | Print shows tables; the text layer gave one cell per paragraph. book.toml [[text_table]]; the rows must hold exactly the printed characters. |
+| PDF page 78 | QR captions and film credits separated: "הסרט שצולם בידי צוות המחפשים, חלק 1" (fig-a10-13), "…הנספים לפני האסון" (fig-a10-14), credits as two paragraphs (a10-p051, a10-p052) | The PDF stores two stacked caption lines of neighbouring columns as one text line, so letters interleaved. |
+| Whole book | 38 wrong paragraph splits joined (37 in text, 1 in the PDF page 78 credits): paragraphs that print splits at a photo edge, a hanging list label, a citation line or a tall glyph are one paragraph again; list items and paragraphs that print separates by 3-4 pt of space are separate | Ingest paragraph rules. Old IDs of joined paragraphs and where they went: id-moves.csv; IDs stay stable through ids.csv. |
+| PDF pages 34, 127, 279, 280, 283, 284, 286, 291, 294, 303 | 14 bracket and run-order fixes in mixed Hebrew and Latin lines, for example "(Siwa, …", "(Bourcart, 1899)", "(RB)." | book.toml [[text_fix]]; each checked against a render of the printed line and the EPUB line in Chromium. Brackets that print leaves open are kept: book.toml [[print_quirk]] (6). |
 | PDF page 22 | Omitted "The English text continues from the left page" | Print-only reading note for two-page spreads; the EPUB puts the English pages in reading order. |
 | PDF page 23 | Note reference 3 restored as a superscript link | Print sets it as a full-size digit. |
 | PDF pages 21-37 | English article pages in reading order 21, 23, 22, 25, 24, … | Print lays out two-page spreads. |

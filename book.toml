@@ -137,6 +137,46 @@ reason = "PDF page 283: print opens this bracket and closes only the inner (Goog
 contains = "(1934(."
 reason = "PDF page 310: print shows two opening brackets around the year; kept as printed."
 
+# Tables printed as text. ingest_pdf.py replaces the printed lines from "top" to "bottom" with an XHTML
+# table. The rows must hold exactly the printed characters; "replaces" lists the paragraph IDs that held them.
+# Cells transcribed from the print layout (render checked); the first row is the header.
+[[text_table]]
+id = "a06-t1"
+unit = "a06"
+page = 25
+top = "1935"
+bottom = "245"
+rows = [["1935", "1967", "1995", "2010"], ["245", "300", "339", "347"]]
+replaces = ["a06-p007", "a06-p008", "a06-p009", "a06-p010", "a06-p011", "a06-p012", "a06-p013", "a06-p014"]
+[[text_table]]
+id = "a18-t1"
+unit = "a18"
+page = 181
+top = "תקופה"
+bottom = "150-100"
+rows = [
+  ["תקופה", "משקל סיגים (טונות)", "משקל נחושת (טונות)*"],
+  ["תקופת הברונזה המוקדמת", "5,000", "500-300"],
+  ["תקופת הברזל", "130,000-100,000", "18,000-6,500"],
+  ["התקופה הרומית", "70,000-40,000", "7,000-2,500"],
+  ["התקופה הממלוכית", "1,500", "150-100"],
+]
+replaces = ["a18-p053", "a18-p054", "a18-p055", "a18-p056", "a18-p057", "a18-p058"]
+[[text_table]]
+id = "a35-t1"
+unit = "a35"
+page = 287
+top = "המקור 2010"
+bottom = "אלעזרי־וולקני, 1940 245"
+rows = [
+  ["המקור", "2010", "1995", "1967", "1935"],
+  ["Bodaker et al., 2010", "347", "", "", ""],
+  ["סטרינסקי, 2005", "", "339", "", ""],
+  ["Neev & Emery, 1967", "", "", "300", ""],
+  ["אלעזרי־וולקני, 1940", "", "", "", "245"],
+]
+replaces = ["a35-p062", "a35-p063", "a35-p064", "a35-p065", "a35-p066", "a35-p067"]
+
 # Text left out on purpose. Each entry is logged as an intentional change.
 [[omit]]
 page = 22

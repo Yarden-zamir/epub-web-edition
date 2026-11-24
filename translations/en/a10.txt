@@ -14,7 +14,7 @@ On 13 July 1990 the greatest disaster in the history of mountaineering took plac
 <p><a href="#a10-src1-ref" role="doc-backlink">*</a>Part of this article appeared in "Masa Acher" on 15 September 2008 (with thanks to Moshe Gilad).</p>
 
 ## fig-a10-02
-<img src="../images/p066-x251-replacement.png" width="1600" height="1337" alt="Map of Central Asia: Tajikistan highlighted in the centre, Kyrgyzstan to the north and Afghanistan to the south, the cities of Dushanbe, Tashkent and Kabul, and a red triangle on Lenin Peak in the Pamir range, on the border between Tajikistan and Kyrgyzstan."/><figcaption><span class="caption">Map of the disaster area.</span><span class="edition-note">Replacement map for this edition, drawn from Natural Earth data (public domain). The printed map is not included until its rights are cleared.</span></figcaption>
+<img src="../images/p066-x251-replacement.png" width="1600" height="1424" alt="Map of Central Asia: Tajikistan highlighted in the centre, Kyrgyzstan to the north and Afghanistan to the south, the cities of Dushanbe, Tashkent and Kabul, and a red triangle on Lenin Peak in the Pamir range, on the border between Tajikistan and Kyrgyzstan."/><figcaption><span class="caption">Map of the disaster area.</span><span class="edition-note">Replacement map for this edition, drawn from Natural Earth data (public domain). The printed map is not included until its rights are cleared.</span></figcaption>
 
 ## a10-p003
 Professor Agursky, Benny Agur's father and a Sovietologist with connections in Israel and in the Soviet Union, came across a muted report of the disaster in the Soviet press. Together with the other families he launched a vigorous fundraising drive to pay for a rescue expedition, and turned to the "Israeli Alpine Club"<b> </b>(see the article<b> </b>"Return to the Place You Came From") to get it organized. He demanded of the Foreign Ministry – and was granted – that it act at the diplomatic level so that the expedition could reach the disaster area. Although the tragedy was an international one, the Israeli search and rescue team was the only foreign team that came forward to help, and its contribution won high esteem from the media and the public of what was then the Soviet Union.
@@ -50,10 +50,7 @@ Boris, a Jewish intellectual and a member of the Leningrad Alpine Club, had visi
 <img src="../images/p068-x257.jpeg" width="253" height="352" alt="Portrait: a man in a fur hat and a blue coat against a background of snow."/>
 
 ## a10-p013
-he was stunned to find it empty of tents
-
-## a10-p014
-and people. Boris is the tragic hero of this event, in which he lost 23 of his fellow club members, his partner among them, and the Israelis who were under his wing. He was also almost the only source of reliable information about the disaster, which he passed on to me in a detailed debriefing during the domestic flights from Moscow to the
+he was stunned to find it empty of tents and people. Boris is the tragic hero of this event, in which he lost 23 of his fellow club members, his partner among them, and the Israelis who were under his wing. He was also almost the only source of reliable information about the disaster, which he passed on to me in a detailed debriefing during the domestic flights from Moscow to the
 
 ## a10-p015
 Pamir base camp.
@@ -197,10 +194,8 @@ Zeev Manovla, the brother of one of the Israelis who died, uploaded films that t
 <a href="https://www.youtube.com/watch?v=9BM5qcA22kY&amp;t=672s" class="qr-link"><img src="../images/p078-qr4.png" width="283" height="283" alt="QR code for the film shot by the victims before the disaster."/></a><figcaption><span class="caption">The film shot by the victims before the disaster</span></figcaption>
 
 ## a10-p051
-Film editing: editing of the films at Ein Gedi: Noam Sinai
+Film editing: Sharon Kligman and Zeev Manovla
 
 ## a10-p052
-Sharon Kligman. Text and narration – Eli Raz
+Editing of the films at Ein Gedi: Noam Sinai. Text and narration – Eli Raz.
 
-## a10-p053
-and Zeev Manovla
