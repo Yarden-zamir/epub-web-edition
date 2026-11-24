@@ -1,0 +1,392 @@
+{
+ "fig-a06-01": {
+  "tag": "figure",
+  "lang": "he",
+  "inner": "<img src=\"../images/p021-x103.jpeg\" width=\"1009\" height=\"477\" alt=\"מבט מגובה על מפרץ ים המלח: כתם מים חום־כתום עגול בתוך המים הטורקיזיים, בין מצוקים.\"/><figcaption><span class=\"caption\">הפטרייה השיטפונית של נחל קדם.</span> <span class=\"credit\">צילום: משה ברנשטיין</span></figcaption>"
+ },
+ "a06-h": {
+  "tag": "h2",
+  "lang": "en",
+  "inner": "The Life Story of the Dead Sea"
+ },
+ "a06-p001": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "Eli Raz"
+ },
+ "a06-p002": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "Background"
+ },
+ "a06-p003": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "The Dead Sea is located at the deepest continental section of the Great Rift Valley and serves as a base level drainage basin of an area of 43,000 square kilometers in Egypt, Israel, Jordan, Lebanon, and Syria. Its natural body of water currently spans 600 square kilometers, with a maximum depth of some 300 meters and a height of 432.08 meters below sea level.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref1\" href=\"#a06-fn1\">1</a> Due to this level – the lowest on the continental surface of the Earth – and the fact that it is surrounded by higher topographical formations, the Dead Sea has no external drainage, making it a terminal lake. The only way for water to leave the lake is evaporation. Its main water sources are the rivers flowing into it, most importantly the Jordan River. Secondary water sources include springs, some of which gush from beneath the shoreline. The Dead Sea’s water level reflects the ratio between the total amount of water flowing into it and that <span epub:type=\"pagebreak\" role=\"doc-pagebreak\" id=\"pg-23\" title=\"19\"/>evaporating from it. Since these two amounts are variable, the ratio is dynamic, resulting in fluctuating levels. Historically, this ratio was governed by the natural climate, responding to both seasonal and long-term rise and fall."
+ },
+ "a06-fn1": {
+  "tag": "aside",
+  "lang": "en",
+  "inner": "<p><a href=\"#a06-fnref1\" role=\"doc-backlink\">1</a> Hydrological Service, Israel Water Authority, Monthly Report, 1 October 2017. By Oct. 1 2025 the level was –440.6</p>"
+ },
+ "a06-p004": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "Today, the effect of natural causes on the Dead Sea level is negligible, with the main changes caused by human interference. In Israel and its riparian entities, this interference has increased with time: the Israeli Degania Dam across the Jordan River at the southern exit of the Sea of Galilee was erected; other diversions and damming projects in the Dead Sea’s drainage basin were added; and pumping from the lake itself to industrial evaporation pools for the production of minerals has increased with the expansion of the pool areas, that now cover almost the entire southern basin, on both sides of the border. As a result, the Jordan River’s annual volumetric flow rate dropped from some 1.25 billion cubic meters to only tens of millions today. The annual water deficit of the Dead Sea increased over the past three decades from 400 to 700 million cubic meters and this has caused a sharp and ongoing drop in its level."
+ },
+ "a06-p005": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "During the last three hydrological decades<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref2\" href=\"#a06-fn2\">2</a> the decrease in the Dead Sea’s level has accelerated from a ten-year annual average of 0.7 to 1.16 meters in the previous hydrological decade, with 39% of the decrease attributed to industrial activity. In the last year alone, the level has dropped by 1.42 meters.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref3\" href=\"#a06-fn3\">3</a> This dramatic decrease has caused the shoreline to recede, the water volume to decrease and the natural area of the lake to shrink from about 1,000 square kilometers in 1930 to less than 600 today, all of which were <span epub:type=\"pagebreak\" role=\"doc-pagebreak\" id=\"pg-22\" title=\"18\"/>accompanied by changes in the ratios among the water’s chemical elements and by a rise in the total salinity.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref4\" href=\"#a06-fn4\">4</a>"
+ },
+ "a06-fn2": {
+  "tag": "aside",
+  "lang": "en",
+  "inner": "<p><a href=\"#a06-fnref2\" role=\"doc-backlink\">2</a> The hydrological year begins on 1 October, prior to the rainy season.</p>"
+ },
+ "a06-fn3": {
+  "tag": "aside",
+  "lang": "en",
+  "inner": "<p><a href=\"#a06-fnref3\" role=\"doc-backlink\">3</a> Hydrological Service, 1 October 2017.</p>"
+ },
+ "fig-a06-02": {
+  "tag": "figure",
+  "lang": "he",
+  "inner": "<img src=\"../images/p022-x109-masked.png\" width=\"709\" height=\"444\" alt=\"Line chart of the Dead Sea water level in meters below sea level. The line falls steadily from about −399 m on the left to −440.61 m at the last point, labelled 01/10/2025, with a short rise around 1991–92.\"/><figcaption><span class=\"caption\">Dead Sea water levels, 1977–2017, according to the Hydrological Service, Israel Water Authority Note the unusual rise during the extremely rainy winter of 1991–92. The average annual decrease from 2007 to 2017 was 1.16 meters.</span></figcaption>"
+ },
+ "a06-fn4": {
+  "tag": "aside",
+  "lang": "en",
+  "inner": "<p><a href=\"#a06-fnref4\" role=\"doc-backlink\">4</a> Some 347 grams of salts are dissolved in every liter of Dead Sea water, and the water density is some 1.25 kg/l. Only two other lakes in the world – Lake Assal in Djibouti (348 g/l) and Lake Vanda in Antarctica (350 g/l) are slightly saltier; however, both are much smaller and shallower. Data for table 1, “Increase over time in Dead Sea water salinity,” was culled from the following sources: Benjamin Elazari - Volcani, Studies on the Microflora of the Dead Sea, PhD thesis, Hebrew University of Jerusalem, 1940 (Hebrew); David Neev and Kenneth Orris Emery, “The Dead Sea,” Geological Survey of Israel, no. 41 (1967) (Hebrew); Abraham Starinsky, “The Dead Sea Basin: the Biggest Spring Discharge in the World,” Melach Ha’Aretz, no. 1 (2005), pp. 35–52 (Hebrew); Idan Bodaker et al., “Comparative Community Genomics in the Dead Sea: An Increasingly Extreme Environment,” The ISME Journal, no. 4 (2010),pp. 399–407.</p>"
+ },
+ "a06-p006": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "<b>Table 1.</b> Increase over time in Dead Sea water salinity (g/l)"
+ },
+ "a06-p007": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "1935"
+ },
+ "a06-p008": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "1967"
+ },
+ "a06-p009": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "1995"
+ },
+ "a06-p010": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "2010"
+ },
+ "a06-p011": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "300"
+ },
+ "a06-p012": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "339"
+ },
+ "a06-p013": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "347"
+ },
+ "a06-p014": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "245"
+ },
+ "a06-p015": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "Yet, the Dead Sea is unique not only in its high salinity but also in its unusual composition of salts. In other saline bodies of water in the world the leading positive ion is commonly sodium (Na+), whereas in the Dead Sea it is the magnesium ion (Mg+2) as well as a relatively high concentration of calcium ion (Ca+2). The latter two ions are known to science as life inhibiting. Their extremely high concentrations in the Dead Sea are considered the upper threshold values for life, used until quite recently as a scientific basis for the lake’s myth of death (see below, “Search for Life”).<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref5\" href=\"#a06-fn5\">5</a>"
+ },
+ "a06-p016": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "Legacy"
+ },
+ "a06-p017": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "The Dead Sea’s world heritage can be seen by references to it in some 115,000 different articles in all disciplines until 2016.These references far outnumber those of another famous salt lake – the Great Salt Lake in Utah, with a mere 25,000.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref6\" href=\"#a06-fn6\">6</a> This cultural status is related to its unique properties of extreme salinity and buoyancy and the lack of visible life; to its exceptional geographical environment; and to its religioushistorical background. All these have given rise to supernatural myths, <span epub:type=\"pagebreak\" role=\"doc-pagebreak\" id=\"pg-24\" title=\"20\"/>such as the Sodom and Gomorrah upheaval,<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref7\" href=\"#a06-fn7\">7</a> various superstitions, as well as intellectual curiosity. More recently, the Dead Sea has gained scientific status in cutting-edge studies of life in extreme environments.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref8\" href=\"#a06-fn8\">8</a>"
+ },
+ "a06-fn5": {
+  "tag": "aside",
+  "lang": "en",
+  "inner": "<p><a href=\"#a06-fnref5\" role=\"doc-backlink\">5</a> Antje Boetius and Samantha Joye, “Ecology Thriving in Salt,” Science, no. 324 (June 2009), pp. 1523–1525; Aharon Oren, “Microbiological Studies in the Dead Sea: Future Challenges toward the Understanding of Life at the Limit of Salt Concentrations,” Hydrobiologia, vol. 405 (June 1999), pp. 1–9.</p>"
+ },
+ "a06-fn6": {
+  "tag": "aside",
+  "lang": "en",
+  "inner": "<p><a href=\"#a06-fnref6\" role=\"doc-backlink\">6</a> All unreferenced tables are from Eli Raz in Alon Lotan, Uriel Safriel and Eran Feitelson (eds.), 126 “Ecosystems and Human Welfare: National Assessment,” full report to be published by HaMaarag (Israel's National Nature Assessment Program) (Hebrew). For Table 4 data see Asya S. Buchalo et al., \"Newly Discovered Halophilic Fungi in the Dead Sea (Israel),” in Joseph Seckbach (ed.), Journey to Diverse Microbial Worlds: Adaptation to Exotic Environments (Dordrecht: Springer, 2000), pp. 239–252.</p>"
+ },
+ "a06-p018": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "Ancient historians called the Dead Sea Lacus Asphaltites, and described chunks of natural asphalt floating on it, their enthusiasm in collecting the asphalt and its various uses. Asphalt is a viscous derivative of crude oil – the heaviest of its components (such as petroleum, gasoline, and diesel), which may be separated in an artificial refinement process. Asphalt and bitumen are interchangeable terms referring to combustible organic materials composed mostly of carbon and hydrogen (hydrocarbons) that appear as solids, which become viscous and liquefy at temperatures of 60–70 degrees Celsius."
+ },
+ "fig-a06-03": {
+  "tag": "figure",
+  "lang": "he",
+  "inner": "<img src=\"../images/p024-x116.jpeg\" width=\"576\" height=\"396\" alt=\"אישה במעיל כחול יושבת על גושי אספלט שחורים ונקבוביים על חוף סלעי.\"/><figcaption><span class=\"caption\">גושי אספלט לחוף ים המלח</span></figcaption>"
+ },
+ "a06-fn7": {
+  "tag": "aside",
+  "lang": "en",
+  "inner": "<p><a href=\"#a06-fnref7\" role=\"doc-backlink\">7</a> See Genesis, chapters 18–19. Salt pillars and naturally combustible materials such as sulfur and asphalt are abundant in the Dead Sea’s environment, illustrating how its natural uniqueness has inspired such myths. Arie Nissenbaum, “Life in a Dead Sea: Fables, Allegories, and Scientific Search,” BioScience, vol. 29, no. 3 (March 1979), pp. 153–157.</p>"
+ },
+ "a06-fn8": {
+  "tag": "aside",
+  "lang": "en",
+  "inner": "<p><a href=\"#a06-fnref8\" role=\"doc-backlink\">8</a> Eli Raz in Alon Lotan, Uriel Safriel and Eran Feitelson (eds.), “Ecosystems and Human Welfare: National Assessment,” Interim Report by Hama’arag (May 2017), p. 54 (Hebrew).</p>"
+ },
+ "a06-p019": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "Their natural source is rocks containing kerogen, a solid mixture of organic chemical compounds, also called oil shale. The Dead Sea asphalt originates in such rocks, visible in rocky outcrops that are common in the area and also located deep beneath the bottom of the Dead Sea, in conditions of heat and pressure."
+ },
+ "a06-p020": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "Under these conditions, the organic material is squeezed out of the rock and may be discharged through fissures and reach the surface as asphalt. This phenomenon of floating chunks, too, is unique to the Dead Sea."
+ },
+ "a06-p021": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "Several archeological sites in Canaan and Egypt, dating from 3900– 2200 BC, show indications of trade in Dead Sea asphalt for various uses, albeit in small quantities.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref9\" href=\"#a06-fn9\">9</a> The conquests of Alexander the Great in the 4th century BC created a new cultural and economic space that encompassed both areas. While the embalming tradition of Ancient Egypt was based mostly on materials processed from flora and fauna, such as beeswax, resins, concentrates and perfumes, these geopolitical upheavals exposed Hellenistic Egypt, which continued with the embalming tradition, to an appropriate inorganic substitute: the asphalt of the Dead Sea.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref10\" href=\"#a06-fn10\">10</a> The high demand for Dead Sea asphalt by the Egyptians caused its price to rise steeply, and led to struggles between Alexander’s heirs and the Nabateans, and among the latter, over collecting it and trading in it. Writing in 50 BC, Greek historian Diodorus Siculus (flourished 1st century BC) describes a naval battle that occurred in 312 BC on the lake itself, as part of this struggle. Pedanius Dioscorides (ca. AD 40–90), author of most of the authoritative pharmacological literature of the ancient world, referred to the medical uses of Dead Sea asphalt and stated that its therapeutic qualities are higher than those of <span epub:type=\"pagebreak\" role=\"doc-pagebreak\" id=\"pg-26\" title=\"22\"/>salts form any other source. Roman-Jewish scholar Flavius Josephus (AD 37–100) also described the appearance and collection of chunks of asphalt (also translated as bitumen), their medical usage and their use for sealing naval vessels. Further evidence of collecting asphalt from the lake’s shores appeared occasionally in the following centuries. Only two cases of (particularly large) discharges of chunks were reported in the nineteenth century, in conjunction with powerful earthquakes, and consequently, the rarity of asphalt chunks in modern times was associated with seismic lulls.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref11\" href=\"#a06-fn11\">11</a> Sightings of floating chunks were reported again in 1956, immediately upon the establishment of Kibbutz Ein Gedi on the shore of the Dead Sea. Apparently, the infrequent reports beforehand were related to the lack of human settlements along the western coast of the lake. At any rate, since the late 1950s the new kibbutz has supplied asphalt to the Teva pharmaceutical plant. The last documented observation of a large chunk was in 1969.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref12\" href=\"#a06-fn12\">12</a>"
+ },
+ "a06-fn9": {
+  "tag": "aside",
+  "lang": "en",
+  "inner": "<p><a href=\"#a06-fnref9\" role=\"doc-backlink\">9</a> Jacques Connan, Arie Nissenbaum and Daniel Dessort, “Molecular Archeology: Export of Dead Sea Asphalt to Canaan and Egypt in the Chalcolithic–Early Bronze Age (4th–3rd millennium BC),” Geochimica et Cosmochimica Acta, vol. 56 (1992), pp. 2743–2759.</p>"
+ },
+ "a06-fn10": {
+  "tag": "aside",
+  "lang": "en",
+  "inner": "<p><a href=\"#a06-fnref10\" role=\"doc-backlink\">10</a> Arie Nissenbaum, “Molecular Archeology: Organic Geochemistry of Egyptian Mummies,” Journal of Archaeological Science, vol. 19, no. 1 (January 1992), pp. 1–6.</p>"
+ },
+ "a06-p022": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "Another valuable mineral harvested from the Dead Sea is salt. Until the twentieth century, table salt was a precious commodity. Supply and demand gaps resulted in handsome profits for its harvesters and high taxes for the governments controlling them. While the Dead Sea asphalt was unique, salt was also harvested in other locations along the Mediterranean shores. However, the lake was an attractive and convenient source. It supplied adjacent areas but not only them, thanks to a combination of three factors: a body of water highly saturated with salt, a climate with a high evaporation rate, and natural lagoons that served as evaporation pools. Evidence of production and usage of salt from the Dead Sea in ancient times is infrequent. The earliest appears in the Old Testament: “Surely Moab shall be as Sodom, and the children of Ammon as Gomorrah, even the breeding of nettles, and saltpits” (Zephaniah 2:9, KJV); <span epub:type=\"pagebreak\" role=\"doc-pagebreak\" id=\"pg-29\" title=\"25\"/>in Ezekiel’s vision, the Dead Sea shall be “healed” (sweetened) and filled with fish, “But the miry places thereof and the marshes thereof shall not be healed; they shall be given to salt” (47:9–11, KJV). The exclusion of the “miry places and marshes” (lagoons) from the grand vision is an indirect testimony to the importance of salt. The Book of Leviticus commands: “And every oblation of thy meat offering shalt though season with salt,” and demands to prevent any shortage of salt for this purpose: “neither shalt thou suffer the salt of the covenant of thy God to be lacking from thy meat offering” (2:23, KJV). In order to comply with this commandment, a salt storeroom was built in the Temple. Later, in a document from the time of the Bar Kokhba Revolt (AD 135), the leader demands that his people in Ein Gedi send him loads of salt.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref13\" href=\"#a06-fn13\">13</a>"
+ },
+ "a06-fn11": {
+  "tag": "aside",
+  "lang": "en",
+  "inner": "<p><a href=\"#a06-fnref11\" role=\"doc-backlink\">11</a> Arie Nissenbaum, “Dead Sea Asphalts: Historical Aspects,” The American Association of Petroleum Geologists Bulletin, vol. 62, no. 5 (May 1978), pp. 837–844.</p>"
+ },
+ "a06-fn12": {
+  "tag": "aside",
+  "lang": "en",
+  "inner": "<p><a href=\"#a06-fnref12\" role=\"doc-backlink\">12</a> Verbal and photographic testimony by Gideon Hadas, Kibbutz Ein Gedi.</p>"
+ },
+ "a06-p023": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "Since the Temple was no longer active, it appears this salt was used for daily consumption, and perhaps also for financing the revolt. In the Baraita “The Compounding of Incense” quoted in the Talmud, “Sodomic salt” is mentioned. Although its purpose is not clear from the sources, it was obviously produced in the Dead Sea.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref14\" href=\"#a06-fn14\">14</a> Finally, in a 1138 document, the Crusader King Fulk d’Anjou grants rights to revenues from the salt and asphalt supplied by the villagers of Tekoa, located south of Hebron, from the Dead Sea.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref15\" href=\"#a06-fn15\">15</a>"
+ },
+ "a06-fn13": {
+  "tag": "aside",
+  "lang": "en",
+  "inner": "<p><a href=\"#a06-fnref13\" role=\"doc-backlink\">13</a> Yigael Yadin, Jonas C. Greenfield, Ada Yardeni and Baruch a. Levine (eds.), The Documents from Bar-Kokhba Period in the Cave of Letters: Hebrew, Aramaic and Nabatian-Aramaic Papyri (Jerusalem: Israel Exploration Society, 2002), pp. 56, 58 (Hebrew). according Eli Raz, Dead Sea Book (Jerusalem: Israeli Nature and Parks Authority; Tel Aviv: Keter Publishing, 1993), pp. 179, 181, 196 (Hebrew).</p>"
+ },
+ "a06-fn14": {
+  "tag": "aside",
+  "lang": "en",
+  "inner": "<p><a href=\"#a06-fnref14\" role=\"doc-backlink\">14</a> An important source on salt production in the Dead Sea vicinity in the tenth century is the Jerusalemite doctor Al-Tamimi. Zohar Amar and Yaron Serri, The Land of Israel and Syria According to the Description of Al-Tamimi (Ramat Gan: Bar-Ilan University Press, 2004), pp. 45–53 (Hebrew).</p>"
+ },
+ "a06-fn15": {
+  "tag": "aside",
+  "lang": "en",
+  "inner": "<p><a href=\"#a06-fnref15\" role=\"doc-backlink\">15</a> Regesta Regni Hierosolymitani (RRH), ed. R. Rohricht (Innsbruck, 1893), pp. 43–44, n. 173.</p>"
+ },
+ "fig-a06-04": {
+  "tag": "figure",
+  "lang": "he",
+  "inner": "<img src=\"../images/p028-x126-render.jpg\" width=\"431\" height=\"261\" alt=\"פרט מפסיפס עתיק: סירה ועליה גושי מלח צבעוניים על מים מסוגננים בקווים גליים.\"/><figcaption><span class=\"caption\">סירה נושאת מלח על ים המלח. מפת מידבא, שנת 560 ~ לספירה (הוצאת מחלקת המדידות והחברה לחקירת</span><span class=\"caption\">ארץ ישראל ועתיקותיה). דמויות המלחים הושחתו במסגרת איקונוקלאזם.</span></figcaption>"
+ },
+ "a06-p024": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "In the past, seasonal and periodical rises in the Dead Sea water level formed lagoons. Caused by the flow of the rising waters (from water currents and winter storms) through and above natural pebble dams along the shore, the seasonal ebbing would leave lagoons behind, which would partially or fully evaporate through the summer and autumn, making it easy to mine salt until the next rainy season. Currently, however, without the cyclic changes in the water level, which is only dropping, and because the waterline is not surrounded by pebbles but with mud planes (the exposed bottom of the lake), the lagoons – once a common feature of the Dead Sea landscape – have disappeared."
+ },
+ "fig-a06-06": {
+  "tag": "figure",
+  "lang": "he",
+  "inner": "<img src=\"../images/p031-x139.jpeg\" width=\"358\" height=\"537\" alt=\"תצלום שחור־לבן ישן: אנשים אוספים מלח במים רדודים, וערמות מלח לבנות על החוף לרגלי ההרים.\"/><figcaption><span class=\"caption\">איסוף מלח מהלגונות.</span> <span class=\"credit\">צילום: המושבה האמריקאית בירושלים. אוסף מטסון בספריית הקונגרס, וושינגטון.</span></figcaption>"
+ },
+ "fig-a06-05": {
+  "tag": "figure",
+  "lang": "he",
+  "inner": "<img src=\"../images/p031-x137.jpeg\" width=\"355\" height=\"535\" alt=\"תצלום שחור־לבן ישן: אנשים עומדים במים רדודים ליד ערמות מלח לבנות, ובאופק רכס הרים.\"/>"
+ },
+ "a06-p025": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "The winter of 1991–92 saw the highest precipitation in Israel since scientific collection of data began in 1861. For the first and last time, the Degania Dam gates were opened to prevent the Sea of Galilee from overflowing. About 1.5 billion cubic meters of water flowed through the Jordan River to the Dead Sea, its level rose, pebbles accumulated along the shore, and the lagoons returned as a fascinating singular performance, which only served to illustrate the enormity of the loss. Salt mining in a lagoon near Ein Gedi has been documented in writing and in photographs by explorers and researchers from the nineteenth and early twentieth centuries. The lagoon was called Birket al-Khalil (Arabic for Pool of Hebron) as the people of that city monopolized salt production there. Identified <span epub:type=\"pagebreak\" role=\"doc-pagebreak\" id=\"pg-30\" title=\"26\"/>some three kilometers south of Ein Gedi, it was marked as a blue spot on a map from the British Mandate period (1918–1948). This spot has been copied to every subsequent map, despite the fact that the lagoon has dried out and been disjointed from the rest of the lake for decades, due to the receding water level. Sic transit gloria mundi: the lake that the Byzantine Madaba Map calls the Asphalt and Salt Lake no longer produces these resources."
+ },
+ "a06-p026": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "The Zionist Chapter"
+ },
+ "a06-p027": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "In 1908, the Jewish World Zionist Organization appointed a scientific delegation, headed by German geologist Max Blanckenhorn, to explore the economic potential of the Dead Sea. The study’s findings led to a two decades’ effort to obtain a concession – first from the Ottoman authorities and after 1918 from the British Mandate authorities. In 1930, Palestine Potash Ltd. (PPL) was founded and began operating in the northern part of the lake, under Zionist professional entrepreneurship and management by Moshe Novomeysky, with Transjordanian-Hashemite and British partners (Prince Abdallah, the future King of Transjordan, and Major Tulloch, respectively).<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref16\" href=\"#a06-fn16\">16</a> PPL produced valuable minerals through natural evaporation of Dead Sea water in artificial pools, and was highly successful until geopolitical circumstances forced it to close. As a result of the 1948 War, the northern part of the Dead Sea’s western shore was occupied by the Kingdom of Jordan, which also controlled its eastern shore, while the southern part was occupied by the newly established state of Israel. In 1952, the latter established the Dead Sea Works (DSW), based on know-how and equipment <span epub:type=\"pagebreak\" role=\"doc-pagebreak\" id=\"pg-33\" title=\"29\"/>acquired from PPL. After many years of costly investments and heavy losses, the new company managed to establish lucrative operations in the southwestern part of the lake."
+ },
+ "a06-fn16": {
+  "tag": "aside",
+  "lang": "en",
+  "inner": "<p><a href=\"#a06-fnref16\" role=\"doc-backlink\">16</a> The company was registered in the UK in 1929, and the concession was granted retroactively in January 1931 by the Palestine and Transjordan governments, subject to an agreement between the agents of the crown and the colonies on the one hand, and Novomeysky and Tulloch on the other. See Yair Giladi, New Life for the Dead Sea (Jerusalem: Yad Izhak Ben-Zvi, 1998), pp. 20–46 (Hebrew).</p>"
+ },
+ "a06-p028": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "In 1961, the Dead Sea Works Franchise Law granted DSW an extensive concession to carry out any action that would promote its interests over an unprecedentedly large territory of 600 square kilometers, covering the entire Israeli side of the Dead Sea lake and shore.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref17\" href=\"#a06-fn17\">17</a> The industrial interference in the Dead Sea ecosystem has been state encouraged: the natural water flow to the lake was diverted for the developing state’s agricultural needs, and the area of the evaporation pools was extended to increase production, while the amounts of water pumped into them from both sides of the lake remained unsupervised.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref18\" href=\"#a06-fn18\">18</a>"
+ },
+ "a06-p029": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "Search for Life"
+ },
+ "a06-p030": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "For 3,300 years, from Aristotle’s time to the 1930s, discovering life in the Dead Sea has posed a challenge to a series of scholars and scientists, all of whom have failed. A number of factors – such as the lake’s name, the biblical myth, and the terrain itself – continued to hold sway over scholarly and literary minds <span epub:type=\"pagebreak\" role=\"doc-pagebreak\" id=\"pg-32\" title=\"28\"/>until well into the twentieth century. As James Joyce writes, “A barren land, bare waste. Volcanic lake, the dead sea: no fish, weedless, sunk deep in the earth... poisonous foggy waters... the cities of the plain: Sodom, Gomorrah, Edom. All dead names. A dead sea in a dead land... Dead: an old woman’s: the grey sunken cunt of the world. Desolation.”<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref19\" href=\"#a06-fn19\">19</a> Then, in 1934, a new explanation was offered by Dutch botanist and microbiologist Lourens Baas- Becking, who argued that it was not the overall high salinity that was responsible for the lake’s barrenness, but rather the composition of its salts, specifically the extremely high concentration of calcium ions (Ca+2).<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref20\" href=\"#a06-fn20\">20</a> But only two years later, all that changed, when Benjamin Wilkansky, a young doctoral student at the Hebrew University of Jerusalem, discovered life in the Dead Sea.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref21\" href=\"#a06-fn21\">21</a> This discovery of life in an environment previously thought to be completely devoid of it opened a new avenue for the study of life on Earth."
+ },
+ "a06-fn17": {
+  "tag": "aside",
+  "lang": "en",
+  "inner": "<p><a href=\"#a06-fnref17\" role=\"doc-backlink\">17</a> The Dead Sea Works Franchise Law, Israel’s Law Book, 1961, no. 342, 16 January 1961 (Hebrew), distinguishes between leased land on an area of 240 square kilometers, where the plants are located and development works are carried out, for which the company would pay a municipal tax, and a land reserve that would remain available for the company as required. Development operations within the huge concession territory were carried out without being required to make them known to the public, without statutory committee approvals, without the possibility of filing objections and without any external oversight. This questionable arrangement was reformed only in 1995, following strong public protest. Subsequent development in the concession area was subjected to the Planning and Construction Law, and the Franchise Law itself was extended until 2030.</p>"
+ },
+ "a06-fn18": {
+  "tag": "aside",
+  "lang": "en",
+  "inner": "<p><a href=\"#a06-fnref18\" role=\"doc-backlink\">18</a> I naugurated in 1964, the National Water Carrier of Israel supplied water from the Sea of Galilee to the arid south at the expense of other uses – among other things, diminishing the amount of water that eventually reached the Dead Sea. The Israel Water Authority (IWA) is authorized to oversee all water uses of all sources and all types (drinking, brackish, desalinated, reused, etc.) – apart for the Dead Sea water (interview with former IWA Director, Prof. Uri Shani, 2010).</p>"
+ },
+ "a06-p031": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "Recently, Antje Boetius and Samantha Joye have stated, “The Dead Sea... presents fascinating challenges to the understanding of biological processes and the limits of life in one of the most extreme environments on earth.”<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref22\" href=\"#a06-fn22\">22</a> This is an apt expression of the lake’s highranking position as an object of study and of the scientific passion for understanding it, particularly as a test-case for comparison with other hypersaline environments.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref23\" href=\"#a06-fn23\">23</a> The newfound scientific interest in the Dead Sea as a habitat has culminated in a research related to a Dead <span epub:type=\"pagebreak\" role=\"doc-pagebreak\" id=\"pg-35\" title=\"31\"/>Sea organism by the Israeli scholar Ada Yonath.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref24\" href=\"#a06-fn24\">24</a> Her discoveries challenged many subsequent researchers, both in the study of cellular proteins and in a number of applications, such as antibiotics."
+ },
+ "a06-fn19": {
+  "tag": "aside",
+  "lang": "en",
+  "inner": "<p><a href=\"#a06-fnref19\" role=\"doc-backlink\">19</a> James Joyce, Ulysses (New York: Vintage International, 1990), p. 61.</p>"
+ },
+ "a06-fn20": {
+  "tag": "aside",
+  "lang": "en",
+  "inner": "<p><a href=\"#a06-fnref20\" role=\"doc-backlink\">20</a> Lourens G. M. Baas Becking, Geobiologie of Inleinding Tot de Milieukunde (Den Haag: W.P. Van Stockum &amp; Zoon, 1934).</p>"
+ },
+ "a06-fn21": {
+  "tag": "aside",
+  "lang": "en",
+  "inner": "<p><a href=\"#a06-fnref21\" role=\"doc-backlink\">21</a> B. Wilkansky, “Life in the Dead Sea,” Nature, no. 138 (September 1936), p. 467.</p>"
+ },
+ "a06-fn22": {
+  "tag": "aside",
+  "lang": "en",
+  "inner": "<p><a href=\"#a06-fnref22\" role=\"doc-backlink\">22</a> Boetius and Joye, “Ecology Thriving in Salt.”</p>"
+ },
+ "a06-fn23": {
+  "tag": "aside",
+  "lang": "en",
+  "inner": "<p><a href=\"#a06-fnref23\" role=\"doc-backlink\">23</a> Oren, “Microbiological Studies in the Dead Sea.”</p>"
+ },
+ "a06-p032": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "As mentioned, the continued decrease in the Dead Sea water level was accompanied by growing salinity and changes in the ratios of its chemical components. Ironically, the plethora of studies informed by the Dead Sea that benefit humankind are concurrent to the Sea’s ecological decline. While organisms originating from it are still kept in research laboratories worldwide, life can no longer be detected in it due to the increasing human intervention."
+ },
+ "fig-a06-07": {
+  "tag": "figure",
+  "lang": "he",
+  "inner": "<img src=\"../images/p035-x151.jpeg\" width=\"709\" height=\"446\" alt=\"מים שקטים בתוך בולענים לחוף ים המלח, בין גושי סלע כהים, בשעת דמדומים.\"/><figcaption><span class=\"caption\">בולענים לחוף ים המלח.</span> <span class=\"credit\">צילום: מיכל כוכבא, מתוך אתר פיקיויקי</span><span class=\"edition-credit\">מקור: מיכל כוכבא, פיקיויקי, דרך ויקישיתוף. רישיון CC BY 2.5. התמונה חתוכה. <a href=\"https://commons.wikimedia.org/wiki/File:PikiWiki_Israel_37805_Sinkhole_at_The_Dead_Sea.jpg\">רשומת המקור</a> · <a href=\"https://creativecommons.org/licenses/by/2.5/\">הרישיון</a></span></figcaption>"
+ },
+ "a06-fn24": {
+  "tag": "aside",
+  "lang": "en",
+  "inner": "<p><a href=\"#a06-fnref24\" role=\"doc-backlink\">24</a> Ada Yonath received the Nobel Prize for working out the structure of the ribosome, the cellular organ responsible for protein production. Dead-Sea organisms are used as models for mechanisms of adaptation to a hostile external environment and for the functioning of cell proteins, since they are more likely to survive laboratory manipulation. This consideration led Yonath, using the Dead-Sea organisms (Haloarcula marismortui), to an unprecedented achievement: the construction, under laboratory conditions, of a ribosome (the cellular “protein factory”) originating in that archaeon. Ada Yonath, “Large facilities and and the evolving ribosome, the cellular machine for genetic-code translation,” Journal of The Royal Society Interface, 6 (October 2009), pp. 1–11.</p>"
+ },
+ "a06-p033": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "The ongoing decrease in the Dead Sea water level causes ecological transformations not only in the lake itself but also in its surrounding environment. These pose a threat to biodiversity, including endemic species found nowhere else in the world and organisms that play an important role in the food chain. It is difficult to predict future effects on the environment, but global experience in similar cases does not bode well."
+ },
+ "a06-p034": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "Sinking Even Lower"
+ },
+ "a06-p035": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "One clear current threat in the vicinity of the Dead Sea is the proliferation of sinkholes, which endanger human life. Measuring sometimes up to more than 80 meters in diameter and 29 meters in depth, the appearance of sinkholes along the coastal plain of the Dead Sea is a relatively new phenomenon, never observed prior to 1980."
+ },
+ "a06-p036": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "There are currently estimated to be more than 6,500 of them, their numbers increasing at an incomparable rate to any other sinkhole"
+ },
+ "a06-p037": {
+  "tag": "p",
+  "lang": "he",
+  "inner": ".)ראו איורים בעמודים site in the world (108,107"
+ },
+ "fig-a06-08": {
+  "tag": "figure",
+  "lang": "he",
+  "inner": "<img src=\"../images/p034-x147.jpeg\" width=\"715\" height=\"424\" alt=\"מבט מגובה על בולענים מלאי מים בצבעים ירוק, טורקיז, אדום וכתום, בתוך קרקע לבנה ומסולסלת.\"/><figcaption><span class=\"caption\">בולענים בצבעים שונים.</span> <span class=\"credit\">צילום: זאב שטיין, מתוך אתר פיקיויקי</span><span class=\"edition-credit\">מקור: זאב שטיין, פיקיויקי. רישיון CC BY 2.5 IL. התמונה חתוכה. <a href=\"https://www.pikiwiki.org.il/image/view/81831\">רשומת המקור</a> · <a href=\"https://creativecommons.org/licenses/by/2.5/il/\">הרישיון</a></span></figcaption>"
+ },
+ "a06-p038": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "The sinkhole phenomenon also causes severe damage to infrastructures and economic loss, leading to the suspension of development plans. The receding water line leaves behind a dismal vista of barren stretches of unstable mud-dotted shores with sinkholes that prevent safe access to the sea – the area’s main tourist attraction. They also wreak havoc on roads, in places endangering automobile traffic Sinkholes are the outcome of the collapse of the uppermost, weakly consolidated Holocene sedimentary section into underlying dissolution cavities within a subterranean salt layer. The subterranean interface between the salt-saturated Dead Sea water and the overlaying under-saturated groundwater follows the drop in the lake’s level, sinking and triggering an aggressive dissolution of the salt by exposing it to the under-saturated ground water.<a epub:type=\"noteref\" role=\"doc-noteref\" id=\"a06-fnref25\" href=\"#a06-fn25\">25</a>"
+ },
+ "a06-p039": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "Under these conditions, it is impossible to develop and operate agricultural and tourist projects that require great investment of money and effort. Yet there are no alternative means of subsistence currently on the horizon. If in the past, my working day at the Dead Sea used to begin with “a song in my heart,” now, given the pervasive spread of the sinkholes – and the resulting need to try and predict their appearance and, at times, recommend the evacuation of additional areas – the scene is not so heartwarming."
+ },
+ "a06-fn25": {
+  "tag": "aside",
+  "lang": "en",
+  "inner": "<p><a href=\"#a06-fnref25\" role=\"doc-backlink\">25</a> Eli Raz, “Sinkhole Formation Along the Dead Sea Shore: A Human-Induced Environmental Problem,” 2nd German-Israeli Climate Talks: Climate Change in the Dead Sea Great Rift Valley, DESERVE Project, September 2015.</p>"
+ },
+ "a06-p040": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "Beyond the Horizon"
+ },
+ "a06-p041": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "Due to the profiteering manipulations of business magnates who do not even live in the region, the Dead Sea is paying an environmental price whilst the human population is paying an economic and demographic one. These tycoons shirk responsibility for damage they have caused and refuse to devote some of their profits to address it. The Israeli government, on its part, who should have imposed regulations on such activities, has consistently failed to meet its legal and moral responsibility for safeguarding against the environmental deterioration of the Dead Sea. Following the Israeli Government Resolution No. 2863 of 2003, an interdisciplinary team of experts has examined a broad range of solutions for the Dead Sea crisis. Eventually, an impractical political caprice, named The Peace Conduit, was selected by the administration as the sole option for a feasibility study. After considerable investment of time and money in the study of this option, it failed. It has now become more necessary than ever to explore other alternatives in accordance with the 2003 resolution – and such alternatives certainly do exist."
+ },
+ "a06-p042": {
+  "tag": "p",
+  "lang": "en",
+  "inner": "If the current situation is allowed to continue, we may sigh and shrug helplessly as we lower our gaze to the changing shores and see the abandoned facilities and the date groves infested with hundreds of sinkholes, or we can raise our heads and look beyond the horizon. Especially toward evening, when the Moab Mountains skyline and sunset-hued clouds are reflected in the lake’s water, we may thus recharge our hopes and energies. We are just visitors here on a brief stay, and this exceptional lake is not ours to consume. We are duty-bound to resist the human interference that has so gravely harmed the spiritual and material resources offered by the unique and enigmatic natural phenomenon called the Dead Sea."
+ },
+ "fig-a06-09": {
+  "tag": "figure",
+  "lang": "he",
+  "inner": "<img src=\"../images/p038-x159.jpeg\" width=\"590\" height=\"476\" alt=\"תצורת מלח לבנה ומחוספסת עם נטיפים, היוצרת מעין מערה נמוכה, על רקע הרים.\"/>"
+ },
+ "fig-a06-10": {
+  "tag": "figure",
+  "lang": "he",
+  "inner": "<img src=\"../images/p038-x161.jpeg\" width=\"589\" height=\"441\" alt=\"תקריב של גבישי מלח עגולים ולבנים, דמויי פנינים.\"/>"
+ }
+}

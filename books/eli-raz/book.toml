@@ -1,0 +1,1040 @@
+# Private book configuration for tools/ingest_pdf.py in the epub-web-edition pipeline.
+# Every value here comes from the source PDF. The comments name where.
+
+pdf = "source/source.pdf"  # Relative to this folder. source/PROVENANCE.txt says where it came from.
+pdf_sha256 = "c7efc94efd4cbd42bf9d479a20ff1af763e017ec0ce1cfab75d2be7e3560e994"
+# Ornaments that are not book content. Checked visually on PDF pages 6-7.
+decorative = ["p006-x17", "p007-x21"]
+# Reader note before the printed form of a [[correction]] (an edition note at the end of the chapter).
+correction_note = "תיקון של מהדורה זו. בדפוס:"
+
+# Wrong code points in the PDF text layer, mapped to what the print shows.
+# U+0007: InDesign "indent to here" after note and source numbers (130 cases). Prints as a space.
+# U+001A: a zero-width glyph under ayin in "מעין" (PDF pages 210, 211). The render shows a shva.
+# U+FFFD: one FrankRuhlMFBold glyph without a character code (PDF page 70, "הקַשָרים"); the only one in the PDF. The render shows a patach under ק.
+# Note references that print as full-size digits. Each one is restored as a reference and logged.
+[[note_ref_fix]]
+page = 23
+contains = "1.42 meters.3"
+number = 3
+reason = "Print sets reference 3 as a full-size digit (typesetting slip). Note 3 exists at the page foot."
+
+# Bracket order in mixed Hebrew and Latin lines. The PDF stores brackets differently in Hebrew and Latin
+# fonts, so the extracted order can be wrong. Each fix was checked against a render of the printed line.
+
+[[text_fix]]
+page = 34
+find = "site in the world (108,107 ראו איורים בעמודים)."
+replace = "site in the world (ראו איורים בעמודים 107, 108)."
+reason = "Page numbers after a Hebrew run inside an English line: logical order, so the line displays like the print."
+[[text_fix]]
+page = 127
+find = "וסביבתו)Siwa,"
+replace = "וסביבתו (Siwa,"
+reason = "Opening bracket before a Latin run."
+[[text_fix]]
+page = 279
+find = "ואילו 1934(Bass-Becking)"
+replace = "ואילו Bass-Becking (1934)"
+reason = "Name and year order inside a Hebrew line."
+[[text_fix]]
+page = 280
+find = "האמירה של 2009) Boetius and Joye):"
+replace = "האמירה של Boetius and Joye (2009):"
+reason = "Citation run with a year in brackets."
+[[text_fix]]
+page = 283
+find = "החיפוש) Google Scholar, 2016)."
+replace = "החיפוש (Google Scholar, 2016)."
+reason = "Opening bracket before a Latin run."
+[[text_fix]]
+page = 283
+find = "(, Gay-Lussac, 1819; Ehrenberg, 1848; Lortet"
+replace = "(Gay-Lussac, 1819; Ehrenberg, 1848; Lortet,"
+reason = "One citation run over two lines; print breaks it at the line end."
+[[text_fix]]
+page = 283
+find = "Bass-Becking,1934;1891),"
+replace = "1891; Bass-Becking,1934),"
+reason = "End of the same citation run."
+[[text_fix]]
+page = 284
+find = "יתר(ולכן"
+replace = "יתר) ולכן"
+reason = "Closing bracket of the note that opens with (מלבד; print shows it after יתר."
+[[text_fix]]
+page = 286
+find = "(, Kaplan & Friedman, 1970; Oren & Shilo"
+replace = "(Kaplan & Friedman, 1970; Oren & Shilo,"
+reason = "One citation run over two lines; print breaks it at the line end."
+[[text_fix]]
+page = 286
+find = "Oren,1983a, 1993;1982)."
+replace = "1982; Oren,1983a, 1993)."
+reason = "End of the same citation run."
+[[text_fix]]
+page = 291
+find = ") Bourcart, 1899)."
+replace = "(Bourcart, 1899)."
+reason = "Opening bracket at the start of a line before a Latin run."
+[[text_fix]]
+page = 291
+find = "הנורווגי 1919(Hiorth) הציע"
+replace = "הנורווגי Hiorth (1919) הציע"
+reason = "Name and year order inside a Hebrew line."
+[[text_fix]]
+page = 294
+find = ") Wachs et al., 2000,"
+replace = "(Wachs et al., 2000,"
+reason = "Opening bracket at the start of a line before a Latin run."
+[[text_fix]]
+page = 303
+find = "(RB(."
+replace = "(RB)."
+reason = "Closing bracket after a Latin abbreviation."
+
+# Lines where tools/check_bidi.py reports a different order than the print, reviewed against a render of the
+# print and of the EPUB text in Chromium. The check skips them.
+# Name and year: print shows "(1934) Bass-Becking" right to left; Unicode keeps "Bass-Becking (1934)" as one left-to-right run. Same reading.
+# A citation over two lines: the check sees each line alone; in the paragraph the run is one, and it displays like the print.
+[[bidi_reviewed]]
+page = 279
+contains = "ואילו Bass-Becking (1934)"
+[[bidi_reviewed]]
+page = 280
+contains = "האמירה של Boetius and Joye (2009):"
+[[bidi_reviewed]]
+page = 283
+contains = "1891; Bass-Becking,1934),"
+[[bidi_reviewed]]
+page = 283
+contains = "(Gay-Lussac, 1819; Ehrenberg, 1848; Lortet,"
+[[bidi_reviewed]]
+page = 286
+contains = "(Kaplan & Friedman, 1970; Oren & Shilo,"
+[[bidi_reviewed]]
+page = 286
+contains = "1982; Oren,1983a, 1993)."
+[[bidi_reviewed]]
+page = 291
+contains = "הנורווגי Hiorth (1919) הציע"
+
+[[text_fix]]
+page = 145
+find = "בקתדרה 2002,101."
+replace = "בקתדרה 101, 2002."
+reason = "Number order in a Hebrew line: print reads 101, 2002 (errata/print-check.md row 33)."
+[[text_fix]]
+page = 305
+find = "9 /1978"
+replace = "1978/9"
+reason = "Print reads 1978/9 (winter 1978-79)."
+[[text_fix]]
+page = 311
+find = "Ehrenberg, C.G. 54.מובא"
+replace = "54. Ehrenberg, C.G. מובא"
+reason = "Entry 54 starts its own line in print; the label came out after the Latin run (errata/print-check.md row 68)."
+
+# Bracket defects that are in the print. tools/check_text.py skips paragraphs that contain these texts.
+[[print_quirk]]
+contains = "(בעברית: 'חורבת הנחושת' שוכנת"
+reason = "PDF page 176: print opens a bracket and never closes it."
+[[print_quirk]]
+contains = "(למיקום שטחי החפירה של"
+reason = "PDF page 178: print opens two brackets and closes one."
+[[print_quirk]]
+contains = "(מעבר ל־100"
+reason = "PDF page 300: print opens a bracket and never closes it."
+[[print_quirk]]
+contains = "באתר (Hebrewbooks."
+reason = "PDF page 309: print shows the closing bracket before Hebrewbooks; kept as printed."
+[[print_quirk]]
+contains = "(לעומת 25 אלף ל- Great Salt Lake"
+reason = "PDF page 283: print opens this bracket and closes only the inner (Google Scholar, 2016)."
+[[print_quirk]]
+contains = "(1934(."
+reason = "PDF page 310: print shows two opening brackets around the year; kept as printed."
+
+# Verse set as poems (a01-p011 names Moshe Mazar's maqama, Elisheva Rosenbaum's poems and Galit Hazan-Rokach's poem;
+# a24 quotes a song). Line texts are exact extracted lines; stanza sizes follow the printed gaps (3 pt or more, or 10 pt
+# in the maqama). The author line prints "חזן-רוקם"; a01-p011 spells "חזן-רוקח". Kept as printed.
+[[poem]]
+unit = "a07"
+pages = [50]
+title = "כְּמוֹ אֵשֶׁת לוֹט"
+author = "גלית חזן-רוקם"
+first = "כְּמוֹ אֵשֶׁת לוֹט"
+last = "בְּשׁוּב הַמַּיִם מִן הַיָּם אֶל הָרָקִיעַ"
+stanzas = [6]
+[[poem]]
+unit = "a24"
+pages = [207]
+first = "היה היה איש"
+last = "(לא יפה)..."
+stanzas = [7]
+[[poem]]
+unit = "a26"
+pages = [213, 214]
+first = "שמעו שמעו בני מואב ועמון"
+last = "וכולנו על מקלותינו, נרד אליך לעין גדי לרגל..."
+stanzas = [4, 4, 4, 4, 4, 4, 4, 4, 4, 4]
+[[poem]]
+unit = "a30"
+pages = [244]
+title = "גזעי התמרים"
+author = "אלישבע רוזנבוים (באר), עין גדי"
+first = "גִּזְעֵי הַתְּמָרִים"
+last = "פְּרוּשָׂה עֲלֵיהֶם."
+stanzas = [7]
+[[poem]]
+unit = "a35"
+pages = [290]
+title = "דרך חלון האוטובוס"
+author = "אלישבע רוזנבוים (באר), עין גדי"
+first = "כָּל הַמַּרְאוֹת אֵינָם"
+last = "נְמוֹגוֹת."
+stanzas = [6, 5]
+[[poem]]
+unit = "a36"
+pages = [308]
+title = "קו 486 - בדרך היורדת אל הבית"
+author = "אלישבע רוזנבוים (באר), עין גדי"
+first = "שמים,"
+last = "הביתה."
+stanzas = [33, 1]
+
+# Tables printed as text. ingest_pdf.py replaces the printed lines from "top" to "bottom" with an XHTML
+# table. The rows must hold exactly the printed characters; "replaces" lists the paragraph IDs that held them.
+# Cells transcribed from the print layout (render checked); the first row is the header.
+[[text_table]]
+id = "a06-t1"
+unit = "a06"
+page = 25
+top = "1935"
+bottom = "245"
+rows = [["1935", "1967", "1995", "2010"], ["245", "300", "339", "347"]]
+replaces = ["a06-p007", "a06-p008", "a06-p009", "a06-p010", "a06-p011", "a06-p012", "a06-p013", "a06-p014"]
+[[text_table]]
+id = "a18-t1"
+unit = "a18"
+page = 181
+top = "תקופה"
+bottom = "150-100"
+rows = [
+  ["תקופה", "משקל סיגים (טונות)", "משקל נחושת (טונות)*"],
+  ["תקופת הברונזה המוקדמת", "5,000", "500-300"],
+  ["תקופת הברזל", "130,000-100,000", "18,000-6,500"],
+  ["התקופה הרומית", "70,000-40,000", "7,000-2,500"],
+  ["התקופה הממלוכית", "1,500", "150-100"],
+]
+replaces = ["a18-p053", "a18-p054", "a18-p055", "a18-p056", "a18-p057", "a18-p058"]
+[[text_table]]
+id = "a35-t1"
+unit = "a35"
+page = 287
+top = "המקור 2010"
+bottom = "אלעזרי־וולקני, 1940 245"
+rows = [
+  ["המקור", "2010", "1995", "1967", "1935"],
+  ["Bodaker et al., 2010", "347", "", "", ""],
+  ["סטרינסקי, 2005", "", "339", "", ""],
+  ["Neev & Emery, 1967", "", "", "300", ""],
+  ["אלעזרי־וולקני, 1940", "", "", "", "245"],
+]
+replaces = ["a35-p062", "a35-p063", "a35-p064", "a35-p065", "a35-p066", "a35-p067"]
+
+# Corrections of proven errors in the print (approved by Yarden 2026-11-24). Both editions apply them.
+# Format: [[correction]] page = PDF page, find = printed text inside one printed line (once), replace = corrected
+# text, reason = what is wrong, evidence = the source that proves it. The reader sees the corrected text with a
+# dagger that links to an edition note with the printed form (correction_note above). Apply only entries marked
+# verified in errata/ERRATA.md, and add each one to CONTENT-CHANGES.md.
+
+# The 22 entries below come from errata/proposed.toml (errata agent, commit ab1c111); errata/ERRATA.md has the research.
+[[correction]]
+element = "a06-p022"
+page = 29
+find = "(2:23, KJV)"
+replace = "(2:13, KJV)"
+reason = "The salt-of-the-covenant verse is Leviticus 2:13. Leviticus 2 has 16 verses."
+evidence = "https://bible-api.com/leviticus+2:13?translation=kjv"
+
+[[correction]]
+element = "a06-p022"
+page = 29
+find = "shalt though season"
+replace = "shalt thou season"
+reason = "Misquote of the KJV: 'shalt thou season with salt'."
+evidence = "https://bible-api.com/leviticus+2:13?translation=kjv"
+
+[[correction]]
+element = "a06-p021"
+page = 26
+find = "salts form any other source"
+replace = "salts from any other source"
+reason = "Typo: 'form' for 'from'."
+evidence = "Reading of the sentence; no outside source needed."
+
+[[correction]]
+element = "a06-p023"
+page = 29
+find = "south of Hebron"
+replace = "south of Bethlehem"
+reason = "Tekoa lies about 8 km south of Bethlehem, between Bethlehem and Hebron, not south of Hebron."
+evidence = "https://en.wikipedia.org/wiki/Tekoa_(ancient_town)"
+
+[[correction]]
+element = "a06-p030"
+page = 33
+find = "For 3,300 years"
+replace = "For 2,300 years"
+reason = "Aristotle lived 384-322 BC; from his time to the 1930s is about 2,260 years. The book itself dates him to the 4th century BC (a35-p016)."
+evidence = "https://en.wikipedia.org/wiki/Aristotle"
+
+[[correction]]
+element = "a06-fn15"
+page = 29
+find = "n. 173."
+replace = "n. 174."
+reason = "In Röhricht's Regesta (1893), pp. 43-44, the 1138 charter of Fulk on Tekoa, bitumen and salt is no. 174. No. 173 is a Templar charter on churches."
+evidence = "https://archive.org/download/regestaregnihie00rhgoog/regestaregnihie00rhgoog_djvu.txt"
+
+[[correction]]
+element = "a31-p002"
+page = 245
+find = "מבול בשלושה במאי"
+replace = "מבול בשני במאי"
+reason = "The Arugot flood was on 2 May 2001. The same article says 2 May twice (a31-p006, a31-p007). Israel Meteorological Service: storm in the night of 1-2 May 2001, the Arugot bridge collapsed."
+evidence = "https://ims.gov.il/sites/default/files/inline-files/%D7%A1%D7%A7%D7%99%D7%A8%D7%AA%20%D7%90%D7%99%D7%A8%D7%95%D7%A2%D7%99%D7%9D%20%D7%A7%D7%99%D7%A6%D7%95%D7%A0%D7%99%D7%99%D7%9D%20-%20%D7%A2%D7%93%D7%9B%D7%95%D7%95%D7%9F%20%D7%9E%D7%A8%D7%A5%202023_0.pdf"
+
+[[correction]]
+element = "a31-p007"
+page = 247
+find = "של ה-3 במאי"
+replace = "של ה-2 במאי"
+reason = "Same event as 'ביום השיטפון ב-2 במאי' earlier in this paragraph. IMS dates the storm and the Arugot bridge collapse to 1-2 May 2001."
+evidence = "https://ims.gov.il/sites/default/files/inline-files/%D7%A1%D7%A7%D7%99%D7%A8%D7%AA%20%D7%90%D7%99%D7%A8%D7%95%D7%A2%D7%99%D7%9D%20%D7%A7%D7%99%D7%A6%D7%95%D7%A0%D7%99%D7%99%D7%9D%20-%20%D7%A2%D7%93%D7%9B%D7%95%D7%95%D7%9F%20%D7%9E%D7%A8%D7%A5%202023_0.pdf"
+
+[[correction]]
+element = "a31-p007"
+page = 247
+find = "דברים יד, 14-13"
+replace = "דברים יא, 14-13"
+reason = "The quoted verses ('והיה אם שמע תשמעו ... ונתתי מטר ארצכם בעתו יורה ומלקוש') are Deuteronomy 11:13-14. Deuteronomy 14:13-14 is about unclean birds."
+evidence = "https://www.sefaria.org/api/v3/texts/Deuteronomy.11.13-14"
+
+[[correction]]
+element = "a10-p003"
+page = 66
+find = "'מועדון האלפיני הישראל'"
+replace = "'מועדון האלפיני הישראלי'"
+reason = "Missing final yod in the club name. a10-p002 prints 'המועדון האלפיני הישראלי'. Checked in the PDF render: the slip is in the print."
+evidence = "https://wiki.imga.org.il/index.php?title=%D7%94%D7%9E%D7%95%D7%A2%D7%93%D7%95%D7%9F_%D7%94%D7%90%D7%9C%D7%A4%D7%99%D7%A0%D7%99"
+
+[[correction]]
+element = "a09-p023"
+page = 61
+find = "בן אוויס"
+replace = "בן נוויס"
+reason = "Ben Nevis, 1,345 m, highest peak of the British Isles, in Scotland. The text gives the same height and place; one letter is missing in the name."
+evidence = "https://en.wikipedia.org/wiki/Ben_Nevis"
+
+[[correction]]
+element = "a13-p058"
+page = 103
+find = "שבאינדוזיה"
+replace = "שבאינדונזיה"
+reason = "Typo: Komodo island is in Indonesia (אינדונזיה)."
+evidence = "https://en.wikipedia.org/wiki/Komodo_(island)"
+
+[[correction]]
+element = "a19-p009"
+page = 185
+find = "במאה ה-14"
+replace = "במאה ה-15"
+reason = "Arnold von Harff travelled to the Holy Land in 1496-1499 (still the Mamluk period, so the bracket stays true)."
+evidence = "https://en.wikipedia.org/wiki/Arnold_von_Harff"
+
+[[correction]]
+element = "a17-p009"
+page = 146
+find = "אברהם מוסיל"
+replace = "אלואיס מוסיל"
+reason = "The Czech explorer of Edom at the start of the 20th century is Alois Musil (1868-1944)."
+evidence = "https://en.wikipedia.org/wiki/Alois_Musil"
+
+[[correction]]
+element = "a18-p063"
+page = 181
+find = "בחפירות רבת א-נחאס"
+replace = "בחפירות ח'רבת א-נחאס"
+reason = "Two letters dropped: the site is ח'רבת א-נחאס (Khirbat en-Nahas) in all 8 other places in the book. Checked in the PDF render: the slip is in the print."
+evidence = "https://en.wikipedia.org/wiki/Khirbat_en-Nahas"
+
+[[correction]]
+element = "a35-p058"
+page = 286
+find = "(Bodaker et al., 2000)"
+replace = "(Bodaker et al., 2010)"
+reason = "The book cites this paper as 2010 in a35-p005 and in the bibliography (sources-p053, The ISME Journal 4: 399-407). No Bodaker 2000 paper exists."
+evidence = "https://doi.org/10.1038/ismej.2009.141"
+
+[[correction]]
+element = "sources-p069"
+page = 311
+find = "pp. 31–41"
+replace = "pp. 33–41"
+reason = "Oren 1983, Limnology and Oceanography 28(1): pages 33-41 (Crossref)."
+evidence = "https://api.crossref.org/works/10.4319/lo.1983.28.1.0033"
+
+[[correction]]
+element = "sources-p024"
+page = 309
+find = "תרח\"ץ"
+replace = "תרצ\"ח"
+reason = "Letters swapped in the Hebrew year. The entry is dated 1938, which is תרצ\"ח (5698)."
+evidence = "https://www.hebcal.com/converter?cfg=json&gy=1938&gm=6&gd=1&g2h=1"
+
+[[correction]]
+element = "sources-p047"
+page = 310
+find = "Geological Society of America Bulletin, v.116,pp. 555–571"
+replace = "Geological Survey of Israel Bulletin 63"
+reason = "Begin, Ehrlich and Nathan 1974 is Geological Survey of Israel Bulletin 63. GSA Bulletin 116: 555-571 is a different paper (Bookman/Ken-Tor et al. 2004, doi:10.1130/B25286.1)."
+evidence = "https://www.cambridge.org/core/books/abs/quaternary-of-the-levant/lake-lisan/CF25D6DE02054F2F38A24D91617CBC85"
+
+[[correction]]
+element = "a36-p053"
+page = 303
+find = "לכמיליון עד סוף העשור"
+replace = "לכמיליארד עד סוף העשור"
+reason = "From about 600 million m³ a year to 'about a million' is impossible. Government Decision 3533 (June 2018) sets the 2030 desalination target at 1,100 million m³ a year."
+evidence = "https://www.ceci.org.il/wp-content/uploads/2023/10/%D7%AA%D7%9B%D7%A0%D7%99%D7%AA-%D7%90%D7%A1%D7%98%D7%A8%D7%98%D7%92%D7%99%D7%AA-%D7%9C%D7%94%D7%AA%D7%9E%D7%95%D7%93%D7%93%D7%95%D7%AA-%D7%A2%D7%9D-%D7%AA%D7%A7%D7%95%D7%A4%D7%AA-%D7%91%D7%A6%D7%95%D7%A8%D7%AA-%D7%91%D7%9E%D7%A9%D7%A7-%D7%94%D7%9E%D7%99%D7%9D-%D7%9C%D7%A9%D7%A0%D7%99%D7%9D-2018-2030.pdf"
+
+[[correction]]
+element = "a35-p070"
+page = 288
+find = "(Coyn & Bellier"
+replace = "(Coyne & Bellier"
+reason = "The French engineering firm that wrote the Red Sea - Dead Sea feasibility study is Coyne et Bellier."
+evidence = "https://www.eib.org/attachments/registers/82425040.pdf"
+
+[[correction]]
+element = "sources-p060"
+page = 311
+find = "Coyn and Bellier"
+replace = "Coyne and Bellier"
+reason = "The firm name is Coyne et Bellier (same entry as a35-p070)."
+evidence = "https://www.eib.org/attachments/registers/82425040.pdf"
+
+# Text left out on purpose. Each entry is logged as an intentional change.
+[[omit]]
+page = 22
+contains = "The English text continues from the left page"
+reason = "Print-only reading note for the two-page spreads. The EPUB puts the English pages in reading order, so the note would mislead."
+
+[char_map]
+"\u0007" = " "
+"\u001a" = "\u05b0"
+"\ufffd" = "\u05b7"
+
+[meta]
+# As printed on the title page (PDF page 5) and the cover (PDF page 1).
+identifier = "urn:uuid:9b1e6f8a-5c3d-4e2a-9f71-2d4b8c6a1e05"  # New identifier for this edition.
+title = "אלי רז חוקר הבולענים"  # Two lines on the title page, joined with a space. No punctuation in print.
+creators = ["אלי רז"]
+editor = "יאיר גלעדי"
+description = "מאמרים, חוויות וסיפורים מהמקצוע ומהחיים"  # Cover text layer, PDF page 1, two lines joined.
+language = "he"
+source = "urn:isbn:978-965-596-043-3"  # Title page, PDF page 5.
+rights = "© כל הזכויות שמורות"  # Title page, PDF page 5. Full rights text stays in the book body.
+
+[layout]
+# Printed page number = PDF page - 4 (PDF page 14 prints "10", PDF page 22 prints "18").
+folio_offset = 4
+folio_font = "Extrim"
+header_max_y = 0.15      # Running heads and folios sit above this share of the page height.
+# Only these fonts count as running heads or folios in that band. Other text there is content (PDF page 308 has a title there).
+# Hebrew fonts store a bracket by its logical code; Latin fonts store its printed shape.
+hebrew_fonts = ["Narkis", "Almoni", "Extrim", "Guttman", "FrankRuhl", "Liddar", "Tubic"]
+running_head_fonts = [["Extrim", 12.0], ["FbTubic", 9.8]]
+footnote_min_y = 0.62    # Small notes below this share of the height are footnotes.
+indent_tolerance = 6.0   # Points. A line this far in from the column edge starts a paragraph.
+short_tolerance = 20.0   # Points. A line that ends this far short of the far edge ends a paragraph.
+paragraph_gap = 3.0      # Points of extra space above a body line that starts a paragraph (print: 3-4; lines: up to 2.8 with points).
+caption_gap = 30.0       # Points between an image edge and a caption line.
+credit_prefixes = ["צילום", "צלם", "צילומים", "באדיבות", "Photo", "Courtesy", "Source", "מקור"]
+
+# Text roles by font. The first rule that matches the font name part and size range wins.
+[[role]]
+font = "Extrim"
+min = 33.0
+role = "display"
+[[role]]
+font = "Extrim"
+min = 19.0
+role = "title"
+[[role]]
+font = "FbMonopoly-Regular"
+min = 19.0
+role = "title"
+[[role]]
+font = "Extrim"
+min = 13.5
+max = 15.5
+role = "byline"
+[[role]]
+font = "FbMonopoly-Regular"
+min = 13.5
+max = 15.5
+role = "byline"
+[[role]]
+font = "FbMonopoly-Medium"
+role = "subheading"
+[[role]]
+font = "AlmoniDLAAA"
+max = 11.6
+role = "small"
+
+# Book structure. Each unit starts at a PDF page and runs until the next unit.
+# Generated from the printed contents (PDF pages 6-7): article start = printed page + 4.
+# Part dividers sit 2 pages before their first article (the next page is blank). Checked against near-empty pages.
+
+[[unit]]  # Cover
+start = 1
+id = "cover"
+kind = "cover"
+[[unit]]  # Blank pages before the title page
+start = 2
+id = "blank-front"
+kind = "blank"
+[[unit]]  # Title page and credits
+start = 5
+id = "titlepage"
+kind = "titlepage"
+[[unit]]  # Printed contents, PDF pages 6-7
+start = 6
+id = "contents"
+kind = "contents"
+[[unit]]  # Portrait page
+start = 8
+id = "frontispiece"
+kind = "frontispiece"
+[[unit]]  # צרור תודות (no author line)
+start = 9
+id = "a01"
+kind = "article"
+[[unit]]  # פתח דבר (יאיר גלעדי)
+start = 11
+id = "a02"
+kind = "article"
+[[unit]]  # אלי רז איש המדבר (עמיר אידלמן)
+start = 13
+id = "a03"
+kind = "article"
+[[unit]]  # הצטלבויות (יונתן ארז)
+start = 15
+id = "a04"
+kind = "article"
+[[unit]]  # Part divider: ים המוות - האומנם?
+start = 17
+id = "s01"
+kind = "part"
+[[unit]]  # ים המלח - מקור השראה: על סיגלית לנדאו (יאיר גלעדי)
+start = 19
+id = "a05"
+kind = "article"
+[[unit]]  # The Life Story of the Dead Sea (אלי רז)
+start = 21
+id = "a06"
+kind = "article"
+# Two-page spreads read left page first. Checked by sentence continuity across every page break.
+page_order = [21, 23, 22, 25, 24, 27, 26, 29, 28, 31, 30, 33, 32, 35, 34, 37, 36, 38]
+[[unit]]  # תולדות מחקר ים המלח (אלי רז)
+start = 39
+id = "a07"
+kind = "article"
+[[unit]]  # Part divider: טיפוס ונפילה, איתור וחילוץ
+start = 51
+id = "s02"
+kind = "part"
+[[unit]]  # אלי רז ויחידת אית"ן (נרי אראלי)
+start = 53
+id = "a08"
+kind = "article"
+[[unit]]  # חזור למדבר ממנו באת (אלי רז)
+start = 57
+id = "a09"
+kind = "article"
+[[unit]]  # אסון הר פאמיר (אלי רז)
+start = 65
+id = "a10"
+kind = "article"
+[[unit]]  # חבר מעולם אחר (אלי רז)
+start = 79
+id = "a11"
+kind = "article"
+[[unit]]  # תעלומת גרשון נדיבי (יאיר גלעדי)
+start = 89
+id = "a12"
+kind = "article"
+[[unit]]  # מורל, עט ונייר טואלט – יומן הבולען (אלי רז)
+start = 93
+id = "a13"
+kind = "article"
+[[unit]]  # בולענים ואמצעי מניעה (אלי רז)
+start = 107
+id = "a14"
+kind = "article"
+[[unit]]  # Part divider: אדם וים המלח בימי קדם
+start = 125
+id = "s03"
+kind = "part"
+[[unit]]  # אדם וסביבה בנווה עין גדי (אלי רז)
+start = 127
+id = "a15"
+kind = "article"
+[[unit]]  # ספנות בים המלח (אלי רז)
+start = 135
+id = "a16"
+kind = "article"
+[[unit]]  # סלע אֱדום (אלי וטל רז, אלכסנדר אוצ'יטל)
+start = 145
+id = "a17"
+kind = "article"
+[[unit]]  # פונון: מנגד לערבה התיכונה (אלי רז, ארז בן יוסף)
+start = 167
+id = "a18"
+kind = "article"
+[[unit]]  # תריאק: המוצר היוקרתי של ים המלח (אלי רז)
+start = 183
+id = "a19"
+kind = "article"
+[[unit]]  # Part divider: יוזמות
+start = 187
+id = "s04"
+kind = "part"
+[[unit]]  # הקמת מצוקי דרגות (יוחאי רוס)
+start = 189
+id = "a20"
+kind = "article"
+[[unit]]  # בקיבוץ עין גדי ובתנועה הקיבוצית (אלי רז)
+start = 191
+id = "a21"
+kind = "article"
+[[unit]]  # הקמת צוות איתור וחילוץ (יאיר גלעדי, ערן חופש)
+start = 195
+id = "a22"
+kind = "article"
+[[unit]]  # Part divider: אישי בהחלט
+start = 201
+id = "s05"
+kind = "part"
+[[unit]]  # זכיתי (חגית (בלבן) לביא)
+start = 203
+id = "a23"
+kind = "article"
+[[unit]]  # טיול בלתי נשכח (אפרת אנגרס-אוולד)
+start = 205
+id = "a24"
+kind = "article"
+[[unit]]  # עם אלי בעבר הירדן (חנוך פלסר)
+start = 209
+id = "a25"
+kind = "article"
+[[unit]]  # שמעו, שמעו בני מואב (משה מזר)
+start = 213
+id = "a26"
+kind = "article"
+[[unit]]  # מעלילות עבר הירדן (אלי וטל רז)
+start = 215
+id = "a27"
+kind = "article"
+[[unit]]  # סיור מודרך בחוג הסרטן (אלי רז)
+start = 229
+id = "a28"
+kind = "article"
+[[unit]]  # אלי ואליהוא (משה שנקר)
+start = 233
+id = "a29"
+kind = "article"
+[[unit]]  # Part divider: מבט גיאוגרפי
+start = 237
+id = "s06"
+kind = "part"
+[[unit]]  # בין הר חברון לעין גדי (אלי רז)
+start = 239
+id = "a30"
+kind = "article"
+[[unit]]  # השתוללות איתני הטבע וקריסת גשר ערוגות (אלי רז)
+start = 245
+id = "a31"
+kind = "article"
+[[unit]]  # החור באוזון (אלי רז)
+start = 251
+id = "a32"
+kind = "article"
+[[unit]]  # Part divider: מבט מדעי
+start = 255
+id = "s07"
+kind = "part"
+[[unit]]  # מהו בולבוס (אלי רז)
+start = 257
+id = "a33"
+kind = "article"
+[[unit]]  # אגם הלשון נגד הר סדום (אלי רז)
+start = 259
+id = "a34"
+kind = "article"
+[[unit]]  # המערכת האקולוגית של ים המלח (אלי רז)
+start = 275
+id = "a35"
+kind = "article"
+[[unit]]  # ים המלח - לאן? (אלי רז)
+start = 291
+id = "a36"
+kind = "article"
+[[unit]]  # מקורות
+start = 309
+id = "sources"
+kind = "bibliography"
+[[unit]]  # Blank pages before the back cover
+start = 313
+id = "blank-back"
+kind = "blank"
+[[unit]]  # Back cover
+start = 316
+id = "backcover"
+kind = "backcover"
+
+
+[cover]
+# The EPUB cover-image (library thumbnail) is a render of the full printed cover: photo plus typography.
+# Derived image. The cover page in the spine keeps the real cover text and the original photo.
+render_page = 1
+height_px = 1600
+
+[facsimile]
+# Appendix with a page image of every PDF page, one document per page, with a Return link to the text.
+# Derived images, rendered from source.pdf. They are not scans of paper.
+dpi = 56  # 375x529 px per page; 316 pages take about 8.8 MB. The release EPUB must stay at most 24 MB (tools/check_size.py).
+quality = 55
+title = "עמודי המקור"
+note = "תוספת של מהדורה זו: תמונות של כל עמודי הספר המודפס, כפי שהם מופיעים בקובץ הדפוס. הן נועדו להשוואה עם הטקסט. בכל עמוד יש קישור חזרה למקום המתאים בטקסט."
+return_label = "חזרה לטקסט"
+page_label = "עמוד"
+
+[assets]
+css = "book.css"     # Font stacks name the print fonts first; see the comment in the file.
+fonts = "fonts"      # Noto Sans Hebrew (SIL OFL) as the bundled fallback.
+
+# Alt text, written from the image itself (the PDF has none). Keyed by image file name without extension.
+# Rule: describe what is visible and what the caption states; never guess identities or facts.
+[alt]
+"p022-x109-masked" = "Line chart of the Dead Sea water level in meters below sea level. The line falls steadily from about −399 m on the left to −440.61 m at the last point, labelled 01/10/2025, with a short rise around 1991–92."
+"p040-x169" = "קטע ממפה עתיקה בשחור־לבן: ים המלח (Lac. Asphaltidis) כאגם מוארך שנהר הירדן (Fl. Jordanis) נשפך אליו, ומסביבו הר הזיתים (Mons Olueti), יריחו (Herichonte) ופילדלפיה (Philadelfia) עם ציורי מגדלים."
+"p042-x177" = "מפה עתיקה בלטינית של ים המלח, ובה הכיתוב MARE MORTUUM, SALSUM sive SALIS, LACUS ASPHALTITIS, ציוני סדום ועמורה על האגם, ועין גדי, מדבר מעון ויהודה (IUDAEA) לחופו."
+"p043-x181" = "מפה חרוטה וצפופה של ארץ יהודה. ים המלח בצד ימין כגוף מים מוארך וכהה עם הכיתוב MARE MORTUUM, MARE SALSUM, LACUS ASPHALTITIS, וציורי ערים בוערות בתוכו: צבויים, סדום, עמורה ואדמה."
+"p044-x185" = "מפה משורטטת באנגלית בשם Sketch of the Backwater at the South End of the Dead Sea: מפרץ בשם The Backwater בדרום ים המלח, מצר ומעבר, ומקרא של שלוש נקודות (A עד C)."
+"p045-x189" = "מפה בשחור־לבן בכתב גרמני של דרום ים המלח: חצי האי הלשון (Lingua Maris), מצדה (Masada), תל אל־מסגל, מעבר המים (Die Furth) ונחלים היורדים אל האגם."
+"p047-x195" = "תחריט: שיירת גמלים גוררת סירה על עגלה במישור, ולפניה פרש על סוס ואנשים בגלימות."
+"p049-x201" = "מפה מודפסת באנגלית בשם Sketch Map of the Dead Sea, 1848: קו החוף של ים המלח לכל אורכו, עם מספרי עומק, סוגי קרקעית ושמות מקומות, ובהם מצדה וחצי האי הלשון."
+"p066-x251" = "מפת דרכים של מרכז אסיה: טג'יקיסטן במרכז, קירגיזסטן מצפון ואפגניסטן מדרום, הערים דושנבה, טשקנט וקאבול, וסמן אדום במזרח טג'יקיסטן."
+"p111-x416" = "לוח איורים: חתך קידוח עם שכבות חצץ, מלח וטין וחלל בתוך שכבת המלח; חתך סייסמי של פני שכבת המלח לפי עומק; ושלושה שלבים של היווצרות בולען, שבהם מי תהום ממיסים את המלח, נפתח חלל ופני השטח קורסים לתוכו."
+"p112-x420" = "שני חתכים של חוף ים המלח, 1960 ו־2000. מפלס ים המלח יורד מ־395 ל־414 מטר מתחת לפני הים, הפן הבייני בין מי התהום למי ים המלח נודד, ומי התהום מגיעים אל שכבת המלח. חיצים מסמנים את זרימת המים."
+"p113-x424" = "גרף משולב לשנים 1978 עד 2018: קו כחול של מפלס ים המלח היורד מכ־399 לכ־431 מטר מתחת לפני הים, וקו אדום של מספר הבולענים המצטבר, העולה מאפס לכ־6,000, בעיקר משנות האלפיים."
+"p116-x452" = "תרשים הנדסי של גשר על שישה עמודים מעל כביש 90, עם מידה כוללת של 104,000 ומפתחים של 12,000 ו־20,000."
+"p118-x464" = "מפה הנדסית בשחור־לבן של תוואי כביש: קו כחול עבה ומתפתל של תוואי חדש לצד קו ירוק, על רקע קווי גובה ומבנים."
+"p118-x466" = "תצלום אוויר עם שכבה ירוקה המסמנת את שטח המלח התת־קרקעי, קו אדום של תוואי, נחל ערוגות, וסימוני קידוחים ונקודות מדידה."
+"p119-x470" = "מפת תכנון של אזור עין גדי ובה כביש 90, נחל ערוגות, שטחי חקלאות ותיירות, ורצועה בין שני קווים כחולים המסומנת 'רצועה בסיכון גבוה'."
+"p120-x474" = "איור: אוטובוס נוסע על כביש שמתחתיו יריעות מתוחות מעל בור בקרקע, והכביש נשאר שלם."
+"p120-x476" = "איור: אוטובוס נופל לתוך בור שנפתח בכביש בלי יריעות הגנה."
+"p122-x486" = "שתי תמונות של אותו שטח: משמאל מפת לוויין צבעונית עם בולענים קיימים ועיגול לבן המסמן התרעה (Alarm!), ומימין תצלום של השטח עם בולענים פעילים, אותו עיגול, ובולען שהופיע ותועד 14 שבועות לאחר ההתרעה."
+"p124-x494" = "מפת רצועת החוף המערבית של ים המלח: אזורים בסגול, צהוב וירוק לאורך החוף מסמנים רמות שונות של היתכנות להתפתחות בולענים, לצד כביש וקווי גובה."
+"p136-x540" = "שלושה עוגני אבן מנוקבים, בצילום ובשרטוט חתך המסומנים A, B ו־C עם סרגל קנה מידה, ומימין צילום של עוגן אבן על החוף ובו שרידי חבל."
+"p137-x549" = "שרטוט קווי של ספינה עם מפרש גדול, תורן וחבלים, וחרטום וירכתיים מוגבהים."
+"p147-x583" = "מפה טופוגרפית בשחור־לבן עם קווי גובה מ־700 עד 1,200 מטר, קלעת סלע (879), מית דליב, א־סלע, ואדי חבס, ואדי אל־הרש ודרך המלך, עם חץ צפון וקנה מידה של 500 מטר."
+"p162-x645" = "שורת סימנים בכתב היתדות, מועתקת בשרטוט קווי."
+"p092-x351" = "מכתב בכתב יד בעברית על נייר שורות משנת 1974, חתום בשורה התחתונה."
+"p096-x366" = "דפים מקומטים מלאים בכתב יד כחול וצפוף בעברית, מחוברים בפס במרכז."
+"p117-x458" = "סמל מרכז מדע ים המלח והערבה (Dead-Sea & Arava Science Center), בחסות אוניברסיטת בן־גוריון בנגב."
+"p169-x669" = "מפת תבליט צבעונית של האזור משני צדי הגבול בין ישראל לירדן: אזור מודגש בצהוב מחירבת אן־נחאס עד פונון, ושמות מקומות כמו חצבה, עין יהב, קוריקרה, בצרה ודנא, עם קנה מידה של 10 ק\"מ."
+"p171-x677" = "איור תלת־ממדי של טרנספורם ים המלח: שבר בין לוח אפריקה ללוח ערב, עם ים סוף, ים המלח והכנרת לאורכו, וחיצים המראים תנועה מנוגדת של שני הלוחות."
+"p185-x728" = "תחריט של נחש מפותל לגובה עם ראש פתוח, לצד המספרים 10, 15 ו־20 בשוליים."
+"p200-x794" = "מכתב מודפס על נייר של ראש הממשלה (The Prime Minister), ירושלים, ח' באב תשנ\"ג, 26 ביולי 1993, אל צוות עין גדי. נוסח המכתב: ידידים יקרים, מקריאה בעיתונים אני למד על יזמתכם והחלצותכם בהתנדבות לעזרתם של מטיילים במדבר יהודה אשר נקלעו למצוקה. למדתי על החוויות הקשות שעוברות עליכם, על אומץ הלב, על המאמץ. אהיה לפה לרבים מאתנו אם אודה לכם על כל שאתם עושים, על הסיכון שאתם נוטלים על עצמכם, על הדבקות במשימה, על הצלתן של נפשות – ועל הרגעים המרים. הצוות שלכם מגלם את פניה היפות של מדינת ישראל. תודה מעומק הלב. חתום: יצחק רבין."
+"p228-x890" = "ציור קווי של שתי דמויות מצוירות עם אוזניים מחודדות, זנב ארוך וטפרים, אוחזות זו בזו."
+"p242-x947" = "שתי מפות בשחור־לבן: למעלה מפת קווי גובה של אגן נחל ערוגות, ולמטה מפה של האזור שבין חברון לים המלח עם נחלים, דרכים ונקודות גובה."
+"p260-x1009" = "שתי מפות זו לצד זו: משמאל תצלום לוויין ובו ים המלח וחיצים לאורך בקע הירדן, בכותרת 'חדירת הלשון הימית מפרץ סדום' (מתוך וינברג ובגין, 2005), ומימין מפת אגם הלשון לאורך בקע הירדן (מתוך רז, 1993)."
+"p262-x1019" = "גרף של תנודות מפלס אגם הלשון (במטרים מתחת לפני הים) לפי גיל מוחלט באלפי שנים, עם חמישה פסים אנכיים ממוספרים 1 עד 5 המסמנים אירועי היינריך, וסימון של מפלס ים המלח היום."
+"p266-x1048" = "חתך גאולוגי רוחבי של האגן הצפוני של ים המלח, בעומקים מ־300 עד מינוס 1,100 מטר, עם תצורות סדום, עמורה והלשון במרכז האגן, שכבות סלע בשוליים ומקרא של סוגי סלעים."
+"p269-x1062" = "מפה מוארכת בשחור־לבן של האגן הצפוני של ים המלח, ובה כתמים כהים של דיאפירים של מלח לאורך קווי העתקים מקווקווים, ושמות כמו עין גדי, דיאפיר עין גדי, דלתת הירדן ודיאפיר הלשון."
+"p271-x1072-masked" = "חתך סייסמי אפור של קרקעית האגן הצפוני, ובו קווים המסמנים את גבולות התצורות: תצורת הלשון, תצורת עמורה ותצורת סדום, ובבסיס החתך דיאפירים של מלח, ובהם דיאפיר דלתת הירדן ודיאפיר עין גדי."
+"p272-x1077" = "איור על רקע צהוב: חמישה מקטעי סלע דולומיט סדוקים בטור אלכסוני, עם חיצים כחולים קשתיים ביניהם וחיצים כתומים גדולים כלפי מעלה וכלפי מטה משני הצדדים."
+"p273-x1081" = "חתך סכמטי של הר סדום: עמוד מלח מורם במרכז בין מישור עמיעז משמאל לבקע ים המלח מימין, שכבות מלח מתחת לאבני חול וחרסיות משני הצדדים, וחץ המראה את עליית המלח."
+"p281-x1101" = "טבלה. מילות חיפוש בגוגל סקולר, ומספר המאמרים: סך הכול, עד שנת 1979, 1980–1997, 1998–2016. \"dead sea\" \"halophilic Archaea\" antibiotic: 443, 3, 13, 415. \"dead sea\" \"halophilic Archaea\" antibiotics: 394, 3, 13, 376. \"great salt lake\" \"halophilic Archaea\" antibiotic: 190, 0, 5, 207. \"great salt lake\" \"halophilic Archaea\" antibiotics: 212, 0, 5, 185."
+"p282-x1105" = "טבלה. מילות חיפוש בגוגל סקולר, פרסום ראשון, ומספר המאמרים עד שנת 1979, 1980–1997, 1998–2016. \"dead sea\" fungi: 1801, 370, 517 (140%), 3630 (700%). \"dead sea\" fungal: 1801, 543, 792 (146%), 5110 (645%). \"dead sea\" fungal life: 1796, 395, 573 (145%), 4390 (766%)."
+"p285-x1115-masked" = "טבלה. מילות חיפוש בגוגל סקולר, פרסום ראשון, מספר מאמרים עד שנת 1979, משנת 1980, ויחס בין מספרי המאמרים. \"dead sea\" microorganism: 1869, 562, 9,010, 16. \"dead sea\" bacteria: 1869, 599, 9,280, 15.5. \"dead sea\" microbiology: 1897, 196, 5,140, 26. \"dead sea\" \"halophilic Archaea\": 1963, 9, 1,350, 150. \"dead sea\" \"halophilic bacteria\": 1952, 84, 1,610, 19."
+"p293-x1138" = "תצלום שחור־לבן של גבר מבוגר בחליפה ועניבת פרפר, יושב ליד שולחן ומדבר אל מיקרופון."
+"p294-x1144" = "דף בכתב יד מספר אורחים: שתי ברכות בעברית, אחת מתוארכת 20/6/1984 והשנייה 19.2.1985, כל אחת חתומה."
+"p297-x1152" = "תרשים חלופה מערכתית: הזרמת מים מותפלים מפרץ חיפה לכנרת, בשלושה קטעים (כ־20, כ־17 וכ־13 ק\"מ), עם פרופיל גובה מהים התיכון דרך העמק אל הכנרת, וטבלת השוואה של חלופות: אשקלון–קומרן, חדרה–בית שאן וקישון–כנרת."
+"p299-x1163" = "תרשים סכמטי של פרויקט RD: הולכת 2,000 מלמ\"ש מי ים מים סוף לאורך 250 ק\"מ, התפלה, וחלוקה של מים מותפלים לירדן ולישראל ולפלסטינאים, והזרמת 1,200 מלמ\"ש רכז ימי לים המלח (בעקבות Harza JRV, 1996)."
+"p301-x1169" = "מפת לוויין של האזור מים סוף עד ים המלח, עם קו המוביל המתוכנן לאורך הערבה בצד הירדני, מתקן התפלה מסומן בעיגול אדום, ומקרא של מי ים, מי ים ורכז, ומים מותפלים, וקנה מידה של 100 ק\"מ."
+"p302-x1173" = "מבט אוויר תלת־ממדי בסגנון Google Earth על רמת המדבר הירדני, עם קווי תוואים צבעוניים, הכיתובים Desert Highway ו־King's Highway, וחץ אדום לכיוון עמאן."
+"p304-x1179" = "תרשים מתוך הדוח הסופי של תוכנית המחקר להולכת מים מים סוף לים המלח (Final Report, Red Sea – Dead Sea Water Conveyance Study Program): לפי כמות המים המוזרמת, מ־0 עד 1,000 מלמ\"ש בשנה, שינויים צפויים במפלס, בשכבתיות, בפריחה ביולוגית (ציאנובקטריה ודונליאלה), בהלבנת גבס, בבולענים, במי התהום ובתעשייה, עם קווים אנכיים ב־400 וב־700."
+"p305-x1185-masked" = "גרף פיזור של צפיפות מי ים המלח (גרם לסמ\"ק, 170 עד 174) לפי עומק (0 עד מינוס 350 מטר): קו אופקי אדום בעומק של כ־65 מטר מפריד בין גוף מים עליון – הניזון, מהגגר, מושפע מתנאים מטאורולוגיים ומכיל חיים – לבין גוף מים תחתון – מלוח, צפוף, מבודד וחסר חמצן."
+"p121-x482" = "הדמיה של חתך כביש לחוף ים המלח: מתחת לאספלט שכבת אגרגטים, רשת גיאוגריד, שכבת חצץ מהודקת ויריעות גיאוטכניות, והבולענים שנפערו מתחת נשארים מכוסים בלי שהכביש קורס."
+"p114-x437-render" = "תצלום אוויר של חוף ים המלח ובו שורה של בולענים לאורך קו ישר, עם הכיתוב שעל התמונה: השפעת העתק גיאולוגי סמוי על התפתחות ליניארית של אתר שלם."
+"p078-qr1" = "קוד QR לסרט שצולם בידי צוות המחפשים, חלק 3."
+"p078-qr2" = "קוד QR לסרט שצולם בידי צוות המחפשים, חלק 2."
+"p078-qr3" = "קוד QR לסרט שצולם בידי צוות המחפשים, חלק 1."
+"p078-qr4" = "קוד QR לסרט שצולם בידי הנספים לפני האסון."
+"p166-qr1" = "קוד QR למאמר בקתדרה 101, 2002."
+"p234-qr1" = "קוד QR לסרט שצולם עם אליהוא."
+"p120-x478" = "פועלים פורסים יריעות גיאוטכניות לבנות על רצועה רחבה לצד כביש, עם מחפר ומשאית ברקע ומצוק מדברי מאחור."
+"p183-x713-masked" = "צנצנת רוקחים קרמית מצוירת בכחול וצהוב על רקע שחור, ועליה הכיתוב THERIAC והסמל IHS."
+
+"p001-x1379" = "מבט מגובה על מפרץ במי ים המלח הטורקיזיים, ובו כתם גדול בצבע חום־כתום, בין מצוקים צהבהבים תחת שמיים מעוננים וכהים."
+"p008-x32" = "גבר עם שיער אפור, בחולצה אפורה עם שרוולים אדומים ובמכנסיים קצרים, עומד עם רגל מורמת על גוש מלח לבן, ומאחוריו מים ירקרקים."
+"p011-x40" = "גבר בכובע מצחייה ובחולצה צהובה יושב בין ענפי עץ זית."
+"p013-x46" = "יעלים על סלע מעל מדרון מדברי, ואחד מהם עומד על הפסגה."
+"p014-x50" = "קבוצת מטיילים בכובעים עומדת במעגל במדבר, ואדם כורע מולה ומסביר בתנועות ידיים."
+"p015-x54" = "שלושה רוכבי אופניים בכביש מתפתל בין הרי מדבר."
+"p017-x60" = "תצלום תקריב של גבישי מלח לבנים בצורת פרחים מסולסלים."
+"p018-x64" = "שני מטפסים בקסדות עוברים על דופן סלע בהירה מעל מים, בקניון צר."
+"p019-x68" = "חלל תצוגה ריק ובו פסלים לבנים מגובשי מלח, תלויים מהתקרה ועומדים על הרצפה."
+"p020-x85" = "פסל של שמלה מגובשת במלח לבן ומסולסל, תלוי באוויר על רקע אפור."
+"p020-x87" = "כינור מכוסה בגבישי מלח לבנים על רקע שחור."
+"p020-x82" = "ספר בכריכה קשה בשם SIGALIT LANDAU – SALT YEARS, בתמונה אלכסונית."
+"p020-x91-masked" = "ספר בכריכה קשה בשם SIGALIT LANDAU – SALT YEARS, בתמונה אלכסונית."
+"p020-x93" = "ידיים מרימות מן המים בד מגובש במלח לבן, קשור למקל עץ."
+"p020-x95" = "גבר ואישה בכובע ובשמלה צבעונית מורידים מעגורן אל המים שמלה מגובשת במלח, על חוף ים המלח."
+"p021-x103" = "מבט מגובה על מפרץ ים המלח: כתם מים חום־כתום עגול בתוך המים הטורקיזיים, בין מצוקים."
+"p024-x116" = "אישה במעיל כחול יושבת על גושי אספלט שחורים ונקבוביים על חוף סלעי."
+"p028-x126" = "פרט מפסיפס עתיק: סירה ועליה גושי מלח צבעוניים על מים מסוגננים בקווים גליים."
+"p031-x137" = "תצלום שחור־לבן ישן: אנשים עומדים במים רדודים ליד ערמות מלח לבנות, ובאופק רכס הרים."
+"p031-x139" = "תצלום שחור־לבן ישן: אנשים אוספים מלח במים רדודים, וערמות מלח לבנות על החוף לרגלי ההרים."
+
+"p035-x151" = "מים שקטים בתוך בולענים לחוף ים המלח, בין גושי סלע כהים, בשעת דמדומים."
+"p034-x147" = "מבט מגובה על בולענים מלאי מים בצבעים ירוק, טורקיז, אדום וכתום, בתוך קרקע לבנה ומסולסלת."
+"p038-x159" = "תצורת מלח לבנה ומחוספסת עם נטיפים, היוצרת מעין מערה נמוכה, על רקע הרים."
+"p038-x161" = "תקריב של גבישי מלח עגולים ולבנים, דמויי פנינים."
+"p039-x165" = "פרט מפסיפס עתיק: מים כחולים מסוגננים, עצים, סירות וכיתוב ביוונית."
+"p041-x173" = "קטע טקסט מודפס בעברית בכתב ישן, בכותרת 'פרק ב ימי נהרי הרי עמקי הארץ'."
+"p051-x207" = "תצלום שחור־לבן: שני מטפסים בציוד מלא תלויים יחד על כבל מתוח ליד מצוק."
+"p052-x211" = "שורה של מטיילים עולה במדרון אל פסגה סלעית, ליד עץ שיטה."
+"p053-x215" = "דופן מצוק בהיר עם רצועות שכבות ושני מטפסים קטנים עליו."
+"p056-x223" = "פסגות הרים מושלגות וחדות."
+"p057-x227" = "מטפס בקסדה אדומה תלוי בחבל על קיר סלע מכוסה צמחייה ירוקה."
+"p060-x235" = "חבל טיפוס ורוד עובר דרך עוגנים בסדק בסלע אדמדם."
+"p065-x247" = "שורה של מטפסים קטנים חוצה מדרון שלג רחב."
+"p068-x257" = "דיוקן: גבר בכובע פרווה ובמעיל כחול על רקע שלג."
+"p070-x270" = "אוהלים צבעוניים במחנה על קרחון, מתחת לפסגה מושלגת."
+"p071-x274" = "מדרון שלג תלול עם אוהלים קטנים בתחתיתו."
+"p071-x276" = "דיוקן: גבר בכובע ירוק עם שוליים מפרווה, על רקע שלג."
+"p072-x280" = "חמישה גברים יושבים מסביב לשולחן מאולתר באוהל ואוכלים."
+"p073-x284" = "פתח של בקיע בקרחון, ומעליו נטיפי קרח חדים ותלויים."
+"p074-x288" = "מטפס עם תרמיל ומקלות הליכה יורד במדרון מושלג, ואחריו עוד שני מטפסים."
+
+"p074-x290" = "תרנגול לבן עומד בשדה ליד מסוק כתום, ואדם עולה במדרגות המסוק."
+"p079-x310" = "תקריב של נטיפי מלח לבנים וחדים התלויים כמו וילון."
+"p089-x332" = "ערוץ מדברי עם צמחייה ירוקה במורד מצוקים בגוני צהוב וחום."
+"p090-x336" = "תצלום שחור־לבן של צעיר בחולצה בהירה, ומתחתיו כמה שורות בכתב יד."
+"p093-x356" = "בולען עגול ומלא מים ירוקים בקרקע חשופה ומלוחה, ושני אנשים עומדים בשפתו."
+"p094-x360" = "מבט מתוך בור חשוך כלפי מעלה אל פתח לא סדיר שמעליו שמיים, עם חותמת תאריך 10 10 2003."
+"p100-x376" = "תקריב של קרקע חולית ואבנים, עם חותמת תאריך 10 10 2003."
+"p101-x380" = "גבר עם שריטה במצח מצלם את עצמו בתוך חלל חשוך, עם חותמת תאריך 10 10 2003."
+"p104-x388" = "חילוץ לילי: אדם בקסדה תלוי בחבלים ממוט חצובה מעל בור, ואנשים עומדים בשפתו."
+"p106-x394" = "בולען גדול ועמוק בקרקע אפורה, ובשפתו הרחוקה מבנים וגדר."
+"p107-x398" = "כביש סדוק ושבור שקרס בשוליו לתוך שקע בקרקע, ליד עמודי חשמל."
+"p108-x402" = "שלט צהוב בעברית ובערבית 'זהירות! אזור בולענים' ומשאית מנוף שמציבה שלט בצד כביש."
+"p109-x406" = "גבישי מלח לבנים בצורת קונוסים מתחת למים ירוקים."
+"p109-x408" = "נטיפי מלח לבנים תלויים מעל מים בצבע כתום־אדום בתוך בולען."
+"p110-x412" = "שלושה איורים בשחור־לבן של דמות קטנה: מציצה מתוך בור, זוחלת בין שני פסים כהים, ומטפסת בין שני קירות."
+"p115-x442" = "כביש מדברי שמוביל אל הרים צהובים, ובאמצעו חור שחור קטן."
+"p115-x444" = "בולען גדול בכביש, עם גושי אספלט שבורים בתוכו ואדם עומד מעבר לו, עם חותמת תאריך 28 10 2003."
+"p116-x450-masked" = "מבט מלמעלה על גשר בטון ומתחתיו ערוץ יבש עם שיחים."
+"p123-x490" = "יריעה גיאוטכנית שחורה ומחוררת מונחת על קרקע עם חצץ, ובה פתח מרובע שנחתך."
+"p125-x500" = "מבט מגובה על חוף ים המלח: רצועות מלח לבנות מתעקלות לאורך המים הטורקיזיים, ורכס הרים באופק."
+
+"p126-x505" = "מפל מים דק יורד על דופן סלע בקניון צר ומצוקים בגוני חום וכתום, ושני אנשים קטנים למטה."
+"p127-x509" = "גבר במשקפי שמש ובחולצה ירוקה בהירה יושב על סלעים, לצד צמחייה ירוקה."
+"p129-x515" = "פרט מפסיפס מפת מידבא: ציורי ערים עם מגדלים ועצי תמר, וכיתוב ביוונית."
+"p129-x517" = "פרט מפסיפס מפת מידבא: חוף מסוגנן עם ציורי מבנים ועצי תמר, וכיתוב ביוונית."
+"p133-x527" = "קטע טקסט מודפס בעברית בכתב ישן, בפתיחה 'לולבי עבר הירדן'."
+"p135-x535" = "תצלום שחור־לבן: סירת מפרש עם שני מפרשים משולשים על מים שקטים, ורכס הרים באופק."
+"p136-x544-masked" = "עוגן עשוי עץ ועופרת מונח על חצץ."
+"p138-x553" = "תצלום שחור־לבן של חורבה: שני קירות אבן מקבילים יורדים במדרון לעבר החוף, ומאחור הרים."
+"p140-x559" = "תצלום שחור־לבן: ספינת מפרש וסירה קטנה על המים, ואנשים בגלימות עומדים ויושבים על החוף."
+"p141-x563" = "תצלום שחור־לבן: חוף עם אנשים וסחורות, ושתי ספינות מפרש עוגנות ליד מזח."
+"p142-x567" = "תצלום שחור־לבן: ספינה מתכתית עם תורן עומדת על החוף, ואנשים עובדים לידה."
+"p143-x571" = "תצלום שחור־לבן: דוברה עם מבנה פתוח מעליה ליד מזח ארוך מעץ."
+"p145-x577" = "שני אנשים עומדים על במת עבודה תלויה ליד קיר סלע אדמדם."
+"p148-x587" = "קבוצת מבקרים עומדת על סלע חצוב גדול עם מדרגות, בין צמחייה וסלעים."
+"p149-x591" = "סלעי חול מעוגלים עם מדרגות חצובות ובורות, וצמחייה ירוקה ביניהם."
+"p151-x597" = "קטע של מדרגות חצובות בסלע בהיר, העולות בין קירות סלע."
+"p151-x599" = "פתח חצוב ועגול בסלע בהיר מעל עשב."
+"p151-x601" = "שרידי מבנים חצובים בסלע בהיר, עם קירות ומשטחים מדורגים."
+"p157-x615" = "קבוצת אנשים יושבת בצל מתחת לסלע גדול ותלוי, ומאחור נוף הרים."
+"p157-x617" = "שני אנשים כורעים ליד במת מתכת עם מוטות וכבלים, על משטח סלע."
+
+"p157-x619" = "חבלים וטבעות מתכת תלויים מול קיר סלע אדמדם, ועליו תבליט שחוק."
+"p159-x626" = "תצלום שחור־לבן של אסטלה בעלת ראש מעוגל: דמות עומדת עם מטה, ומעליה סמלים עגולים."
+"p159-x628" = "תבליט שחוק בתוך מסגרת חצובה בקיר סלע בהיר."
+"p159-x632-masked" = "אסטלת אבן מעוגלת: דמות בגלימה ובכובע גבוה אוחזת מטה, ומעליה סמלים של סהר, כוכב ושמש."
+"p160-x637" = "מבט מרחוק על מצוק סלע בהיר ומחורץ מול שמיים כחולים, ואנשים קטנים עליו ועל במה תלויה."
+"p162-x643" = "סימנים חרוטים ושחוקים על משטח סלע אדמדם."
+"p165-x653" = "קיר סלע אדמדם עם סימנים חרוטים ושחוקים."
+"p167-x661" = "תצלום אוויר של שטח מדברי עם שרידי מבנים וחלקות מרובעות."
+"p168-x665" = "גוש סלע מחורץ בצבע כתום ומאחוריו שרידי קשת אבן בין סלעים."
+"p170-x673" = "דופן של בריכת אגירה בנויה אבן בשטח פתוח עם עשב ירוק."
+"p172-x681" = "קניון בין קירות סלע גבוהים, עם עצי דקל מצד אחד ושמיים כחולים מעליו."
+"p177-x693" = "ערמה גדולה של סיגים שחורים לפני שרידי קירות אבן במדבר."
+"p180-x701" = "גבעה חומה ומסולעת, ואנשים קטנים הולכים עליה."
+"p182-x707" = "קניון צר עם קירות סלע בהירים ומים ירקרקים בתחתיתו."
+"p183-x717-masked" = "כלי רוקחים קרמי לבן עם מכסה וידיות כחולות, ועליו הכיתוב Theriaca Reformata, על רקע שחור."
+"p183-x721-masked" = "כלי רוקחים קרמי לבן עם מכסה וידיות ירוקות, ועליו הכיתוב THERIACA בתוך עיטור צמחי, על רקע אדום כהה."
+"p187-x735" = "מפל מים דק על קיר סלע תלול עם צמחייה, ושני מטפסים קטנים יורדים בחבלים."
+"p188-x741" = "גבר בחולצה כחולה ובמכנסיים קצרים מחזיק חבלים כרוכים, ואנשים נוספים מאחוריו."
+"p189-x745" = "מבט מראש מצוק על חוף ים המלח, מפרצונים ומים כחולים."
+"p191-x751" = "אישה וגבר במשקפי שמש יושבים צמודים ומחייכים, על רקע סלע."
+
+"p192-x755" = "קבוצת אנשים בקסדות לבנות וצהובות יושבת ועומדת בין סלעים בקניון."
+"p193-x759" = "גמלים עם אוכפים במדבר חולי, ושני גברים בכאפייה ובכובע עומדים לידם."
+"p195-x765" = "שורה של עשרה גברים ברתמות טיפוס ועם חבלים, עומדים זה לצד זה במדבר."
+"p196-x769" = "צוות חילוץ בבגדים אדומים נושא אדם על אלונקה עם גלגל במדרון סלעי."
+"p198-x775" = "מחלץ תלוי על כבל מתוח בין שני מצוקים מעל קניון, וברקע מים."
+"p199-x779" = "גבר בחולצה לבנה רוכן מעל שולחן ולוחץ יד לגבר בחליפה, ולצדו שורת אנשים יושבים מאחורי השולחן."
+"p199-x781" = "אישה בחולצה כחולה וגבר בחולצה לבנה אוחזים יחד מגילה מגולגלת ומחייכים."
+"p201-x800" = "מטייל בכובע רחב שוליים, בתרמיל ובמקלות הליכה, צועד על שכבות סלע מוטות במדרון."
+"p202-x806" = "אדם עומד על ראשו על סלע, רגליו באוויר, וליד חבלים מגולגלים."
+"p203-x810" = "אישה בכובע ובמעיל רכובה על גמל, על רקע מדרון מסולע."
+"p205-x816" = "אישה בצעיף יושבת על סלע בערוץ יבש וכותבת במחברת."
+"p209-x833" = "עצי דקל צפופים בערוץ, ואדם עומד על סלעים בהירים לידם."
+"p211-x839" = "עצי דקל בערוץ מתחת למצוקים, ואדם קטן עומד בתחתית."
+"p212-x843" = "קניון צר וגבוה עם קירות כהים וצמחייה, אור חודר מלמעלה ואנשים קטנים הולכים בתחתיתו."
+"p213-x847" = "קיר קניון חלק עם פסים אנכיים בגוני חום, כתום וירוק מעל מים."
+"p215-x853" = "קניון עם מפלים וצמחייה ואנשים קטנים בתחתיתו."
+"p218-x861" = "גבר עומד במים בתוך נקיק צר שקירותיו מעוקלים ופסים כתומים לאורכם."
+"p220-x867" = "נקיק עם קירות סלע מעוגלים ובהירים, ומים ירקרקים בתחתיתו."
+"p223-x875" = "מפל קטן ובריכת מים בין סלעים גדולים ומעוגלים בקניון."
+"p225-x881" = "שני תצלומים צמודים של מפלים על סלעים בצבעי כתום ושחור."
+
+"p229-x896" = "קבוצה גדולה של מבוגרים וילדים מצטלמת יחד בחוץ, בין עצים."
+"p231-x902" = "קבוצת אנשים עומדת ויושבת מסביב לשולחן עם מפה צבעונית ליד בית."
+"p233-x908" = "גבר בחולצה לבנה עומד על מדרון מעל ים המלח ומסביר בתנועות ידיים, ואנשים יושבים מולו."
+"p234-x914" = "דיוקן: גבר מקריח עם זקן קצר בקפוצ'ון כחול, מחייך, ליד רכב לבן."
+"p235-x918" = "קבוצת מבוגרים מצטלמת יחד בשטח מדברי, חלקם כורעים בשורה הקדמית."
+"p235-x920" = "קבוצת מבוגרים מצטלמת יחד מול קיר מצויר בגרפיטי צבעוני."
+"p236-x924" = "קבוצת מטיילים עומדת למרגלות קיר סלע בהיר עם מערה, ואחדים מטפסים עליו."
+"p237-x929" = "מבט מראש מצוק אל ערוץ עם עצי דקל, ומעבר לו מי ים המלח הכחולים."
+"p238-x935" = "מטיילים עם תרמילים הולכים בקניון בין קירות סלע אדמדמים, וגמלים מאחוריהם."
+"p239-x939" = "מבט מגובה על מי ים המלח הכחולים, ובתוכם כתם גדול של מי שיטפון חומים־צהבהבים, מול הרים."
+"p245-x955" = "מפל חום ועכור יורד בעוצמה על דופן סלע מכוסה צמחייה ירוקה."
+"p248-x963" = "טנדר לבן קבור חלקית באבנים ובבוץ בערוץ אחרי שיטפון."
+"p249-x967" = "גשר בטון שקרס, ומעקה הגשר מתעקם מעל הערוץ שנסחף מתחתיו."
+"p249-x969" = "שרידי גשר שבור בערוץ, עם גושי בטון סדוקים."
+"p251-x975" = "שני אנשים צפים על הגב במי ים המלח הצלולים, ואחד מהם קורא עיתון."
+"p254-x982" = "תצלום שחור־לבן של שלט פרסומת בעברית ובאנגלית: 'אל תחמיץ את החוויה – תפוס רחצה בחמי עין גדי', ועליו דמות מצוירת בכובע ובמשקפיים."
+"p255-x987" = "גבישי מלח לבנים מסולסלים לחוף, מים כהים ביניהם, והר מאחור תחת שמיים כחולים."
+"p256-x993" = "מטייל הולך בערוץ סלעי לצד שיחי הרדוף בפריחה ורודה, מתחת לרכס תלול."
+"p257-x997" = "שטח רחב של סלעים עגולים בהירים, דמויי כדורים, למרגלות רכס מדברי."
+"p258-x1001" = "צללית של פסל עשוי אבנים עגולות זו על זו, מול שקיעה כתומה, עם הכיתוב ARAD וערד."
+
+"p259-x1005" = "גבעה לבנה ומעוגלת מעל מדרונות בהירים, ואנשים קטנים עומדים בראשה, ומאחור ים המלח."
+"p260-x1011" = "מבט מגובה על שפך נחל: רצועת מים חומים־צהבהבים נכנסת לים המלח הכחול, וקשת בענן באופק."
+"p261-x1015" = "ארבעה גברים מרוחים בבוץ אפור עומדים בתוך מתקן בטון ומורחים זה את זה."
+"p263-x1025-masked" = "ערוץ רחב בין מדרונות בהירים ומחורצים של סלע רך."
+"p263-x1027" = "מדרונות מדורגים בפסים אופקיים בגוני חום ואדום יורדים אל חוף ים המלח, ומבנים קטנים לחוף."
+"p265-x1044" = "נוף של תלוליות ומצוקים לבנים ומחורצים של סלע רך, עם גומות ובורות, ורכס באופק."
+"p267-x1052" = "קיר סלע בפסים אופקיים בגוני אדום וחום, עם סדק אנכי ממולא."
+"p267-x1054" = "פתח מנהרה בתוך סדק אנכי בקיר סלע בהיר, שלט אזהרה, ואנשים יושבים לפניו."
+"p268-x1058" = "תקריב של שכבות סלע דקות ומקומטות בגוני אפור, לבן וירוק."
+"p270-x1066" = "קיר סלע בהיר ובו שכבות מקומטות בכיוונים מנוגדים."
+"p275-x1087" = "תצלום מיקרוסקופ: תאים ירוקים מוארכים עם שני שוטונים, על רקע תכלת."
+"p291-x1130" = "מפל מים חומים ועכורים יורד מצוק גבוה בגוני חום, ועץ ירוק בתחתיתו."
+"p292-x1134" = "מפה משורטטת ביד בגרמנית: עמק הירדן וים המלח מהכנרת עד הים, עם קווי מוביל ונקודות גובה, ובראשה רשימה ממוספרת של קטעי תוכנית."
+"p293-x1140" = "כרזת סרט בשם 'תעלת בלאומילך' (Big Dig) של אפרים קישון: גבר עם פטיש אוויר ברחוב עירוני ליד רכבים."
+"p298-x1159" = "חמישה אנשים בחליפות עומדים מאחורי שולחן ומציגים מסמכים חתומים, מול קיר עם סמל."
+"p316-x1379" = "מבט מגובה על מפרץ במי ים המלח הטורקיזיים, ובו כתם גדול בצבע חום־כתום, בין מצוקים צהבהבים תחת שמיים מעוננים וכהים."
+
+# Targets of the printed QR codes, decoded locally from the images (OpenCV 4.14). The image becomes a link.
+[qr_links]
+"p078-qr1" = "https://www.youtube.com/watch?v=_ptomIUGz78&t=235s"
+"p078-qr2" = "https://www.youtube.com/watch?v=T05e1rQwm_M&t=321s"
+"p078-qr3" = "https://www.youtube.com/watch?v=1yUAmm-NTXs&t=53s"
+"p078-qr4" = "https://www.youtube.com/watch?v=9BM5qcA22kY&t=672s"
+"p166-qr1" = "https://files.ybz.org.il/periodicals/Cathedra/101/Article_101.2.pdf?_gl=1*q194nn*_gcl_au*MzM2MzA3NjcuMTc3NTQ5NzA2Ng"
+"p234-qr1" = "https://www.youtube.com/watch?v=yfMGHdqRdJs&t=7s"
+
+# Public (release) edition only: uv run tools/ingest_pdf.py CONTENT_DIR --release.
+# The complete edition keeps every printed image. Evidence for each entry: clearance record of 2026-11-24.
+# Images that stay carry an edition credit with the source record and the licence. All of them are crops of the source.
+
+[[release.change]]
+image = "p066-x251"
+action = "replace"
+file = "replacements/p066-x251-open-map.jpg"
+alt = "מפת תבליט מדושנבה ועד פסגת לנין: קו מקווקו של טיסה מדושנבה למנחת בג'ירגיטל, וקו מנוקד של מסוק משם אל מחנה הבסיס באצ'יקטש שבעמק אלאי, מצפון לרכס טרנס־אלאי ולגבול טג'יקיסטן וקירגיזסטן. במפה מוגדלת שמתחת: מחנה הבסיס, המחנה הראשון, המחבת שבה אירע האסון ופסגת לנין, בין קרחונים, עם קנה מידה של 2 ק\"מ. בפינה מפת התמצאות של מרכז אסיה."
+note = "מפה חלופית חדשה למהדורה זו. מקומות, מחנות וקרחונים: OpenStreetMap (רישיון ODbL). גבולות ונהרות: Natural Earth (נחלת הכלל). תבליט: Copernicus DEM (האיחוד האירופי ו־ESA). קווי הטיסה והמסוק ישרים וסכמטיים. המפה המודפסת אינה נכללת עד לבירור זכויותיה."
+reason = "Printed map looks like a Google Maps screenshot without attribution. Replacement drawn by scripts/pamir_map.py from OSM, Natural Earth and Copernicus DEM; sources in the script and in site/figure-maps/fig-a10-02.json."
+
+[[release.change]]
+image = "p183-x717"
+action = "withhold"
+note = "התמונה (כלי רוקחים עם הכיתוב Theriaca Reformata) הוסרה זמנית ממהדורה זו, עד לבירור זכויותיה."
+reason = "No source found among 411 Commons candidates."
+
+[[release.change]]
+image = "p301-x1169"
+action = "replace"
+file = "replacements/p301-x1169-open-map.jpg"
+alt = "מפת תבליט מעקבה ועד עמאן ומהים התיכון ועד מדבר ירדן: קו רצוף של מי ים סוף מעקבה צפונה לאורך הערבה בצד הירדני אל מתקן התפלה בקרבת ים המלח, המסומן בעיגול מקווקו כמיקום משוער; קו כפול של מי ים ורכז מהמתקן אל ים המלח; וקו מקווקו של מים מותפלים מהמתקן לעמאן. מקרא עם הכמויות של שלב א': 500, 400 ו־100 מלמ\"ש, וקנה מידה של 50 ק\"מ."
+note = "מפה סכמטית חדשה שצוירה למהדורה זו לפי הטקסט בפרק. היא אינה האיור של ביין וחובריו (2020), שאינו נכלל עד לקבלת רשות מבעלי הזכויות. התוואי ומיקום מתקן ההתפלה משוערים. מקומות וים המלח: OpenStreetMap (רישיון ODbL). גבולות: Natural Earth (נחלת הכלל). תבליט: Copernicus DEM (האיחוד האירופי ו־ESA)."
+reason = "Printed figure (Bein et al. 2020 on a satellite base map) is not cleared. New schematic map from the book text (a36-p044, a36-p045, a36-p048, caption of fig-a36-09) by scripts/jordan_maps.py."
+
+[[release.change]]
+image = "p302-x1173"
+action = "replace"
+file = "replacements/p302-x1173-open-view.jpg"
+alt = "מבט תלת־ממדי מדרום־מערב לכיוון צפון־מזרח על רמת המדבר הירדני: בפינה השמאלית התחתונה בריכות האידוי בדרום ים המלח, מעליהן מצוק הבקע. על שפת הרמה עוברת דרך המלך (כביש 35) דרך טפילה וכרכ, ומאחוריה, ברמה, הכביש המדברי (כביש 15) דרך אל־חסא וקטרנה, שלאורכו עובר מוביל דיסי–עמאן. חץ אדום מצביע צפונה לעמאן."
+note = "מבט חדש שצויר למהדורה זו מנתונים פתוחים, במקום תצלום Google Earth שאינו נכלל. הגבהים מוגדלים פי 2. כבישים ויישובים: OpenStreetMap (רישיון ODbL). תבליט: Copernicus DEM (האיחוד האירופי ו־ESA). מוביל דיסי–עמאן עובר בתחום הדרך של הכביש המדברי, לפי סקר ההשפעה על הסביבה של המוביל (Consolidated Consultants, 2008). במבט זה הכביש המדברי, 'הנתיב האופקי' שבכיתוב, עובר באלכסון. תוואי החלופות שבתצלום המקורי אינם מוצגים."
+reason = "Google Earth print use needs Google plus the imagery providers next to the image; the print shows only 'Google' and the providers cannot be recovered. New perspective view by scripts/jordan_maps.py from OSM and Copernicus DEM."
+
+[[release.credit]]
+image = "p034-x147"
+text = "מקור: זאב שטיין, פיקיויקי. רישיון CC BY 2.5 IL. התמונה חתוכה."
+links = [{ label = "רשומת המקור", url = "https://www.pikiwiki.org.il/image/view/81831" },
+         { label = "הרישיון", url = "https://creativecommons.org/licenses/by/2.5/il/" }]
+
+[[release.credit]]
+image = "p035-x151"
+text = "מקור: מיכל כוכבא, פיקיויקי, דרך ויקישיתוף. רישיון CC BY 2.5. התמונה חתוכה."
+links = [{ label = "רשומת המקור", url = "https://commons.wikimedia.org/wiki/File:PikiWiki_Israel_37805_Sinkhole_at_The_Dead_Sea.jpg" },
+         { label = "הרישיון", url = "https://creativecommons.org/licenses/by/2.5/" }]
+
+[[release.credit]]
+image = "p049-x201"
+text = "המפה: Jesse Ames Spencer, 1848, מוקטנת ממפת לוטננט לינץ'; חריטה: N. Orr. פורסמה ב־1852 בספרו של ספנסר The East (George P. Putnam). הספרייה הלאומית, אוסף ערן לאור. נחלת הכלל. התמונה חתוכה."
+links = [{ label = "רשומת המקור", url = "https://www.nli.org.il/en/maps/NNL_ALEPH990039420770205171/NLI" }]
+
+[[release.credit]]
+image = "p183-x713"
+text = "כלי לתריאק, איטליה, 1641. Wellcome Collection, רישיון CC BY 4.0. התמונה חתוכה."
+links = [{ label = "רשומת המקור", url = "https://commons.wikimedia.org/wiki/File:Albarello_vase_for_theriac,_Italy,_1641_Wellcome_L0057175.jpg" },
+         { label = "הרישיון", url = "https://creativecommons.org/licenses/by/4.0/" }]
+
+[[release.credit]]
+image = "p183-x721"
+text = "צילום: Jebulon, ויקישיתוף. נחלת הכלל. התמונה חתוכה."
+links = [{ label = "רשומת המקור", url = "https://commons.wikimedia.org/wiki/File:Th%C3%A9riaque1.jpg" }]
+
+[[release.credit]]
+image = "p270-x1066"
+text = "צילום: Shayshal2, ויקישיתוף. רישיון CC BY-SA 4.0. התמונה חתוכה, והגרסה החתוכה מופצת באותו רישיון."
+links = [{ label = "רשומת המקור", url = "https://commons.wikimedia.org/wiki/File:Lisan_formation_in_Pratzim_river_3.jpg" },
+         { label = "הרישיון", url = "https://creativecommons.org/licenses/by-sa/4.0/" }]
+
+[[release.credit]]
+image = "p275-x1087"
+text = "צילום: CSIRO. רישיון CC BY 3.0. התמונה חתוכה."
+links = [{ label = "רשומת המקור", url = "https://www.scienceimage.csiro.au/image/7595/" },
+         { label = "הרישיון", url = "https://creativecommons.org/licenses/by/3.0/" }]

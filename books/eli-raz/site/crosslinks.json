@@ -1,0 +1,21 @@
+{
+ "links": [
+  {"element": "a09-p011", "text": "'מצוקי דרגות' (ראו מאמר בספר זה)", "target": "a20-h"},
+  {"element": "a10-p003", "text": "'חזור למקום ממנו באת'", "target": "a09-h"},
+  {"element": "a10-p029", "text": "'חבר מעולם אחר'", "target": "a11-h"},
+  {"element": "a14-p008", "text": "'מורל ועט ונייר טואלט'", "target": "a13-h"},
+  {"element": "a14-p013", "text": "'אגם הלשון נגד הר סדום'", "target": "a34-h"},
+  {"element": "a14-p024", "text": "'השתוללות איתני הטבע'", "target": "a31-h"},
+  {"element": "a22-p013", "text": "'אסון הר פאמיר'", "target": "a10-h"},
+  {"element": "a22-p017", "text": "'מורל, עט ונייר טואלט'", "target": "a13-h"},
+  {"element": "a27-p008", "text": "'פונון: מנגד לערבה התיכונה'", "target": "a18-h"},
+  {"element": "a27-p039", "text": "'סלע אדום'", "target": "a17-h"},
+  {"element": "a29-p007", "text": "ראו בהמשך", "target": "a33-h"},
+  {"element": "a34-p018", "text": "'בולענים ואמצעי מניעה'", "target": "a14-h"},
+  {"element": "a35-p038", "text": "'ים המלח - לאן?'", "target": "a36-h"},
+  {"element": "a35-p048", "text": "'ים המלח - לאן?'", "target": "a36-h"},
+  {"element": "a36-p009", "text": "'בולענים ואמצעי מניעה'", "target": "a14-h"},
+  {"element": "a36-p042", "text": "'בולענים ואמצעי מניעה'", "target": "a14-h"},
+  {"element": "a36-p063", "text": "'האקולוגיה של ים המלח'", "target": "a35-h"}
+ ]
+}

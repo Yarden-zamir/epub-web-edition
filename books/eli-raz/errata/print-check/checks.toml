@@ -1,0 +1,307 @@
+# Print check of each errata entry (test agent, 2026-11-24).
+# One [rows.N] table per row of errata/ERRATA.md (rows 68-70 are the "Not print errors" bullets, in list order).
+# verdict: "in print" | "conversion error" | "unclear"
+# shows: what the crop shows, when it is more than "the quoted text, unchanged".
+# printed: the printed text, only when it differs from the quote in ERRATA.md.
+# explanation: one or two plain sentences for the web errata page.
+# Build print-check.md and errata.json from this file: uv run errata/print-check/build.py
+
+[rows.1]
+verdict = "in print"
+explanation = "Leviticus 2 has only 16 verses. The salt-of-the-covenant verse is Leviticus 2:13."
+
+[rows.2]
+verdict = "in print"
+explanation = "The King James Version reads \"shalt thou season with salt\"."
+
+[rows.3]
+verdict = "in print"
+explanation = "Typo: \"form\" for \"from\"."
+
+[rows.4]
+verdict = "in print"
+explanation = "Tekoa lies about 8 km south of Bethlehem, on the road to Hebron. It is not south of Hebron."
+
+[rows.5]
+verdict = "in print"
+explanation = "Aristotle lived in the 4th century BC, about 2,300 years before the 1930s."
+
+[rows.6]
+verdict = "in print"
+explanation = "In Röhricht's Regesta (1893), the 1138 charter on the salt and bitumen of Tekoa is no. 174. No. 173 is a Templar charter."
+
+[rows.7]
+verdict = "in print"
+shows = "\"מבול בשלושה\" at the end of one line and \"במאי\" at the start of the next."
+explanation = "The same article dates the flood to 2 May 2001 two times. The Israel Meteorological Service records it on the night of 1-2 May 2001."
+
+[rows.8]
+verdict = "in print"
+shows = "\"של ה–3 במאי\". The dash is the Hebrew font's hyphen; the PDF text layer stores U+002D."
+explanation = "The same paragraph dates the flood to 2 May. The Israel Meteorological Service agrees."
+
+[rows.9]
+verdict = "in print"
+shows = "\"דברים יד, 13–14:\" (read right to left). The text layer stores \"14-13\", which displays the same way in a right-to-left line."
+explanation = "The quoted verses (\"והיה אם שמע תשמעו … יורה ומלקוש\") are Deuteronomy 11:13-14. Deuteronomy 14:13-14 lists unclean birds."
+
+[rows.10]
+verdict = "in print"
+explanation = "The final yod is missing. The same chapter prints \"המועדון האלפיני הישראלי\"."
+
+[rows.11]
+verdict = "in print"
+shows = "\"בן אוויס 1345 מ׳\"."
+explanation = "The 1,345 m peak in Scotland, the highest in the British Isles, is Ben Nevis (בן נוויס)."
+
+[rows.12]
+verdict = "in print"
+explanation = "Komodo is in Indonesia (אינדונזיה)."
+
+[rows.13]
+verdict = "in print"
+explanation = "Arnold von Harff travelled in 1496-1499, in the 15th century. That is still the Mamluk period, so the bracket stays true."
+
+[rows.14]
+verdict = "in print"
+explanation = "The Czech explorer of Edom is Alois Musil (1868-1944)."
+
+[rows.15]
+verdict = "in print"
+explanation = "The site is Khirbat en-Nahas. The book prints \"ח'רבת א-נחאס\" in all 8 other places."
+
+[rows.16]
+verdict = "in print"
+explanation = "The book cites the same paper as Bodaker et al. 2010 in another paragraph and in the bibliography (ISME Journal 4: 399-407)."
+
+[rows.17]
+verdict = "in print"
+explanation = "Oren 1983 in Limnology and Oceanography 28(1) is on pages 33-41."
+
+[rows.18]
+verdict = "in print"
+explanation = "Two letters are swapped. The year 1938 is 5698, written תרצ\"ח."
+
+[rows.19]
+verdict = "in print"
+explanation = "Begin, Ehrlich and Nathan 1974 is Geological Survey of Israel Bulletin 63. GSA Bulletin 116: 555-571 is a different paper from 2004."
+
+[rows.20]
+verdict = "in print"
+explanation = "A rise from about 600 million m³ to \"about a million\" is impossible. The government target for 2030 is 1,100 million m³ a year."
+
+[rows.21]
+verdict = "in print"
+explanation = "The engineering firm is Coyne et Bellier."
+
+[rows.22]
+verdict = "in print"
+explanation = "The engineering firm is Coyne et Bellier."
+
+[rows.23]
+verdict = "in print"
+shows = "\"בני, דב,\" at the end of one line and \"גדי ויוקי\" at the start of the next."
+explanation = "The climber who died was Gabi Manobla, and the same chapter prints \"גבי מנובלא\". The text is Eli's memoir, so the family decides."
+
+[rows.24]
+verdict = "in print"
+shows = "The quote wraps over two lines."
+explanation = "The story is set in 1990. The Israeli rescue team went to Armenia in December 1988, and the rescue mission to Turkey was in 1999. The family decides."
+
+[rows.25]
+verdict = "in print"
+explanation = "The same Alps trip is dated 1981 in one chapter and 1982 in another. No outside source settles it, so the family decides."
+
+[rows.26]
+verdict = "in print"
+explanation = "The \"Frying Pan\" camp on Lenin Peak is at about 5,200-5,300 m, not 3,005 m. Sources differ on the exact height."
+
+[rows.27]
+verdict = "in print"
+shows = "The quote wraps over two lines; the \"…\" stands for \"German geologist Max\"."
+explanation = "Sultan Abdul Hamid II invited and funded Blanckenhorn's expedition, as another chapter of the book says. A fix needs a new wording of the clause."
+
+[rows.28]
+verdict = "in print"
+explanation = "Lartet worked on the Lisan peninsula in 1864. 1869 is the year of his publication."
+
+[rows.29]
+verdict = "in print"
+explanation = "The title of that article in the book is \"חזור למדבר ממנו באת\"."
+
+[rows.30]
+verdict = "in print"
+explanation = "The title of that article in the book is \"המערכת האקולוגית של ים המלח\"."
+
+[rows.31]
+verdict = "in print"
+shows = "\"(7373 מ״ר)\". The four digits sit edge to edge (each 5.28 pt wide, no gap), and the text layer holds no unmapped glyph between them. The \"×\" is missing in the print itself, not in our conversion."
+explanation = "The fortress measures 73 × 73 m (about 5,300 m²). The print lost the \"×\" sign, and the unit also needs a change."
+
+[rows.32]
+verdict = "in print"
+explanation = "Bennett's earliest Edomite finds at Umm al-Biyara are about a century later than Amaziah, not earlier. A later paragraph of the same article agrees."
+
+[rows.33]
+verdict = "conversion error"
+printed = "פורסם בקתדרה 101, 2002"
+shows = "\"פורסם בקתדרה 101, 2002.\" The text layer stores \",101\" to the right of \".2002\"; our text reverses the two numbers and drops the space (\"2002,101\"). The year 2002 is printed, so the question about the year stays open."
+explanation = "Cathedra issue 101 is dated October 2001, not 2002."
+
+[rows.34]
+verdict = "in print"
+explanation = "The distance from Sela to Hatzeva is 19 km in one chapter and 28 km in another. By coordinates it is about 31 km."
+
+[rows.35]
+verdict = "in print"
+explanation = "Sela is about 3 km north-west of Busayra, not 5 km north-east."
+
+[rows.36]
+verdict = "in print"
+explanation = "Kibbutz Ein Gedi was founded in 1953-1956. The sentence may mean that the dispute began in the 1960s."
+
+[rows.37]
+verdict = "in print"
+explanation = "Amram Mitzna was head of Central Command in 1987-1989, but the text sets the story in the 1970s."
+
+[rows.38]
+verdict = "in print"
+explanation = "The 1958 Independence Day parade was in Jerusalem; Haifa held the parade in 1953, 1956, 1960 and 1963. The right year of the photo is not known."
+
+[rows.39]
+verdict = "in print"
+explanation = "The Degania Dam gates also opened in 1969, 1993 and 1995, so \"first and last time\" is not correct."
+
+[rows.40]
+verdict = "in print"
+explanation = "The published peak for 1964 is up to 40 thousand cells per ml. The book cites Oren 2008, which was not checked."
+
+[rows.41]
+verdict = "in print"
+explanation = "Herzl was born in 1860, so the letters cannot start in 1809. The range is probably 1899-1901, not confirmed."
+
+[rows.42]
+verdict = "in print"
+explanation = "The 1994 decision was Decision 1631 of the California State Water Resources Control Board. The court ruling was in 1983."
+
+[rows.43]
+verdict = "in print"
+explanation = "The bottom is at about −728 m and the surface at about −441 m, so the water depth is about 287 m. The sentence around it is also garbled."
+
+[rows.44]
+verdict = "in print"
+explanation = "The book dates the same report 2011 in other places. World Bank reports date it 2013-2014."
+
+[rows.45]
+verdict = "in print"
+explanation = "2019 cannot follow a signing in 2021. The 300 and 65 million m³ figures belong to the Israel-Jordan agreement of February 2015."
+
+[rows.46]
+verdict = "in print"
+explanation = "Other paragraphs of the same chapter date the World Bank study from 2005 and the final report 2011."
+
+[rows.47]
+verdict = "in print"
+shows = "Page 306: \"מסמך מדיניות ארוכת טווח (2020)\". Page 307: \"ארוכת טווח' מינואר 2020\"."
+explanation = "The same long-term policy document is dated 2022 in three other paragraphs and in the bibliography."
+
+[rows.48]
+verdict = "in print"
+explanation = "Other citations of the same report give 1998. The known reports are a 1996 draft and a final report of February 1998."
+
+[rows.49]
+verdict = "in print"
+shows = "Page 276 (a35-p006): \"(Steinhorn, 1983)\". Page 305 (a36-p063): \"(Steinhorn 1983)\", without the comma; our text agrees with the print there."
+explanation = "The bibliography lists only Steinhorn 1981. A 1983 paper exists, so the bibliography may lack it."
+
+[rows.50]
+verdict = "in print"
+shows = "\"כיהן בשנים 1950\" at the end of one line and \"עד 1955 כמרצה בטכניון\" at the start of the next."
+explanation = "Lowdermilk was in Israel in 1951-1957 and taught at the Technion from about 1953-1955 to 1957."
+
+[rows.51]
+verdict = "in print"
+explanation = "The final pagination is volume 6, Suppl 5, pp. S575-S585. \"pp. 1–11\" may be the online-first version."
+
+[rows.52]
+verdict = "in print"
+shows = "\"הגובה הוא 428–.\" and \"לינטש: 394– מטרים\": the minus sign (U+2212) prints directly left of the digits. Our text has a space between the number and the minus sign; the numbers and signs agree."
+explanation = "Symonds (1841) measured 1,312 ft (about 400 m) and Lynch (1848) 1,316 ft (about 401 m). The author may use another source."
+
+[rows.53]
+verdict = "in print"
+explanation = "Musil did his field work in 1896-1902. 1907 is the year of his book Arabia Petraea."
+
+[rows.54]
+verdict = "in print"
+shows = "\"הגדולה\" at the end of one line and \"שבהן הוא 5.7 ק״מ\" at the start of the next."
+explanation = "This was true for the old survey. Malham Cave measured about 10 km in 2019, so an update note is possible."
+
+[rows.55]
+verdict = "in print"
+explanation = "The first record of fungi in the Dead Sea is Buchalo et al. 1998, as another paragraph says. The bibliography has only the 2000 work, two times."
+
+[rows.56]
+verdict = "in print"
+explanation = "One weak source gives 1976 for Mitzpe Shalem. This is an eyewitness memoir."
+
+[rows.57]
+verdict = "in print"
+explanation = "Lenin Peak is 7,134 m high. This is a round figure in a memoir."
+
+[rows.58]
+verdict = "in print"
+explanation = "43 climbers died. \"About fifty\" is a round figure."
+
+[rows.59]
+verdict = "in print"
+explanation = "The title of that article is \"מורל, עט ונייר טואלט\". Only the punctuation differs."
+
+[rows.60]
+verdict = "in print"
+explanation = "The Hebrides. This is a spelling of the name, not a factual error."
+
+[rows.61]
+verdict = "in print"
+shows = "Page 146 (a17-p010): \"(555–539 לפנה״ס)\". Page 156 (a17-p036): \"(539–555 לפנה״ס)\", the two years in the other order; our text agrees with the print in both places."
+explanation = "Nabonidus usually reigned 556-539 BC, but 555 also appears in the literature."
+
+[rows.62]
+verdict = "in print"
+explanation = "The author chose these verse ranges."
+
+[rows.63]
+verdict = "in print"
+explanation = "The literature gives 1817 or 1819 for Gay-Lussac's analysis. The year is not settled."
+
+[rows.64]
+verdict = "in print"
+explanation = "The Burj Formation is Middle Cambrian, about 510 million years old. 550 is the author's round figure."
+
+[rows.65]
+verdict = "in print"
+explanation = "Dioptase is a separate mineral from chrysocolla. This is a simplification."
+
+[rows.66]
+verdict = "in print"
+explanation = "The figure may be a road distance."
+
+[rows.67]
+verdict = "in print"
+explanation = "The arithmetic differs from his own scenario, but this is a diary written in the pit."
+
+[rows.68]
+verdict = "conversion error"
+printed = "54. Ehrenberg, C.G. מובא אצל אורן, א., (2008). חיים בים־המלח – עבר, הווה ועתיד. מלח הארץ 3, הוצ' מגנס, האוניברסיטה העברית בירושלים, עמ' 72."
+shows = "Entry 53 (Coyn and Bellier) ends with \"p. 3.\" Entry 54 starts a new line: \"Ehrenberg, C.G.\", cited through Oren 2008. Our sources-p060 merges the two entries and moves \"54.\" into the middle. The print gives no year for Ehrenberg, so \"lost its data\" is not a print fault."
+explanation = "In print, entry 54 is a separate entry: Ehrenberg, cited through Oren 2008. Our conversion merged it into entry 53."
+
+[rows.69]
+verdict = "in print"
+shows = "\"30. C. B., Smith, N. G.,Ben-Yosef, E., Robinson\" and nothing more, before the next heading. The print itself has the broken entry."
+explanation = "The printed bibliography has this broken entry: part of the author list only, with no title or year."
+
+[rows.70]
+verdict = "in print"
+shows = "\"39. וינברג, ר. ובגין, ב\"ז, 'מה ראתה אשת לוט? …'. מלח הארץ 1, עמ' 1–18.\" with no year. The print itself has no year."
+explanation = "The printed entry has no year. The text cites Weinberger and Begin 2005."

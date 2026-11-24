@@ -1,0 +1,352 @@
+{
+  "figure": "fig-a07-09",
+  "title": "ים המלח אז והיום",
+  "image": "site/media/spencer-1848-map.jpg",
+  "size": [
+    1063,
+    1663
+  ],
+  "corners": {
+    "nw": [
+      31.778593713721484,
+      35.23240918045933
+    ],
+    "ne": [
+      31.739946147524215,
+      35.7100437957641
+    ],
+    "sw": [
+      31.112142833384933,
+      35.23306659072098
+    ]
+  },
+  "method": "Affine least-squares fit on 5 land landmarks; residuals 0.15-1.13 km. The printed graticule is about 10 km off and was not used.",
+  "control_points": [
+    {
+      "name": "Callirrhoe / Ayn al-Zara",
+      "pixel_full_scan": [
+        808,
+        660
+      ],
+      "latlon": [
+        31.597,
+        35.5593
+      ],
+      "source": "https://www.wikidata.org/wiki/Q11910919"
+    },
+    {
+      "name": "Arnon / Wadi Mujib",
+      "pixel_full_scan": [
+        835,
+        1025
+      ],
+      "latlon": [
+        31.4658,
+        35.5733
+      ],
+      "source": "https://www.wikidata.org/wiki/Q2120208"
+    },
+    {
+      "name": "Ain Jiddy / Ein Gedi",
+      "pixel_full_scan": [
+        452,
+        1062
+      ],
+      "latlon": [
+        31.4667,
+        35.3944
+      ],
+      "source": "https://www.wikidata.org/wiki/Q1011544"
+    },
+    {
+      "name": "Masada",
+      "pixel_full_scan": [
+        345,
+        1407
+      ],
+      "latlon": [
+        31.3156,
+        35.3539
+      ],
+      "source": "https://www.wikidata.org/wiki/Q186312"
+    },
+    {
+      "name": "Kerak",
+      "pixel_full_scan": [
+        1127,
+        1689
+      ],
+      "latlon": [
+        31.1806,
+        35.7014
+      ],
+      "source": "https://www.wikidata.org/wiki/Q844694"
+    }
+  ],
+  "crop_in_full_scan": [
+    82,
+    294,
+    1144,
+    1956
+  ],
+  "credit": {
+    "text": "Jesse Ames Spencer, Sketch map of the Dead Sea reduced from that of Lieut. Lynch, 1848 (published 1852). National Library of Israel, Eran Laor Cartographic Collection. Public domain.",
+    "url": "https://commons.wikimedia.org/wiki/File:Jesse_Ames_Spencer,_Sketch_map_of_the_Dead_Sea_reduced_from_that_of_Lieut._Lynch._U.S.N._1848_(FL45605182_3942077).jpg"
+  },
+  "levels": {
+    "today": {
+      "value": -441.53,
+      "date": "2026-11-01",
+      "source": "site/data/dead-sea-level.json"
+    },
+    "then": {
+      "value": -401.3,
+      "date": "1848-05",
+      "label": "1,316.7 feet below the Mediterranean, measured by spirit levelling, 8-29 May 1848",
+      "source": "W. F. Lynch, Official Report of the United States Expedition to Explore the Dead Sea and River Jordan, Baltimore 1852, p. 43",
+      "url": "https://archive.org/details/OfficialReportOfTheUSExpedition"
+    },
+    "middle": {
+      "value": -392,
+      "date": "1938-04",
+      "label": "M.W.L. (−) 392 Metres, April 1938, printed in the sea on the 1945 sheet",
+      "source": "Survey of Palestine, 1:100,000 Palestine, sheet 13 Dead Sea, revised June 1945",
+      "url": "https://commons.wikimedia.org/wiki/File:Survey_of_Palestine,_Dead_Sea_(FL60505868_3809558).jpg"
+    }
+  },
+  "fallback": "The top-level image, corners, control points and credit describe the Spencer sheet (1370 px). Show it when the layers cannot load.",
+  "layers": [
+    {
+      "id": "lynch-1849",
+      "role": "then",
+      "label": "1848: מפת הסקר של לינץ'",
+      "date": "1848",
+      "image": "site/media/then-now/lynch-1849.webp",
+      "size": [
+        2509,
+        4817
+      ],
+      "bytes": 941654,
+      "bounds": [
+        [
+          30.986815,
+          35.216429
+        ],
+        [
+          31.836195,
+          35.73482
+        ]
+      ],
+      "projection": "EPSG:3857, north up; place with bounds (L.imageOverlay)",
+      "load": "on-open",
+      "method": "Affine least-squares fit, full-scan pixel to longitude and latitude, on 6 land landmarks with Wikidata coordinates; residuals 0.25-2.12 km (RMS 1.22 km). The 1848 sketch is less accurate south of the Lisan: the unfitted check point Safieh is 6.6 km off. Scan cropped to the printed frame, halved, warped to Web Mercator at 23 m.",
+      "control_points": [
+        {
+          "name": "Ain el Feshkhah / Ein Feshkha",
+          "pixel_full_scan": [
+            2395,
+            1595
+          ],
+          "latlon": [
+            31.714444,
+            35.453333
+          ],
+          "source": "https://www.wikidata.org/wiki/Q405816",
+          "residual_km": 1.08
+        },
+        {
+          "name": "W. Zerka Main, Callirrhoe / Ayn al-Zara",
+          "pixel_full_scan": [
+            3650,
+            2545
+          ],
+          "latlon": [
+            31.597,
+            35.559306
+          ],
+          "source": "https://www.wikidata.org/wiki/Q11910919",
+          "residual_km": 2.12
+        },
+        {
+          "name": "Ain Jidy / Ein Gedi",
+          "pixel_full_scan": [
+            1930,
+            4625
+          ],
+          "latlon": [
+            31.466667,
+            35.394444
+          ],
+          "source": "https://www.wikidata.org/wiki/Q1011544",
+          "residual_km": 0.95
+        },
+        {
+          "name": "W. el Mojeb, Arnon / Wadi Mujib",
+          "pixel_full_scan": [
+            3745,
+            4445
+          ],
+          "latlon": [
+            31.465833,
+            35.573333
+          ],
+          "source": "https://www.wikidata.org/wiki/Q2120208",
+          "residual_km": 1.05
+        },
+        {
+          "name": "Sebbeh, Masada",
+          "pixel_full_scan": [
+            1528,
+            6266
+          ],
+          "latlon": [
+            31.315556,
+            35.353889
+          ],
+          "source": "https://www.wikidata.org/wiki/Q186312",
+          "residual_km": 1.11
+        },
+        {
+          "name": "Kerak / Kerak Castle",
+          "pixel_full_scan": [
+            5180,
+            7634
+          ],
+          "latlon": [
+            31.180556,
+            35.701389
+          ],
+          "source": "https://www.wikidata.org/wiki/Q844694",
+          "residual_km": 0.25
+        }
+      ],
+      "check_points": [
+        {
+          "name": "Safieh / Al Safi",
+          "pixel_full_scan": [
+            3272,
+            8893
+          ],
+          "latlon": [
+            31.036904,
+            35.487657
+          ],
+          "source": "https://www.wikidata.org/wiki/Q27125336",
+          "offset_km": 6.56
+        }
+      ],
+      "crop_in_full_scan": [
+        175,
+        270,
+        5360,
+        9920
+      ],
+      "credit": {
+        "text": "W. F. Lynch, Sketch Map of the Dead Sea from the observations of the U.S. Expedition, 1848. National Library of Israel, Eran Laor Cartographic Collection (FL25570575), via Wikimedia Commons. Public domain.",
+        "url": "https://commons.wikimedia.org/wiki/File:William_Francis_Lynch,_Sketch_map_of_the_Dead_Sea_(FL25570575_3468188).jpg"
+      },
+      "level": "then"
+    },
+    {
+      "id": "survey-1945",
+      "role": "middle",
+      "label": "1945: מפת מחלקת המדידות של ממשלת המנדט",
+      "date": "1945-06",
+      "image": "site/media/then-now/survey-1945.webp",
+      "size": [
+        3302,
+        2950
+      ],
+      "bytes": 1926968,
+      "bounds": [
+        [
+          31.310923,
+          35.157457
+        ],
+        [
+          31.672478,
+          35.632055
+        ]
+      ],
+      "projection": "EPSG:3857, north up; place with bounds (L.imageOverlay)",
+      "load": "on-open",
+      "method": "Fitted by the printed 1 km Palestine Grid (EPSG:28191): 441 grid crossings found in the scan, affine pixel-to-grid fit, residual median 17 m, max 58 m. Grid checked first: the printed corner table agrees within 1.5 m (Palestine 1923 datum), and printed landmarks lie 0.04-0.52 km from their Wikidata points. Datum shift to WGS 84 by PROJ. Map face only (grid E 165-210, N 080-120), warped to Web Mercator at 16 m.",
+      "grid_checks": {
+        "corner_table_max_m": 1.5,
+        "landmarks": [
+          {
+            "name": "Masada, summit",
+            "pixel_full_scan": [
+              5626,
+              10780
+            ],
+            "wikidata": "Q186312",
+            "offset_km": 0.04
+          },
+          {
+            "name": "Engeddi, spring symbol",
+            "pixel_full_scan": [
+              6411,
+              6789
+            ],
+            "wikidata": "Q1011544",
+            "offset_km": 0.52
+          },
+          {
+            "name": "Hot Springs (Callirrhoe), spring symbol",
+            "pixel_full_scan": [
+              10248,
+              3424
+            ],
+            "wikidata": "Q11910919",
+            "offset_km": 0.21
+          },
+          {
+            "name": "Wadi Mujib, channel at the mouth",
+            "pixel_full_scan": [
+              10553,
+              6847
+            ],
+            "wikidata": "Q2120208",
+            "offset_km": 0.1
+          }
+        ]
+      },
+      "credit": {
+        "text": "Survey of Palestine, 1:100,000 Palestine, sheet 13 Dead Sea, second edition. Printed by 514 C. Fd. Survey Coy. Sept. 1942, revised and reprinted by the Survey of Palestine June 1945. National Library of Israel, Eran Laor Cartographic Collection (FL60505868), via Wikimedia Commons. Public domain.",
+        "url": "https://commons.wikimedia.org/wiki/File:Survey_of_Palestine,_Dead_Sea_(FL60505868_3809558).jpg"
+      },
+      "level": "middle"
+    },
+    {
+      "id": "sentinel-2026-11-20",
+      "role": "now",
+      "label": "2026: תצלום לוויין, 20 בנובמבר 2026",
+      "date": "2026-11-20",
+      "image": "site/media/then-now/sentinel-2026-11-20.jpg",
+      "size": [
+        2795,
+        4817
+      ],
+      "bytes": 3236527,
+      "bounds": [
+        [
+          30.986814,
+          35.157457
+        ],
+        [
+          31.836195,
+          35.734939
+        ]
+      ],
+      "projection": "EPSG:3857, north up; place with bounds (L.imageOverlay). Covers both old maps.",
+      "load": "on-open",
+      "method": "Copernicus Sentinel-2 L2A true-colour image (TCI) of 2026-11-20, scenes S2C_36RYV_20261120_0_L2A and S2C_36SYA_20261120_0_L2A (cloud 0.27% and 0.007%), read at 20 m from the cloud-optimised GeoTIFFs, reprojected from UTM 36N to Web Mercator at 23 m.",
+      "credit": {
+        "text": "Contains modified Copernicus Sentinel data 2026",
+        "url": "https://sentinels.copernicus.eu/documents/247904/690755/Sentinel_Data_Legal_Notice"
+      },
+      "level": "today"
+    }
+  ]
+}

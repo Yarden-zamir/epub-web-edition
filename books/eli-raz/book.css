@@ -1,0 +1,103 @@
+/* Book typography for the EPUB and the web edition.
+   Font stacks list the fonts of the print edition first (names as embedded in the source PDF).
+   A reader device that has them installed uses them. Others use the bundled Noto Sans Hebrew (SIL OFL).
+   Limit: the print fonts are not bundled. The PDF holds only unusable subsets, and bundling needs a licence.
+   Revisit when licensed font files for web and ebook use are available.
+   Keep to CSS that Kindle supports: no grid, no flex, no custom properties, no "direction". */
+
+@font-face { font-family: "Book Sans"; src: url("../fonts/NotoSansHebrew-Regular.ttf"); font-weight: normal; font-style: normal; }
+@font-face { font-family: "Book Sans"; src: url("../fonts/NotoSansHebrew-Bold.ttf"); font-weight: bold; font-style: normal; }
+@font-face { font-family: "Book Sans Light"; src: url("../fonts/NotoSansHebrew-Light.ttf"); font-weight: normal; font-style: normal; }
+
+/* Body: Narkisim (print: NarkisimMF 12.5 pt). */
+body {
+  font-family: "NarkisimMF", "Narkisim MF", "Narkisim", "Book Sans", "Arial", sans-serif;
+  line-height: 1.65;
+  margin: 0;
+  text-align: right;
+  hyphens: manual;
+  widows: 2;
+  orphans: 2;
+}
+/* English text: Times New Roman, as in print. */
+[lang="en"] { font-family: "Times New Roman", "Times", "Liberation Serif", serif; text-align: left; }
+
+/* Titles: Extrim, light grey display (print: Extrim 24-41 pt, colour #6d6e71). */
+h1, h2, h3, .display-title, .byline {
+  font-family: "Extrim", "FbExtrim", "Book Sans Light", "Book Sans", sans-serif;
+  font-weight: normal;
+  line-height: 1.2;
+  page-break-after: avoid;
+  break-after: avoid;
+}
+h2[lang="en"], .byline[lang="en"], .subheading[lang="en"] { font-family: "FbMonopoly", "Fb Monopoly", "Helvetica Neue", "Arial", sans-serif; }
+h2 { font-size: 1.9em; margin: 1.2em 0 0.4em; color: #555659; }
+.display-title { font-size: 2.2em; margin: 0.6em 0; color: #555659; }
+.byline { font-size: 1.1em; margin: 0 0 1.8em; color: #555659; text-indent: 0; }
+.subheading { font-weight: bold; margin: 1.4em 0 0.4em; text-indent: 0; }
+
+section.article, section.part { page-break-before: always; break-before: page; }
+
+p { margin: 0 0 0.5em; text-indent: 0; }
+
+/* Captions, credits, notes and small print: Almoni (print: AlmoniDLAAA 9-11 pt). */
+figcaption, aside.footnote, .small, section.titlepage p {
+  font-family: "AlmoniDLAAA", "Almoni DL AAA", "Almoni", "Book Sans", "Arial", sans-serif;
+}
+
+figure { margin: 1.6em 0; page-break-inside: avoid; break-inside: avoid; text-align: center; }
+figure img { max-width: 100%; height: auto; }
+figcaption { font-size: 0.82em; line-height: 1.45; margin-top: 0.5em; text-align: right; }
+figcaption .caption { display: block; }
+figcaption .credit { display: block; font-size: 0.92em; color: #555659; margin-top: 0.15em; }
+.small { font-size: 0.85em; }
+
+sup.ref { font-size: 0.7em; line-height: 0; }
+aside.footnote { font-size: 0.8em; line-height: 1.45; margin-top: 1.5em; border-top: 1px solid #999; padding-top: 0.4em; }
+
+table { border-collapse: collapse; margin: 1.4em auto; font-size: 0.9em; }
+th, td { border-bottom: 1px solid #999; padding: 0.3em 0.7em; text-align: right; }
+
+section.cover { text-align: center; margin: 0; padding: 0; }
+section.cover img { max-width: 100%; }
+section.titlepage { text-align: center; }
+section.titlepage p { text-align: center; }
+
+nav#toc ol { list-style: none; padding: 0; }
+nav#toc li { margin: 0.35em 0; }
+
+/* Facsimile appendix: one page image per document, Return link first, image fits the screen. */
+section.facsimile-intro { page-break-before: always; break-before: page; }
+section.facsimile-page { text-align: center; margin: 0; page-break-before: always; break-before: page; }
+.fx-nav { text-align: center; font-size: 0.85em; margin: 0.2em 0 0.4em; }
+.fx-label { color: #555659; }
+figure.facsimile { margin: 0; }
+figure.facsimile img { max-width: 100%; max-height: 92vh; width: auto; height: auto; }
+.edition-note { font-size: 0.9em; color: #555659; }
+.source-note { font-size: 0.8em; }
+
+/* Release edition: edition credits and notes after the printed caption, and the box of a withheld image. */
+figcaption .edition-credit, figcaption .edition-note { display: block; font-size: 0.88em; color: #555659; margin-top: 0.3em; }
+figure .withheld { margin: 0 auto; max-width: 22em; height: 7em; border: 1px dashed #8b8478; background: #f1eee8; }
+.fx-mask-note { text-align: center; font-size: 0.8em; margin: 0.3em 0; }
+
+/* Poems (book.toml [[poem]]): one line per printed line, stanzas as printed. No indent; title and author smaller than a chapter title. */
+section.poem { margin: 1.6em 0; page-break-inside: auto; }
+h3.poem-title { font-size: 1.25em; margin: 0 0 0.2em; color: #555659; page-break-after: avoid; break-after: avoid; }
+p.poem-author { font-size: 0.85em; margin: 0 0 1.2em; color: #555659; text-indent: 0; }
+div.poem-body p.stanza { margin: 0 0 1em; text-indent: 0; line-height: 1.7; page-break-inside: avoid; break-inside: avoid; }
+
+/* Tables printed as text (book.toml [[text_table]]). */
+table.text-table th { font-weight: bold; border-bottom: 2px solid #555659; }
+/* Staircase lines as printed: indent-N starts N em further in. padding-right first for older Kindle readers. */
+span.indent-1 { padding-right: 1em; padding-inline-start: 1em; }
+span.indent-2 { padding-right: 2em; padding-inline-start: 2em; }
+span.indent-3 { padding-right: 3em; padding-inline-start: 3em; }
+span.indent-4 { padding-right: 4em; padding-inline-start: 4em; }
+span.indent-5 { padding-right: 5em; padding-inline-start: 5em; }
+span.indent-6 { padding-right: 6em; padding-inline-start: 6em; }
+
+/* Edition corrections (book.toml [[correction]]): the corrected text reads as normal text; a small dagger links
+   to an edition note with the printed form (a footnote, so Kindle shows it as a pop-up). */
+a.edition-mark { font-size: 0.7em; vertical-align: super; line-height: 0; text-decoration: none; }
+aside.edition-correction { font-size: 0.8em; }
