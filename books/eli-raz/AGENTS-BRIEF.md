@@ -82,7 +82,7 @@ Each file has one owner. Others only read it.
 
 | File | Owner | Format |
 |---|---|---|
-| site/enhancements.json | orchestrator | existing: related, places (old), tables, charts |
+| site/enhancements.json | orchestrator | existing: related, places (old), tables, charts, feature_photo (the closing photo and the link preview image; the hero uses the blurred cover) |
 | book.toml, book.css, replacements/ | EPUB/Kindle quality agent (from 2026-11-24); the maps agent hands it replacement images and the [[release.change]] text it needs | see book.toml comments |
 | site/figure-maps/<figure-id>.json | maps agent | {"figure", "title", "base": "opentopomap" or other tile layer id, "bounds": [[s, w], [n, e]], "markers": [{"name", "lat", "lon", "wikidata"?, "source", "target"?}], "lines": [{"name", "coords": [[lat, lon], …], "source"}], "areas"?: […], "attribution": ["© OpenStreetMap contributors (ODbL)", …], "note": "how it was made"} |
 | site/places.json | content-data agent | {"places": [{"id", "name", "lat", "lon", "wikidata": "Q…", "targets": [element IDs], "description": "one or two sentences, from the book, with the source element ID", "description_source": "element ID", "figures": [figure IDs of photos of this place]}]} |
