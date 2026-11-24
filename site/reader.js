@@ -844,3 +844,134 @@ for (const figure of reading.querySelectorAll("figure.web-chart[data-chart]")) {
     drawChart(figure).catch((err) => console.error(err));
   }, { rootMargin: "300px" }).observe(figure);
 }
+
+// Footnotes and glossary terms open in a popover: on hover with a mouse, on tap, click or Enter otherwise.
+// The browser handles light dismiss and Escape (popover attribute).
+const notePop = byId("note-popover");
+const termPop = byId("term-popover");
+const glossary = JSON.parse(document.getElementById("glossary-data")?.textContent ?? "[]");
+function placePopover(pop, anchor) {
+  const box = anchor.getBoundingClientRect();
+  const width = pop.offsetWidth, height = pop.offsetHeight;
+  const left = Math.min(innerWidth - width - 8, Math.max(8, box.left + box.width / 2 - width / 2));
+  const below = box.bottom + 8 + height <= innerHeight || box.top - 8 - height < 0;
+  pop.style.left = `${left}px`;
+  pop.style.top = `${below ? box.bottom + 8 : box.top - 8 - height}px`;
+}
+function openPopover(pop, anchor, content) {
+  pop.replaceChildren(...content);
+  if (!pop.matches(":popover-open")) pop.showPopover();
+  placePopover(pop, anchor);
+}
+function goLink(href, label, pop) {
+  const go = document.createElement("a");
+  go.href = href;
+  go.className = "pop-go";
+  go.setAttribute("aria-label", label);
+  go.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m0 0 6-6m-6 6 6 6"/></svg>';
+  if (document.dir === "ltr") go.querySelector("svg").style.transform = "scaleX(-1)";
+  go.addEventListener("click", (e) => { e.preventDefault(); pop.hidePopover(); goTo(href.slice(1)); });
+  return go;
+}
+function noteContent(ref) {
+  const note = document.getElementById(ref.getAttribute("href").slice(1));
+  if (!note) throw new Error(`reader.js: note ${ref.getAttribute("href")} is missing`);
+  const body = document.createElement("div");
+  body.className = "pop-body";
+  for (const child of note.cloneNode(true).children) body.append(child);
+  for (const el of body.querySelectorAll("[id]")) el.removeAttribute("id");
+  for (const back of body.querySelectorAll("a[role='doc-backlink']")) back.remove();
+  if (note.lang) { body.lang = note.lang; body.dir = note.dir || "auto"; }
+  return [body, goLink(`#${note.id}`, "מעבר להערה בגוף הפרק", notePop)];
+}
+function termContent(button) {
+  const t = glossary[Number(button.dataset.term)];
+  if (!t) throw new Error(`reader.js: glossary term ${button.dataset.term} is missing`);
+  const body = document.createElement("div");
+  body.className = "pop-body";
+  const name = document.createElement("strong");
+  name.textContent = t.term;
+  const text = document.createElement("p");
+  text.textContent = t.definition;
+  body.append(name, text);
+  return [body, goLink(t.source, "מעבר למקור ההגדרה בספר", termPop)];
+}
+reading.addEventListener("click", (e) => {
+  const ref = e.target.closest("a[role='doc-noteref']");
+  if (ref) {
+    e.preventDefault();
+    openPopover(notePop, ref, noteContent(ref));
+    if (e.detail === 0) notePop.querySelector("a")?.focus(); // Opened from the keyboard.
+  }
+});
+// A term button toggles the term popover by itself (popovertarget); fill and place it first.
+let termAnchor = null;
+reading.addEventListener("click", (e) => {
+  const term = e.target.closest("button.term");
+  if (term) { termAnchor = term; termPop.replaceChildren(...termContent(term)); }
+}, true);
+termPop.addEventListener("toggle", (e) => { if (e.newState === "open" && termAnchor) placePopover(termPop, termAnchor); });
+// Hover with a mouse: open after a short pause, close when the pointer leaves both the anchor and the popover.
+let hoverTimer = 0;
+function hover(selector, pop, content) {
+  reading.addEventListener("pointerover", (e) => {
+    const anchor = e.target.closest(selector);
+    if (!anchor || e.pointerType !== "mouse") return;
+    clearTimeout(hoverTimer);
+    hoverTimer = setTimeout(() => {
+      if (pop === termPop) termAnchor = anchor;
+      openPopover(pop, anchor, content(anchor));
+    }, 280);
+  });
+  const leave = (e) => {
+    if (e.pointerType !== "mouse" || e.relatedTarget?.closest?.(`${selector}, .note-pop`)) return;
+    clearTimeout(hoverTimer);
+    hoverTimer = setTimeout(() => { if (pop.matches(":popover-open")) pop.hidePopover(); }, 320);
+  };
+  reading.addEventListener("pointerout", (e) => { if (e.target.closest(selector)) leave(e); });
+  pop.addEventListener("pointerout", (e) => { if (!pop.contains(e.relatedTarget)) leave(e); });
+  pop.addEventListener("pointerover", () => clearTimeout(hoverTimer));
+}
+hover("a[role='doc-noteref']", notePop, noteContent);
+hover("button.term", termPop, termContent);
+
+// Continue reading: remember the block at the top of the screen, and offer to return to it on the next visit.
+const POSITION_KEY = `reader-position:${document.documentElement.dataset.bookId}`;
+function blockAtTop() {
+  const el = document.elementFromPoint(innerWidth / 2, Math.min(innerHeight / 3, 200));
+  return el?.closest(".book .doc :is(p, h2, h3, figure, li)[id]") ?? null;
+}
+let positionTimer = 0;
+addEventListener("scroll", () => {
+  clearTimeout(positionTimer);
+  positionTimer = setTimeout(() => {
+    const block = blockAtTop();
+    if (!block) return;
+    const id = block.closest(".doc > section[id]")?.id;
+    const chapter = id ? tocDialog.querySelector(`[data-chapter="${CSS.escape(id)}"] :is(.toc-name, .toc-part-title)`)?.textContent ?? "" : "";
+    try { localStorage.setItem(POSITION_KEY, JSON.stringify({ id: block.id, chapter })); }
+    catch { /* Storage blocked: the reader simply starts at the top next time. */ }
+  }, 800);
+}, { passive: true });
+function offerResume() {
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(POSITION_KEY) ?? "null"); } catch { return; }
+  if (!saved?.id || location.hash || !document.getElementById(saved.id)) return;
+  const bar = document.createElement("div");
+  bar.className = "resume";
+  const go = document.createElement("a");
+  go.href = `#${saved.id}`;
+  go.textContent = saved.chapter ? `להמשיך לקרוא: ${saved.chapter}` : "להמשיך מהמקום שעצרתי";
+  const close = document.createElement("button");
+  close.type = "button";
+  close.textContent = "×";
+  close.setAttribute("aria-label", "סגירה");
+  const remove = () => bar.remove();
+  go.addEventListener("click", (e) => { e.preventDefault(); remove(); goTo(saved.id); });
+  close.addEventListener("click", remove);
+  bar.append(go, close);
+  document.body.append(bar);
+  // The offer fades away once the reader starts somewhere else.
+  addEventListener("scroll", () => { if (scrollY > innerHeight * 1.5) remove(); }, { passive: true });
+}
+offerResume();

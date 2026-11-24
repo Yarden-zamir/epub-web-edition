@@ -25,14 +25,9 @@
       <button type="button" class="icon-btn" data-open="search-dialog" aria-haspopup="dialog" aria-keyshortcuts="/" aria-label="חיפוש בספר">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>
       </button>
-      <div class="split nav-download" id="nav-download">
-        <a class="icon-btn split-main" href="{{epub_href}}" download aria-label="הורדת הספר, EPUB {{epub_size}}">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v12m0 0-5-5m5 5 5-5M5 20.5h14"/></svg>
-        </a>
-        <button type="button" class="split-more" popovertarget="send-menu" aria-label="דרכים לשלוח את הספר לקורא ספרים">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
-        </button>
-      </div>
+      <a class="icon-btn nav-download" id="nav-download" href="{{epub_href}}" download aria-label="הורדת הספר, EPUB {{epub_size}}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v12m0 0-5-5m5 5 5-5M5 20.5h14"/></svg>
+      </a>
     </div>
   </div>
   <div class="progress" aria-hidden="true"></div>
@@ -84,7 +79,7 @@
   </div>
 </footer>
 
-<div id="send-menu" class="menu" popover>
+<div id="send-menu" class="menu" popover role="dialog" aria-label="שליחת הספר לקורא ספרים">
   <p class="menu-note">מורידים את הקובץ, ואז מעלים אותו לשירות של קורא הספרים:</p>
   <a class="menu-download" href="{{epub_href}}" download>הורדת הקובץ <span class="btn-meta">EPUB · {{epub_size}}</span></a>
   <ul>
@@ -126,6 +121,10 @@
   <p id="search-status" class="search-status" aria-live="polite"></p>
   <ol id="search-results" class="panel-list search-results"></ol>
 </dialog>
+
+<div id="note-popover" class="note-pop" popover role="dialog" aria-label="הערה"></div>
+<div id="term-popover" class="note-pop" popover role="dialog" aria-label="הגדרה"></div>
+{{glossary}}
 
 <dialog id="figure-dialog" class="figure-viewer" aria-label="תצוגת תמונה">
   <button type="button" data-close class="viewer-close" aria-label="סגירה">×</button>

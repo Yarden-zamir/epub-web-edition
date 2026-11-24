@@ -30,6 +30,7 @@ import json
 import posixpath
 import shutil
 import sys
+import unicodedata
 import xml.etree.ElementTree as ET
 import zipfile
 from dataclasses import dataclass, replace
@@ -162,6 +163,8 @@ class Converter:
         self.tables: dict[str, dict] = {}  # Figure ID -> data table spec from the enhancements file.
         self.charts: dict[str, ET.Element] = {}  # Printed figure ID -> live chart figure placed after it.
         self.skipped_docs: set[str] = set()  # Spine documents marked epub-only.
+        self.crosslinks: dict[str, list[dict]] = {}  # Element ID -> crosslinks.json entries inside it.
+        self.glossary: list[dict] = []  # glossary.json terms, in file order.
         self.links: list[tuple[str, str]] = []  # (source document, target ID) to check after all documents load.
         self.search: list[SearchEntry] = []
         self.bodies: list[tuple[Item, ET.Element]] = []
@@ -275,6 +278,12 @@ class Converter:
         self.figure_img |= {fig.get("id"): (img.get("src"), img.get("alt") or "") for fig in body.iter("figure")
                             if fig.get("id") and (img := fig.find(".//img")) is not None}
         self.search[first_entry:] = [replace(e, chapter=chapter, img=images.get(e.id)) for e in self.search[first_entry:]]
+        if top is not None:
+            for el in list(top.iter()):
+                for link in self.crosslinks.get(el.get("id", ""), []):
+                    add_crosslink(el, link)
+            if kind == "article":
+                mark_terms(top, self.glossary)
         for fig in list(body.iter("figure")):
             if (spec := self.tables.get(fig.get("id", ""))):
                 attach_table(fig, spec)
@@ -311,6 +320,113 @@ class Converter:
 
 def clean_text(el: ET.Element) -> str:
     return " ".join("".join(el.itertext()).split())
+
+
+def text_slots(el: ET.Element) -> list[tuple[ET.Element, str]]:
+    """(owner, "text" or "tail") for every run of text inside el, in reading order, outside links and buttons."""
+    slots = [(el, "text")]
+    for child in el:
+        if child.tag not in ("a", "button"):
+            slots += text_slots(child)
+        slots.append((child, "tail"))
+    return slots
+
+
+def wrap_text(root: ET.Element, owner: ET.Element, slot: str, start: int, end: int, new: ET.Element) -> ET.Element:
+    """Move text[start:end] of one text slot into the new inline element, in place."""
+    text = getattr(owner, slot) or ""
+    new.text, new.tail = text[start:end], text[end:]
+    setattr(owner, slot, text[:start])
+    if slot == "text":
+        owner.insert(0, new)
+    else:
+        parent = next(p for p in root.iter() if any(c is owner for c in p))
+        parent.insert(list(parent).index(owner) + 1, new)
+    return new
+
+
+def add_crosslink(el: ET.Element, link: dict) -> None:
+    """Link the exact text that names a chapter. A match that is already inside a link (the EPUB has it) stays as is."""
+    for owner, slot in text_slots(el):
+        if (at := (getattr(owner, slot) or "").find(link["text"])) >= 0:
+            wrap_text(el, owner, slot, at, at + len(link["text"]),
+                      ET.Element("a", {"class": "crosslink", "href": f"#{link['target']}"}))
+            return
+    if link["text"] not in "".join(el.itertext()):  # Present but not found above: it sits inside a link already.
+        raise BookError(f"crosslinks.json: {link['text'][:40]!r} is not in {el.get('id')}")
+
+
+HEBREW_PREFIXES = "ובלמשכה"
+SAFE_PREFIXES = "ובלה"  # A short form takes only these, so "בצר" never matches inside "מבצר".
+
+
+def is_word_char(c: str) -> bool:
+    return c.isalnum() or unicodedata.category(c).startswith("M")
+
+
+def find_form(text: str, form: str) -> tuple[int, int] | None:
+    """First whole-word match of a glossary form, allowing up to two one-letter prefixes before it."""
+    allowed = SAFE_PREFIXES if len(form) <= 3 else HEBREW_PREFIXES
+    at = text.find(form)
+    while at >= 0:
+        end = at + len(form)
+        if end == len(text) or not is_word_char(text[end]):
+            for begin in range(at, max(at - 2, 0) - 1, -1):
+                if all(c in allowed for c in text[begin:at]) and (begin == 0 or not is_word_char(text[begin - 1])):
+                    return begin, end
+        at = text.find(form, at + 1)
+    return None
+
+
+def mark_terms(top: ET.Element, glossary: list[dict]) -> None:
+    """Mark the first use of each glossary term in a chapter, in body paragraphs and list items."""
+    left = set(range(len(glossary)))
+    skip_classes = {"byline", "display-title", "small", "caption", "credit"}
+    for el in list(top.iter()):
+        if not left:
+            return
+        if el.tag not in ("p", "li") or skip_classes & set((el.get("class") or "").split()):
+            continue
+        for owner, slot in text_slots(el):
+            while left:
+                text = getattr(owner, slot) or ""
+                found = [(m, i) for i in left for f in glossary[i]["forms"] if (m := find_form(text, f))]
+                if not found:
+                    break
+                (start, end), i = min(found, key=lambda x: (x[0][0], -x[0][1]))
+                term = ET.Element("button", {"type": "button", "class": "term", "data-term": str(i),
+                                             "popovertarget": "term-popover"})
+                owner, slot = wrap_text(top, owner, slot, start, end, term), "tail"
+                left.discard(i)
+
+
+def load_glossary(data_dir: Path | None, conv: "Converter") -> list[dict]:
+    path = data_dir / "glossary.json" if data_dir else None
+    if path is None or not path.is_file():
+        return []
+    terms = json.loads(path.read_text(encoding="utf-8"))["terms"]
+    for t in terms:
+        if t["source"] not in conv.ids or not t["forms"] or not t["definition"]:
+            raise BookError(f"glossary.json: term {t['term']!r}: needs forms, a definition and a source ID in the EPUB")
+    return terms
+
+
+def load_crosslinks(data_dir: Path | None, conv: "Converter") -> dict[str, list[dict]]:
+    path = data_dir / "crosslinks.json" if data_dir else None
+    if path is None or not path.is_file():
+        return {}
+    result: dict[str, list[dict]] = {}
+    for link in json.loads(path.read_text(encoding="utf-8"))["links"]:
+        if link["element"] not in conv.ids or link["target"] not in conv.ids:
+            raise BookError(f"crosslinks.json: {link['element']} -> {link['target']}: both must be IDs in the EPUB")
+        result.setdefault(link["element"], []).append(link)
+    return result
+
+
+def glossary_data(glossary: list[dict]) -> str:
+    """Term definitions for the popover. reader.js reads them by the data-term index."""
+    data = [{"term": t["term"], "definition": t["definition"], "source": f"#{t['source']}"} for t in glossary]
+    return f'<script type="application/json" id="glossary-data">{json.dumps(data, ensure_ascii=False).replace("</", "<\\/")}</script>'
 
 
 def title_and_byline(top: ET.Element, kind: str) -> tuple[str, tuple[str, str | None] | None]:
@@ -717,6 +833,8 @@ def build(epub: Path, out: Path, enhancements_file: Path | None = SITE / "enhanc
         enhancements = load_enhancements(out, conv, enhancements_file)
         conv.tables = load_tables(enhancements_file, conv)
         conv.charts = load_charts(out, enhancements_file, conv)
+        conv.crosslinks = load_crosslinks(data_dir, conv)
+        conv.glossary = load_glossary(data_dir, conv)
         docs = [conv.convert(item, body, enhancements) for item, body in conv.bodies]
         # The places map sits right after the printed contents, or before the book when it has none.
         at = conv.kinds.index("contents") + 1 if "contents" in conv.kinds else 0
@@ -745,6 +863,7 @@ def build(epub: Path, out: Path, enhancements_file: Path | None = SITE / "enhanc
             "toc": toc,
             "timeline_tab": timeline[0],
             "timeline": timeline[1],
+            "glossary": glossary_data(conv.glossary) if conv.glossary else "",
             "font_preload": "\n".join(
                 f'<link rel="preload" href="{html.escape("book/" + i.path)}" as="font" type="{i.media_type}" crossorigin>'
                 for i in sorted(book.items.values(), key=lambda i: i.path)
