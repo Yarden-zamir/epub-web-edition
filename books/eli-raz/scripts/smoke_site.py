@@ -41,7 +41,8 @@ with sync_playwright() as p:
             page.wait_for_timeout(1500)
             overflow = page.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth")
             page.add_script_tag(path=str(AXE))
-            violations = page.evaluate("axe.run(document, {resultTypes: ['violations']}).then(r => r.violations.map(v => v.id))")
+            # Each violation with the selectors of its first three elements, so a failed run says where to look.
+            violations = page.evaluate("axe.run(document, {resultTypes: ['violations']}).then(r => r.violations.map(v => v.id + ' ' + v.nodes.slice(0, 3).map(n => n.target.join(' ')).join(', ')))")
             if errors or overflow > 0 or violations:
                 problems.append(f"{width} {scheme}: errors {errors[:2]} overflow {overflow} axe {violations}")
             page.close()
