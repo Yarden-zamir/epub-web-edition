@@ -163,6 +163,7 @@ function create(spec) {
   };
   const arrowRight = new Path2D("M-12 0 H9 M3 -5 L10 0 L3 5");
   const arrowLeft = new Path2D("M12 0 H-9 M-3 -5 L-10 0 L-3 5");
+  const arrowDown = new Path2D("M0 -12 V9 M-5 3 L0 10 L5 3");
 
   function draw(ctx, depth, env) {
     const level = -depth;
@@ -397,15 +398,20 @@ function create(spec) {
       ctx.globalAlpha = 1;
     }
 
-    // Cracks at the surface before the roof gives way, and dust over the new crater.
+    // While the ground falls in: a down arrow that sinks with it (not on refill), and dust over the new crater.
     for (const h of active) {
       const top = h.surface(0), p = h.p;
-      const crack = ramp(p, 0, 0.12) * (1 - ramp(p, 0.35, 0.6));
-      if (crack > 0.01) {
-        ctx.globalAlpha = crack;
-        ctx.strokeStyle = env.color("--xp-void");
-        ctx.lineWidth = 1;
-        for (const [dx, dy] of [[-6, 7], [-1, 9], [5, 6]]) ctx.stroke(shape([[h.x, top + 1], [h.x + dx * h.size, top + dy * h.size]], false));
+      const fall = h.closing ? 0 : ramp(p, 0, 0.15) * (1 - ramp(p, 0.7, 1));
+      if (fall > 0.01) {
+        ctx.save();
+        ctx.globalAlpha = fall;
+        ctx.translate(h.x, top + h.crater * 0.55 - 4);
+        ctx.strokeStyle = env.color("--ink");
+        ctx.lineWidth = 1.6;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.stroke(arrowDown);
+        ctx.restore();
       }
       const puff = ramp(p, 0.2, 0.75);
       if (!h.closing && puff > 0 && puff < 1) {
