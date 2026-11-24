@@ -1,16 +1,43 @@
-/* Figure viewer */
-.figure-viewer { width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: #0e0d0c; color: #eee8de; }
-.figure-viewer[open] { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; }
-.figure-viewer img { max-width: calc(100vw - 2rem); max-height: calc(100dvh - 9rem); object-fit: contain; }
-.viewer-caption { max-width: 40rem; padding: 0 1rem; font-size: 0.95rem; line-height: 1.5; }
-.viewer-caption .credit { display: block; color: #a8a094; font-size: 0.9em; }
+/* Figure viewer: the image on a dark stage, its caption below (beside it on wide screens). */
+.figure-viewer { --drag: 0; width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: rgb(14 13 12 / calc(1 - var(--drag) * 0.85)); color: #eee8de; overflow: hidden; }
+.figure-viewer::backdrop { background: transparent; }
+.figure-viewer[open] { display: grid; grid-template: "bar" auto "stage" minmax(0, 1fr) "caption" auto / minmax(0, 1fr); }
+.viewer-bar { grid-area: bar; z-index: 2; display: flex; align-items: center; gap: 0.5rem; padding: max(0.5rem, env(safe-area-inset-top)) 0.75rem 0.5rem; padding-inline-start: 1.1rem; font-family: var(--sans); transition: opacity var(--dur-base) var(--ease-out); opacity: calc(1 - var(--drag) * 2); }
+.viewer-count { flex: 1; font-size: 0.85rem; color: #b9b0a2; font-variant-numeric: tabular-nums; }
+.viewer-original { padding: 0.45rem 0.8rem; border-radius: var(--radius-pill); font-size: 0.82rem; color: #d9d1c4; text-decoration: none; }
+.viewer-original:hover { background: rgb(255 255 255 / 0.1); }
+.viewer-btn { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: var(--radius-pill); color: #f3ede3; background: rgb(255 255 255 / 0.08); transition: background-color var(--dur-quick) var(--ease-out), opacity var(--dur-base) var(--ease-out); }
+.viewer-btn:hover { background: rgb(255 255 255 / 0.18); }
+.viewer-btn svg { width: 1.35rem; height: 1.35rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.figure-viewer :focus-visible { outline-color: #f3ede3; }
+
+.viewer-stage { grid-area: stage; position: relative; display: grid; place-items: center; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
+.viewer-stage img { max-width: none; max-height: none; object-fit: contain; transform-origin: 50% 50%; cursor: zoom-in; -webkit-user-drag: none; }
+.figure-viewer[data-zoomed] .viewer-stage img { cursor: grab; }
+.figure-viewer[data-zoomed] .viewer-stage img:active { cursor: grabbing; }
+/* Previous and next sit at the stage edges; touch screens use a swipe and hide them. */
+.viewer-step { position: absolute; z-index: 1; top: 50%; translate: 0 -50%; width: 3.25rem; height: 3.25rem; background: rgb(14 13 12 / 0.55); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.viewer-step:disabled { opacity: 0; pointer-events: none; }
+.viewer-prev { inset-inline-start: clamp(0.5rem, 2vw, 1.5rem); }
+.viewer-next { inset-inline-end: clamp(0.5rem, 2vw, 1.5rem); }
+[dir="rtl"] .viewer-next svg, [dir="ltr"] .viewer-prev svg { transform: scaleX(-1); }
+.figure-viewer[data-zoomed] .viewer-step { opacity: 0; pointer-events: none; }
+@media (hover: none) { .viewer-step { display: none; } }
+
+.viewer-caption { grid-area: caption; box-sizing: border-box; width: 100%; max-width: 46rem; max-height: 34dvh; margin: 0 auto; overflow-y: auto; padding: 0.75rem 1.25rem max(1rem, env(safe-area-inset-bottom)); font-family: var(--sans); font-size: 0.95rem; line-height: 1.6; color: #eee8de; transition: opacity var(--dur-base) var(--ease-out); opacity: calc(1 - var(--drag) * 2); }
+.viewer-caption:empty { display: none; }
+.viewer-caption { white-space: normal; }
+.viewer-caption > * { margin: 0 0 0.35rem; }
+.viewer-caption .credit { display: block; color: #b9b0a2; font-size: 0.85em; }
+.viewer-caption a { color: #f0c3a6; }
 .viewer-caption .deep-link { display: none; }
-.viewer-original { font-size: 0.85rem; color: #a8a094; }
-.viewer-close { position: absolute; top: 0.75rem; inset-inline-end: 0.75rem; width: 2.75rem; height: 2.75rem; border-radius: var(--radius-pill); font-size: 1.5rem; color: inherit; }
-.viewer-close:hover { background: rgb(255 255 255 / 0.1); }
-
-@media print {
-  .nav, .hero, .footer, .deep-link, .skip-link { display: none; }
-  .book figure.photo, .book figure.artwork { width: auto; margin-inline: 0; }
+.figure-viewer[data-zoomed] :is(.viewer-caption, .viewer-bar .viewer-count) { opacity: 0.25; }
+/* Wide screens: the caption becomes a column beside the image, so the image keeps the full height. */
+@media (min-width: 64rem) and (min-aspect-ratio: 4/3) {
+  .figure-viewer[open] { grid-template: "stage bar" auto "stage caption" minmax(0, 1fr) / minmax(0, 1fr) minmax(16rem, 24rem); }
+  .viewer-bar { padding-top: 1rem; }
+  .viewer-caption { align-self: end; max-height: none; padding: 1rem 1.5rem 2rem; padding-inline-start: 1.25rem; font-size: 1rem; }
+  /* Without a caption the image takes the whole width under the bar. */
+  .figure-viewer[open]:has(.viewer-caption:empty) { grid-template: "bar" auto "stage" minmax(0, 1fr) / minmax(0, 1fr); }
 }
-
+@media print { .figure-viewer { display: none; } }

@@ -131,10 +131,23 @@
 {{glossary}}
 
 <dialog id="figure-dialog" class="figure-viewer" aria-label="תצוגת תמונה">
-  <button type="button" data-close class="viewer-close" aria-label="סגירה">×</button>
-  <img id="viewer-img" alt="">
+  <div class="viewer-bar">
+    <span id="viewer-count" class="viewer-count"></span>
+    <a id="viewer-original" class="viewer-original" href="" target="_blank" rel="noopener">הקובץ המקורי</a>
+    <button type="button" id="viewer-close" class="viewer-btn" aria-label="סגירה" aria-keyshortcuts="Escape" autofocus>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div id="viewer-stage" class="viewer-stage">
+    <img id="viewer-img" alt="" draggable="false">
+    <button type="button" id="viewer-prev" class="viewer-btn viewer-step viewer-prev" aria-label="התמונה הקודמת">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+    </button>
+    <button type="button" id="viewer-next" class="viewer-btn viewer-step viewer-next" aria-label="התמונה הבאה">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+    </button>
+  </div>
   <div id="viewer-caption" class="viewer-caption"></div>
-  <a id="viewer-original" class="viewer-original" href="" target="_blank" rel="noopener">פתיחת הקובץ המקורי</a>
 </dialog>
 {{end}}</body>
 </html>
