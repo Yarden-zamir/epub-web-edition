@@ -48,7 +48,7 @@
 .xp-schematic, .xp-sources { margin: 0.5rem 0 0; font-size: 0.78rem; line-height: 1.5; color: var(--muted); }
 .xp-sources a { color: inherit; }
 
-/* Sinkholes (sinkholes.js) */
+/* Sinkholes (73-explorable-sinkholes.js) */
 .sk-land { fill: var(--xp-land); }
 .sk-brine { fill: var(--xp-brine); }
 .sk-fresh { fill: var(--xp-fresh); }
@@ -73,8 +73,8 @@
 @keyframes xp-flow-east { from { transform: translateX(-4px); } to { transform: translateX(4px); } }
 @keyframes xp-flow-west { from { transform: translateX(4px); } to { transform: translateX(-4px); } }
 
-/* Transform (transform.js): a tall map, so it keeps a phone-like width on large screens. */
-.explorable[data-kind="transform"] .xp-svg { max-width: 26rem; margin-inline: auto; }
+/* Transform (74-explorable-transform.js): a tall map, so it keeps a phone-like width on large screens. */
+.explorable[data-kind="transform"] .xp-stage { max-width: 22rem; margin-inline: auto; }
 .tf-basin { fill: var(--xp-basin); }
 .tf-west { fill: var(--xp-plate-a); stroke: var(--ink); stroke-width: 1.5; }
 .tf-plate-east { fill: var(--xp-plate-b); stroke: var(--ink); stroke-width: 1.5; }
@@ -85,4 +85,19 @@
 .tf-grip path { fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; }
 @media (prefers-reduced-motion: no-preference) {
   .xp-stage:not(.dragging) .tf-east { transition: transform 120ms ease-out; }
+}
+
+/* Mount Sodom (75-explorable-diapir.js) */
+.dp-lake { fill: var(--xp-fresh); }
+.dp-sand { fill: var(--xp-land); stroke: var(--xp-land-edge); stroke-width: 1.2; }
+.dp-salt { fill: var(--xp-salt); stroke: var(--xp-salt-edge); stroke-width: 1; }
+.dp-salt.alt { fill: color-mix(in srgb, var(--xp-salt) 82%, var(--xp-salt-edge)); }
+.dp-bed { stroke: var(--xp-salt-edge); stroke-width: 1; }
+.dp-cap { fill: var(--xp-land-edge); }
+.dp-mirror { stroke: var(--xp-fresh-ink); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.dp-arrow { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.dp-grip circle { fill: var(--paper); stroke: var(--ink); stroke-width: 1.5; }
+.dp-grip path { fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; }
+@media (prefers-reduced-motion: no-preference) {
+  .explorable[data-kind="diapir"] .xp-stage:not(.dragging) svg > g { transition: transform 120ms ease-out; }
 }
