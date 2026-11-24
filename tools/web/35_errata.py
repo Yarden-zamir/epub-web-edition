@@ -330,7 +330,9 @@ def write(site: Site) -> None:
         "book_css": esc(f"../book/{css}"),
         "verified": str(len(linked)),
         "total": str(len(STATE.rows)),
-        "translator": "ההסברים תורגמו לעברית בתרגום מכונה מתוך רשימת המחקר באנגלית, ועדיין לא נבדקו." if "machine" in STATE.translator else "",
+        # The note repeats the claim of errata-he.json "translator", so it shows exactly while no person reviewed the text.
+        "translator": ("ההסברים תורגמו לעברית מתוך רשימת המחקר באנגלית. תרגום בבינה מלאכותית, לא נבדק בידי אדם."
+                       if "not reviewed by a person" in STATE.translator else ""),
         "filters": "".join(filters),
         "sections": "".join(sections),
     })
