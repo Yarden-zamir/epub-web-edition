@@ -20,8 +20,8 @@ const WATER_TABLE_WEST = -382; // Groundwater table at the west edge.
 // side is eaten deeper with every metre of level drop after that (EAT metres for the full eaten share, scaled by seeded
 // noise), up to half of the layer or less, so chunky pieces stay. At a few sites the two fronts meet: there the salt
 // is gone, the layer breaks into separate jagged pieces, and above each gap the ground collapses.
-const EAT = 9, GRID = 2.5, SEED = 7, GAPS = 4; // Any fixed seed: it fixes the shapes only.
-const COLLAPSE_S = 1.1; // Length of the collapse animation when a gap opens.
+const EAT = 9, GRID = 2.5, SEED = 7, GAPS = 7, GAP_SPACING = 26; // Any fixed seed: it fixes the shapes only.
+const COLLAPSE_S = 1.1, REFILL_S = 0.6; // Collapse when a gap opens; refill when the level rises again.
 const STREAKS = [0.15, 0.35, 0.55, 0.75, 0.92]; // Fresh-water flow lines, as fractions between water table and interface.
 
 // Seeded random numbers (mulberry32), so the front looks the same on every visit.
@@ -119,12 +119,13 @@ function create(spec) {
   }));
   const bite = (at, level, rate, most) => (at === null ? 0 : Math.max(0, Math.min(most, ((at - level) / EAT) * (0.35 + 1.1 * rate))));
   // The eaten share from the top and from the bottom at a level; their sum of 1 or more means a gap.
-  // Gap sites: where both sides bite fastest, at least 40 units apart, at most GAPS. Near a site the eaten share may
+  // Gap sites: where both sides bite fastest, at least GAP_SPACING units apart, at most GAPS; the pieces between them
+  // are the salt left over. Near a site the eaten share may
   // reach the full layer; elsewhere at most 0.5 from the top and 0.4 from the bottom.
   const sum = (col) => (col ? col.rt + col.rb : 0);
-  const peaks = cols.filter((col, i) => col.atBottom !== null && sum(col) >= sum(cols[i - 1]) && sum(col) >= sum(cols[i + 1]) && sum(col) > 1);
+  const peaks = cols.filter((col, i) => col.atBottom !== null && sum(col) >= sum(cols[i - 1]) && sum(col) >= sum(cols[i + 1]) && sum(col) > 0.7);
   const sites = [];
-  for (const col of [...peaks].sort((c1, c2) => sum(c2) - sum(c1))) if (sites.length < GAPS && sites.every((site) => Math.abs(site.x - col.x) >= 40)) sites.push(col);
+  for (const col of [...peaks].sort((c1, c2) => sum(c2) - sum(c1))) if (sites.length < GAPS && sites.every((site) => Math.abs(site.x - col.x) >= GAP_SPACING)) sites.push(col);
   for (const col of cols) {
     const near = Math.max(0, ...sites.map((site) => 1 - Math.abs(site.x - col.x) / 8));
     col.topMost = 0.12 + 0.38 * col.rt + 0.6 * near;
@@ -256,18 +257,23 @@ function create(spec) {
     }
 
     let fallen = 0;
-    // A collapse plays once when the gap below a site opens (COLLAPSE_S seconds): cracks, the roof breaks and the pit
-    // opens, the funnel tears down to the gap, soil falls into it, dust rises. Moving the level back up refills it.
-    // Under reduced motion the hole is there at once.
+    // Each hole runs toward open (its gap is open) or closed. Opening (COLLAPSE_S): cracks, the roof breaks and the pit
+    // opens, the funnel tears down to the gap, soil falls into it, dust rises. Closing when the level rises again
+    // (REFILL_S): the same in reverse, without soil and dust. Under reduced motion it changes at once.
     const easeOut = (q) => 1 - (1 - q) ** 3;
     for (const h of holes) {
       const [t, b] = eatenAt(h.col, level);
-      const gap = t + b >= 1;
-      if (!gap) { h.openedAt = null; continue; }
-      h.openedAt ??= env.time;
-      const p = reduceMotion.matches ? 1 : Math.min(1, (env.time - h.openedAt) / COLLAPSE_S);
-      if (p < 1) env.wantsFrame = true;
-      fallen++;
+      const target = t + b >= 1 ? 1 : 0;
+      const dt = h.last === undefined ? 0 : Math.min(0.1, Math.max(0, env.time - h.last));
+      h.last = env.time;
+      h.p ??= 0;
+      if (reduceMotion.matches) h.p = target;
+      else if (h.p < target) h.p = Math.min(target, h.p + dt / COLLAPSE_S);
+      else if (h.p > target) h.p = Math.max(target, h.p - dt / REFILL_S);
+      if (h.p !== target) env.wantsFrame = true;
+      if (target) fallen++;
+      if (h.p <= 0) continue;
+      const p = h.p, closing = target === 0;
       const top = h.surface(0), bottom = h.col.bottom;
       const tear = easeOut(ramp(p, 0.18, 0.8)), sag = easeOut(ramp(p, 0.15, 0.55));
       // Cracks in the surface, before the roof gives way.
@@ -306,7 +312,7 @@ function create(spec) {
         ctx.closePath();
         ctx.fill();
       }
-      if (p < 1) {
+      if (p < 1 && !closing) {
         // Soil falls down the funnel into the gap (accelerating), and dust rises over the pit.
         ctx.fillStyle = env.color("--xp-land-edge");
         for (let k = 0; k < 6; k++) {
