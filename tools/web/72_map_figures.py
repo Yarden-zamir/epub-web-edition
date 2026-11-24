@@ -23,7 +23,8 @@ IMAGES: list[tuple[Path, str]] = []  # Then-and-now images: (source file, path i
 # The long side of a then-and-now image in the site: about twice the largest map box (44rem), for sharp screens.
 # Known limit: a reader who zooms in far sees the image soften. Revisit if the view gets a zoom past the fitted layer.
 THEN_NOW_SIDE = 1600
-THEN_NOW_QUALITY = 70  # WebP quality: each layer lands between 80 and 400 KB.
+THEN_NOW_QUALITY = 68  # WebP quality: each layer lands between 80 and 400 KB.
+# WebP effort: 6 saves 4% more bytes but takes 4 times as long (about 15 s for the three layers).
 
 
 def check_lat_lon(lat: float, lon: float, where: str) -> None:
@@ -197,7 +198,7 @@ def write(site: Site) -> None:
         dest.parent.mkdir(parents=True, exist_ok=True)
         with Image.open(source) as im:
             im.thumbnail((THEN_NOW_SIDE, THEN_NOW_SIDE), Image.Resampling.LANCZOS)  # Never enlarges; keeps transparency.
-            im.save(dest, "WEBP", quality=THEN_NOW_QUALITY, method=6)
+            im.save(dest, "WEBP", quality=THEN_NOW_QUALITY, method=4)
         sizes[url] = {"source_bytes": source.stat().st_size, "bytes": dest.stat().st_size}
     site.report["map_figures"] = sorted(DATA)
     if sizes:
