@@ -160,7 +160,9 @@ self.addEventListener("fetch", (event) => {
     }
     const path = sitePath(url);
     const file = FILES[path];
-    if (!file || url.search) return; // Downloads, build.json and unlisted files go to the network untouched.
+    // Pages ask for scripts and styles as path?v=<content hash> (tools/web/99_offline.py). Another query, an older
+    // hash (a page of another build), downloads, build.json and unlisted files go to the network untouched.
+    if (!file || (url.search && url.search !== `?v=${file[0]}`)) return;
     event.respondWith(file[1] === "shell" ? networkFirst(request, path, event.clientId) : cacheFirst(request, path));
     return;
   }
