@@ -41,9 +41,9 @@ Serve dist/release/web with a local http.server for browser tests. Playwright 1.
 
 ## Checks
 
-`uv run books/eli-raz/scripts/check.py` (default, light, for this machine): ingest outputs from the shared cache ~/.cache/eli-raz/ingest/ (no ingest runs here; when the inputs changed, the build uses the last ingest and CI ingests the change), build_epub, build_web, check_release (withheld images, credits, the EPUB size budget), and books/eli-raz/dist/release/web/preview.html with chapter a06 (`--preview a06,a14` picks the units). Serve the folder and open preview.html for UI work.
+`uv run books/eli-raz/scripts/check.py` (default, light, for this machine): the ingest outputs of the current inputs from the shared cache ~/.cache/eli-raz/ingest/ (keyed by the hash of every ingest input; when no entry matches, both ingests run once at low priority and every worktree reuses the result; an older ingest is never used), build_epub, build_web, check_release (withheld images, credits, the EPUB size budget), and books/eli-raz/dist/release/web/preview.html with chapter a06 (`--preview a06,a14` picks the units). Serve the folder and open preview.html for UI work.
 
-Heavy flags, for GitHub Actions (each one also works here, but only when a task needs it on this machine): `--ingest`, `--compare-ingest`, `--epubcheck`, `--smoke` (quick: errors, overflow, axe on a sample), `--axe-full` (fresh load at every width and scheme, axe on the whole page), `--explorables`, `--record` (videos, traces, screenshots, load timings), `--sample` (tools/verify.py), `--gate` (what main's deploy runs), `--full` (all), `--no-build`. `check.py --help` explains each.
+Heavy flags, for GitHub Actions (each one also works here, but only when a task needs it on this machine): `--compare-ingest`, `--epubcheck`, `--smoke` (quick: errors, overflow, axe on a sample), `--axe-full` (fresh load at every width and scheme, axe on the whole page), `--explorables`, `--record` (videos, traces, screenshots, load timings), `--sample` (tools/verify.py), `--gate` (what main's deploy runs), `--full` (all), `--no-build`. `check.py --help` explains each.
 
 Where each check runs (.github/workflows/check.yml, one job that builds once and runs the checks as parallel processes):
 - Each push to a PR (`--gate`): ingest, build, check_release, EPUBCheck, the quick smoke test.

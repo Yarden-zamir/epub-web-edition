@@ -5,19 +5,18 @@
 """Build the release edition and check it. The default is light, for this machine; the heavy checks run in GitHub Actions.
 
 Usage, from the repo root (flags combine):
-  uv run books/eli-raz/scripts/check.py                  default: ingest outputs from the shared cache, build_epub,
+  uv run books/eli-raz/scripts/check.py                  default: the ingest outputs of the current inputs, build_epub,
                                                           build_web, check_release, and preview.html (a06)
   --preview a06,a14     the units of preview.html (books/eli-raz/dist/release/web/preview.html)
-  --ingest              run both ingests when their inputs are not in the cache (heavy: minutes of CPU)
-  --compare-ingest      with --ingest: when the ingests run, also run the complete ingest in a copy of the whole book
-                        folder and fail when it differs from the copy of INGEST_INPUTS (a missing input)
+  --compare-ingest      when the ingests run, also run the complete ingest in a copy of the whole book folder and fail
+                        when it differs from the copy of INGEST_INPUTS (a missing input)
   --epubcheck           EPUBCheck (Java), skipped when these exact EPUB bytes passed before
   --smoke               quick smoke test (Playwright): errors, overflow, axe on a sample (scripts/smoke_site.py)
   --axe-full            smoke test with a fresh load at every width and scheme and axe on the whole page
   --explorables         every interactive explainer (scripts/check_explorables.py), screenshots in dist/explorables
   --record              videos, traces, screenshots and load timings (scripts/record_site.py) in dist/record
   --sample              tools/verify.py on the sample edition (widths, interaction, speed)
-  --gate                --ingest --epubcheck --smoke: what main's deploy workflow runs on every push
+  --gate                --epubcheck --smoke: what each PR runs
   --full                every check above; ingests run again in a copy of INGEST_INPUTS and of the whole book folder,
                         and fail when the two differ; EPUBCheck runs again
   --no-build            use the build that is already in books/eli-raz/dist/release (CI jobs after the build job)
@@ -26,7 +25,10 @@ Usage, from the repo root (flags combine):
 
 Agents do not run the heavy checks on the build machine: .github/workflows/check.yml runs them on GitHub for each PR
 (--gate), the merge queue (every check) and every night (--full); docs/WORKFLOW.md, Checks.
-Shared cache (all worktrees on this machine): ~/.cache/eli-raz, or $ELI_RAZ_CACHE.
+Shared cache (all worktrees on this machine): ~/.cache/eli-raz, or $ELI_RAZ_CACHE. Ingest outputs are stored by the
+hash of every ingest input (ingest_key: the ingest code, book.toml and the other INGEST_INPUTS). A run restores only
+the entry of its own inputs. When there is none, it runs both ingests (minutes of CPU, at low priority) and stores
+the result, so every other worktree with the same inputs reuses it. It never builds from an older ingest.
 The heavy flags need .tools/ in the repo root: EPUBCheck 5.4.0 in .tools/epubcheck-5.4.0/, a Java runtime in
 .tools/jdk-*/, axe-core 4.14.0 in .tools/axe/package/, and the Chromium of Playwright 1.64.1 (see smoke_site.py).
 """
@@ -150,7 +152,7 @@ def run_ingests(compare: bool) -> None:
     """Both ingests at the same time. The complete one runs in a copy of the inputs, because both modes rewrite
     ids.csv and id-moves.csv; the book folder keeps the release ingest's lists, as with the two run in turn.
     compare: also run the complete ingest in a copy of the whole book folder, and fail when its outputs differ."""
-    uv = ["uv", "run"]
+    uv = ["nice", "-n", "15", "uv", "run"]  # Low priority: the build machine runs many worktrees at once.
     with tempfile.TemporaryDirectory(prefix="eli-raz-complete-") as tmp:
         copy = Path(tmp) / "content"
         for root in INGEST_INPUTS:
@@ -183,26 +185,18 @@ def same_tree(a: Path, b: Path) -> bool:
         (a / n).read_bytes() == (b / n).read_bytes() for n in names)
 
 
-def ingest(allowed: bool, fresh: bool, compare: bool) -> None:
-    """Fill the book folder with the ingest outputs: from the shared cache, or by running both ingests (allowed)."""
+def ingest(fresh: bool, compare: bool) -> None:
+    """Fill the book folder with the ingest outputs of the current inputs: the cache entry of exactly these inputs,
+    or both ingests run now and stored. An older entry (another branch, an older ingest_pdf.py or book.toml) never
+    stands in: its IDs can differ from the site data, and its lists would overwrite the tracked ones."""
     key = ingest_key()
     cached = CACHE / "ingest" / key
     if cached.is_dir() and not fresh:
         restore(cached)
         say(f"ingest inputs unchanged ({key[:12]}): outputs from {cached}")
         return
-    if not allowed:
-        # Light default: no ingest on this machine. The preview then shows the last ingest; CI ingests the change.
-        note = "ingest inputs changed; this build uses the last ingest. CI ingests the change; --ingest ingests here"
-        if (CONTENT / "epub-src-release").is_dir():
-            say(f"{note} (heavy). Using the ingest in {CONTENT}.")
-            return
-        entries = sorted((CACHE / "ingest").glob("[0-9a-f]*"), key=lambda e: e.stat().st_mtime) if (CACHE / "ingest").is_dir() else []
-        if not entries:
-            sys.exit("No ingest on this machine yet. Run once with --ingest (heavy), or let CI check the change.")
-        restore(entries[-1])
-        say(f"{note} (heavy). Using the newest cached ingest, {entries[-1].name[:12]}, of any worktree.")
-        return
+    if not fresh:
+        say(f"no cached ingest for these inputs ({key[:12]}): running both ingests (minutes of CPU)")
     run_ingests(compare=compare)
     # Also store under the key after the ingest: a run that adds IDs changes ids.csv, and the next run starts from it.
     for k in {key, ingest_key()}:
@@ -269,7 +263,7 @@ def epubcheck(force: bool) -> tuple[list[str | Path], Path | None] | None:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    for flag in ("ingest", "compare-ingest", "epubcheck", "smoke", "axe-full", "explorables", "record", "sample", "gate", "full", "no-build"):
+    for flag in ("compare-ingest", "epubcheck", "smoke", "axe-full", "explorables", "record", "sample", "gate", "full", "no-build"):
         ap.add_argument(f"--{flag}", action="store_true")
     ap.add_argument("--preview", metavar="UNITS", default="a06", help="comma-separated unit IDs of preview.html")
     ap.add_argument("--advisory", metavar="GROUPS", default="", help="groups whose failure only warns")
@@ -278,7 +272,7 @@ def main() -> None:
     uv: list[str | Path] = ["uv", "run"]
     if not a.no_build:
         EPUB.parent.mkdir(parents=True, exist_ok=True)
-        ingest(allowed=a.ingest or a.gate or a.full, fresh=a.full, compare=a.compare_ingest or a.full)
+        ingest(fresh=a.full, compare=a.compare_ingest or a.full)
         run([*uv, "tools/build_epub.py", CONTENT / "epub-src-release", EPUB], PIPELINE)
         run([*uv, "tools/build_web.py", EPUB, WEB, CONTENT / "site" / "enhancements.json"], PIPELINE)
         # check_release also runs tools/check_size.py: the EPUB at most 24 MB, under the 25 MB file limit of kitshn.
