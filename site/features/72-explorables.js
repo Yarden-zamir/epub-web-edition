@@ -46,8 +46,12 @@ function interpolate(points, x) {
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 // 0 at a, 1 at b, eased in between: shapes fade and grow instead of popping in.
 const ramp = (v, a, b) => { const t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
-const number = (value, digits = 0) =>
-  value.toLocaleString("he-IL", { minimumFractionDigits: digits, maximumFractionDigits: digits });
+// One formatter per number of decimals: toLocaleString with options builds a new one on every call (every frame).
+const formats = new Map();
+const number = (value, digits = 0) => {
+  if (!formats.has(digits)) formats.set(digits, new Intl.NumberFormat("he-IL", { minimumFractionDigits: digits, maximumFractionDigits: digits }));
+  return formats.get(digits).format(value);
+};
 // A number inside Hebrew text: isolated (U+2068 ... U+2069), so the sentence around it never reorders.
 const iso = (text) => `\u2068${text}\u2069`;
 const MINUS = "\u2212";
@@ -71,15 +75,45 @@ function markHintSeen(id) {
 
 // Colours, gradients and fonts come from the CSS tokens. A theme change clears them and redraws.
 function makeEnv(box) {
-  const colors = new Map(), gradients = new Map(), layers = new Map();
+  const colors = new Map(), gradients = new Map(), layers = new Map(), sprites = new Map();
   let ctx = null, family = "";
+  // A label as a bitmap at the current size, font and theme: text drawn left-aligned at (0, 0), with its box.
+  function sprite(text, size, weight, color) {
+    const key = `${text}|${size}|${weight}|${color}|${env.pixel}`;
+    if (!sprites.has(key)) {
+      if (sprites.size > 400) sprites.clear(); // Labels with changing numbers must not grow the cache without end.
+      const font = `${weight} ${size * env.unit}px ${family}`, halo = 2.75 * env.unit;
+      const bitmap = document.createElement("canvas");
+      const b = bitmap.getContext("2d");
+      b.font = font;
+      b.direction = "rtl";
+      b.textAlign = "left";
+      const m = b.measureText(text);
+      const x0 = -m.actualBoundingBoxLeft - halo, y0 = -m.actualBoundingBoxAscent - halo;
+      const w = m.actualBoundingBoxRight + halo - x0, h = m.actualBoundingBoxDescent + halo - y0;
+      bitmap.width = Math.max(1, Math.ceil(w * env.pixel));
+      bitmap.height = Math.max(1, Math.ceil(h * env.pixel));
+      b.setTransform(env.pixel, 0, 0, env.pixel, -x0 * env.pixel, -y0 * env.pixel);
+      b.font = font; // A size change resets the context's state.
+      b.direction = "rtl";
+      b.textAlign = "left";
+      b.lineJoin = "round";
+      b.lineWidth = 3.5 * env.unit;
+      b.strokeStyle = env.color("--paper");
+      b.strokeText(text, 0, 0);
+      b.fillStyle = env.color(color);
+      b.fillText(text, 0, 0);
+      sprites.set(key, { bitmap, x0, y0, w: bitmap.width / env.pixel, h: bitmap.height / env.pixel, width: m.width });
+    }
+    return sprites.get(key);
+  }
   const env = {
     unit: 1,
     time: 0,
     wantsFrame: false,
     bind(context) { ctx = context; },
     pixel: 1, // Device pixels per drawing unit.
-    reset() { colors.clear(); gradients.clear(); layers.clear(); family = getComputedStyle(box).fontFamily; },
+    reset() { colors.clear(); gradients.clear(); layers.clear(); sprites.clear(); family = getComputedStyle(box).fontFamily; },
     // Static parts are drawn once into a bitmap at the current size and theme; a frame only copies it.
     layer(key, [x, y, w, h], draw) {
       const id = `${key}@${env.pixel.toFixed(4)}`;
@@ -112,19 +146,23 @@ function makeEnv(box) {
       return gradients.get(key);
     },
     // Hebrew label with a paper halo, about `size` CSS pixels at any width. align: "left", "right" or "center".
+    // Each label is drawn once into a small bitmap (text with a halo is slow to draw without a GPU); a frame copies
+    // it, at whole device pixels when the label is not rotated, so it stays sharp.
     label(c, text, x, y, { align = "center", size = 13, weight = 600, color = "--ink", rotate = 0 } = {}) {
+      const s = sprite(text, size, weight, color);
+      const left = x + (align === "left" ? 0 : align === "right" ? -s.width : -s.width / 2);
+      const m = c.getTransform();
+      if (!rotate && !m.b && !m.c && Math.abs(m.a - env.pixel) < 1e-6 && Math.abs(m.d - env.pixel) < 1e-6) {
+        c.save();
+        c.setTransform(1, 0, 0, 1, 0, 0);
+        c.drawImage(s.bitmap, Math.round(m.a * (left + s.x0) + m.e), Math.round(m.d * (y + s.y0) + m.f));
+        c.restore();
+        return;
+      }
       c.save();
       c.translate(x, y);
       if (rotate) c.rotate(rotate);
-      c.font = `${weight} ${size * env.unit}px ${family}`;
-      c.direction = "rtl";
-      c.textAlign = align;
-      c.lineJoin = "round";
-      c.lineWidth = 3.5 * env.unit;
-      c.strokeStyle = env.color("--paper");
-      c.strokeText(text, 0, 0);
-      c.fillStyle = env.color(color);
-      c.fillText(text, 0, 0);
+      c.drawImage(s.bitmap, left - x + s.x0, s.y0, s.w, s.h);
       c.restore();
     },
     textWidth(c, text, { size = 13, weight = 600 } = {}) {

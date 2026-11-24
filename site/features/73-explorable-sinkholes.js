@@ -236,30 +236,37 @@ function create(spec) {
       c.fillStyle = env.gradient("land", 0, 0, 0, H, [[0, "--xp-land"], [1, "--xp-land-deep"]]);
       c.fillRect(0, 0, W, H);
     }), 0, 0, W, H);
-    if (moving) { // The sunken surface: sky between the old surface and the new one.
-      ctx.save();
-      ctx.clip(below);
-      ctx.fillStyle = env.gradient("sky", 0, 0, 0, H, [[0, "--xp-sky-top"], [1, "--xp-sky"]]);
-      ctx.fill(shape([...surfacePts, [W, -40], [0, -40]]));
-      ctx.restore();
-    }
-
     // Water in the ground: a tint and pore dots over the sediment. Fresh groundwater between the water table and the
     // interface, saturated Dead Sea water below the interface. The ground stays ground; only the lake is open water.
-    ctx.save();
-    ctx.clip(belowNow);
+    // Each kind of wet ground is a fixed bitmap; a frame copies it through its zone, a simple polygon (cheap to clip;
+    // a pattern fill through the sagging surface cost most of a frame on phones).
+    const wet = (key, token, alpha) => env.layer(key, [0, 0, W, H], (c) => {
+      c.clip(below);
+      c.fillStyle = env.gradient("land", 0, 0, 0, H, [[0, "--xp-land"], [1, "--xp-land-deep"]]);
+      c.fillRect(0, 0, W, H);
+      c.globalAlpha = alpha;
+      c.fillStyle = env.color(token);
+      c.fillRect(0, 0, W, H);
+      c.globalAlpha = 1;
+      c.fillStyle = poreTile(c, env);
+      c.fillRect(0, 0, W, H);
+    });
     const freshZone = shape([[0, wt0], [xs, yL], [0, yI0]]);
     const brineZone = shape([[0, yI0], [W, yI(W)], [W, H], [0, H]]);
-    ctx.globalAlpha = 0.62;
-    ctx.fillStyle = env.color("--xp-fresh");
-    ctx.fill(freshZone);
-    ctx.globalAlpha = 0.72;
-    ctx.fillStyle = env.color("--xp-brine");
-    ctx.fill(brineZone);
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = poreTile(ctx, env);
-    ctx.fill(freshZone);
-    ctx.fill(brineZone);
+    for (const [zone, layer] of [[freshZone, wet("fresh-ground", "--xp-fresh", 0.62)], [brineZone, wet("brine-ground", "--xp-brine", 0.72)]]) {
+      ctx.save();
+      ctx.clip(zone);
+      ctx.drawImage(layer, 0, 0, W, H);
+      ctx.restore();
+    }
+    // The sunken surface: sky in the strip between the old surface and the new one, over the salt only.
+    const sunk = surfacePts.filter(([x]) => x >= SALT.from - 40 && x <= SALT.to + 40);
+    if (moving && sunk.length) {
+      ctx.fillStyle = env.gradient("sky", 0, 0, 0, H, [[0, "--xp-sky-top"], [1, "--xp-sky"]]);
+      ctx.fill(shape([...sunk, ...sunk.map(([x]) => [x, Y(ground(x)) - 1]).reverse()]));
+    }
+    ctx.save();
+    ctx.clip(belowNow);
     // Bedding lines of the ground; over a collapse they bend down into the space the salt left.
     ctx.strokeStyle = env.color("--xp-land-edge");
     ctx.globalAlpha = 0.3;
@@ -481,8 +488,8 @@ function create(spec) {
     ctx.lineJoin = "round";
     ctx.stroke(surfaceLine);
     ctx.drawImage(env.layer("top", [0, 0, W, H], (c) => {
-      env.label(c, L.west, 6, 14, { align: "left", size: 12, weight: 500, color: "--muted" });
-      env.label(c, L.east, W - 6, 14, { align: "right", size: 12, weight: 500, color: "--muted" });
+      env.label(c, L.west, 6, 4 + 11 * u, { align: "left", size: 12, weight: 500, color: "--muted" });
+      env.label(c, L.east, W - 6, 4 + 11 * u, { align: "right", size: 12, weight: 500, color: "--muted" });
       if (!small) env.label(c, L.slope, 70, Y(ground(70)) - 9);
       // Along the slab, at its east end, where the interface never reaches within the control range.
       env.label(c, L.salt, 395, Y(saltTop(395) - thickAt(395) / 2) + 5, { rotate: saltAngle });
