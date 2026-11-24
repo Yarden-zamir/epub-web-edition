@@ -617,6 +617,33 @@ def merge_fragments(frags: list[Line], max_gap: float | None = 15.0) -> list[Lin
     return merged
 
 
+def ltr_runs(text: str) -> str:
+    """Escape a Hebrew note and set each run of three or more Latin words left to right.
+
+    A long English licence notice inside a Hebrew note otherwise shows its punctuation at the wrong edge.
+    A span with dir="ltr" (Kindle reads the dir attribute) keeps the run in order.
+    """
+    words = text.split(" ")
+    out: list[str] = []
+    run: list[str] = []
+
+    def flush() -> None:
+        if len(run) >= 3 and any(c.isascii() and c.isalpha() for w in run for c in w):
+            out.append(f'<span dir="ltr" lang="en">{html.escape(" ".join(run), quote=False)}</span>')
+        else:
+            out.extend(html.escape(w, quote=False) for w in run)
+        run.clear()
+
+    for w in words:
+        if any(is_hebrew(c) for c in w):
+            flush()
+            out.append(html.escape(w, quote=False))
+        else:
+            run.append(w)
+    flush()
+    return " ".join(out)
+
+
 def with_edition_span(caption: str, cls: str, inner: str) -> str:
     """Add an edition span after the printed caption, or make a caption when print has none."""
     span = f'<span class="{cls}">{inner}</span>'
@@ -1531,7 +1558,7 @@ class Ingest:
                 if fig.change:
                     self.used_alt.update(k for k in alts if k.startswith(base + "-"))
                     alt = fig.change.alt or ""
-                    caption = with_edition_span(caption, "edition-note", html.escape(fig.change.note))
+                    caption = with_edition_span(caption, "edition-note", ltr_runs(fig.change.note))
                 elif credit := self.credits.get(base):
                     self.release_used.add(base)
                     caption = with_edition_span(caption, "edition-credit", credit_html(credit))
@@ -1600,7 +1627,7 @@ class Ingest:
             body, _, heading = self.render_unit(unit)
             if unit.kind == "titlepage" and self.release:
                 # book.toml [[release.notice]]: legal notices of the public edition (data licences), once.
-                body += "".join(f'\n<p id="{unit.id}-notice{n}" class="edition-note">{html.escape(x["text"], quote=False)}</p>'
+                body += "".join(f'\n<p id="{unit.id}-notice{n}" class="edition-notice">{ltr_runs(x["text"])}</p>'
                                 for n, x in enumerate(self.cfg["release"].get("notice", []), start=1))
             epub_type = {"cover": "cover", "titlepage": "titlepage", "contents": "toc", "part": "part",
                          "article": "chapter", "frontispiece": "frontispiece", "blank": "",
@@ -1673,7 +1700,7 @@ class Ingest:
                     f'<p class="fx-nav"><a href="{back}">{html.escape(cfg["return_label"])}</a> <span class="fx-label">{label}</span></p>\n'
                     f'<figure id="{name}-img" class="facsimile"><img src="../facsimile/{name}.jpg" width="{pix.width}" height="{pix.height}" '
                     f'alt="{label}: תמונת העמוד המודפס"/></figure>\n'
-                    + "".join(f'<p class="edition-note fx-mask-note">{html.escape(note)}</p>\n' for _, note in masks)
+                    + "".join(f'<p class="edition-note fx-mask-note">{ltr_runs(note)}</p>\n' for _, note in masks)
                     + '</section>')
             page_doc = DOC.format(lang=lang, title=label, body=body).replace("<body>", '<body epub:type="appendix">', 1)
             (self.out / "OEBPS" / "text" / f"{name}.xhtml").write_text(page_doc, encoding="utf-8")

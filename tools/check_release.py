@@ -18,6 +18,7 @@ import hashlib
 import html
 import sys
 import tomllib
+import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
 
@@ -48,19 +49,21 @@ def main() -> None:
         for name in z.namelist():
             if (hit := banned.get(sha(z.read(name)))):
                 leaks.append(f"EPUB {name}: {hit}")
-        text = "".join(z.read(n).decode("utf-8") for n in z.namelist() if n.endswith(".xhtml"))
+        # Text content per document (notes may hold markup, such as a left-to-right span).
+        docs = [z.read(n) for n in z.namelist() if n.endswith(".xhtml") and "/facsimile" not in n and "/fx-" not in n]
+        text = "\n".join(" ".join("".join(ET.fromstring(d).itertext()).split()) for d in docs)
     for path in web.rglob("*"):
         if path.is_file() and (hit := banned.get(sha(path.read_bytes()))):
             leaks.append(f"web {path.relative_to(web)}: {hit}")
     missing = []
     for change in release.get("change", []):
-        if html.escape(change["note"]) not in text:
+        if " ".join(change["note"].split()) not in text:
             missing.append(f"{change['image']}: edition note missing")
     for credit in release.get("credit", []):
-        if html.escape(credit["text"]) not in text:
+        if " ".join(credit["text"].split()) not in text:
             missing.append(f"{credit['image']}: edition credit missing")
     for notice in release.get("notice", []):
-        if html.escape(notice["text"], quote=False) not in text:
+        if " ".join(notice["text"].split()) not in text:
             missing.append(f"release notice missing: {notice['text'][:40]}")
     missing += over_budget(epub)
     print(f"changed images {len(release.get('change', []))} | banned files {len(banned)} | leaks {len(leaks)}")
