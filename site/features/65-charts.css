@@ -13,7 +13,7 @@
 .chart-plot { position: relative; }
 /* The y axis is on the left of the drawing, so its title sits on the left too, and the legend on the right. */
 .chart-head { display: flex; flex-direction: row-reverse; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.25rem 1rem; font-family: var(--sans); font-size: 0.8rem; }
-.chart-axis-title, .chart-x-title { margin: 0 0 0.25rem; color: var(--muted); font-family: var(--sans); font-size: 0.78rem; }
+.chart-axis-title, .chart-x-title { margin: 0 0 0.25rem; color: var(--muted); font-family: var(--sans); font-size: 0.8125rem; }
 .chart-x-title { text-align: center; margin-top: 0.15rem; }
 .chart-legend { display: flex; flex-wrap: wrap; gap: 0.25rem 0.9rem; margin: 0; padding: 0; list-style: none; color: var(--ink); }
 .chart-legend li { display: inline-flex; align-items: center; gap: 0.4rem; }
@@ -27,19 +27,19 @@
 .chart .line.s2 { stroke: var(--series-2); }
 .chart .pt { fill: var(--series); }
 .chart .pt.s2 { fill: var(--series-2); }
-.chart .direct { font-size: 12px; font-weight: 600; fill: var(--series); }
+.chart .direct { font-size: 13px; font-weight: 600; fill: var(--series); }
 .chart .direct.s2 { fill: var(--series-2); }
 .chart .band { fill: color-mix(in srgb, var(--muted) 12%, transparent); }
-.chart .band-label { fill: var(--muted); font-size: 11px; font-weight: 700; }
+.chart .band-label { fill: var(--muted); font-size: 13px; font-weight: 700; }
 .chart .marker { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 4; }
 .chart .marker-badge { fill: var(--paper); stroke: var(--muted); stroke-width: 1; }
-.chart .marker-n { fill: var(--ink); font-size: 10px; font-weight: 700; }
+.chart .marker-n { fill: var(--ink); font-size: 12px; font-weight: 700; }
 .chart .cross { stroke: var(--muted); stroke-width: 1; }
 .chart .dot { fill: var(--series); stroke: var(--paper); stroke-width: 2; }
 .chart .dot.s2 { fill: var(--series-2); }
 .chart:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
-.chart-markers { margin: 0.4rem 0 0; padding-inline-start: 1.4rem; font-family: var(--sans); font-size: 0.78rem; color: var(--soft); }
-.chart-source, .chart-notes { margin: 0.6rem 0 0; font-family: var(--sans); font-size: 0.78rem; line-height: 1.5; color: var(--muted); }
+.chart-markers { margin: 0.4rem 0 0; padding-inline-start: 1.4rem; font-family: var(--sans); font-size: 0.8125rem; color: var(--soft); }
+.chart-source, .chart-notes { margin: 0.6rem 0 0; font-family: var(--sans); font-size: 0.8125rem; line-height: 1.5; color: var(--muted); }
 .chart-source a { color: inherit; }
 .csv-link { display: inline-block; min-height: 1.5rem; padding-block: 0.2rem; margin-top: 0.5rem; font-family: var(--sans); font-size: 0.8rem; color: var(--accent); }
 .chart-tip { position: absolute; transform: translate(-50%, calc(-100% - 12px)); padding: 0.3rem 0.55rem; border-radius: var(--radius-s); background: var(--ink); color: var(--paper); font-family: var(--sans); font-size: 0.8rem; white-space: nowrap; pointer-events: none; }

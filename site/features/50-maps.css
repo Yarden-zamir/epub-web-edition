@@ -20,7 +20,7 @@
 .map-pin { overflow: visible; }
 .map-pin .pin-dot { position: absolute; inset: 1px; border-radius: 50%; background: var(--pin); box-shadow: 0 0 0 2px var(--pin-ring), 0 1px 4px rgb(0 0 0 / 0.45); transition: scale var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease); }
 .map-pin .pin-label {
-  position: absolute; top: 50%; right: calc(100% + 4px); translate: 0 -50%; color: var(--ink); font: 600 12.5px/1.3 var(--sans); white-space: nowrap; pointer-events: none;
+  position: absolute; top: 50%; right: calc(100% + 4px); translate: 0 -50%; color: var(--ink); font: 600 13px/1.3 var(--sans); white-space: nowrap; pointer-events: none;
   text-shadow: 0 0 1px var(--halo), 0 0 2px var(--halo), 0 0 3px var(--halo), 0 0 4px var(--halo), 0 0 6px var(--halo);
 }
 .map-pin.label-hidden .pin-label { visibility: hidden; }
