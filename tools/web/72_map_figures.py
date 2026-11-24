@@ -6,14 +6,13 @@ writes the then-and-now images to media/then-now/ at the size the view needs, an
 site/features/75-map-figures.js fills the box and adds a toggle between the map and the printed image.
 """
 
-import html
 import json
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from PIL import Image
 
-from build_web import BookError, Site, missing_id
+from build_web import BookError, Site, credit_html, missing_id
 
 # Line colours for figure maps: the first three slots of the dataviz reference palette, the only slots that stay apart
 # for colour-blind readers when all pairs can meet (site/features/75-map-figures.css). Each slot also has its own dash.
@@ -47,19 +46,6 @@ def book_path(site: Site, path: str, where: str) -> Path:
     if not path.startswith("site/"):
         raise BookError(f"{where}: {path!r} must start with site/")
     return site.data_dir / path.removeprefix("site/")
-
-
-def credit_html(lines: list[str], links: dict[str, str], where: str) -> str:
-    """The attribution lines as HTML, with the first use of each linked word made a link."""
-    text = " · ".join(html.escape(line) for line in lines)
-    for word, url in links.items():
-        if not url.startswith("https://"):
-            raise BookError(f"{where}: attribution link for {word!r} must be https")
-        key = html.escape(word)
-        if key not in text:
-            raise BookError(f"{where}: attribution_links names {word!r}, which no attribution line has")
-        text = text.replace(key, f'<a href="{html.escape(url)}" rel="noopener">{key}</a>', 1)
-    return text
 
 
 def map_box(figure: str, kind: str) -> ET.Element:
