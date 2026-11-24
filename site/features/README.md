@@ -23,6 +23,8 @@ Use the tokens of `00-base.css`, never a literal value for the same purpose.
 | `--radius-s` | 0.5rem | Inputs, chips, thumbnails, small tooltips |
 | `--radius-m` | 0.875rem | Cards, popovers, dialogs, menus, sheets, video |
 | `--radius-pill` | 999px | Pill buttons, toggles, round icon buttons |
+| `--ease-out`, `--ease-in-out` | curves | Arriving parts; parts that move from place to place (`01-motion.css`) |
+| `--dur-quick`, `--dur-base`, `--dur-slow` | 150, 250, 400 ms | Hover and colour; small panels, chips, swaps; larger changes. Shorter with reduced motion |
 
 - A part inside a rounded box with padding takes the outer radius minus the padding, so the corners stay concentric. For example, a row inside a `--radius-m` panel with 0.5rem padding uses `calc(var(--radius-m) - 0.5rem)`.
 - Circles (dots) use 50%. Book photos have no radius.
