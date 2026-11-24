@@ -283,6 +283,8 @@ def main() -> None:
         run([*uv, "tools/build_web.py", EPUB, WEB, CONTENT / "site" / "enhancements.json"], PIPELINE)
         # check_release also runs tools/check_size.py: the EPUB at most 24 MB, under the 25 MB file limit of kitshn.
         run([*uv, "tools/check_release.py", CONTENT, EPUB, WEB], PIPELINE)
+        # Link previews: absolute addresses from the one URL setting, app.json (tools/check_meta.py).
+        run([*uv, "tools/check_meta.py", WEB, CONTENT / "site" / "app.json"], PIPELINE)
         preview(a.preview.split(","))
     groups = set(filter(None, a.advisory.split(",")))
     unknown = groups - {"epubcheck", "smoke", "explorables", "record", "sample"}
