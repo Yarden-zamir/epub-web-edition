@@ -59,7 +59,7 @@ Each file has one owner. Others only read it.
 | site/crosslinks.json | content-data agent | {"links": [{"element": "paragraph ID", "text": "exact substring that names the chapter", "target": "chapter heading ID"}]} |
 | site/charts/<figure-id>.json | charts agent | {"figure", "title", "source": {"kind": "digitized" or "dataset", "label", "url"?, "method"}, "x": {"label", "unit", "type": "year" or "number"}, "y": {"label", "unit"}, "series": [{"name", "points": [[x, y], …]}], "notes"} |
 | site/translations/<lang>/<unit>.json (built by translations/build.py from translations/<lang>/<unit>.txt) | translation agent (done) | {"unit", "lang", "translator": "machine translation (Claude), not reviewed", "items": {"element ID": "inner HTML of that element in the target language"}} |
-| site/then-now.json | orchestrator | then-and-now spec (fitted 1848 map) |
+| site/then-now.json | maps agent (from 2026-11-24) | then-and-now spec: fitted old maps, today layer, levels |
 | site/data/*.json, site/media/* | as created | data files and public-domain media referenced by the files above |
 
 Pipeline repo ownership: UI agent owns tools/build_web.py, tools/verify.py, site/*, kitshn.config.ts; the EPUB/Kindle quality agent owns tools/ingest_pdf.py, tools/build_epub.py, tools/check_*.py, tools/calibre_view.py, tools/figure_sheets.py.
