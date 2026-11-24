@@ -23,7 +23,8 @@
 // env: unit (drawing units per CSS pixel), time (seconds, for slow motion), color(token), gradient(key, x0, y0, x1, y1, stops),
 //      layer(key, [x, y, w, h], draw) -> a bitmap of draw() for parts that never change (copy it with ctx.drawImage),
 //      overlay(tag, className) -> an element over the canvas (and under the handle), scale (CSS px per unit), view,
-//      label(ctx, text, x, y, options), figures(ctx, text, x, y, options) for a number with fixed-width digits.
+//      label(ctx, text, x, y, options), figures(ctx, text, x, y, options) for a number with fixed-width digits,
+//      textWidth(ctx, text, {size, weight}) -> width of a label in drawing units.
 // All feature scripts share one scope (site/features/README.md): only explorableKit is global here.
 const explorableKit = (() => {
 
@@ -124,6 +125,13 @@ function makeEnv(box) {
       c.fillText(text, 0, 0);
       c.restore();
     },
+    textWidth(c, text, { size = 13, weight = 600 } = {}) {
+      c.save();
+      c.font = `${weight} ${size * env.unit}px ${family}`;
+      const width = c.measureText(text).width;
+      c.restore();
+      return width;
+    },
     // A number whose digits all take the width of "0", right-aligned at x: it never shifts as it changes.
     figures(c, text, x, y, { size = 13, weight = 700, color = "--ink" } = {}) {
       c.save();
@@ -196,7 +204,7 @@ async function setUp(figure, box) {
     b.style.setProperty("--at", at.toFixed(4));
     b.dataset.edge = at < 0.08 ? "start" : at > 0.92 ? "end" : "middle";
     b.setAttribute("aria-label", `${c.label}: ${mark.label}`);
-    b.addEventListener("click", () => { markHintSeen(figure.id); animateTo(mark.value); });
+    b.addEventListener("click", () => { markHintSeen(figure.id); touched = true; animateTo(mark.value); });
     marks.append(b);
   }
   if (marks.childElementCount) track.append(marks);
@@ -241,8 +249,8 @@ async function setUp(figure, box) {
   if (!ctx) throw new Error(`explorable ${figure.id}: no 2D canvas`);
   env.bind(ctx);
   const scene = kind.create(spec, env);
-  let value = c.start, summary = "", scale = 1, moving = false;
-  let frame = 0, tween = 0, pending = c.start;
+  let value = c.start, summary = "", scale = 1, moving = false, touched = false; // touched: the reader moved it.
+  let frame = 0, tween = 0, pending = c.start; // pending: the newest value asked for; redraws use it, not `value`.
 
   let canvasValue = NaN; // The value the canvas shows; NaN after a resize or theme change.
   function drawCanvas(v) {
@@ -309,6 +317,7 @@ async function setUp(figure, box) {
     if (down.button !== 0) return;
     down.preventDefault();
     markHintSeen(figure.id);
+    touched = true;
     handle.setPointerCapture(down.pointerId);
     stage.classList.add("dragging");
     moving = true;
@@ -325,8 +334,9 @@ async function setUp(figure, box) {
     handle.addEventListener("pointerup", end, { once: true });
     handle.addEventListener("pointercancel", end, { once: true });
   });
-  input.addEventListener("input", () => { moving = true; setValue(Number(input.value)); });
-  input.addEventListener("change", () => { moving = false; show(value); commit(); });
+  input.addEventListener("input", () => { touched = true; moving = true; setValue(Number(input.value)); });
+  // The input holds the new value; `value` may still be the last painted one (a tap fires input and change together).
+  input.addEventListener("change", () => { moving = false; show(Number(input.value)); commit(); });
   input.addEventListener("pointerdown", () => markHintSeen(figure.id));
   input.addEventListener("keydown", (e) => {
     const big = c.step * Math.max(1, Math.round(span / c.step / 10));
@@ -339,9 +349,10 @@ async function setUp(figure, box) {
     if (target === null) return;
     e.preventDefault();
     markHintSeen(figure.id);
+    touched = true;
     animateTo(target, 220);
   });
-  reset.addEventListener("click", () => animateTo(c.start, 520));
+  reset.addEventListener("click", () => { touched = true; animateTo(c.start, 520); });
 
   // The canvas matches its box in device pixels; drawings work in their own units (`scale` CSS px each).
   new ResizeObserver(() => {
@@ -356,9 +367,9 @@ async function setUp(figure, box) {
     env.scale = scale;
     canvasValue = NaN;
     scene.resize?.(env);
-    show(value);
+    show(pending);
   }).observe(stage);
-  const retheme = () => { env.reset(); canvasValue = NaN; scene.resize?.(env); show(value); };
+  const retheme = () => { env.reset(); canvasValue = NaN; scene.resize?.(env); show(pending); };
   // The canvas draws with the site font; draw again once it has loaded, or labels keep a fallback font.
   const refont = () => { sizeSlots(); retheme(); };
   document.fonts.ready.then(refont);
@@ -385,12 +396,13 @@ async function setUp(figure, box) {
       if (!entries[0].isIntersecting) return;
       observer.disconnect();
       setTimeout(() => {
-        if (hintSeen(figure.id)) return;
+        if (hintSeen(figure.id) || touched) return;
         markHintSeen(figure.id);
         stage.classList.add("hinting");
         const back = value;
         animateTo(back + c.hint, 650);
-        setTimeout(() => { animateTo(back, 650); setTimeout(() => stage.classList.remove("hinting"), 700); }, 750);
+        // The way back is skipped when the reader took over in the meantime.
+        setTimeout(() => { if (!touched) animateTo(back, 650); setTimeout(() => stage.classList.remove("hinting"), 700); }, 750);
       }, 500);
     }, { threshold: 0.6 }).observe(stage);
   }

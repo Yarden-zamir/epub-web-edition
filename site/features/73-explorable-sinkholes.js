@@ -16,8 +16,9 @@ const INTERFACE_DIP = 0.03; // Metres per unit of x, down to the west.
 const WATER_TABLE_WEST = -382; // Groundwater table at the west edge.
 // Dissolution (schematic, like the printed figure, not a model of the rate): along the salt layer, how deep fresh water
 // has eaten (0 to 1, above 1 is through the layer) grows with the metres of level drop since fresh water reached
-// that point, EAT metres for the full depth, varied by seeded noise, so the front is jagged and pockets connect.
-const EAT = 9, GRID = 3, SEED = 7; // Any fixed seed: it only fixes the shapes of the pockets.
+// that point, EAT metres for the full depth, up to a seeded limit per point: the layer stays riddled, not removed,
+// and only some points are eaten through. Seeded noise makes the front jagged and connects the pockets.
+const EAT = 10, GRID = 3, SEED = 7; // Any fixed seed: it only fixes the shapes of the pockets.
 // Collapse sites: x and a size factor. A roof falls once the salt below is eaten through.
 const SITES = [[122, 0.8], [158, 1.1], [184, 0.7], [221, 1], [259, 0.9], [296, 1.2], [327, 0.8], [362, 1]];
 const STREAKS = [0.15, 0.35, 0.55, 0.75, 0.92]; // Fresh-water flow lines, as fractions between water table and interface.
@@ -106,7 +107,7 @@ function create(spec) {
   for (let x = SALT.from + 2; x <= SALT.to - 8; x += GRID) cols.push({ x, at: exposureLevel(x, min, max), n: rand(), jag: rand() * 2 - 1 });
   for (let pass = 0; pass < 2; pass++) // Smooth the depth noise, so pockets are lobes, not spikes.
     cols.forEach((col, i) => { col.n = (cols[Math.max(0, i - 1)].n + col.n * 2 + cols[Math.min(cols.length - 1, i + 1)].n) / 4; });
-  const eaten = (col, level) => (col.at === null ? 0 : Math.min(1.25, Math.max(0, ((col.at - level) / EAT) * (0.45 + 1.1 * col.n))));
+  const eaten = (col, level) => (col.at === null ? 0 : Math.min(0.3 + 0.95 * col.n, Math.max(0, ((col.at - level) / EAT) * (0.5 + col.n))));
   const colAt = (x) => cols[Math.max(0, Math.min(cols.length - 1, Math.round((x - cols[0].x) / GRID)))];
   // Pockets inside the salt that open as the front nears them and merge with it.
   const pockets = Array.from({ length: 16 }, () => ({
@@ -215,7 +216,7 @@ function create(spec) {
     if (deepest > 0.02) {
       ctx.save();
       ctx.clip(salt);
-      ctx.fillStyle = env.color("--xp-fresh");
+      ctx.fillStyle = env.color("--xp-cavity");
       ctx.fill(hole);
       ctx.strokeStyle = env.color("--xp-salt-edge");
       ctx.lineWidth = 1;
@@ -226,7 +227,8 @@ function create(spec) {
 
     let fallen = 0;
     for (const h of holes) {
-      const down = ramp(eaten(h.col, level), 0.95, 1.15);
+      const near = cols.filter((col) => Math.abs(col.x - h.x) <= 6).map((col) => eaten(col, level));
+      const down = ramp(Math.max(...near), 0.92, 1.08);
       if (down > 0.01) {
         ctx.save();
         ctx.translate(h.x, h.g);
@@ -333,14 +335,21 @@ function create(spec) {
       ctx.save(); ctx.translate(xb, yI(xb) + 18); ctx.strokeStyle = env.color("--xp-brine-ink"); ctx.stroke(arrowLeft); ctx.restore();
     }
     ctx.lineCap = "butt";
-    if (!small) env.label(ctx, L.water_table, xs * 0.5, wt(xs * 0.5) - 7);
+    if (!small) env.label(ctx, L.water_table, Math.max(xs * 0.5, Math.min(xs - 60, 400)), wt(Math.max(xs * 0.5, Math.min(xs - 60, 400))) - 7);
     const ix = Math.max(60, xs * 0.3);
     env.label(ctx, L.interface, ix, yI(ix) + 18);
     const say = ramp(deepest, 0.02, 0.2);
     if (say > 0.01) {
-      const lx = Math.min(Math.max(150, (SALT.from + frontEnd) / 2 + 30), xs - 90);
+      // West of the salt, between the water table and the interface: the fresh water that flows into the salt.
+      // Two short lines (split at the label's middle space), so it fits before the salt starts.
+      const words = L.fresh_dissolves.split(" ");
+      const half = Math.ceil(words.length / 2);
+      const lines = [words.slice(0, half).join(" "), words.slice(half).join(" ")];
+      const look = { color: "--xp-fresh-ink", weight: 700, size: small ? 11 : 12 };
+      const widest = Math.max(...lines.map((line) => env.textWidth(ctx, line, look)));
+      const lx = Math.max(56, widest / 2 + 5 * u), ly = (wt(lx) + yI(lx)) / 2 - 2; // Never past the left edge.
       ctx.globalAlpha = say;
-      env.label(ctx, L.fresh_dissolves, lx, (wt(lx) + Y(saltTop(lx))) / 2 + 5, { color: "--xp-fresh-ink", weight: 700 });
+      lines.forEach((line, i) => env.label(ctx, line, lx, ly + i * 14 * u, look));
       ctx.globalAlpha = 1;
     }
     // Just left of the handle (radius 14 CSS pixels), right-aligned with fixed-width digits: it never jitters.
