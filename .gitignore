@@ -1,3 +1,5 @@
 dist/
 __pycache__/
 work/
+epub-src/
+epub-src-release/
