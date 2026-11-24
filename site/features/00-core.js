@@ -200,6 +200,32 @@ addEventListener("scroll", () => {
     if (!document.documentElement.hasAttribute("data-scrubbing")) history.replaceState({ ...history.state, ...position() }, "");
   }, 200);
 }, { passive: true });
+// Exact sizes for skipped documents. content-visibility (02-book.css) lets off-screen chapters skip layout, but then
+// the browser places them by an estimate; a wrong estimate moves every position below it (native anchor jumps,
+// find-in-page, test tools). So render every document once, measure it, and keep that height as its estimate.
+// Again after fonts load and when the width changes. Later changes near the reader (a chart drawing) update by
+// themselves, because the estimate is "auto" (the last rendered size).
+function sizeDocuments() {
+  const root = document.documentElement;
+  const keep = root.hasAttribute("data-render-all"); // A tool asked to see everything rendered: leave it so.
+  root.setAttribute("data-render-all", "");
+  const docs = [...reading.querySelectorAll(":scope > .doc, :scope > .fx-set")];
+  const heights = docs.map((d) => d.getBoundingClientRect().height);
+  docs.forEach((d, i) => { d.style.containIntrinsicSize = `auto ${Math.ceil(heights[i])}px`; });
+  if (!keep) root.removeAttribute("data-render-all");
+}
+sizeDocuments();
+document.fonts.ready.then(sizeDocuments);
+{
+  let width = innerWidth, timer = 0;
+  addEventListener("resize", () => {
+    if (innerWidth === width) return; // Height-only changes (a phone's bar) keep the sizes.
+    width = innerWidth;
+    clearTimeout(timer);
+    timer = setTimeout(sizeDocuments, 300);
+  });
+}
+
 // Arrival: a reload returns to its saved position; a deep link from outside lands on and highlights its element.
 {
   const state = history.state;
