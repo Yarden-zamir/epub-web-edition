@@ -103,8 +103,8 @@ evidence = "https://en.wikipedia.org/wiki/Komodo_(island)"
 [[correction]]
 element = "a19-p009"
 page = 185
-find = "במאה ה- 14"
-replace = "במאה ה- 15"
+find = "במאה ה-14"
+replace = "במאה ה-15"
 reason = "Arnold von Harff travelled to the Holy Land in 1496-1499 (still the Mamluk period, so the bracket stays true)."
 evidence = "https://en.wikipedia.org/wiki/Arnold_von_Harff"
 

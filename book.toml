@@ -29,7 +29,7 @@ replace = "site in the world (ראו איורים בעמודים 107, 108)."
 reason = "Page numbers after a Hebrew run inside an English line: logical order, so the line displays like the print."
 [[text_fix]]
 page = 127
-find = "וסביבתו) Siwa,"
+find = "וסביבתו)Siwa,"
 replace = "וסביבתו (Siwa,"
 reason = "Opening bracket before a Latin run."
 [[text_fix]]
@@ -54,7 +54,7 @@ replace = "(Gay-Lussac, 1819; Ehrenberg, 1848; Lortet,"
 reason = "One citation run over two lines; print breaks it at the line end."
 [[text_fix]]
 page = 283
-find = "Bass-Becking,1934; 1891),"
+find = "Bass-Becking,1934;1891),"
 replace = "1891; Bass-Becking,1934),"
 reason = "End of the same citation run."
 [[text_fix]]
@@ -69,7 +69,7 @@ replace = "(Kaplan & Friedman, 1970; Oren & Shilo,"
 reason = "One citation run over two lines; print breaks it at the line end."
 [[text_fix]]
 page = 286
-find = "Oren,1983a, 1993; 1982)."
+find = "Oren,1983a, 1993;1982)."
 replace = "1982; Oren,1983a, 1993)."
 reason = "End of the same citation run."
 [[text_fix]]
@@ -89,7 +89,7 @@ replace = "(Wachs et al., 2000,"
 reason = "Opening bracket at the start of a line before a Latin run."
 [[text_fix]]
 page = 303
-find = "(RB (."
+find = "(RB(."
 replace = "(RB)."
 reason = "Closing bracket after a Latin abbreviation."
 
@@ -119,6 +119,22 @@ contains = "1982; Oren,1983a, 1993)."
 page = 291
 contains = "הנורווגי Hiorth (1919) הציע"
 
+[[text_fix]]
+page = 145
+find = "בקתדרה 2002,101."
+replace = "בקתדרה 101, 2002."
+reason = "Number order in a Hebrew line: print reads 101, 2002 (errata/print-check.md row 33)."
+[[text_fix]]
+page = 305
+find = "9 /1978"
+replace = "1978/9"
+reason = "Print reads 1978/9 (winter 1978-79)."
+[[text_fix]]
+page = 311
+find = "Ehrenberg, C.G. 54.מובא"
+replace = "54. Ehrenberg, C.G. מובא"
+reason = "Entry 54 starts its own line in print; the label came out after the Latin run (errata/print-check.md row 68)."
+
 # Bracket defects that are in the print. tools/check_text.py skips paragraphs that contain these texts.
 [[print_quirk]]
 contains = "(בעברית: 'חורבת הנחושת' שוכנת"
@@ -127,7 +143,7 @@ reason = "PDF page 176: print opens a bracket and never closes it."
 contains = "(למיקום שטחי החפירה של"
 reason = "PDF page 178: print opens two brackets and closes one."
 [[print_quirk]]
-contains = "(מעבר ל־ 100"
+contains = "(מעבר ל־100"
 reason = "PDF page 300: print opens a bracket and never closes it."
 [[print_quirk]]
 contains = "באתר (Hebrewbooks."
@@ -333,8 +349,8 @@ evidence = "https://en.wikipedia.org/wiki/Komodo_(island)"
 [[correction]]
 element = "a19-p009"
 page = 185
-find = "במאה ה- 14"
-replace = "במאה ה- 15"
+find = "במאה ה-14"
+replace = "במאה ה-15"
 reason = "Arnold von Harff travelled to the Holy Land in 1496-1499 (still the Mamluk period, so the bracket stays true)."
 evidence = "https://en.wikipedia.org/wiki/Arnold_von_Harff"
 
