@@ -1,6 +1,6 @@
 # /// script
 # requires-python = ">=3.15"
-# dependencies = ["pymupdf==1.28.2", "python-bidi==0.6.12"]
+# dependencies = ["pymupdf==1.28.2", "python-bidi==0.6.12", "fonttools==4.68.0"]
 # ///
 """Convert a print PDF into an EPUB source tree and a page inventory.
 
@@ -27,18 +27,25 @@ Rules:
 import csv
 import hashlib
 import html
+import io
+import logging
 import shutil
 import sys
 import tomllib
 import unicodedata
 import xml.etree.ElementTree as ET
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal
 
 import pymupdf
 from bidi import get_display
+from fontTools.cffLib import CFFFontSet
+from fontTools.pens.boundsPen import BoundsPen
+from fontTools.ttLib import TTFont
+
+logging.getLogger("fontTools").setLevel(logging.ERROR)  # Subset fonts carry odd head dates; marks need only outlines.
 
 PIPELINE = Path(__file__).resolve().parent.parent
 FONT_DIR = PIPELINE / "epub-src" / "OEBPS" / "fonts"
@@ -58,6 +65,90 @@ class Cluster:
     text: str
     style: Literal["", "b", "sup"]
     bracket_font: Literal["", "hebrew", "latin"] = ""  # Hebrew fonts store a bracket's logical code, Latin fonts its shape.
+    baseline: float = 0.0  # Pen origin y, to match marks of the same printed line.
+
+
+@dataclass(frozen=True)
+class Mark:
+    """A combining mark (Hebrew point) at the horizontal centre of its printed ink, on a baseline."""
+    text: str
+    cx: float
+    baseline: float
+    size: float
+
+
+# Order of marks on one letter: shin and sin dots, dagesh, vowels, then other marks (meteg, accents).
+# This is the order of standard Hebrew typing, and canonically equivalent to NFC.
+MARK_RANK = {"\u05c1": 0, "\u05c2": 0, "\u05bc": 1}
+
+
+def mark_rank(c: str) -> int:
+    return MARK_RANK.get(c, 2 if "\u05b0" <= c <= "\u05bb" or c == "\u05c7" else 3)
+
+
+type GlyphInk = Callable[[int], tuple[float, float] | None]  # Glyph ID -> left and right ink edge in em, or None.
+
+
+def glyph_ink(data: bytes) -> GlyphInk:
+    """Ink extent of glyphs in an embedded font: TrueType or OpenType, or a bare CFF font (Type1C)."""
+    if data[:4] in (b"\x00\x01\x00\x00", b"OTTO", b"true"):
+        font = TTFont(io.BytesIO(data))
+        glyphs, order, upm = font.getGlyphSet(), font.getGlyphOrder(), font["head"].unitsPerEm
+
+        def tt(gid: int) -> tuple[float, float] | None:
+            pen = BoundsPen(glyphs)
+            glyphs[order[gid]].draw(pen)
+            return None if pen.bounds is None else (pen.bounds[0] / upm, pen.bounds[2] / upm)
+        return tt
+    cff = CFFFontSet()
+    cff.decompile(io.BytesIO(data), None)
+    top = cff[cff.fontNames[0]]
+    scale = top.FontMatrix[0] if hasattr(top, "FontMatrix") else 0.001
+
+    def cf(gid: int) -> tuple[float, float] | None:
+        cs = top.CharStrings[top.charset[gid]]
+        bounds = cs.calcBounds(top.CharStrings)
+        return None if bounds is None else (bounds[0] * scale, bounds[2] * scale)
+    return cf
+
+
+def page_marks(doc: "pymupdf.Document", page: "pymupdf.Page", char_map: dict[str, str],
+               fonts: dict[int, GlyphInk]) -> list[Mark]:
+    """Combining marks of a page, placed where their ink prints.
+
+    MuPDF places a zero-width mark glyph at a neighbour's edge, so its position names the wrong letter.
+    The text trace has each glyph's pen origin and glyph ID: a mark with its own glyph prints at the origin
+    plus the centre of its outline (read from the embedded font); a mark without a glyph (ID -1) comes from
+    the text of the letter glyph before it, so it prints over that letter.
+    """
+    by_name = {base.split("+")[-1]: xref for xref, _, _, base, *_ in page.get_fonts()}
+    marks: list[Mark] = []
+    for span in page.get_texttrace():
+        if (span["dir"] != (1.0, 0.0) or span["wmode"] != 0) and any(
+                unicodedata.combining(char_map.get(chr(u), chr(u))) for u, *_ in span["chars"]):
+            raise IngestError(f"PDF page {page.number + 1}: marks in a text span that is not horizontal; they need a new rule")
+        prev: tuple[float, float] | None = None
+        for u, gid, origin, bbox in span["chars"]:
+            c = char_map.get(chr(u), chr(u))
+            if not unicodedata.combining(c):
+                prev = (bbox[0], bbox[2])
+                continue
+            if gid == -1:
+                if prev is None:
+                    raise IngestError(f"PDF page {page.number + 1}: mark U+{ord(c):04X} without a letter glyph before it")
+                marks.append(Mark(c, (prev[0] + prev[1]) / 2, origin[1], span["size"]))
+                continue
+            xref = by_name[span["font"]]
+            if xref not in fonts:
+                data = doc.extract_font(xref)[3]
+                if not data:
+                    raise IngestError(f"PDF page {page.number + 1}: font {span['font']} is not embedded; cannot place its marks")
+                fonts[xref] = glyph_ink(data)
+            ink = fonts[xref](gid)
+            if ink is None:
+                continue  # An empty glyph prints nothing.
+            marks.append(Mark(c, origin[0] + (ink[0] + ink[1]) / 2 * span["size"], origin[1], span["size"]))
+    return marks
 
 
 MIRROR = {"(": ")", ")": "("}
@@ -566,6 +657,8 @@ class Ingest:
         self.layout = self.cfg["layout"]
         self.rules = self.cfg["role"]
         self.char_map: dict[str, str] = self.cfg.get("char_map", {})
+        self.marks: dict[int, list[Mark]] = {}
+        self.fonts: dict[int, GlyphInk] = {}
         self.text_fixes_used: set[tuple[int, str]] = set()
         for key, url in self.cfg.get("qr_links", {}).items():
             if not url.startswith(("https://", "http://")):
@@ -663,6 +756,9 @@ class Ingest:
         page = self.doc[pno - 1]
         height = page.rect.height
         result: list[Line] = []
+        if pno not in self.marks:
+            self.marks[pno] = page_marks(self.doc, page, self.char_map, self.fonts)
+        marks = list(self.marks[pno])  # A mark leaves this list when a letter takes it.
         for block in page.get_text("rawdict", flags=pymupdf.TEXT_PRESERVE_WHITESPACE)["blocks"]:
             if block["type"] != 0:
                 continue
@@ -672,11 +768,14 @@ class Ingest:
                     box = line["bbox"] if len(groups) == 1 else (
                         min(s["bbox"][0] for s in group), min(s["bbox"][1] for s in group),
                         max(s["bbox"][2] for s in group), max(s["bbox"][3] for s in group))
-                    if (frag := self.fragment(pno, group, box, height)) is not None:
+                    if (frag := self.fragment(pno, group, box, height, marks)) is not None:
                         result.append(frag)
+        for m in marks:
+            self.issue(pno, "mark", f"U+{ord(m.text):04X} at x {m.cx:.1f} sits over no letter; left out, check the print")
         return result
 
-    def fragment(self, pno: int, spans: list[dict], box: tuple[float, float, float, float], height: float) -> Line | None:
+    def fragment(self, pno: int, spans: list[dict], box: tuple[float, float, float, float], height: float,
+                 marks: list[Mark]) -> Line | None:
         """One text fragment from PDF spans. None for white space, a running head or a folio."""
         x0, y0, x1, y1 = box
         printed = [s for s in spans if "".join(c["c"] for c in s["chars"]).strip()]
@@ -705,16 +804,36 @@ class Ingest:
                     raise IngestError(f"PDF page {pno}: control character U+{ord(c):04X}; add it to [char_map] in book.toml")
                 if c == "\ufffd":
                     raise IngestError(f"PDF page {pno}: a glyph without a character code (U+FFFD); check the print and add it to [char_map] in book.toml")
-                if unicodedata.combining(c) and clusters:
-                    clusters[-1].text += c  # Points stay with their letter.
-                    continue
+                if unicodedata.combining(c):
+                    continue  # Marks come from page_marks(), placed by their ink.
                 kind: Literal["", "hebrew", "latin"] = ""
                 if c in MIRROR:
                     kind = "hebrew" if any(h in font for h in self.layout["hebrew_fonts"]) else "latin"
-                clusters.append(Cluster(ch["bbox"][0], ch["bbox"][2], c, style, kind))
+                clusters.append(Cluster(ch["bbox"][0], ch["bbox"][2], c, style, kind, ch["origin"][1]))
+        self.attach_marks(clusters, marks)
         plain = "".join(c.text for c in clusters)
         role = role_for(font, size, self.rules)  # "small" resolves to caption or footnote later.
         return Line(pno, y0, y1, x0, x1, role, "", plain, hebrew_share(plain) >= 0.5, size, clusters)
+
+    @staticmethod
+    def attach_marks(clusters: list[Cluster], marks: list[Mark]) -> None:
+        """Give each mark to the letter on its baseline whose box holds the mark's ink centre.
+
+        A letter never takes the same mark twice: a letter glyph whose text already has a point can print
+        the same point again as its own glyph (PDF page 244, "לַשִּׁבֳּלִים").
+        """
+        letters = [c for c in clusters if not c.text.isspace()]
+        for m in list(marks):
+            # A mark can sit off the baseline: a qamats inside a final kaf is drawn 4.5 pt higher (PDF page 153).
+            near = [c for c in letters if abs(c.baseline - m.baseline) < 0.45 * m.size and c.x0 - 0.3 <= m.cx <= c.x1 + 0.3]
+            if not near:
+                continue
+            target = min(near, key=lambda c: abs((c.x0 + c.x1) / 2 - m.cx))
+            marks.remove(m)
+            if m.text not in target.text[1:]:
+                target.text += m.text
+        for c in letters:
+            c.text = c.text[0] + "".join(sorted(c.text[1:], key=mark_rank))
 
     def figures(self, pno: int) -> list[Figure]:
         """Figures of a page. Unmodified image streams where possible; derived images where print needs more.
