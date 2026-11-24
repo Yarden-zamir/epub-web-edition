@@ -6,15 +6,14 @@ Clearance evidence: scratchpad clearance record of 2026-11-24, summarized in boo
 
 ## Rights and credits
 
-1. PDF page 302 Google Earth view (p302-x1173): withheld in the release. The image shows "Google" only; Google requires the imagery providers too. Decide: keep withheld, or restore with full attribution.
+1. PDF page 302 Google Earth view (p302-x1173): withheld. Maps agent (2026-11-24) checks Google's guidelines and otherwise draws an open map.
 2. PDF page 183 Theriaca Reformata jar (p183-x717): withheld. No source found among 411 Commons candidates.
-3. PDF page 301 route map, Bein et al. 2020 (p301-x1169): withheld until the authors give permission.
-4. PDF page 66 disaster-area map (p066-x251): replaced by scripts/pamir_map.py (Natural Earth). Decide: keep the replacement, or restore the print map after clearance.
+3. PDF page 301 route map, Bein et al. 2020 (p301-x1169): withheld until the authors give permission. Maps agent draws an open map of the route the chapter describes, labelled as new.
+4. PDF page 66 disaster-area map (p066-x251): replaced by an open map. Maps agent (2026-11-24) improves it or brings a better open source.
 5. Credits that rest on one non-original record:
    - PDF page 35 Kochva photo (p035-x151): Commons record only; the PikiWiki page is not reachable.
    - PDF page 183 Wellcome jar (p183-x713): Commons record only; no live Wellcome catalogue record found.
    - PDF page 275 CSIRO image (p275-x1087): licence from an archived CSIRO page (Wayback 2023-04-16).
-5b. PDF page 49 map credit: Commons and NLI date the map 1848 but its publication 1852 (Spencer, "The East", George P. Putnam). Decide whether to add the publication year to the edition credit.
 6. Cover photo (Moshe Bernstein, Nahal Kedem): compare with the Drive originals "Kedem 1" and "Kedem 2". Blocked: no signed-in Google Drive tool on the build machine. Fix: download both into ~/private-inputs/eli-raz/received-2026-11-24/.
 7. The complete edition (with all print images) was public for a short time before the release replaced it on 2026-11-24. Accepted by Yarden; no action.
 
@@ -50,8 +49,7 @@ Clearance evidence: scratchpad clearance record of 2026-11-24, summarized in boo
 
 ## Repos
 
-15. Release work is not committed: eli-raz-edition (book.toml, book.css, scripts/, replacements/, site/) and epub-web-edition (release mode, related links, check_release.py).
-16. epub-web-edition has 5 local code-only commits that are not pushed.
+15. Commit and push continuously (user rule, 2026-11-24). Content repo: private GitHub repo Yarden-zamir/eli-raz-edition.
 
 ## Web enrichment (site/enhancements.json)
 
