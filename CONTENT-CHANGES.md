@@ -27,10 +27,10 @@ Add an entry in the same change that makes it. Newest first within each section.
 
 | Where | Change | Why |
 |---|---|---|
-| PDF page 66 (p066-x251) | Replaced by a map drawn from Natural Earth data (scripts/pamir_map.py), with an edition note | Printed map looks like an unattributed Google Maps screenshot. |
+| PDF page 66 (p066-x251) | Replaced by a new relief map (scripts/pamir_map.py), with an edition note: Dushanbe to Lenin Peak with the flight and helicopter legs that a10 tells, and a detail of the base camp, the first camp, the Frying Pan and the peak. Places from OSM, borders from Natural Earth, relief from Copernicus DEM. New alt text and note: work/maps/HANDOFF.md, for book.toml | Printed map looks like an unattributed Google Maps screenshot. |
 | PDF page 183 (p183-x717) | Withheld, labelled placeholder, masked on the facsimile page | No source found. |
-| PDF page 301 (p301-x1169) | Withheld, as above | Publication figure on a satellite base map; not cleared. |
-| PDF page 302 (p302-x1173) | Withheld, as above | Google Earth view without the imagery providers. |
+| PDF page 301 (p301-x1169) | Withheld, as above. Open replacement ready: a new schematic map of the eastern RD conveyance drawn from the book text (replacements/p301-x1169-open-map.png, scripts/jordan_maps.py); book.toml change in work/maps/HANDOFF.md | Publication figure on a satellite base map; not cleared. |
+| PDF page 302 (p302-x1173) | Withheld, as above. Open replacement ready: a new perspective relief view looking north-east with the Desert Highway and the King's Highway from OSM (replacements/p302-x1173-open-view.png, scripts/jordan_maps.py); book.toml change in work/maps/HANDOFF.md | Google Earth view without the imagery providers; Google requires the providers next to the image. |
 | PDF pages 34, 35, 49, 183, 183, 270, 275 | Edition credit with source record and licence added after the printed caption | Licence terms ask for attribution and a licence link. |
 
 ## 3. Additions (EPUB)
@@ -45,6 +45,7 @@ Add an entry in the same change that makes it. Newest first within each section.
 
 | Date | What | Source |
 |---|---|---|
+| 2026-11-24 | site/figure-maps/: interactive map specs for the three new maps (fig-a10-02 Pamir, fig-a36-09 RD conveyance, fig-a36-10 Jordanian plateau), each marker and line with its source and the book paragraph it belongs to | OSM element IDs and Wikidata IDs in each marker; schematic lines from the book text; Disi pipeline along the Desert Highway from the 2008 environmental assessment (Consolidated Consultants) |
 | 2026-11-24 | Cover photograph (Moshe Berenstein, flood plume at Nahal Kedem) in its wider original frame for the web hero, credited "צילום: משה ברנשטיין"; the photographer's signature strip (bottom 58 px) cropped off | Photographer's file from Eli Raz's Drive share; same photograph as the cover (provenance/cover-photo.md) |
 | 2026-11-24 | site/crosslinks.json: 17 links where the text names another chapter of the book, each from the printed phrase to that chapter's heading | Book text; checked by content-data/scripts/check_content_data.py |
 | 2026-11-24 | site/glossary.json: 51 geological and local terms that the book explains, each with a near-quote definition and the exact source text | Book text at each term's source element |

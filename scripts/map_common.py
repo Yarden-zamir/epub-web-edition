@@ -5,6 +5,7 @@ Downloads are cached under work/maps/ (ignored by git). Each helper prints the S
 """
 
 import hashlib
+import io
 import json
 import math
 import textwrap
@@ -215,8 +216,15 @@ def km_per_degree_lon(lat: float) -> float:
 
 
 def save_png(fig, path: Path, dpi: int = 200) -> None:
+    """Save as a 256-colour PNG with dithering: about 60% smaller, no visible loss on these maps.
+
+    Limit: a map with smooth wide gradients can band. Save full RGB if a new map shows bands.
+    """
     path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(path, dpi=dpi, metadata={"Software": None})
+    buffer = io.BytesIO()
+    fig.savefig(buffer, dpi=dpi, format="png")
+    image = Image.open(buffer).convert("RGB").quantize(256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.FLOYDSTEINBERG)
+    image.save(path, format="PNG", optimize=True)
     print(f"wrote {path.relative_to(ROOT)} sha256={hashlib.sha256(path.read_bytes()).hexdigest()}")
 
 
