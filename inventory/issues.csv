@@ -1,0 +1,175 @@
+id,page,type,description,status
+A-0001,1,info,p001-x1379.jpeg: no caption next to this image in print,open
+A-0002,5,note,titlepage: small print at the page foot without a number; kept as a paragraph,open
+A-0003,8,info,p008-x32.jpeg: no caption next to this image in print,open
+A-0004,11,info,p011-x40.jpeg: no caption next to this image in print,open
+A-0005,13,info,p013-x46.jpeg: no caption next to this image in print,open
+A-0006,14,info,p014-x50.jpeg: no caption next to this image in print,open
+A-0007,14,info,a03-p006: paragraph continues across the page break (marker kept inside),open
+A-0008,15,info,p015-x54.jpeg: no caption next to this image in print,open
+A-0009,17,info,p017-x60.jpeg: no caption next to this image in print,open
+A-0010,18,info,p018-x64.jpeg: no caption next to this image in print,open
+A-0011,19,info,p019-x68.jpeg: no caption next to this image in print,open
+A-0012,20,info,p020-x85.jpeg: no caption next to this image in print,open
+A-0013,20,info,p020-x87.jpeg: no caption next to this image in print,open
+A-0014,20,info,p020-x82-masked.png: no caption next to this image in print,open
+A-0015,20,info,p020-x91-masked.png: no caption next to this image in print,open
+A-0016,20,info,p020-x95.jpeg: no caption next to this image in print,open
+A-0017,20,info,a05-p004: paragraph continues across the page break (marker kept inside),open
+A-0018,23,intentional-change,Note reference 3 restored: Print sets reference 3 as a full-size digit (typesetting slip). Note 3 exists at the page foot.,open
+A-0019,23,info,a06-p003: paragraph continues across the page break (marker kept inside),open
+A-0020,22,intentional-change,"Omitted 'The English text continues from the left page as a two-page ': Print-only reading note for the two-page spreads. The EPUB puts the English pages in reading order, so the note would mislead.",open
+A-0021,22,info,a06-p005: paragraph continues across the page break (marker kept inside),open
+A-0022,25,hyphen,Joined a line-end hyphen: 'religious-',open
+A-0023,24,info,a06-p017: paragraph continues across the page break (marker kept inside),open
+A-0024,26,info,a06-p021: paragraph continues across the page break (marker kept inside),open
+A-0025,29,note-join,a06: unnumbered note text joined to note 13 (continued from the previous page),open
+A-0026,29,info,a06-p022: paragraph continues across the page break (marker kept inside),open
+A-0027,31,info,p031-x137.jpeg: no caption next to this image in print,open
+A-0028,30,info,a06-p025: paragraph continues across the page break (marker kept inside),open
+A-0029,33,info,a06-p027: paragraph continues across the page break (marker kept inside),open
+A-0030,32,hyphen,Joined a line-end hyphen: 'high-',open
+A-0031,32,info,a06-p030: paragraph continues across the page break (marker kept inside),open
+A-0032,35,info,a06-p031: paragraph continues across the page break (marker kept inside),open
+A-0033,38,info,p038-x159.jpeg: no caption next to this image in print,open
+A-0034,38,info,p038-x161.jpeg: no caption next to this image in print,open
+A-0035,39,info,p039-x165-render.jpg: no caption next to this image in print,open
+A-0036,46,info,a07-p015: paragraph continues across the page break (marker kept inside),open
+A-0037,49,info,a07-p029: paragraph continues across the page break (marker kept inside),open
+A-0038,51,info,p051-x207.jpeg: no caption next to this image in print,open
+A-0039,52,info,p052-x211.jpeg: no caption next to this image in print,open
+A-0040,53,info,p053-x215-render.jpg: no caption next to this image in print,open
+A-0041,56,info,p056-x223.jpeg: no caption next to this image in print,open
+A-0042,57,info,p057-x227.jpeg: no caption next to this image in print,open
+A-0043,60,info,p060-x235.jpeg: no caption next to this image in print,open
+A-0044,60,info,a09-p014: paragraph continues across the page break (marker kept inside),open
+A-0045,63,info,a09-p032: paragraph continues across the page break (marker kept inside),open
+A-0046,64,info,a09-p036: paragraph continues across the page break (marker kept inside),open
+A-0047,65,info,p065-x247.jpeg: no caption next to this image in print,open
+A-0048,67,info,a10-p004: paragraph continues across the page break (marker kept inside),open
+A-0049,68,info,p068-x257.jpeg: no caption next to this image in print,open
+A-0050,72,info,a10-p024: paragraph continues across the page break (marker kept inside),open
+A-0051,78,intentional-change,fig-a10-11: QR code image links to its decoded target,open
+A-0052,78,intentional-change,fig-a10-12: QR code image links to its decoded target,open
+A-0053,78,intentional-change,fig-a10-13: QR code image links to its decoded target,open
+A-0054,78,intentional-change,fig-a10-14: QR code image links to its decoded target,open
+A-0055,79,info,p079-x310.jpeg: no caption next to this image in print,open
+A-0056,82,info,a11-p015: paragraph continues across the page break (marker kept inside),open
+A-0057,89,info,p089-x332.jpeg: no caption next to this image in print,open
+A-0058,93,info,p093-x356.jpeg: no caption next to this image in print,open
+A-0059,94,info,p094-x360.jpeg: no caption next to this image in print,open
+A-0060,96,info,p096-x366.jpeg: no caption next to this image in print,open
+A-0061,98,info,a13-p031: paragraph continues across the page break (marker kept inside),open
+A-0062,100,info,p100-x376.jpeg: no caption next to this image in print,open
+A-0063,101,info,p101-x380.jpeg: no caption next to this image in print,open
+A-0064,104,info,a13-p058: paragraph continues across the page break (marker kept inside),open
+A-0065,106,info,p106-x394.jpeg: no caption next to this image in print,open
+A-0066,107,info,p107-x398.jpeg: no caption next to this image in print,open
+A-0067,108,info,a14-p005: paragraph continues across the page break (marker kept inside),open
+A-0068,109,info,p109-x406.jpeg: no caption next to this image in print,open
+A-0069,115,info,p115-x444.jpeg: no caption next to this image in print,open
+A-0070,117,info,p117-x458.jpeg: no caption next to this image in print,open
+A-0071,118,info,p118-x464.jpeg: no caption next to this image in print,open
+A-0072,120,info,a14-p052: paragraph continues across the page break (marker kept inside),open
+A-0073,125,info,p125-x500-masked.png: no caption next to this image in print,open
+A-0074,126,info,p126-x505.jpeg: no caption next to this image in print,open
+A-0075,127,info,p127-x509.jpeg: no caption next to this image in print,open
+A-0076,128,info,a15-p007: paragraph continues across the page break (marker kept inside),open
+A-0077,131,info,a15-p018: paragraph continues across the page break (marker kept inside),open
+A-0078,136,auto-fix,Bracket pair ')Hadas et al. 2005(' reordered around a left-to-right run; check against print,open
+A-0079,140,info,a16-p016: paragraph continues across the page break (marker kept inside),open
+A-0080,145,info,p145-x577.jpeg: no caption next to this image in print,open
+A-0081,148,info,p148-x587.jpeg: no caption next to this image in print,open
+A-0082,148,info,a17-p012: paragraph continues across the page break (marker kept inside),open
+A-0083,149,info,p149-x591.jpeg: no caption next to this image in print,open
+A-0084,151,info,p151-x599.jpeg: no caption next to this image in print,open
+A-0085,151,info,p151-x601.jpeg: no caption next to this image in print,open
+A-0086,153,info,a17-p022: paragraph continues across the page break (marker kept inside),open
+A-0087,154,info,a17-p024: paragraph continues across the page break (marker kept inside),open
+A-0088,156,info,a17-p031: paragraph continues across the page break (marker kept inside),open
+A-0089,157,info,p157-x615.jpeg: no caption next to this image in print,open
+A-0090,157,info,p157-x617.jpeg: no caption next to this image in print,open
+A-0091,159,info,p159-x628.jpeg: no caption next to this image in print,open
+A-0092,159,info,p159-x632-masked.png: no caption next to this image in print,open
+A-0093,159,info,a17-p042: paragraph continues across the page break (marker kept inside),open
+A-0094,162,info,p162-x645.png: no caption next to this image in print,open
+A-0095,164,info,a17-p054: paragraph continues across the page break (marker kept inside),open
+A-0096,166,intentional-change,fig-a17-18: QR code image links to its decoded target,open
+A-0097,167,info,p167-x661.jpeg: no caption next to this image in print,open
+A-0098,168,info,a18-p003: paragraph continues across the page break (marker kept inside),open
+A-0099,172,info,a18-p022: paragraph continues across the page break (marker kept inside),open
+A-0100,174,info,a18-p026: paragraph continues across the page break (marker kept inside),open
+A-0101,176,info,a18-p037: paragraph continues across the page break (marker kept inside),open
+A-0102,179,info,a18-p045: paragraph continues across the page break (marker kept inside),open
+A-0103,182,info,p182-x707.jpeg: no caption next to this image in print,open
+A-0104,183,info,p183-x713-masked.png: no caption next to this image in print,open
+A-0105,183,info,p183-x717-masked.png: no caption next to this image in print,open
+A-0106,187,info,p187-x735.jpeg: no caption next to this image in print,open
+A-0107,189,info,p189-x745.jpeg: no caption next to this image in print,open
+A-0108,191,info,p191-x751.jpeg: no caption next to this image in print,open
+A-0109,194,info,a21-p011: paragraph continues across the page break (marker kept inside),open
+A-0110,195,info,p195-x765.jpeg: no caption next to this image in print,open
+A-0111,196,info,p196-x769.jpeg: no caption next to this image in print,open
+A-0112,200,info,p200-x794.png: no caption next to this image in print,open
+A-0113,201,info,p201-x800-render.jpg: no caption next to this image in print,open
+A-0114,202,info,p202-x806.jpeg: no caption next to this image in print,open
+A-0115,203,info,p203-x810.jpeg: no caption next to this image in print,open
+A-0116,205,info,p205-x816.jpeg: no caption next to this image in print,open
+A-0117,206,info,a24-p006: paragraph continues across the page break (marker kept inside),open
+A-0118,209,info,p209-x833.jpeg: no caption next to this image in print,open
+A-0119,210,char-map,U+001A mapped to U+05B0; check against print,open
+A-0120,211,char-map,U+001A mapped to U+05B0; check against print,open
+A-0121,212,info,p212-x843.jpeg: no caption next to this image in print,open
+A-0122,213,info,p213-x847.jpeg: no caption next to this image in print,open
+A-0123,215,info,p215-x853.jpeg: no caption next to this image in print,open
+A-0124,222,info,a27-p033: paragraph continues across the page break (marker kept inside),open
+A-0125,226,info,a27-p047: paragraph continues across the page break (marker kept inside),open
+A-0126,227,info,a27-p054: paragraph continues across the page break (marker kept inside),open
+A-0127,228,info,a27-p057: paragraph continues across the page break (marker kept inside),open
+A-0128,229,info,p229-x896.jpeg: no caption next to this image in print,open
+A-0129,230,info,a28-p005: paragraph continues across the page break (marker kept inside),open
+A-0130,231,info,p231-x902.jpeg: no caption next to this image in print,open
+A-0131,233,info,p233-x908.jpeg: no caption next to this image in print,open
+A-0132,234,info,p234-x914.jpeg: no caption next to this image in print,open
+A-0133,234,intentional-change,fig-a29-03: QR code image links to its decoded target,open
+A-0134,234,info,a29-p005: paragraph continues across the page break (marker kept inside),open
+A-0135,235,info,p235-x920.jpeg: no caption next to this image in print,open
+A-0136,236,info,p236-x924.jpeg: no caption next to this image in print,open
+A-0137,237,info,p237-x929.jpeg: no caption next to this image in print,open
+A-0138,247,info,a31-p007: paragraph continues across the page break (marker kept inside),open
+A-0139,249,info,p249-x967.jpeg: no caption next to this image in print,open
+A-0140,253,info,a32-p013: paragraph continues across the page break (marker kept inside),open
+A-0141,254,info,a32-p017: paragraph continues across the page break (marker kept inside),open
+A-0142,255,info,p255-x987.jpeg: no caption next to this image in print,open
+A-0143,256,info,p256-x993.jpeg: no caption next to this image in print,open
+A-0144,257,note,a33: reference '3' has no single matching note; kept as superscript,open
+A-0145,257,note,a33: reference '2' has no single matching note; kept as superscript,open
+A-0146,257,note,a33: reference '12' has no single matching note; kept as superscript,open
+A-0147,257,note,a33: reference '13' has no single matching note; kept as superscript,open
+A-0148,259,info,p259-x1005.jpeg: no caption next to this image in print,open
+A-0149,260,info,p260-x1009.jpeg: no caption next to this image in print,open
+A-0150,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
+A-0151,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
+A-0152,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
+A-0153,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
+A-0154,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
+A-0155,274,auto-fix,Bracket pair ') Neev and Hall 1979 (' reordered around a left-to-right run; check against print,open
+A-0156,277,auto-fix,"Bracket pair ') Wilkansky, 1936 (' reordered around a left-to-right run; check against print",open
+A-0157,279,info,a35-p015: paragraph continues across the page break (marker kept inside),open
+A-0158,281,info,a35-p031: paragraph continues across the page break (marker kept inside),open
+A-0159,282,info,a35-p036: paragraph continues across the page break (marker kept inside),open
+A-0160,284,info,a35-p045: paragraph continues across the page break (marker kept inside),open
+A-0161,287,note,a35: small print at the page foot without a number; kept as a paragraph,open
+A-0162,287,note,a35: small print at the page foot without a number; kept as a paragraph,open
+A-0163,287,note,a35: small print at the page foot without a number; kept as a paragraph,open
+A-0164,287,note,a35: small print at the page foot without a number; kept as a paragraph,open
+A-0165,287,note,a35: small print at the page foot without a number; kept as a paragraph,open
+A-0166,287,note,a35: small print at the page foot without a number; kept as a paragraph,open
+A-0167,287,info,a35-p058: paragraph continues across the page break (marker kept inside),open
+A-0168,293,info,p293-x1140.jpeg: no caption next to this image in print,open
+A-0169,297,info,p297-x1152.jpeg: no caption next to this image in print,open
+A-0170,299,info,p299-x1163.jpeg: no caption next to this image in print,open
+A-0171,309,hyphen,Joined a line-end hyphen: 'Collapse-',open
+A-0172,310,hyphen,Joined a line-end hyphen: 'High-',open
+A-0173,316,reuse,Image xref 1379 repeats; first file p001-x1379.jpeg,open
+A-0174,316,info,p316-x1379.jpeg: no caption next to this image in print,open

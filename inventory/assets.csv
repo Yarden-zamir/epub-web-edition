@@ -1,0 +1,218 @@
+file,sha256,pdf_page,pdf_xref,pixels,derivation,status
+OEBPS/images/p001-x1379.jpeg,008875e6349d97a06d65e4784c53c47752e3fd57446da9fd3766d56e53dc96e1,1,1379,1798x1651,unmodified PDF image stream,pending
+OEBPS/images/p008-x32.jpeg,e8f2acb1193415b29a773eb8f531a67a82fe7745171dfc2a05c37b80481d39b8,8,32,1009x1422,unmodified PDF image stream,pending
+OEBPS/images/p011-x40.jpeg,4f00ad894bc01096a8779a9240777c70fe2d3e47ae3fd411fcfcb8072ed531f5,11,40,1009x533,unmodified PDF image stream,pending
+OEBPS/images/p013-x46.jpeg,903a1a03117feacac5cdf9b7471eec6153a77b93fd552c70e8cf37263322524b,13,46,1009x477,unmodified PDF image stream,pending
+OEBPS/images/p014-x50.jpeg,bcd14bc08d68c4d4d36a5e1b9e689bcaa91d60f64602346af02a8f28b8518220,14,50,710x533,unmodified PDF image stream,pending
+OEBPS/images/p015-x54.jpeg,96ab38cffcefa8d8ce6df1579f606512c9a3d067a80acb8b8e7b29f0a8b649d1,15,54,1009x478,unmodified PDF image stream,pending
+OEBPS/images/p017-x60.jpeg,0586c134b921a808a9b58b6137c468c79ed89256242fbe55bc8932f3c8324b49,17,60,1009x1095,unmodified PDF image stream,pending
+OEBPS/images/p018-x64.jpeg,5d79bce89f6112a5efc1943511aaf3b0fba6461aba79146b0e340c1fa2ea331a,18,64,589x924,unmodified PDF image stream,pending
+OEBPS/images/p019-x68.jpeg,bc0a99b611fdb512fa044996e713d1dc4a8851cf9e5660e502383489243b4c3b,19,68,1009x652,unmodified PDF image stream,pending
+OEBPS/images/p020-x85.jpeg,1d968545efc4b01ec7adec32eeb913056a0719dd4130c49456df3d0ce05a205c,20,85,480x546,unmodified PDF image stream,pending
+OEBPS/images/p020-x87.jpeg,2c77ec6a84dfede8a1227d7e9f21246f19b0a055c339d726ac2e15124ab5a591,20,87,252x194,unmodified PDF image stream,pending
+OEBPS/images/p020-x82-masked.png,09ce1de5c1954dbb059981fa76be8f19e323e6452356ecdb0c5d182aeaf3a797,20,82,432x370,PDF image stream with its soft mask applied (lossless PNG),pending
+OEBPS/images/p020-x91-masked.png,7e54f2363069f293462e71bccc56cb7ae301a2acad41a534cfff56c26d7a7426,20,91,432x370,PDF image stream with its soft mask applied (lossless PNG),pending
+OEBPS/images/p020-x93.jpeg,80c8ef2eabbf59f885b9b83620918e3e5c964a18e54e221d266348f7d2e7eb75,20,93,338x256,unmodified PDF image stream,pending
+OEBPS/images/p020-x95.jpeg,b3b5a50447ebfcfee534f5ebe3837e50849ffcb6b6c131bb34339ece006c724f,20,95,247x296,unmodified PDF image stream,pending
+OEBPS/images/p021-x103.jpeg,94f31dac454da8dea6d8930aa6d5beba6011cd5447ed0b512d1f1c2a710a08f9,21,103,1009x477,unmodified PDF image stream,pending
+OEBPS/images/p022-x109-masked.png,b5bd8cd9b0b256d683106d447e3eb238fb71299a55dda7d1125ac8da73d4ff9a,22,109,709x444,PDF image stream with its soft mask applied (lossless PNG),pending
+OEBPS/images/p024-x116.jpeg,336d6dcac91afdaa802f5e0c4fb5e2370147c533f078e9f20b5bf192f50de549,24,116,576x396,unmodified PDF image stream,pending
+OEBPS/images/p028-x126-render.jpg,967a3cded8bc79f67f34164f2c0538e87d01c0c1639cb833919181ca5c311f82,28,126,431x261,page region rendered at 91 dpi: placed rotated or mirrored in print; original stream kept in work/originals,pending
+OEBPS/images/p031-x137.jpeg,3d59dd9b2224d9e4594ebbdbad131acca96fc4df0c6c5d1ca5d99f3c0d7cecb9,31,137,355x535,unmodified PDF image stream,pending
+OEBPS/images/p031-x139.jpeg,f3a805aef02dcc86f611056ef4ffd5611fc9b037d0ec8b840726ae2096050a83,31,139,358x537,unmodified PDF image stream,pending
+OEBPS/images/p035-x151.jpeg,e2afd73e770002780b8fb173a92cb11f04980de9e63cc9ef61202f6895b8712a,35,151,709x446,unmodified PDF image stream,pending
+OEBPS/images/p034-x147.jpeg,98080358a4b8d4a53d9dfe08d89373fba236aad264d6adeaf0faf1b3243b8afc,34,147,715x424,unmodified PDF image stream,pending
+OEBPS/images/p038-x159.jpeg,11795551317442c9be8affd9782981d9e547077f6cfc734f26c46993b62961c8,38,159,590x476,unmodified PDF image stream,pending
+OEBPS/images/p038-x161.jpeg,c9f2c82a516f33cf9e0ce1f4b8cde29acf5a0b1fb1d4f0964b93c42fc7d70564,38,161,589x441,unmodified PDF image stream,pending
+OEBPS/images/p039-x165-render.jpg,7acf027cc49bb2104d4d428f9d638fc556359594c670caaf19faa926c4ef9c10,39,165,482x228,page region rendered at 72 dpi: placed rotated or mirrored in print; original stream kept in work/originals,pending
+OEBPS/images/p040-x169.jpeg,f6758ebb83e0c400d511b326dbc05e12bd2a06a8505cee62904f279e311ccc5a,40,169,709x336,unmodified PDF image stream,pending
+OEBPS/images/p041-x173.jpeg,c618cce793c6e6c0c05ac437d55a1dd5e5b90d23ec956abbafe9b5f712f19703,41,173,660x325,unmodified PDF image stream,pending
+OEBPS/images/p042-x177.png,9f3e46b9096b1d3386fde1586e1fb977dc11e33771928dd232c631d032dafec4,42,177,670x409,unmodified PDF image stream,pending
+OEBPS/images/p043-x181.jpeg,03bffc35578b7160d26fa130cecf1bb417314a212a20dee75d891f6bc6a16608,43,181,709x583,unmodified PDF image stream,pending
+OEBPS/images/p044-x185.jpeg,4493e7d972120bf24def3bb4e22280b3f1475cbfa63d4949ceb2cf92f0eb26a0,44,185,712x449,unmodified PDF image stream,pending
+OEBPS/images/p045-x189.png,970e4595419a7c09edba183f83a82f15fdc57fcd11530b49d113dd4d0f0ec863,45,189,711x692,unmodified PDF image stream,pending
+OEBPS/images/p047-x195.jpeg,5d32981924520b30b6a601f0ddb75d08badebd3594a6ae4924909a9106636933,47,195,714x441,unmodified PDF image stream,pending
+OEBPS/images/p049-x201.jpeg,71fe0466b3ef5417c1ec8e09f91126dd02ec1f2e8e7cb559ef231afa330eadd3,49,201,613x961,unmodified PDF image stream,pending
+OEBPS/images/p051-x207.jpeg,15950451b565121fea3048f69329cdbe2b658e8cf7bb898309990f02dbad2087,51,207,1009x1097,unmodified PDF image stream,pending
+OEBPS/images/p052-x211.jpeg,1af53e5b302e2fd8e252f12d9100ceb94768516dad5a40a5586cf3b057b5d1be,52,211,589x924,unmodified PDF image stream,pending
+OEBPS/images/p053-x215-render.jpg,d84470629fe3fda1c44de11b313fbc4a1c32326ee1700f8ede9f078c98b452d9,53,215,482x228,page region rendered at 72 dpi: placed rotated or mirrored in print; original stream kept in work/originals,pending
+OEBPS/images/p056-x223.jpeg,23569f00266b5a537cb0ef6f6943c184c923eb34799831024f74018a96d003f2,56,223,589x924,unmodified PDF image stream,pending
+OEBPS/images/p057-x227.jpeg,f5c2877de545ac977901faad9629afb735f4ce373c20e0dfb067231f19282fd5,57,227,1009x477,unmodified PDF image stream,pending
+OEBPS/images/p060-x235.jpeg,32287e42f430bb0a59ce2ce46557dd232bbf697a72f3a2cc77e2a7352ef08884,60,235,274x431,unmodified PDF image stream,pending
+OEBPS/images/p065-x247.jpeg,1a18718d706ba81ed5facb51695cc5bfa94d1caad6777ff512e1a7f85d9f757c,65,247,1009x476,unmodified PDF image stream,pending
+OEBPS/images/p066-x251.jpeg,aad06c969b1521214e43695cdf4d0f87b614b3151e9b0f5f90e3858d5697011f,66,251,714x461,unmodified PDF image stream,pending
+OEBPS/images/p068-x257.jpeg,d60c04634bd52be461c216c0d7205687e1ef7166bb6bb0342b7f387f4d93c000,68,257,253x352,unmodified PDF image stream,pending
+OEBPS/images/p070-x270.jpeg,1a88691b6a95bfe32b98c7a8bfe229e9ba36f407eb98a1add1336133cea97cb1,70,270,642x715,unmodified PDF image stream,pending
+OEBPS/images/p071-x274.jpeg,193e1b5c7d13d58377d1ad3e0e1fe980e6ac412a05cc51f00de956dff35e666d,71,274,322x512,unmodified PDF image stream,pending
+OEBPS/images/p071-x276.jpeg,3c0e0850a6ce13f4bb45397fd6bb2740654160e6bbad6d27acac86a9414e3653,71,276,246x356,unmodified PDF image stream,pending
+OEBPS/images/p072-x280.jpeg,868c412c43065561ba49179585d48492d494f64d571d90037b03e652f7f40b9d,72,280,709x416,unmodified PDF image stream,pending
+OEBPS/images/p073-x284.jpeg,ff6e8ac77fed1a56151e01b7836421060e1c5793aa0fa287ac3508e9b1a4e7cb,73,284,709x395,unmodified PDF image stream,pending
+OEBPS/images/p074-x288.jpeg,104d3ac7b9289571a1ebeb95c1c3d203e6e101e637c3e32d1c55fb2b3d7afb77,74,288,712x460,unmodified PDF image stream,pending
+OEBPS/images/p074-x290.jpeg,315311624af00822c5f6437c25ce55e2bad552d8f17d2fed2a37f6be40737162,74,290,318x435,unmodified PDF image stream,pending
+OEBPS/images/p078-qr1.png,c815d9fea3ac52180e7491ad6d6099bec13bd23b7a8d14d9719d824cf46e2a6c,78,vector,292x292,vector QR code rendered at 300 dpi,pending
+OEBPS/images/p078-qr2.png,4e258ba0c7d2e2278bbe1f359f5af80438a40399abe8a89e66794f565d3724c2,78,vector,290x290,vector QR code rendered at 300 dpi,pending
+OEBPS/images/p078-qr3.png,68c082fb24a107da7d6ada03cc8874986d5a7f1ca9abf1699bbda8006ef2bed6,78,vector,287x287,vector QR code rendered at 300 dpi,pending
+OEBPS/images/p078-qr4.png,fcc14a257121864bee361874a8b50ef6d5ab02411e346830fc5874489a60c707,78,vector,283x283,vector QR code rendered at 300 dpi,pending
+OEBPS/images/p079-x310.jpeg,3798fe465851292f026da2deba94b60c7dd1f9c7a7db0004614c6a205f69071b,79,310,1009x478,unmodified PDF image stream,pending
+OEBPS/images/p089-x332.jpeg,4e3805b644a630c9539743595aad6dae25a9410e91705c13e8c274cae800ec39,89,332,1009x477,unmodified PDF image stream,pending
+OEBPS/images/p090-x336.jpeg,50b65df12283736f9b3921c5be1cbd44eb096363e07b177d5138179d7feab759,90,336,316x717,unmodified PDF image stream,pending
+OEBPS/images/p092-x351.png,c27f50f3bcd5fc619c7c1b5cd032ff4e555b3a7f5902f81b056f5495ed5b68d6,92,351,661x676,unmodified PDF image stream,pending
+OEBPS/images/p093-x356.jpeg,a8bc10e5aab38cdcd3edbe3a9ed7b6b189250a7306d666f4c9ef9000add87549,93,356,1009x478,unmodified PDF image stream,pending
+OEBPS/images/p094-x360.jpeg,2d248d47188654e0849a8b9a2791618969a5cff36fd30a2d2fcdf3aa62f732b3,94,360,709x547,unmodified PDF image stream,pending
+OEBPS/images/p096-x366.jpeg,63474e2516331f19ce512ef84482034c0fd11fa4ce703d00874799c8f433daa1,96,366,711x546,unmodified PDF image stream,pending
+OEBPS/images/p100-x376.jpeg,ac1e5d7c16f4d2b244af86b81339d07713b038e8e37c3e1d3e2d20392647ae7d,100,376,615x474,unmodified PDF image stream,pending
+OEBPS/images/p101-x380.jpeg,f1fca4250a06515445328626cccd3656338e3e5c08992b0f7001e352b44ad4fe,101,380,596x459,unmodified PDF image stream,pending
+OEBPS/images/p104-x388.jpeg,36335d288e03ff356f05af304e4b468466f09a52fe825a35fbe417448e0abd76,104,388,712x560,unmodified PDF image stream,pending
+OEBPS/images/p106-x394.jpeg,36803d90a64bfa0f732ebe19e0ddc91bb9d0e1973b49e0cec69b329b91be23c9,106,394,709x533,unmodified PDF image stream,pending
+OEBPS/images/p107-x398.jpeg,d169f26b18dfe3a193076891dfeee401e5781f6d1578425b8bd2089f13ab307a,107,398,1009x478,unmodified PDF image stream,pending
+OEBPS/images/p108-x402.jpeg,c9235c307588abc5223b3fee890f13b9841be805e4396a02995b74897c597b20,108,402,526x388,unmodified PDF image stream,pending
+OEBPS/images/p109-x406.jpeg,d55e517191b14bdb4bcdaa32cc9be81129a1400286e3f3898ab543d09df9b1e1,109,406,491x375,unmodified PDF image stream,pending
+OEBPS/images/p109-x408.jpeg,afa4109adb49c66d4b056a7b7e0f3966a7f79fd4948eff1dc8a37740c664152b,109,408,713x636,unmodified PDF image stream,pending
+OEBPS/images/p110-x412.jpeg,88f549e4b171629830201f34a4d5f703b8862d78f800038473bbfe04318bbc9a,110,412,531x276,unmodified PDF image stream,pending
+OEBPS/images/p111-x416.jpeg,6dbe3bb1ea7a3920204a76355f78e19d243cc73f73d454e0904c83fc7655121f,111,416,808x606,unmodified PDF image stream,pending
+OEBPS/images/p112-x420.jpeg,fe7218a7bae0435f5d7e7d8a0125b633b028cd9861cabd51bf64207b734a37f1,112,420,709x494,unmodified PDF image stream,pending
+OEBPS/images/p113-x424.jpeg,f9b1e9c60720df852f90da44e23a6a507ebedab294ea52e8e5362e52faeb0a08,113,424,709x373,unmodified PDF image stream,pending
+OEBPS/images/p114-x437-render.jpg,405ffcda8d178211742026d35c917ccc20d6c06b8751c1f48cf76bd08aba91d0,114,437,784x399,page region rendered at 150 dpi: an inline image prints on top (label); original stream kept in work/originals,pending
+OEBPS/images/p115-x442.jpeg,eedbec55bc22d8713284398777dd383b5c544b81b2bc439ffde8eafc7fadf881,115,442,355x307,unmodified PDF image stream,pending
+OEBPS/images/p115-x444.jpeg,ad6b40ff89683b163285fd727a606b84e3d259a6c06995c2615e6fb4f038e360,115,444,355x304,unmodified PDF image stream,pending
+OEBPS/images/p116-x450-masked.png,8df73db35d51cc569c7a029684494da2387c5df8ff0a75f3ccbf251ae8f92d27,116,450,714x437,PDF image stream with its soft mask applied (lossless PNG),pending
+OEBPS/images/p116-x452.jpeg,15727b287bc23cb5f52c0192aea75d4c9629e8f35b893f12e52c677f91ef9911,116,452,709x132,unmodified PDF image stream,pending
+OEBPS/images/p117-x458.jpeg,6d138f7fc9b13dbfc489d0b6971bf2c65d4063690660057f9244b067ccadde50,117,458,295x100,unmodified PDF image stream,pending
+OEBPS/images/p118-x464.jpeg,de992d9042952d9b2dc0e0340087246ecd6a2b4024deb3eee09449d3e1e7cdd5,118,464,345x635,unmodified PDF image stream,pending
+OEBPS/images/p118-x466.jpeg,1ee0d9be59140e2cebef223106ce8ad9663809bf983377479255e20db70dcbfb,118,466,364x632,unmodified PDF image stream,pending
+OEBPS/images/p119-x470.jpeg,5435cbe8ac8c2e62462318d4314b4d45978d2c80647be780cc5d26eb2eb2286f,119,470,709x407,unmodified PDF image stream,pending
+OEBPS/images/p120-x474.jpeg,8964d519be14502683f512eaddf4b9c39901a9d8c48d32c13498adf497c6e26c,120,474,245x251,unmodified PDF image stream,pending
+OEBPS/images/p120-x476.jpeg,b1b846e0370f48dfaa7d0748cdb3e7719f37b383fd2c051c057a615bcef4d341,120,476,239x251,unmodified PDF image stream,pending
+OEBPS/images/p120-x478.jpeg,fe706106e20e7098d01da2ecdb90d79e5ab4689e21d07e7e1d430894f76db40c,120,478,709x424,unmodified PDF image stream,pending
+OEBPS/images/p121-x482.jpeg,77a658b23bcc993b74276a3b9cad5fa262d69f75ee6faa0e3315275d384e49ce,121,482,709x474,unmodified PDF image stream,pending
+OEBPS/images/p122-x486.jpeg,6fc8c8f31a0de0f5f783a8f35cfe18152c8a39d9ac4e895abf97d30d907fcad2,122,486,709x444,unmodified PDF image stream,pending
+OEBPS/images/p123-x490.jpeg,dade86a502890dc7c1459e29be33bd4bb06f9c608d1a63891cff69039c1891c7,123,490,709x520,unmodified PDF image stream,pending
+OEBPS/images/p124-x494.jpeg,3f4516912494b3683b82f7a3590fee48c7c94aaef1dcdd5bb355adecc005bad2,124,494,260x639,unmodified PDF image stream,pending
+OEBPS/images/p125-x500-masked.png,158b2b09a262f51eb1269957ea89be6b36f5ba0d5a2ac503ab141078024e56ba,125,500,1009x1097,PDF image stream with its soft mask applied (lossless PNG),pending
+OEBPS/images/p126-x505.jpeg,dd2524eb1aebe6df950b33256aaadce3a1e8762706f85dedd19c9a96e5d4f35c,126,505,589x926,unmodified PDF image stream,pending
+OEBPS/images/p127-x509.jpeg,0da928e228d4ecccdfd93c93e07ded1756d96946d47de04f9300cb338d24052e,127,509,1009x477,unmodified PDF image stream,pending
+OEBPS/images/p129-x515.jpeg,31d9652c24ffda6bd559d50ecf8da714df66194353e460bf799537eb283488d8,129,515,709x357,unmodified PDF image stream,pending
+OEBPS/images/p129-x517-render.jpg,20d31198f66ef8d6e1257979b51d50bb328b4f855f10a0be3ec5d44a6067207e,129,517,398x224,page region rendered at 84 dpi: placed rotated or mirrored in print; original stream kept in work/originals,pending
+OEBPS/images/p133-x527.png,d6a7d108b897672f434ceccfefe44b35edc06ad5a293feec9404f7e0456993df,133,527,678x449,unmodified PDF image stream,pending
+OEBPS/images/p135-x535-masked.png,a6531647b05e8233285224ade94620ea5fe2a0fa93f28bd18e16fa653debc65e,135,535,1009x477,PDF image stream with its soft mask applied (lossless PNG),pending
+OEBPS/images/p136-x540.jpeg,e9738a131c1b735be76c84f339628631d02479bbb0cf86e5cd6bd09b7516a7ce,136,540,709x377,unmodified PDF image stream,pending
+OEBPS/images/p136-x544-masked.png,fae5891cfc5ab142f2cb62b48a498c2c9357337691b9b3c8d01f24a15ba4c032,136,544,359x402,PDF image stream with its soft mask applied (lossless PNG),pending
+OEBPS/images/p137-x549.png,e19060915da5e52fa754d880aa820271f8ba9205125ccd4e4e63697e2e3d1fef,137,549,488x294,unmodified PDF image stream,pending
+OEBPS/images/p138-x553.jpeg,39fcd062599688829cfe6eee4681c8e2d2517aae742074cf5ac32babb9896b5e,138,553,709x558,unmodified PDF image stream,pending
+OEBPS/images/p140-x559.jpeg,528c25f24394582a7f148c168241123cc8b6b4e5c57f8d9f017b3ae472ee0108,140,559,709x492,unmodified PDF image stream,pending
+OEBPS/images/p141-x563.jpeg,d9642ab64a695fd6857011bd332112ccbbcc897129d8a5290018bd8197550b29,141,563,709x414,unmodified PDF image stream,pending
+OEBPS/images/p142-x567.jpeg,c1aef4e88033828524282a951f1234c5cd2855997c2b93f39940738283e3d56e,142,567,709x556,unmodified PDF image stream,pending
+OEBPS/images/p143-x571.jpeg,f915c03ca58905253c8a771dcab2dc760913f5e425698ab000aa677d49d6467b,143,571,709x372,unmodified PDF image stream,pending
+OEBPS/images/p145-x577.jpeg,fe8e72b4d2aac441fc72dd3fbd0a57613517d238f93d0e90b8b3a10c99a443ff,145,577,1009x477,unmodified PDF image stream,pending
+OEBPS/images/p147-x583.jpeg,0d866e64d2c59bffb5c2cb5d67103ac72b526473bfa5ff8de8d0d2cbd994e336,147,583,709x701,unmodified PDF image stream,pending
+OEBPS/images/p148-x587.jpeg,138bcfbb707e80428fb7f33dc3586fdd67d72c1302c81fcf420bbfdc5f3835c0,148,587,709x532,unmodified PDF image stream,pending
+OEBPS/images/p149-x591.jpeg,439976564eb36ea72b394029db3905e733b644fdb0a3c7d325714c3f9c735297,149,591,709x534,unmodified PDF image stream,pending
+OEBPS/images/p151-x597.jpeg,98b2b0ba23cb5846ee257f0292836d6ed687bd7111c99c969626aba127f91ced,151,597,369x346,unmodified PDF image stream,pending
+OEBPS/images/p151-x599.jpeg,fb4d053f88a9731566b04d4ecaf52565f58f2bc5a37afe705bc5ea48a169406f,151,599,337x350,unmodified PDF image stream,pending
+OEBPS/images/p151-x601.jpeg,dd0487ff88a013038bebe1163b88b4f66a63925f373ea725efc48ca341208896,151,601,706x488,unmodified PDF image stream,pending
+OEBPS/images/p157-x615.jpeg,7151a58502cf0dbb1a06b6bc5abe01df4b805d4924782eaf8328ff8a9409bbc2,157,615,353x669,unmodified PDF image stream,pending
+OEBPS/images/p157-x617.jpeg,de3d8e7304c874238d53c65550a0720ae61cd0181ab7f66ee80f9ae5262b3425,157,617,353x261,unmodified PDF image stream,pending
+OEBPS/images/p157-x619.jpeg,53308c22d4fe17b39bd4ba24c483cebd0a4305fdc847fa7eaa31d60ea233cc04,157,619,351x330,unmodified PDF image stream,pending
+OEBPS/images/p159-x626.png,8a2fa2ba68957eb558f57558ea3463ca971289f9eeec1b431f45f3eeefb0f022,159,626,324x240,unmodified PDF image stream,pending
+OEBPS/images/p159-x628.jpeg,c4023569fd95d58bec276d7c4c6919191e855b27543bb38b106e77c20c0b30be,159,628,711x490,unmodified PDF image stream,pending
+OEBPS/images/p159-x632-masked.png,06e38ebb0cfee55a960e80a0835a172e275e60790dfdb40224e4ec019112701d,159,632,286x346,PDF image stream with its soft mask applied (lossless PNG),pending
+OEBPS/images/p160-x637.jpeg,b7d044f9f3976bfc817d7e4730d05cdfd77a2e464d146db24410c58b6a615c87,160,637,711x768,unmodified PDF image stream,pending
+OEBPS/images/p162-x643.jpeg,020bb5589ab84b6f0894ee8aee3c6a11ead0152b5d442880d2883d8bbd2cb928,162,643,709x487,unmodified PDF image stream,pending
+OEBPS/images/p162-x645.png,6d4ac28857d2ffd262e4de635a0916783f77d38185da9d6190b939708b92e5c4,162,645,714x131,unmodified PDF image stream,pending
+OEBPS/images/p165-x653.jpeg,fa77ae59d8b4d482b634b4a2af89dd81d869dbabfe558b95a141e0ec3a880dce,165,653,649x1007,unmodified PDF image stream,pending
+OEBPS/images/p166-qr1.png,3d7ace0a69912ff6194af6c6ae78f36843cc75c1b66cc9901d3f646916cfccf3,166,vector,358x358,vector QR code rendered at 300 dpi,pending
+OEBPS/images/p167-x661.jpeg,b23cc27f188df95443dac7bea8fd89582920f833271c4a0e7467d2b8bc8f8c0a,167,661,1009x477,unmodified PDF image stream,pending
+OEBPS/images/p168-x665.jpeg,dcb9ecde4c9382fb139de622deddebe79920139494fb0a569facf86f08382ee5,168,665,709x632,unmodified PDF image stream,pending
+OEBPS/images/p169-x669.jpeg,0d11f17e030c90930bbafd0d6a92e27bf94069ce1be659ff6b470072b886a0fe,169,669,709x330,unmodified PDF image stream,pending
+OEBPS/images/p170-x673.jpeg,55b3e4705a54847e4eb654b1f508bb787e9bf750dce6dbb4b59049e483c3f0a8,170,673,709x403,unmodified PDF image stream,pending
+OEBPS/images/p171-x677.jpeg,01fd9e4916b6fb33ad8a65a00454cdf8ae9841f0968888b30aa9c1e534007bd1,171,677,376x413,unmodified PDF image stream,pending
+OEBPS/images/p172-x681.jpeg,4732d29ef8c83fa4587204116a28622f6b6d125f61573a9ed1a88bee7b55c024,172,681,709x883,unmodified PDF image stream,pending
+OEBPS/images/p177-x693.jpeg,539ec8baa45aca8f67bf1b4da43666f2c411baddc4288192d71568735045ba1e,177,693,709x452,unmodified PDF image stream,pending
+OEBPS/images/p180-x701.jpeg,4a2cbf2aaf816a4247ee786ec2666528107682e43a433cd7c5ca5f212e33842f,180,701,714x631,unmodified PDF image stream,pending
+OEBPS/images/p182-x707.jpeg,8fb0aebf0bda12d7c2b705e88e6d6201eea2d2821f8536c8a430b373ca4c814d,182,707,585x928,unmodified PDF image stream,pending
+OEBPS/images/p183-x713-masked.png,2cdcf2291b2f23d1ae825b0aeefb82b800ec92efedea3d5bfabc49ae849c83ba,183,713,322x372,PDF image stream with its soft mask applied (lossless PNG),pending
+OEBPS/images/p183-x717-masked.png,6dc2889cfbd375f0bf6b7607884d48c65db3f4bf82e6131a3ae6352294a28dfe,183,717,324x372,PDF image stream with its soft mask applied (lossless PNG),pending
+OEBPS/images/p183-x721-masked.png,68e7e9de5cd79fa8fb37b2696be845ef1268b14871b74ea629776fae8bf9f8cf,183,721,336x370,PDF image stream with its soft mask applied (lossless PNG),pending
+OEBPS/images/p185-x728.png,60938bc409b153f8e2952ade8ac517767b7737658ed563b43cebe3669b109f77,185,728,302x436,unmodified PDF image stream,pending
+OEBPS/images/p187-x735.jpeg,cdcefc467bf73ece3aae4033904e3b69f6069afa476541c17a89c2dce169114d,187,735,1009x1098,unmodified PDF image stream,pending
+OEBPS/images/p188-x741.jpeg,cb0e2470213bea0c8db15ee06cde088c9da7eb44b1da88853761da4c08e39340,188,741,588x926,unmodified PDF image stream,pending
+OEBPS/images/p189-x745.jpeg,4c4b66028ec0c173d326e67836e6c4bdb01ebbf5fc88b251fc2a8742302698c7,189,745,1009x475,unmodified PDF image stream,pending
+OEBPS/images/p191-x751.jpeg,63d81f8c186409141089883816957b9e18e1683f5c531537eda943c9ddac6b6a,191,751,1009x477,unmodified PDF image stream,pending
+OEBPS/images/p192-x755.jpeg,9355171fb6a98abbb170d26e0de2c4bdec23d19919b1e207cae9f061c32ff7c3,192,755,709x477,unmodified PDF image stream,pending
+OEBPS/images/p193-x759.jpeg,de29f8cbe0f57ad6682dd35af3cdf50c877600f27bdb911594379e74785c98c1,193,759,709x473,unmodified PDF image stream,pending
+OEBPS/images/p195-x765.jpeg,ed41e936901a8484e7b3dacffe02154dbeef19a1f646b45e0e5677be340aa40b,195,765,1009x477,unmodified PDF image stream,pending
+OEBPS/images/p196-x769.jpeg,095fa54142bc2d973dffa712e7d7e56bf83d627cf0b2b5f332a65854795a4bf6,196,769,709x436,unmodified PDF image stream,pending
+OEBPS/images/p198-x775.jpeg,f3af1857cd5d719120bddd5ebc7aa78bfbcfcdcec52b7db43799c28204c312ca,198,775,709x363,unmodified PDF image stream,pending
+OEBPS/images/p199-x779.jpeg,db391c44463abe91b657a506855fc08e944960c7084f9eb59cdd9a77701b6347,199,779,721x428,unmodified PDF image stream,pending
+OEBPS/images/p199-x781.jpeg,68475ef6cfb87bae6a758ef03e7d30aabf94f40692d1737031a051e157dbeca1,199,781,714x454,unmodified PDF image stream,pending
+OEBPS/images/p200-x794.png,bf389c495f8d922f18237b2a2e87f0578f12a22a8c3f846b11df16ea538464d8,200,794,760x1021,unmodified PDF image stream,pending
+OEBPS/images/p201-x800-render.jpg,685ad18511fe14005133dbb5be0030ca8b61c360643f1603f98f5f99141e34e8,201,800,1004x1095,page region rendered at 150 dpi: placed rotated or mirrored in print; original stream kept in work/originals,pending
+OEBPS/images/p202-x806.jpeg,556b791129164e781095f8a7db369f02286e249b33a7c62eb6e3c2da0f57cb92,202,806,589x924,unmodified PDF image stream,pending
+OEBPS/images/p203-x810.jpeg,9575c976c229126392185e290ef5ce718676c9010c6817764bc32fd69aaf56e0,203,810,1009x477,unmodified PDF image stream,pending
+OEBPS/images/p205-x816.jpeg,fa56fbbf335a72e91555c02dbb34a3f013e6f7b773b32dba031571183c562f37,205,816,1009x477,unmodified PDF image stream,pending
+OEBPS/images/p209-x833.jpeg,2ca3dbf5ede43db0a0950c48d0012178152a9703afe7a08549785121b65fb536,209,833,1009x477,unmodified PDF image stream,pending
+OEBPS/images/p211-x839.jpeg,5b2b999dd4d699747878764dc7b0f9f6c844bb93064ecb82b71c68cf3306795e,211,839,355x473,unmodified PDF image stream,pending
+OEBPS/images/p212-x843.jpeg,b5f83a3d27f3f7a1a1e3e8cc233d4b35959c63b67dd15210a2a3589f10e17f64,212,843,590x926,unmodified PDF image stream,pending
+OEBPS/images/p213-x847.jpeg,67a2d7fbb1cd83918adb374c37d8400315ba7f88dc5d6712715a8406b98d4e06,213,847,1009x475,unmodified PDF image stream,pending
+OEBPS/images/p215-x853.jpeg,1223b520743e638aaddac6130a1a2ff0efc7bb65f1e75d811656d507c8375b64,215,853,1009x477,unmodified PDF image stream,pending
+OEBPS/images/p218-x861.jpeg,18978444d937e2c2a8dd0c4094ec6f3e744d02d1e867660ca3126d59d3561e17,218,861,714x1069,unmodified PDF image stream,pending
+OEBPS/images/p220-x867.jpeg,90a0c5364ac69a73b19a3e0c5e965ff38453bed14dcf161c476bd862002f1e01,220,867,709x707,unmodified PDF image stream,pending
+OEBPS/images/p223-x875.jpeg,393fe2d5e9c0a0c3ea2c2774284d99c128c7ce624cff44485c9add63c3f34888,223,875,709x639,unmodified PDF image stream,pending
+OEBPS/images/p225-x881.jpeg,408233edbee7b3ff08d5a5a52cf02902bc69c318f1b96aed74a4e3c05a48e23d,225,881,714x536,unmodified PDF image stream,pending
+OEBPS/images/p228-x890.png,a6007cd45de2c50aa98ebbea115190148708249fe917e3810a6fd605a5577dcf,228,890,446x447,unmodified PDF image stream,pending
+OEBPS/images/p229-x896.jpeg,03859d5f6d29fd843a291508df1d846476013b00edc9ba7434a7d61a74be4cd1,229,896,1009x477,unmodified PDF image stream,pending
+OEBPS/images/p231-x902.jpeg,e5d4513a1db9f4b004d7df323381f72739a44dd62f5b28977a6347ae7975bef5,231,902,714x514,unmodified PDF image stream,pending
+OEBPS/images/p233-x908.jpeg,ac8b60573cfa6e17d2bb555f177f1cc51d8b1c9de4d96687a1a034192cb1b898,233,908,1009x478,unmodified PDF image stream,pending
+OEBPS/images/p234-x914.jpeg,0c1e3ee74ac75c88cd611ad423bcd0769b8c9c7886c5318049bda126fe338425,234,914,306x460,unmodified PDF image stream,pending
+OEBPS/images/p234-qr1.png,61d4ee69de9c854a0a6107dc14a843afaa2eae4e7e016e18ba38a3a46160b838,234,vector,292x292,vector QR code rendered at 300 dpi,pending
+OEBPS/images/p235-x918.jpeg,29a75ed56db431045b55778a38bac963a72b04e03a22164ef9721209e63b796e,235,918,709x493,unmodified PDF image stream,pending
+OEBPS/images/p235-x920.jpeg,356192e2615d72186978b30491a2cd8c858b3d0abc8a61730d39212944f7995b,235,920,713x541,unmodified PDF image stream,pending
+OEBPS/images/p236-x924.jpeg,5cf4807339af7249d00e06e8ecd51c99d2821618116978305613dc8accc88192,236,924,590x924,unmodified PDF image stream,pending
+OEBPS/images/p237-x929.jpeg,a1e1dee3a83ea8709db50e0d765a5b569be8181a76f4e909b98568950f1bd090,237,929,1009x1095,unmodified PDF image stream,pending
+OEBPS/images/p238-x935.jpeg,a094375bb2f0b894d6e6ba8f70fc3af66d61b12cddce78e64f32092ba7e8ab51,238,935,590x926,unmodified PDF image stream,pending
+OEBPS/images/p239-x939-render.jpg,2398c19b89591c82466f64a59236e7e40513ef28c9c00b20b7ee180c1a69716b,239,939,482x228,page region rendered at 72 dpi: placed rotated or mirrored in print; original stream kept in work/originals,pending
+OEBPS/images/p242-x947.png,618b58c256e6c374c0d16a9d7c41b74950871f27dcde3ce5be5bc19874fa48b3,242,947,713x1017,unmodified PDF image stream,pending
+OEBPS/images/p245-x955.jpeg,4b0882c698eb8321292a5726649ca46d8151759a188e9b1cf44ad1b2d6c50d19,245,955,1009x477,unmodified PDF image stream,pending
+OEBPS/images/p248-x963.jpeg,08fb85971f3fb7a2824194a7036c5083b84a290b00d811f9992a52d4755eb709,248,963,709x379,unmodified PDF image stream,pending
+OEBPS/images/p249-x967.jpeg,bea842536df6b7bfaff2a5e3a72b8c5e2c5e6fe6af9b10144b6b906b61241150,249,967,709x478,unmodified PDF image stream,pending
+OEBPS/images/p249-x969.jpeg,f82da0df8c8fb86753c0712e734f5dbd7410eeaac1a0fcd47dc7b86b85c35a96,249,969,709x477,unmodified PDF image stream,pending
+OEBPS/images/p251-x975.jpeg,cd83585ada1b9629e04bdae4ef228a24627f8c738fc3c5aad13a7690ec6850cf,251,975,1009x477,unmodified PDF image stream,pending
+OEBPS/images/p254-x982.jpeg,101cdd33f48e2a7f3ef8f678007ce06d85e58f482afc3f90b955d9af4f1bf2ab,254,982,636x503,unmodified PDF image stream,pending
+OEBPS/images/p255-x987.jpeg,ad6c11748f8d729775b6cc9f7b7481713dd5dd7339a906ff116c49ffdfb1c117,255,987,1009x1095,unmodified PDF image stream,pending
+OEBPS/images/p256-x993.jpeg,f6d3cadf1159b104c0ba73af75f732465fc17fc60f7eb35e27295dcf125568a6,256,993,590x924,unmodified PDF image stream,pending
+OEBPS/images/p257-x997.jpeg,251f47bbf5082bc7d32a7b72043b212bf7c3da33653acfb48d53f9b21c984faa,257,997,1009x477,unmodified PDF image stream,pending
+OEBPS/images/p258-x1001.jpeg,16bec6e80d3676506406a3a353038ab562e87cd77a61beaeeb9080d7aeb8052b,258,1001,714x476,unmodified PDF image stream,pending
+OEBPS/images/p259-x1005.jpeg,7b9194db3a2071fc2241c953fd10a873c7a60dd1e46d69ebd0ed7b296a06aee9,259,1005,1009x477,unmodified PDF image stream,pending
+OEBPS/images/p260-x1009.jpeg,1740454d72e204e1af8c27e55548cf9d504faa2ca38210519011a23a53288059,260,1009,351x499,unmodified PDF image stream,pending
+OEBPS/images/p260-x1011.jpeg,833115a9f59eba106d63df8ddb0033fab626f6a58992ae828373a7a7ca63aac2,260,1011,709x425,unmodified PDF image stream,pending
+OEBPS/images/p261-x1015.jpeg,8c44206131bcf074bed90231b8d360ce64b2746509d7a4124969e8a12850ce03,261,1015,712x490,unmodified PDF image stream,pending
+OEBPS/images/p262-x1019.jpeg,caa23a2c0c82913a16ba8664310ca1504e0189ecb78e98c14e79be7305b19e9e,262,1019,606x622,unmodified PDF image stream,pending
+OEBPS/images/p263-x1025-masked.png,048f9f5dc2413973585381839a67b9c66d041a5363f4bdcb0b8ea5ea777ccddc,263,1025,711x368,PDF image stream with its soft mask applied (lossless PNG),pending
+OEBPS/images/p263-x1027.jpeg,598c17e1a69ceccc6ee84f23df95bb962f5c22f12f278ac464367fa8f8365e34,263,1027,715x534,unmodified PDF image stream,pending
+OEBPS/images/p265-x1044.jpeg,13f040934263d6575b6be2f45baff5bdd0d3b88e837902918f9c38acc6e1d310,265,1044,709x477,unmodified PDF image stream,pending
+OEBPS/images/p266-x1048.jpeg,8506f091c9ede58b0a7df24b46ce34321106dd4f645ad547addaf0771c3f66bb,266,1048,714x460,unmodified PDF image stream,pending
+OEBPS/images/p267-x1052.jpeg,8e79f48fd772d347dcdeabee8a0be921604f2f0ac3ccc8490a896bf31acf6358,267,1052,352x385,unmodified PDF image stream,pending
+OEBPS/images/p267-x1054.jpeg,dc426d14cba443c62628bac501759eb34378d820fb9c51abe4fd97300740db9d,267,1054,349x385,unmodified PDF image stream,pending
+OEBPS/images/p268-x1058.jpeg,9a890392f7586c775fc44013fe0ecc983b341fbe3377933f5a2e4b4594c1cba5,268,1058,712x506,unmodified PDF image stream,pending
+OEBPS/images/p269-x1062.jpeg,4be19c2e56a92d65ad6f50d80cc6d2ef0e58ab9a859d165e246eb3ab4b2b42d7,269,1062,329x909,unmodified PDF image stream,pending
+OEBPS/images/p270-x1066.jpeg,dc6e632945869ac4216fb8516cdacad68124042e5fb7db7912e62c5ceccd3083,270,1066,709x488,unmodified PDF image stream,pending
+OEBPS/images/p271-x1072-masked.png,544891fb86c75754fba4a58d417ee4777fa40017e4dd5645b106ce2192c19793,271,1072,719x299,PDF image stream with its soft mask applied (lossless PNG),pending
+OEBPS/images/p272-x1077.jpeg,be14476b95136038348d7446a635a08451c106539f648272595b2ca81b4bf579,272,1077,247x661,unmodified PDF image stream,pending
+OEBPS/images/p273-x1081.jpeg,65d37c784f4b8e9db12c4569f786971bea0ac3be09b6d4ecfcaa86702bca8116,273,1081,714x388,unmodified PDF image stream,pending
+OEBPS/images/p275-x1087.jpeg,c5babaaee0a9bf71c1e3e02b6afa20ca6e73ebfc29c2a6bd990ae4e0bf4697a0,275,1087,1009x477,unmodified PDF image stream,pending
+OEBPS/images/p281-x1101.jpeg,7e7d8a9bca21d5df525f4ff5fa95a177daf5e1028434957c0fbf67a77a79c217,281,1101,709x175,unmodified PDF image stream,pending
+OEBPS/images/p282-x1105.jpeg,d4d5f947b4bf73d67185997a586b3a9abe54a550c628523e9963652995a57647,282,1105,709x153,unmodified PDF image stream,pending
+OEBPS/images/p285-x1115-masked.png,a5a0bc2848c2cb0e35b6e3fc9a38183876adfe63337b4b136381a22195af805a,285,1115,709x220,PDF image stream with its soft mask applied (lossless PNG),pending
+OEBPS/images/p291-x1130.jpeg,2a809b122a2b589eacac715d4a6e4d9495810d1a49fcb44578b821ad256da196,291,1130,1009x477,unmodified PDF image stream,pending
+OEBPS/images/p292-x1134.jpeg,c8a836002fb965bfdb0617e11886230f73d946e822077d4821eb416aa07ecc90,292,1134,709x629,unmodified PDF image stream,pending
+OEBPS/images/p293-x1138.jpeg,f06b49058ec1c48bbb4999db559f4fd67f17a4a83a3659dd3f96471c1bdd15dc,293,1138,368x494,unmodified PDF image stream,pending
+OEBPS/images/p293-x1140.jpeg,403f2bd09d0bd5cc52b4dbe026b327b20138a32fa8205edb4179bd4688ab0dc3,293,1140,341x492,unmodified PDF image stream,pending
+OEBPS/images/p294-x1144.jpeg,0eebc402d56a93b7c2097986e029e3c03db2c7ca849aa5aec64295372862d78b,294,1144,709x663,unmodified PDF image stream,pending
+OEBPS/images/p297-x1152.jpeg,f2ce8748a39df8c9b3d6a47bf73c1f2c467aeda6b2af6d5b69cc6957859703b4,297,1152,709x489,unmodified PDF image stream,pending
+OEBPS/images/p298-x1159.jpeg,43fd5ecec1696c7127a44b66ae5c448da88e8326a09c4b95e437628e78f9b496,298,1159,713x490,unmodified PDF image stream,pending
+OEBPS/images/p299-x1163.jpeg,0255437f3a7e1de065bf3389eba535830033a5d37775a4e85c350a0696c5cf5e,299,1163,709x438,unmodified PDF image stream,pending
+OEBPS/images/p301-x1169.jpeg,e7d9316d1f88ea9fae77ba6af8f587accaec38b274fae8c703ae1a471679fd90,301,1169,505x549,unmodified PDF image stream,pending
+OEBPS/images/p302-x1173.jpeg,5d7db375ebe658d835328dc4e8e56720b28a56bf4ae0fa6330d5922a48e90922,302,1173,709x445,unmodified PDF image stream,pending
+OEBPS/images/p304-x1179.jpeg,ed7702facbcdb4b0c4d5d20c79aa48eaedea6b066f5b7fc10f6b8fd0ca2769e8,304,1179,709x540,unmodified PDF image stream,pending
+OEBPS/images/p305-x1185-masked.png,7b754f786e96f66fe6f2da8bfdd819d541e27cdbcb39a704d0453ed9e2ef45e2,305,1185,567x456,PDF image stream with its soft mask applied (lossless PNG),pending
+OEBPS/images/p316-x1379.jpeg,008875e6349d97a06d65e4784c53c47752e3fd57446da9fd3766d56e53dc96e1,316,1379,1798x1651,unmodified PDF image stream,pending
