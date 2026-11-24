@@ -1,7 +1,7 @@
 /* A short status note at the bottom of the screen (offline saving). */
 .toast {
   position: fixed; inset-inline: 0; bottom: max(1rem, env(safe-area-inset-bottom)); z-index: 950;
-  width: fit-content; max-width: calc(100vw - 2rem); margin: 0 auto; box-sizing: border-box;
+  width: fit-content; max-width: calc(100vw - 2rem); margin: 0 auto;
   padding: 0.65rem 1.1rem; border-radius: var(--radius-pill); background: var(--ink); color: var(--paper);
   font-family: var(--sans); font-size: 0.9rem; line-height: 1.4; box-shadow: 0 10px 30px rgb(0 0 0 / 0.25);
   opacity: 0; transform: translateY(0.5rem);

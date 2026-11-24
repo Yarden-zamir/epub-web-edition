@@ -1,5 +1,5 @@
 /* Footnote and glossary popovers. */
-.note-pop { position: fixed; inset: auto; margin: 0; box-sizing: border-box; width: min(24rem, calc(100vw - 1.5rem)); max-height: min(60vh, 26rem); overflow: auto; padding: 0.9rem 1rem; padding-inline-end: 3rem; border: 1px solid var(--rule); border-radius: var(--radius-m); background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 0.9rem; line-height: 1.55; box-shadow: 0 16px 40px rgb(0 0 0 / 0.22); }
+.note-pop { position: fixed; inset: auto; margin: 0; width: min(24rem, calc(100vw - 1.5rem)); max-height: min(60vh, 26rem); overflow: auto; padding: 0.9rem 1rem; padding-inline-end: 3rem; border: 1px solid var(--rule); border-radius: var(--radius-m); background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 0.9rem; line-height: 1.55; box-shadow: 0 16px 40px rgb(0 0 0 / 0.22); }
 .note-pop p { margin: 0.3rem 0 0; }
 .note-pop strong { display: block; font-size: 1rem; }
 .pop-go { position: absolute; top: 0.6rem; inset-inline-end: 0.6rem; display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: var(--radius-pill); color: var(--accent); }
