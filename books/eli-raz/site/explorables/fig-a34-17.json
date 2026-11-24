@@ -3,7 +3,7 @@
   "kind": "diapir",
   "title": "הר סדום מתרומם: מה עשה לו אגם הלשון",
   "instruction": "גררו את גוש המלח למעלה, או הזיזו את המחוון: קודם בתוך מי אגם הלשון, ואחר כך אחרי שהאגם יבש.",
-  "schematic": "שרטוט סכמטי לפי האיור המודפס, לא בקנה מידה: 800 המטרים שהומסו באגם הלשון אינם מצוירים לגובה, ורק סלע החיפוי שהצטבר מהם גדל. 70 המטרים שמאז מוגדלים לגובה. היחס בין קצב השכבות שבמרכז לשכבות שבאגפים הוא להמחשה.",
+  "schematic": "שרטוט סכמטי לפי האיור המודפס, לא בקנה מידה: 800 המטרים שהומסו באגם הלשון אינם מצוירים לגובה, ורק סלע החיפוי שהצטבר מהם גדל. 70 המטרים שמאז מוגדלים לגובה. היחס בין קצב השכבות שבמרכז לשכבות שבאגפים, קצב זרימת המלח, ותוואי המערה הם להמחשה.",
   "control": {
     "label": "התרוממות המלח",
     "min": 0,
@@ -33,7 +33,11 @@
     "west": "מערב",
     "east": "מזרח",
     "phase_lake": "בתוך אגם הלשון",
-    "phase_dry": "אחרי שאגם הלשון יבש"
+    "phase_dry": "אחרי שאגם הלשון יבש",
+    "amora": "תצורת עמורה",
+    "fault": "העתק שוליים",
+    "caves": "מערות מלח",
+    "cap_young": "סלע החיפוי גדל מלמטה: / השכבה הצעירה צמודה למלח"
   },
   "texts": {
     "start": "מלח תצורת סדום נודד בתת־הקרקע ממרכז האגן, ומתרומם במערבו לאורך העתקי השוליים. השכבות שבמרכז המחדר מגיעות מעומק גדול יותר, ולכן מתרוממות מהר יותר מאלה שבאגפים.",
@@ -52,6 +56,10 @@
       "element": "a34-p047"
     },
     {
+      "label": "השכבות התחתונות נעות מהר יותר מהעליונות",
+      "element": "a34-p048"
+    },
+    {
       "label": "המסה באגם הלשון וראי המלח; שכבות המרכז מהירות מהאגפים",
       "element": "a34-p050"
     },
@@ -66,6 +74,10 @@
     {
       "label": "שיא ההר 165 מ' מתחת לפני הים",
       "element": "a34-p038"
+    },
+    {
+      "label": "מערות המלח הגדולות בעולם: הארוכה 5.7 ק\"מ, כ־20 ק\"מ בסך הכל",
+      "element": "a34-p039"
     }
   ],
   "marks": [
@@ -76,6 +88,34 @@
     {
       "value": 800,
       "label": "האגם יבש"
+    }
+  ],
+  "label_notes": {
+    "amora": "The cover the rising salt broke through while Lake Lisan stood (a34-p050).",
+    "fault": "The marginal faults of the rift, after the printed figure; the salt rises along the deep western one (a34-p047).",
+    "caves": "Rain seeps into cracks and contacts between the upright layers and dissolves the salt (a34-p053); the world's largest salt caves (a34-p039).",
+    "cap_young": "a34-p051: the cap rock's contact with the salt is its youngest part, its top the oldest. ' / ' splits the two lines."
+  },
+  "legend": [
+    {
+      "swatch": "salt",
+      "label": "מלח"
+    },
+    {
+      "swatch": "cap",
+      "label": "סלע חיפוי"
+    },
+    {
+      "swatch": "marl",
+      "label": "חוואר הלשון"
+    },
+    {
+      "swatch": "dry-ground",
+      "label": "אבני חול וחרסיות"
+    },
+    {
+      "swatch": "lisan",
+      "label": "אגם הלשון"
     }
   ]
 }
