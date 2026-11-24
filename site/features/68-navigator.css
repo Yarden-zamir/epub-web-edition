@@ -5,7 +5,10 @@
 .tabs { display: flex; gap: 0.25rem; padding: 0.25rem 1rem 0.5rem; border-bottom: 1px solid var(--rule); }
 .tabs:has(> [role="tab"]:only-of-type) { display: none; }
 .tabs [role="tab"] { padding: 0.45rem 0.9rem; border-radius: var(--radius-pill); font-size: 0.9rem; color: var(--muted); }
-.tabs [role="tab"][aria-selected="true"] { background: var(--ink); color: var(--paper); }
+/* The selected tab sits on an ink pill that slides between tabs (its place comes from 20-navigator.js). */
+.tabs { position: relative; isolation: isolate; }
+.tabs::before { content: ""; position: absolute; z-index: -1; top: var(--tab-top, 0.25rem); left: 0; width: var(--tab-w, 0); height: var(--tab-h, 0); border-radius: var(--radius-pill); background: var(--ink); transform: translateX(var(--tab-x, 0)); transition: transform var(--dur-base) var(--ease-out), width var(--dur-base) var(--ease-out); }
+.tabs [role="tab"][aria-selected="true"] { color: var(--paper); }
 .toc-filter { position: sticky; top: 0; z-index: 1; padding: 0.75rem 1rem 0.5rem; background: var(--paper); }
 .toc-filter input { width: 100%; box-sizing: border-box; padding: 0.6rem 0.9rem; border: 1px solid var(--rule); border-radius: var(--radius-s); background: var(--mat); color: inherit; font: inherit; font-size: 0.95rem; }
 .toc-filter input:focus { outline: 2px solid var(--accent); outline-offset: 0; }

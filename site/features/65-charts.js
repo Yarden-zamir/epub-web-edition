@@ -113,7 +113,7 @@ function drawFigureChart(area, panels, width) {
     });
     panel.series.forEach((s, si) => {
       if (s.kind === "line") {
-        svg("path", { d: s.pts.map((p, i) => `${i ? "L" : "M"}${x(p.x).toFixed(1)},${y(p.y).toFixed(1)}`).join(""), class: `line s${si + 1}` }, root);
+        svg("path", { d: s.pts.map((p, i) => `${i ? "L" : "M"}${x(p.x).toFixed(1)},${y(p.y).toFixed(1)}`).join(""), class: `line s${si + 1}${area.dataset.drawn ? "" : " draw-in"}`, pathLength: 1 }, root);
       } else {
         for (const p of s.pts) svg("circle", { cx: x(p.x).toFixed(1), cy: y(p.y).toFixed(1), r: 2.6, class: `pt s${si + 1}` }, root);
       }
@@ -204,6 +204,7 @@ function drawFigureChart(area, panels, width) {
     });
   });
   area.replaceChildren(...nodes);
+  area.dataset.drawn = ""; // Lines draw in only the first time; a redraw for a new width shows them at once.
 }
 async function setUpChart(figure) {
   const box = figure.querySelector(".chart-box");

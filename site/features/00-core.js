@@ -153,6 +153,40 @@ function onNear(el, callback) {
   nearObserver.observe(el);
 }
 
+// Motion: html.motion turns on the entrance styles (00-base.css and the feature styles). Without the script or with
+// reduced motion everything shows in its final state.
+document.documentElement.classList.toggle("motion", !reduceMotion.matches);
+reduceMotion.addEventListener("change", () => document.documentElement.classList.toggle("motion", !reduceMotion.matches));
+// One shared observer for "do this once when it is on screen" (entrance motion): each target leaves after first use.
+const visibleCallbacks = new Map();
+const visibleObserver = new IntersectionObserver((entries) => {
+  for (const entry of entries) {
+    if (!entry.isIntersecting) continue;
+    visibleObserver.unobserve(entry.target);
+    const callback = visibleCallbacks.get(entry.target);
+    visibleCallbacks.delete(entry.target);
+    callback();
+  }
+}, { rootMargin: "0px 0px -10% 0px" });
+function onVisible(el, callback) {
+  visibleCallbacks.set(el, callback);
+  visibleObserver.observe(el);
+}
+// Entrances: chapter rules, poems and data tables get .seen once they come on screen; staggered parts get --i.
+if (!reduceMotion.matches) {
+  for (const h of reading.querySelectorAll("section.chapter > h2")) onVisible(h, () => h.classList.add("seen"));
+  for (const poem of reading.querySelectorAll("section.poem")) {
+    poem.querySelectorAll(".line").forEach((line, i) => line.style.setProperty("--i", i));
+    onVisible(poem, () => poem.classList.add("seen"));
+  }
+  for (const table of reading.querySelectorAll("table.data-table")) {
+    [...table.tBodies[0]?.rows ?? []].forEach((row, i) => row.style.setProperty("--i", i));
+    onVisible(table, () => table.classList.add("seen"));
+  }
+} else {
+  for (const el of reading.querySelectorAll("section.chapter > h2, section.poem, table.data-table")) el.classList.add("seen");
+}
+
 // Overlays: dialogs and popovers that Back closes. Opening one pushes an entry; closing it any other way
 // (its button, Escape, a click outside) steps history back over its entry, so entries never pile up.
 function isOverlayOpen(el) { return el.matches("dialog") ? el.open : el.matches(":popover-open"); }
