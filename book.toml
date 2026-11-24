@@ -233,6 +233,183 @@ replaces = ["a35-p062", "a35-p063", "a35-p064", "a35-p065", "a35-p066", "a35-p06
 # dagger that links to an edition note with the printed form (correction_note above). Apply only entries marked
 # verified in errata/ERRATA.md, and add each one to CONTENT-CHANGES.md.
 
+# The 22 entries below come from errata/proposed.toml (errata agent, commit ab1c111); errata/ERRATA.md has the research.
+[[correction]]
+element = "a06-p022"
+page = 29
+find = "(2:23, KJV)"
+replace = "(2:13, KJV)"
+reason = "The salt-of-the-covenant verse is Leviticus 2:13. Leviticus 2 has 16 verses."
+evidence = "https://bible-api.com/leviticus+2:13?translation=kjv"
+
+[[correction]]
+element = "a06-p022"
+page = 29
+find = "shalt though season"
+replace = "shalt thou season"
+reason = "Misquote of the KJV: 'shalt thou season with salt'."
+evidence = "https://bible-api.com/leviticus+2:13?translation=kjv"
+
+[[correction]]
+element = "a06-p021"
+page = 26
+find = "salts form any other source"
+replace = "salts from any other source"
+reason = "Typo: 'form' for 'from'."
+evidence = "Reading of the sentence; no outside source needed."
+
+[[correction]]
+element = "a06-p023"
+page = 29
+find = "south of Hebron"
+replace = "south of Bethlehem"
+reason = "Tekoa lies about 8 km south of Bethlehem, between Bethlehem and Hebron, not south of Hebron."
+evidence = "https://en.wikipedia.org/wiki/Tekoa_(ancient_town)"
+
+[[correction]]
+element = "a06-p030"
+page = 33
+find = "For 3,300 years"
+replace = "For 2,300 years"
+reason = "Aristotle lived 384-322 BC; from his time to the 1930s is about 2,260 years. The book itself dates him to the 4th century BC (a35-p016)."
+evidence = "https://en.wikipedia.org/wiki/Aristotle"
+
+[[correction]]
+element = "a06-fn15"
+page = 29
+find = "n. 173."
+replace = "n. 174."
+reason = "In Röhricht's Regesta (1893), pp. 43-44, the 1138 charter of Fulk on Tekoa, bitumen and salt is no. 174. No. 173 is a Templar charter on churches."
+evidence = "https://archive.org/download/regestaregnihie00rhgoog/regestaregnihie00rhgoog_djvu.txt"
+
+[[correction]]
+element = "a31-p002"
+page = 245
+find = "מבול בשלושה במאי"
+replace = "מבול בשני במאי"
+reason = "The Arugot flood was on 2 May 2001. The same article says 2 May twice (a31-p006, a31-p007). Israel Meteorological Service: storm in the night of 1-2 May 2001, the Arugot bridge collapsed."
+evidence = "https://ims.gov.il/sites/default/files/inline-files/%D7%A1%D7%A7%D7%99%D7%A8%D7%AA%20%D7%90%D7%99%D7%A8%D7%95%D7%A2%D7%99%D7%9D%20%D7%A7%D7%99%D7%A6%D7%95%D7%A0%D7%99%D7%99%D7%9D%20-%20%D7%A2%D7%93%D7%9B%D7%95%D7%95%D7%9F%20%D7%9E%D7%A8%D7%A5%202023_0.pdf"
+
+[[correction]]
+element = "a31-p007"
+page = 247
+find = "של ה-3 במאי"
+replace = "של ה-2 במאי"
+reason = "Same event as 'ביום השיטפון ב-2 במאי' earlier in this paragraph. IMS dates the storm and the Arugot bridge collapse to 1-2 May 2001."
+evidence = "https://ims.gov.il/sites/default/files/inline-files/%D7%A1%D7%A7%D7%99%D7%A8%D7%AA%20%D7%90%D7%99%D7%A8%D7%95%D7%A2%D7%99%D7%9D%20%D7%A7%D7%99%D7%A6%D7%95%D7%A0%D7%99%D7%99%D7%9D%20-%20%D7%A2%D7%93%D7%9B%D7%95%D7%95%D7%9F%20%D7%9E%D7%A8%D7%A5%202023_0.pdf"
+
+[[correction]]
+element = "a31-p007"
+page = 247
+find = "דברים יד, 14-13"
+replace = "דברים יא, 14-13"
+reason = "The quoted verses ('והיה אם שמע תשמעו ... ונתתי מטר ארצכם בעתו יורה ומלקוש') are Deuteronomy 11:13-14. Deuteronomy 14:13-14 is about unclean birds."
+evidence = "https://www.sefaria.org/api/v3/texts/Deuteronomy.11.13-14"
+
+[[correction]]
+element = "a10-p003"
+page = 66
+find = "'מועדון האלפיני הישראל'"
+replace = "'מועדון האלפיני הישראלי'"
+reason = "Missing final yod in the club name. a10-p002 prints 'המועדון האלפיני הישראלי'. Checked in the PDF render: the slip is in the print."
+evidence = "https://wiki.imga.org.il/index.php?title=%D7%94%D7%9E%D7%95%D7%A2%D7%93%D7%95%D7%9F_%D7%94%D7%90%D7%9C%D7%A4%D7%99%D7%A0%D7%99"
+
+[[correction]]
+element = "a09-p023"
+page = 61
+find = "בן אוויס"
+replace = "בן נוויס"
+reason = "Ben Nevis, 1,345 m, highest peak of the British Isles, in Scotland. The text gives the same height and place; one letter is missing in the name."
+evidence = "https://en.wikipedia.org/wiki/Ben_Nevis"
+
+[[correction]]
+element = "a13-p058"
+page = 103
+find = "שבאינדוזיה"
+replace = "שבאינדונזיה"
+reason = "Typo: Komodo island is in Indonesia (אינדונזיה)."
+evidence = "https://en.wikipedia.org/wiki/Komodo_(island)"
+
+[[correction]]
+element = "a19-p009"
+page = 185
+find = "במאה ה- 14"
+replace = "במאה ה- 15"
+reason = "Arnold von Harff travelled to the Holy Land in 1496-1499 (still the Mamluk period, so the bracket stays true)."
+evidence = "https://en.wikipedia.org/wiki/Arnold_von_Harff"
+
+[[correction]]
+element = "a17-p009"
+page = 146
+find = "אברהם מוסיל"
+replace = "אלואיס מוסיל"
+reason = "The Czech explorer of Edom at the start of the 20th century is Alois Musil (1868-1944)."
+evidence = "https://en.wikipedia.org/wiki/Alois_Musil"
+
+[[correction]]
+element = "a18-p063"
+page = 181
+find = "בחפירות רבת א-נחאס"
+replace = "בחפירות ח'רבת א-נחאס"
+reason = "Two letters dropped: the site is ח'רבת א-נחאס (Khirbat en-Nahas) in all 8 other places in the book. Checked in the PDF render: the slip is in the print."
+evidence = "https://en.wikipedia.org/wiki/Khirbat_en-Nahas"
+
+[[correction]]
+element = "a35-p058"
+page = 286
+find = "(Bodaker et al., 2000)"
+replace = "(Bodaker et al., 2010)"
+reason = "The book cites this paper as 2010 in a35-p005 and in the bibliography (sources-p053, The ISME Journal 4: 399-407). No Bodaker 2000 paper exists."
+evidence = "https://doi.org/10.1038/ismej.2009.141"
+
+[[correction]]
+element = "sources-p069"
+page = 311
+find = "pp. 31–41"
+replace = "pp. 33–41"
+reason = "Oren 1983, Limnology and Oceanography 28(1): pages 33-41 (Crossref)."
+evidence = "https://api.crossref.org/works/10.4319/lo.1983.28.1.0033"
+
+[[correction]]
+element = "sources-p024"
+page = 309
+find = "תרח\"ץ"
+replace = "תרצ\"ח"
+reason = "Letters swapped in the Hebrew year. The entry is dated 1938, which is תרצ\"ח (5698)."
+evidence = "https://www.hebcal.com/converter?cfg=json&gy=1938&gm=6&gd=1&g2h=1"
+
+[[correction]]
+element = "sources-p047"
+page = 310
+find = "Geological Society of America Bulletin, v.116,pp. 555–571"
+replace = "Geological Survey of Israel Bulletin 63"
+reason = "Begin, Ehrlich and Nathan 1974 is Geological Survey of Israel Bulletin 63. GSA Bulletin 116: 555-571 is a different paper (Bookman/Ken-Tor et al. 2004, doi:10.1130/B25286.1)."
+evidence = "https://www.cambridge.org/core/books/abs/quaternary-of-the-levant/lake-lisan/CF25D6DE02054F2F38A24D91617CBC85"
+
+[[correction]]
+element = "a36-p053"
+page = 303
+find = "לכמיליון עד סוף העשור"
+replace = "לכמיליארד עד סוף העשור"
+reason = "From about 600 million m³ a year to 'about a million' is impossible. Government Decision 3533 (June 2018) sets the 2030 desalination target at 1,100 million m³ a year."
+evidence = "https://www.ceci.org.il/wp-content/uploads/2023/10/%D7%AA%D7%9B%D7%A0%D7%99%D7%AA-%D7%90%D7%A1%D7%98%D7%A8%D7%98%D7%92%D7%99%D7%AA-%D7%9C%D7%94%D7%AA%D7%9E%D7%95%D7%93%D7%93%D7%95%D7%AA-%D7%A2%D7%9D-%D7%AA%D7%A7%D7%95%D7%A4%D7%AA-%D7%91%D7%A6%D7%95%D7%A8%D7%AA-%D7%91%D7%9E%D7%A9%D7%A7-%D7%94%D7%9E%D7%99%D7%9D-%D7%9C%D7%A9%D7%A0%D7%99%D7%9D-2018-2030.pdf"
+
+[[correction]]
+element = "a35-p070"
+page = 288
+find = "(Coyn & Bellier"
+replace = "(Coyne & Bellier"
+reason = "The French engineering firm that wrote the Red Sea - Dead Sea feasibility study is Coyne et Bellier."
+evidence = "https://www.eib.org/attachments/registers/82425040.pdf"
+
+[[correction]]
+element = "sources-p060"
+page = 311
+find = "Coyn and Bellier"
+replace = "Coyne and Bellier"
+reason = "The firm name is Coyne et Bellier (same entry as a35-p070)."
+evidence = "https://www.eib.org/attachments/registers/82425040.pdf"
+
 # Text left out on purpose. Each entry is logged as an intentional change.
 [[omit]]
 page = 22

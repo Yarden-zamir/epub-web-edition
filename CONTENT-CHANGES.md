@@ -24,6 +24,36 @@ Add an entry in the same change that makes it. Newest first within each section.
 | PDF page 70 (a10-p021) | Patach restored in "הקַשָרים": the PDF draws it as one FrankRuhlMFBold glyph without a character code (U+FFFD), which showed as "�" | book.toml [char_map]; checked against a 300 dpi render of the line. The converter now stops on any unmapped U+FFFD. |
 | Whole book | U+0007 → space; U+001A → shva (U+05B0) | Wrong code points in the PDF text layer (book.toml [char_map]). |
 
+## 1a. Corrections of errors in the print (both editions, book.toml [[correction]])
+
+Approved by Yarden on 2026-11-24. Research and verification: errata/ERRATA.md (errata agent, commit ab1c111).
+The reader sees the corrected text with a dagger (†) that opens an edition note with the printed form; the web edition can show the printed form (data-printed).
+
+| Where | Printed → corrected | Why and evidence |
+|---|---|---|
+| PDF page 29 (a06-p022) | "(2:23, KJV)" → "(2:13, KJV)" | The salt-of-the-covenant verse is Leviticus 2:13. Leviticus 2 has 16 verses. Evidence: https://bible-api.com/leviticus+2:13?translation=kjv |
+| PDF page 29 (a06-p022) | "shalt though season" → "shalt thou season" | Misquote of the KJV: 'shalt thou season with salt'. Evidence: https://bible-api.com/leviticus+2:13?translation=kjv |
+| PDF page 26 (a06-p021) | "salts form any other source" → "salts from any other source" | Typo: 'form' for 'from'. Evidence: Reading of the sentence; no outside source needed. |
+| PDF page 29 (a06-p023) | "south of Hebron" → "south of Bethlehem" | Tekoa lies about 8 km south of Bethlehem, between Bethlehem and Hebron, not south of Hebron. Evidence: https://en.wikipedia.org/wiki/Tekoa_(ancient_town) |
+| PDF page 33 (a06-p030) | "For 3,300 years" → "For 2,300 years" | Aristotle lived 384-322 BC; from his time to the 1930s is about 2,260 years. The book itself dates him to the 4th century BC (a35-p016). Evidence: https://en.wikipedia.org/wiki/Aristotle |
+| PDF page 29 (a06-fn15) | "n. 173." → "n. 174." | In Röhricht's Regesta (1893), pp. 43-44, the 1138 charter of Fulk on Tekoa, bitumen and salt is no. 174. No. 173 is a Templar charter on churches. Evidence: https://archive.org/download/regestaregnihie00rhgoog/regestaregnihie00rhgoog_djvu.txt |
+| PDF page 245 (a31-p002) | "מבול בשלושה במאי" → "מבול בשני במאי" | The Arugot flood was on 2 May 2001. The same article says 2 May twice (a31-p006, a31-p007). Israel Meteorological Service: storm in the night of 1-2 May 2001, the Arugot bridge collapsed. Evidence: https://ims.gov.il/sites/default/files/inline-files/%D7%A1%D7%A7%D7%99%D7%A8%D7%AA%20%D7%90%D7%99%D7%A8%D7%95%D7%A2%D7%99%D7%9D%20%D7%A7%D7%99%D7%A6%D7%95%D7%A0%D7%99%D7%99%D7%9D%20-%20%D7%A2%D7%93%D7%9B%D7%95%D7%95%D7%9F%20%D7%9E%D7%A8%D7%A5%202023_0.pdf |
+| PDF page 247 (a31-p007) | "של ה-3 במאי" → "של ה-2 במאי" | Same event as 'ביום השיטפון ב-2 במאי' earlier in this paragraph. IMS dates the storm and the Arugot bridge collapse to 1-2 May 2001. Evidence: https://ims.gov.il/sites/default/files/inline-files/%D7%A1%D7%A7%D7%99%D7%A8%D7%AA%20%D7%90%D7%99%D7%A8%D7%95%D7%A2%D7%99%D7%9D%20%D7%A7%D7%99%D7%A6%D7%95%D7%A0%D7%99%D7%99%D7%9D%20-%20%D7%A2%D7%93%D7%9B%D7%95%D7%95%D7%9F%20%D7%9E%D7%A8%D7%A5%202023_0.pdf |
+| PDF page 247 (a31-p007) | "דברים יד, 14-13" → "דברים יא, 14-13" | The quoted verses ('והיה אם שמע תשמעו ... ונתתי מטר ארצכם בעתו יורה ומלקוש') are Deuteronomy 11:13-14. Deuteronomy 14:13-14 is about unclean birds. Evidence: https://www.sefaria.org/api/v3/texts/Deuteronomy.11.13-14 |
+| PDF page 66 (a10-p003) | "'מועדון האלפיני הישראל'" → "'מועדון האלפיני הישראלי'" | Missing final yod in the club name. a10-p002 prints 'המועדון האלפיני הישראלי'. Checked in the PDF render: the slip is in the print. Evidence: https://wiki.imga.org.il/index.php?title=%D7%94%D7%9E%D7%95%D7%A2%D7%93%D7%95%D7%9F_%D7%94%D7%90%D7%9C%D7%A4%D7%99%D7%A0%D7%99 |
+| PDF page 61 (a09-p023) | "בן אוויס" → "בן נוויס" | Ben Nevis, 1,345 m, highest peak of the British Isles, in Scotland. The text gives the same height and place; one letter is missing in the name. Evidence: https://en.wikipedia.org/wiki/Ben_Nevis |
+| PDF page 103 (a13-p058) | "שבאינדוזיה" → "שבאינדונזיה" | Typo: Komodo island is in Indonesia (אינדונזיה). Evidence: https://en.wikipedia.org/wiki/Komodo_(island) |
+| PDF page 185 (a19-p009) | "במאה ה- 14" → "במאה ה- 15" | Arnold von Harff travelled to the Holy Land in 1496-1499 (still the Mamluk period, so the bracket stays true). Evidence: https://en.wikipedia.org/wiki/Arnold_von_Harff |
+| PDF page 146 (a17-p009) | "אברהם מוסיל" → "אלואיס מוסיל" | The Czech explorer of Edom at the start of the 20th century is Alois Musil (1868-1944). Evidence: https://en.wikipedia.org/wiki/Alois_Musil |
+| PDF page 181 (a18-p063) | "בחפירות רבת א-נחאס" → "בחפירות ח'רבת א-נחאס" | Two letters dropped: the site is ח'רבת א-נחאס (Khirbat en-Nahas) in all 8 other places in the book. Checked in the PDF render: the slip is in the print. Evidence: https://en.wikipedia.org/wiki/Khirbat_en-Nahas |
+| PDF page 286 (a35-p058) | "(Bodaker et al., 2000)" → "(Bodaker et al., 2010)" | The book cites this paper as 2010 in a35-p005 and in the bibliography (sources-p053, The ISME Journal 4: 399-407). No Bodaker 2000 paper exists. Evidence: https://doi.org/10.1038/ismej.2009.141 |
+| PDF page 311 (sources-p069) | "pp. 31–41" → "pp. 33–41" | Oren 1983, Limnology and Oceanography 28(1): pages 33-41 (Crossref). Evidence: https://api.crossref.org/works/10.4319/lo.1983.28.1.0033 |
+| PDF page 309 (sources-p024) | "תרח"ץ" → "תרצ"ח" | Letters swapped in the Hebrew year. The entry is dated 1938, which is תרצ"ח (5698). Evidence: https://www.hebcal.com/converter?cfg=json&gy=1938&gm=6&gd=1&g2h=1 |
+| PDF page 310 (sources-p047) | "Geological Society of America Bulletin, v.116,pp. 555–571" → "Geological Survey of Israel Bulletin 63" | Begin, Ehrlich and Nathan 1974 is Geological Survey of Israel Bulletin 63. GSA Bulletin 116: 555-571 is a different paper (Bookman/Ken-Tor et al. 2004, doi:10.1130/B25286.1). Evidence: https://www.cambridge.org/core/books/abs/quaternary-of-the-levant/lake-lisan/CF25D6DE02054F2F38A24D91617CBC85 |
+| PDF page 303 (a36-p053) | "לכמיליון עד סוף העשור" → "לכמיליארד עד סוף העשור" | From about 600 million m³ a year to 'about a million' is impossible. Government Decision 3533 (June 2018) sets the 2030 desalination target at 1,100 million m³ a year. Evidence: https://www.ceci.org.il/wp-content/uploads/2023/10/%D7%AA%D7%9B%D7%A0%D7%99%D7%AA-%D7%90%D7%A1%D7%98%D7%A8%D7%98%D7%92%D7%99%D7%AA-%D7%9C%D7%94%D7%AA%D7%9E%D7%95%D7%93%D7%93%D7%95%D7%AA-%D7%A2%D7%9D-%D7%AA%D7%A7%D7%95%D7%A4%D7%AA-%D7%91%D7%A6%D7%95%D7%A8%D7%AA-%D7%91%D7%9E%D7%A9%D7%A7-%D7%94%D7%9E%D7%99%D7%9D-%D7%9C%D7%A9%D7%A0%D7%99%D7%9D-2018-2030.pdf |
+| PDF page 288 (a35-p070) | "(Coyn & Bellier" → "(Coyne & Bellier" | The French engineering firm that wrote the Red Sea - Dead Sea feasibility study is Coyne et Bellier. Evidence: https://www.eib.org/attachments/registers/82425040.pdf |
+| PDF page 311 (sources-p060) | "Coyn and Bellier" → "Coyne and Bellier" | The firm name is Coyne et Bellier (same entry as a35-p070). Evidence: https://www.eib.org/attachments/registers/82425040.pdf |
+
 ## 2. Image changes (release edition only, book.toml [release])
 
 | Where | Change | Why |

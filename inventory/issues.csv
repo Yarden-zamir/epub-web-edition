@@ -23,173 +23,195 @@ A-0021,22,info,a06-p005: paragraph continues across the page break (marker kept 
 A-0022,25,intentional-change,"a06-t1: table printed as text, set as a table (8 lines)",open
 A-0023,25,hyphen,Joined a line-end hyphen: 'religious-',open
 A-0024,24,info,a06-p017: paragraph continues across the page break (marker kept inside),open
-A-0025,26,info,a06-p021: paragraph continues across the page break (marker kept inside),open
-A-0026,29,note-join,a06: unnumbered note text joined to note 13 (continued from the previous page),open
-A-0027,29,info,a06-p022: paragraph continues across the page break (marker kept inside),open
-A-0028,31,info,p031-x137.jpeg: no caption next to this image in print,open
-A-0029,30,info,a06-p025: paragraph continues across the page break (marker kept inside),open
-A-0030,33,info,a06-p027: paragraph continues across the page break (marker kept inside),open
-A-0031,32,hyphen,Joined a line-end hyphen: 'high-',open
-A-0032,32,info,a06-p030: paragraph continues across the page break (marker kept inside),open
-A-0033,35,info,a06-p031: paragraph continues across the page break (marker kept inside),open
-A-0034,34,intentional-change,"Text fix 'site in the world (108,107 ראו איורים בעמודים).' -> 'site in the world (ראו איורים בעמודים 107, 108).': Page numbers after a Hebrew run inside an English line: logical order, so the line displays like the print.",open
-A-0035,38,info,p038-x159.jpeg: no caption next to this image in print,open
-A-0036,38,info,p038-x161.jpeg: no caption next to this image in print,open
-A-0037,39,info,p039-x165-render.jpg: no caption next to this image in print,open
-A-0038,46,info,a07-p015: paragraph continues across the page break (marker kept inside),open
-A-0039,49,info,a07-p029: paragraph continues across the page break (marker kept inside),open
-A-0040,50,intentional-change,a07-poem1: verse set as a poem (6 lines),open
-A-0041,51,info,p051-x207.jpeg: no caption next to this image in print,open
-A-0042,52,info,p052-x211.jpeg: no caption next to this image in print,open
-A-0043,53,info,p053-x215-render.jpg: no caption next to this image in print,open
-A-0044,56,info,p056-x223.jpeg: no caption next to this image in print,open
-A-0045,57,info,p057-x227.jpeg: no caption next to this image in print,open
-A-0046,60,info,p060-x235.jpeg: no caption next to this image in print,open
-A-0047,60,info,a09-p014: paragraph continues across the page break (marker kept inside),open
-A-0048,63,info,a09-p032: paragraph continues across the page break (marker kept inside),open
-A-0049,64,info,a09-p036: paragraph continues across the page break (marker kept inside),open
-A-0050,65,info,p065-x247.jpeg: no caption next to this image in print,open
-A-0051,67,info,a10-p004: paragraph continues across the page break (marker kept inside),open
-A-0052,68,info,p068-x257.jpeg: no caption next to this image in print,open
-A-0053,70,char-map,U+FFFD mapped to U+05B7; check against print,open
-A-0054,72,info,a10-p024: paragraph continues across the page break (marker kept inside),open
-A-0055,78,intentional-change,fig-a10-11: QR code image links to its decoded target,open
-A-0056,78,intentional-change,fig-a10-12: QR code image links to its decoded target,open
-A-0057,78,intentional-change,fig-a10-13: QR code image links to its decoded target,open
-A-0058,78,intentional-change,fig-a10-14: QR code image links to its decoded target,open
-A-0059,79,info,p079-x310.jpeg: no caption next to this image in print,open
-A-0060,82,info,a11-p015: paragraph continues across the page break (marker kept inside),open
-A-0061,89,info,p089-x332.jpeg: no caption next to this image in print,open
-A-0062,93,info,p093-x356.jpeg: no caption next to this image in print,open
-A-0063,94,info,p094-x360.jpeg: no caption next to this image in print,open
-A-0064,96,info,p096-x366.jpeg: no caption next to this image in print,open
-A-0065,98,info,a13-p031: paragraph continues across the page break (marker kept inside),open
-A-0066,100,info,p100-x376.jpeg: no caption next to this image in print,open
-A-0067,101,info,p101-x380.jpeg: no caption next to this image in print,open
-A-0068,104,info,a13-p058: paragraph continues across the page break (marker kept inside),open
-A-0069,106,info,p106-x394.jpeg: no caption next to this image in print,open
-A-0070,107,info,p107-x398.jpeg: no caption next to this image in print,open
-A-0071,108,info,a14-p005: paragraph continues across the page break (marker kept inside),open
-A-0072,109,info,p109-x406.jpeg: no caption next to this image in print,open
-A-0073,115,info,p115-x444.jpeg: no caption next to this image in print,open
-A-0074,117,info,p117-x458.jpeg: no caption next to this image in print,open
-A-0075,118,info,p118-x464.jpeg: no caption next to this image in print,open
-A-0076,120,info,a14-p052: paragraph continues across the page break (marker kept inside),open
-A-0077,125,info,p125-x500.jpeg: no caption next to this image in print,open
-A-0078,126,info,p126-x505.jpeg: no caption next to this image in print,open
-A-0079,127,intentional-change,"Text fix 'וסביבתו) Siwa,' -> 'וסביבתו (Siwa,': Opening bracket before a Latin run.",open
-A-0080,127,info,p127-x509.jpeg: no caption next to this image in print,open
-A-0081,128,info,a15-p007: paragraph continues across the page break (marker kept inside),open
-A-0082,131,info,a15-p018: paragraph continues across the page break (marker kept inside),open
-A-0083,136,auto-fix,Bracket pair ')Hadas et al. 2005(' reordered around a left-to-right run; check against print,open
-A-0084,140,info,a16-p016: paragraph continues across the page break (marker kept inside),open
-A-0085,145,info,p145-x577.jpeg: no caption next to this image in print,open
-A-0086,148,info,p148-x587.jpeg: no caption next to this image in print,open
-A-0087,148,info,a17-p012: paragraph continues across the page break (marker kept inside),open
-A-0088,149,info,p149-x591.jpeg: no caption next to this image in print,open
-A-0089,151,info,p151-x599.jpeg: no caption next to this image in print,open
-A-0090,151,info,p151-x601.jpeg: no caption next to this image in print,open
-A-0091,153,info,a17-p022: paragraph continues across the page break (marker kept inside),open
-A-0092,154,info,a17-p024: paragraph continues across the page break (marker kept inside),open
-A-0093,156,info,a17-p031: paragraph continues across the page break (marker kept inside),open
-A-0094,157,info,p157-x615.jpeg: no caption next to this image in print,open
-A-0095,157,info,p157-x617.jpeg: no caption next to this image in print,open
-A-0096,159,info,p159-x628.jpeg: no caption next to this image in print,open
-A-0097,159,info,p159-x632-masked.png: no caption next to this image in print,open
-A-0098,159,info,a17-p042: paragraph continues across the page break (marker kept inside),open
-A-0099,162,info,p162-x645.png: no caption next to this image in print,open
-A-0100,164,info,a17-p054: paragraph continues across the page break (marker kept inside),open
-A-0101,166,intentional-change,fig-a17-18: QR code image links to its decoded target,open
-A-0102,167,info,p167-x661.jpeg: no caption next to this image in print,open
-A-0103,168,info,a18-p003: paragraph continues across the page break (marker kept inside),open
-A-0104,172,info,a18-p022: paragraph continues across the page break (marker kept inside),open
-A-0105,174,info,a18-p026: paragraph continues across the page break (marker kept inside),open
-A-0106,176,info,a18-p037: paragraph continues across the page break (marker kept inside),open
-A-0107,179,info,a18-p045: paragraph continues across the page break (marker kept inside),open
-A-0108,181,intentional-change,"a18-t1: table printed as text, set as a table (11 lines)",open
-A-0109,182,info,p182-x707.jpeg: no caption next to this image in print,open
-A-0110,183,info,p183-x713-masked.png: no caption next to this image in print,open
-A-0111,183,info,p183-x717-masked.png: no caption next to this image in print,open
-A-0112,187,info,p187-x735.jpeg: no caption next to this image in print,open
-A-0113,189,info,p189-x745.jpeg: no caption next to this image in print,open
-A-0114,191,info,p191-x751.jpeg: no caption next to this image in print,open
-A-0115,194,info,a21-p011: paragraph continues across the page break (marker kept inside),open
-A-0116,195,info,p195-x765.jpeg: no caption next to this image in print,open
-A-0117,196,info,p196-x769.jpeg: no caption next to this image in print,open
-A-0118,200,info,p200-x794.png: no caption next to this image in print,open
-A-0119,201,info,p201-x800-render.jpg: no caption next to this image in print,open
-A-0120,202,info,p202-x806.jpeg: no caption next to this image in print,open
-A-0121,203,info,p203-x810.jpeg: no caption next to this image in print,open
-A-0122,205,info,p205-x816.jpeg: no caption next to this image in print,open
-A-0123,206,info,a24-p006: paragraph continues across the page break (marker kept inside),open
-A-0124,207,intentional-change,a24-poem1: verse set as a poem (7 lines),open
-A-0125,209,info,p209-x833.jpeg: no caption next to this image in print,open
-A-0126,210,char-map,U+001A mapped to U+05B0; check against print,open
-A-0127,211,char-map,U+001A mapped to U+05B0; check against print,open
-A-0128,212,info,p212-x843.jpeg: no caption next to this image in print,open
-A-0129,213,intentional-change,a26-poem1: verse set as a poem (40 lines),open
-A-0130,213,info,p213-x847.jpeg: no caption next to this image in print,open
-A-0131,215,info,p215-x853.jpeg: no caption next to this image in print,open
-A-0132,222,info,a27-p033: paragraph continues across the page break (marker kept inside),open
-A-0133,226,info,a27-p047: paragraph continues across the page break (marker kept inside),open
-A-0134,227,info,a27-p054: paragraph continues across the page break (marker kept inside),open
-A-0135,228,info,a27-p057: paragraph continues across the page break (marker kept inside),open
-A-0136,229,info,p229-x896.jpeg: no caption next to this image in print,open
-A-0137,230,info,a28-p005: paragraph continues across the page break (marker kept inside),open
-A-0138,231,info,p231-x902.jpeg: no caption next to this image in print,open
-A-0139,233,info,p233-x908.jpeg: no caption next to this image in print,open
-A-0140,234,info,p234-x914.jpeg: no caption next to this image in print,open
-A-0141,234,intentional-change,fig-a29-03: QR code image links to its decoded target,open
-A-0142,234,info,a29-p005: paragraph continues across the page break (marker kept inside),open
-A-0143,235,info,p235-x920.jpeg: no caption next to this image in print,open
-A-0144,236,info,p236-x924.jpeg: no caption next to this image in print,open
-A-0145,237,info,p237-x929.jpeg: no caption next to this image in print,open
-A-0146,244,intentional-change,a30-poem1: verse set as a poem (7 lines),open
-A-0147,247,info,a31-p007: paragraph continues across the page break (marker kept inside),open
-A-0148,249,info,p249-x967.jpeg: no caption next to this image in print,open
-A-0149,253,info,a32-p013: paragraph continues across the page break (marker kept inside),open
-A-0150,254,info,a32-p017: paragraph continues across the page break (marker kept inside),open
-A-0151,255,info,p255-x987.jpeg: no caption next to this image in print,open
-A-0152,256,info,p256-x993.jpeg: no caption next to this image in print,open
-A-0153,257,note,a33: reference '3' has no single matching note; kept as superscript,open
-A-0154,257,note,a33: reference '2' has no single matching note; kept as superscript,open
-A-0155,257,note,a33: reference '12' has no single matching note; kept as superscript,open
-A-0156,257,note,a33: reference '13' has no single matching note; kept as superscript,open
-A-0157,259,info,p259-x1005.jpeg: no caption next to this image in print,open
-A-0158,260,info,p260-x1009.jpeg: no caption next to this image in print,open
-A-0159,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
-A-0160,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
-A-0161,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
-A-0162,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
-A-0163,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
-A-0164,264,auto-fix,Bracket pair ') Katz et al. 1977 (' reordered around a left-to-right run; check against print,open
-A-0165,265,auto-fix,Bracket pair ') Begin et al. 1974 (' reordered around a left-to-right run; check against print,open
-A-0166,274,auto-fix,Bracket pair ') Neev and Hall 1979 (' reordered around a left-to-right run; check against print,open
-A-0167,277,auto-fix,"Bracket pair ') Wilkansky, 1936 (' reordered around a left-to-right run; check against print",open
-A-0168,279,intentional-change,Text fix 'ואילו 1934(Bass-Becking)' -> 'ואילו Bass-Becking (1934)': Name and year order inside a Hebrew line.,open
-A-0169,279,info,a35-p015: paragraph continues across the page break (marker kept inside),open
-A-0170,280,intentional-change,Text fix 'האמירה של 2009) Boetius and Joye):' -> 'האמירה של Boetius and Joye (2009):': Citation run with a year in brackets.,open
-A-0171,281,info,a35-p029: paragraph continues across the page break (marker kept inside),open
-A-0172,282,info,a35-p034: paragraph continues across the page break (marker kept inside),open
-A-0173,283,intentional-change,"Text fix 'החיפוש) Google Scholar, 2016).' -> 'החיפוש (Google Scholar, 2016).': Opening bracket before a Latin run.",open
-A-0174,283,intentional-change,"Text fix '(, Gay-Lussac, 1819; Ehrenberg, 1848; Lortet' -> '(Gay-Lussac, 1819; Ehrenberg, 1848; Lortet,': One citation run over two lines; print breaks it at the line end.",open
-A-0175,283,intentional-change,"Text fix 'Bass-Becking,1934; 1891),' -> '1891; Bass-Becking,1934),': End of the same citation run.",open
-A-0176,284,intentional-change,Text fix 'יתר(ולכן' -> 'יתר) ולכן': Closing bracket of the note that opens with (מלבד; print shows it after יתר.,open
-A-0177,284,info,a35-p045: paragraph continues across the page break (marker kept inside),open
-A-0178,286,intentional-change,"Text fix '(, Kaplan & Friedman, 1970; Oren & Shilo' -> '(Kaplan & Friedman, 1970; Oren & Shilo,': One citation run over two lines; print breaks it at the line end.",open
-A-0179,286,intentional-change,"Text fix 'Oren,1983a, 1993; 1982).' -> '1982; Oren,1983a, 1993).': End of the same citation run.",open
-A-0180,287,intentional-change,"a35-t1: table printed as text, set as a table (10 lines)",open
-A-0181,287,info,a35-p058: paragraph continues across the page break (marker kept inside),open
-A-0182,290,intentional-change,a35-poem1: verse set as a poem (11 lines),open
-A-0183,291,intentional-change,"Text fix ') Bourcart, 1899).' -> '(Bourcart, 1899).': Opening bracket at the start of a line before a Latin run.",open
-A-0184,291,intentional-change,Text fix 'הנורווגי 1919(Hiorth) הציע' -> 'הנורווגי Hiorth (1919) הציע': Name and year order inside a Hebrew line.,open
-A-0185,293,info,p293-x1140.jpeg: no caption next to this image in print,open
-A-0186,294,intentional-change,"Text fix ') Wachs et al., 2000,' -> '(Wachs et al., 2000,': Opening bracket at the start of a line before a Latin run.",open
-A-0187,297,info,p297-x1152.jpeg: no caption next to this image in print,open
-A-0188,299,info,p299-x1163.jpeg: no caption next to this image in print,open
-A-0189,303,intentional-change,Text fix '(RB (.' -> '(RB).': Closing bracket after a Latin abbreviation.,open
-A-0190,308,intentional-change,a36-poem1: verse set as a poem (34 lines),open
-A-0191,309,hyphen,Joined a line-end hyphen: 'Collapse-',open
-A-0192,310,hyphen,Joined a line-end hyphen: 'High-',open
-A-0193,316,reuse,Image xref 1379 repeats; first file p001-x1379.jpeg,open
-A-0194,316,info,p316-x1379.jpeg: no caption next to this image in print,open
+A-0025,26,intentional-change,Correction 'salts form any other source' -> 'salts from any other source': Typo: 'form' for 'from'. Evidence: Reading of the sentence; no outside source needed.,open
+A-0026,26,info,a06-p021: paragraph continues across the page break (marker kept inside),open
+A-0027,29,intentional-change,"Correction '(2:23, KJV)' -> '(2:13, KJV)': The salt-of-the-covenant verse is Leviticus 2:13. Leviticus 2 has 16 verses. Evidence: https://bible-api.com/leviticus+2:13?translation=kjv",open
+A-0028,29,intentional-change,Correction 'shalt though season' -> 'shalt thou season': Misquote of the KJV: 'shalt thou season with salt'. Evidence: https://bible-api.com/leviticus+2:13?translation=kjv,open
+A-0029,29,intentional-change,"Correction 'south of Hebron' -> 'south of Bethlehem': Tekoa lies about 8 km south of Bethlehem, between Bethlehem and Hebron, not south of Hebron. Evidence: https://en.wikipedia.org/wiki/Tekoa_(ancient_town)",open
+A-0030,29,note-join,a06: unnumbered note text joined to note 13 (continued from the previous page),open
+A-0031,29,intentional-change,"Correction 'n. 173.' -> 'n. 174.': In Röhricht's Regesta (1893), pp. 43-44, the 1138 charter of Fulk on Tekoa, bitumen and salt is no. 174. No. 173 is a Templar charter on churches. Evidence: https://archive.org/download/regestaregnihie00rhgoog/regestaregnihie00rhgoog_djvu.txt",open
+A-0032,29,info,a06-p022: paragraph continues across the page break (marker kept inside),open
+A-0033,31,info,p031-x137.jpeg: no caption next to this image in print,open
+A-0034,30,info,a06-p025: paragraph continues across the page break (marker kept inside),open
+A-0035,33,intentional-change,"Correction 'For 3,300 years' -> 'For 2,300 years': Aristotle lived 384-322 BC; from his time to the 1930s is about 2,260 years. The book itself dates him to the 4th century BC (a35-p016). Evidence: https://en.wikipedia.org/wiki/Aristotle",open
+A-0036,33,info,a06-p027: paragraph continues across the page break (marker kept inside),open
+A-0037,32,hyphen,Joined a line-end hyphen: 'high-',open
+A-0038,32,info,a06-p030: paragraph continues across the page break (marker kept inside),open
+A-0039,35,info,a06-p031: paragraph continues across the page break (marker kept inside),open
+A-0040,34,intentional-change,"Text fix 'site in the world (108,107 ראו איורים בעמודים).' -> 'site in the world (ראו איורים בעמודים 107, 108).': Page numbers after a Hebrew run inside an English line: logical order, so the line displays like the print.",open
+A-0041,38,info,p038-x159.jpeg: no caption next to this image in print,open
+A-0042,38,info,p038-x161.jpeg: no caption next to this image in print,open
+A-0043,39,info,p039-x165-render.jpg: no caption next to this image in print,open
+A-0044,46,info,a07-p015: paragraph continues across the page break (marker kept inside),open
+A-0045,49,info,a07-p029: paragraph continues across the page break (marker kept inside),open
+A-0046,50,intentional-change,a07-poem1: verse set as a poem (6 lines),open
+A-0047,51,info,p051-x207.jpeg: no caption next to this image in print,open
+A-0048,52,info,p052-x211.jpeg: no caption next to this image in print,open
+A-0049,53,info,p053-x215-render.jpg: no caption next to this image in print,open
+A-0050,56,info,p056-x223.jpeg: no caption next to this image in print,open
+A-0051,57,info,p057-x227.jpeg: no caption next to this image in print,open
+A-0052,60,info,p060-x235.jpeg: no caption next to this image in print,open
+A-0053,60,info,a09-p014: paragraph continues across the page break (marker kept inside),open
+A-0054,61,intentional-change,"Correction 'בן אוויס' -> 'בן נוויס': Ben Nevis, 1,345 m, highest peak of the British Isles, in Scotland. The text gives the same height and place; one letter is missing in the name. Evidence: https://en.wikipedia.org/wiki/Ben_Nevis",open
+A-0055,63,info,a09-p032: paragraph continues across the page break (marker kept inside),open
+A-0056,64,info,a09-p036: paragraph continues across the page break (marker kept inside),open
+A-0057,65,info,p065-x247.jpeg: no caption next to this image in print,open
+A-0058,66,intentional-change,"Correction ""'מועדון האלפיני הישראל'"" -> ""'מועדון האלפיני הישראלי'"": Missing final yod in the club name. a10-p002 prints 'המועדון האלפיני הישראלי'. Checked in the PDF render: the slip is in the print. Evidence: https://wiki.imga.org.il/index.php?title=%D7%94%D7%9E%D7%95%D7%A2%D7%93%D7%95%D7%9F_%D7%94%D7%90%D7%9C%D7%A4%D7%99%D7%A0%D7%99",open
+A-0059,67,info,a10-p004: paragraph continues across the page break (marker kept inside),open
+A-0060,68,info,p068-x257.jpeg: no caption next to this image in print,open
+A-0061,70,char-map,U+FFFD mapped to U+05B7; check against print,open
+A-0062,72,info,a10-p024: paragraph continues across the page break (marker kept inside),open
+A-0063,78,intentional-change,fig-a10-11: QR code image links to its decoded target,open
+A-0064,78,intentional-change,fig-a10-12: QR code image links to its decoded target,open
+A-0065,78,intentional-change,fig-a10-13: QR code image links to its decoded target,open
+A-0066,78,intentional-change,fig-a10-14: QR code image links to its decoded target,open
+A-0067,79,info,p079-x310.jpeg: no caption next to this image in print,open
+A-0068,82,info,a11-p015: paragraph continues across the page break (marker kept inside),open
+A-0069,89,info,p089-x332.jpeg: no caption next to this image in print,open
+A-0070,93,info,p093-x356.jpeg: no caption next to this image in print,open
+A-0071,94,info,p094-x360.jpeg: no caption next to this image in print,open
+A-0072,96,info,p096-x366.jpeg: no caption next to this image in print,open
+A-0073,98,info,a13-p031: paragraph continues across the page break (marker kept inside),open
+A-0074,100,info,p100-x376.jpeg: no caption next to this image in print,open
+A-0075,101,info,p101-x380.jpeg: no caption next to this image in print,open
+A-0076,103,intentional-change,Correction 'שבאינדוזיה' -> 'שבאינדונזיה': Typo: Komodo island is in Indonesia (אינדונזיה). Evidence: https://en.wikipedia.org/wiki/Komodo_(island),open
+A-0077,104,info,a13-p058: paragraph continues across the page break (marker kept inside),open
+A-0078,106,info,p106-x394.jpeg: no caption next to this image in print,open
+A-0079,107,info,p107-x398.jpeg: no caption next to this image in print,open
+A-0080,108,info,a14-p005: paragraph continues across the page break (marker kept inside),open
+A-0081,109,info,p109-x406.jpeg: no caption next to this image in print,open
+A-0082,115,info,p115-x444.jpeg: no caption next to this image in print,open
+A-0083,117,info,p117-x458.jpeg: no caption next to this image in print,open
+A-0084,118,info,p118-x464.jpeg: no caption next to this image in print,open
+A-0085,120,info,a14-p052: paragraph continues across the page break (marker kept inside),open
+A-0086,125,info,p125-x500.jpeg: no caption next to this image in print,open
+A-0087,126,info,p126-x505.jpeg: no caption next to this image in print,open
+A-0088,127,intentional-change,"Text fix 'וסביבתו) Siwa,' -> 'וסביבתו (Siwa,': Opening bracket before a Latin run.",open
+A-0089,127,info,p127-x509.jpeg: no caption next to this image in print,open
+A-0090,128,info,a15-p007: paragraph continues across the page break (marker kept inside),open
+A-0091,131,info,a15-p018: paragraph continues across the page break (marker kept inside),open
+A-0092,136,auto-fix,Bracket pair ')Hadas et al. 2005(' reordered around a left-to-right run; check against print,open
+A-0093,140,info,a16-p016: paragraph continues across the page break (marker kept inside),open
+A-0094,145,info,p145-x577.jpeg: no caption next to this image in print,open
+A-0095,146,intentional-change,Correction 'אברהם מוסיל' -> 'אלואיס מוסיל': The Czech explorer of Edom at the start of the 20th century is Alois Musil (1868-1944). Evidence: https://en.wikipedia.org/wiki/Alois_Musil,open
+A-0096,148,info,p148-x587.jpeg: no caption next to this image in print,open
+A-0097,148,info,a17-p012: paragraph continues across the page break (marker kept inside),open
+A-0098,149,info,p149-x591.jpeg: no caption next to this image in print,open
+A-0099,151,info,p151-x599.jpeg: no caption next to this image in print,open
+A-0100,151,info,p151-x601.jpeg: no caption next to this image in print,open
+A-0101,153,info,a17-p022: paragraph continues across the page break (marker kept inside),open
+A-0102,154,info,a17-p024: paragraph continues across the page break (marker kept inside),open
+A-0103,156,info,a17-p031: paragraph continues across the page break (marker kept inside),open
+A-0104,157,info,p157-x615.jpeg: no caption next to this image in print,open
+A-0105,157,info,p157-x617.jpeg: no caption next to this image in print,open
+A-0106,159,info,p159-x628.jpeg: no caption next to this image in print,open
+A-0107,159,info,p159-x632-masked.png: no caption next to this image in print,open
+A-0108,159,info,a17-p042: paragraph continues across the page break (marker kept inside),open
+A-0109,162,info,p162-x645.png: no caption next to this image in print,open
+A-0110,164,info,a17-p054: paragraph continues across the page break (marker kept inside),open
+A-0111,166,intentional-change,fig-a17-18: QR code image links to its decoded target,open
+A-0112,167,info,p167-x661.jpeg: no caption next to this image in print,open
+A-0113,168,info,a18-p003: paragraph continues across the page break (marker kept inside),open
+A-0114,172,info,a18-p022: paragraph continues across the page break (marker kept inside),open
+A-0115,174,info,a18-p026: paragraph continues across the page break (marker kept inside),open
+A-0116,176,info,a18-p037: paragraph continues across the page break (marker kept inside),open
+A-0117,179,info,a18-p045: paragraph continues across the page break (marker kept inside),open
+A-0118,181,intentional-change,"a18-t1: table printed as text, set as a table (11 lines)",open
+A-0119,181,intentional-change,"Correction 'בחפירות רבת א-נחאס' -> ""בחפירות ח'רבת א-נחאס"": Two letters dropped: the site is ח'רבת א-נחאס (Khirbat en-Nahas) in all 8 other places in the book. Checked in the PDF render: the slip is in the print. Evidence: https://en.wikipedia.org/wiki/Khirbat_en-Nahas",open
+A-0120,182,info,p182-x707.jpeg: no caption next to this image in print,open
+A-0121,183,info,p183-x713-masked.png: no caption next to this image in print,open
+A-0122,183,info,p183-x717-masked.png: no caption next to this image in print,open
+A-0123,185,intentional-change,"Correction 'במאה ה- 14' -> 'במאה ה- 15': Arnold von Harff travelled to the Holy Land in 1496-1499 (still the Mamluk period, so the bracket stays true). Evidence: https://en.wikipedia.org/wiki/Arnold_von_Harff",open
+A-0124,187,info,p187-x735.jpeg: no caption next to this image in print,open
+A-0125,189,info,p189-x745.jpeg: no caption next to this image in print,open
+A-0126,191,info,p191-x751.jpeg: no caption next to this image in print,open
+A-0127,194,info,a21-p011: paragraph continues across the page break (marker kept inside),open
+A-0128,195,info,p195-x765.jpeg: no caption next to this image in print,open
+A-0129,196,info,p196-x769.jpeg: no caption next to this image in print,open
+A-0130,200,info,p200-x794.png: no caption next to this image in print,open
+A-0131,201,info,p201-x800-render.jpg: no caption next to this image in print,open
+A-0132,202,info,p202-x806.jpeg: no caption next to this image in print,open
+A-0133,203,info,p203-x810.jpeg: no caption next to this image in print,open
+A-0134,205,info,p205-x816.jpeg: no caption next to this image in print,open
+A-0135,206,info,a24-p006: paragraph continues across the page break (marker kept inside),open
+A-0136,207,intentional-change,a24-poem1: verse set as a poem (7 lines),open
+A-0137,209,info,p209-x833.jpeg: no caption next to this image in print,open
+A-0138,210,char-map,U+001A mapped to U+05B0; check against print,open
+A-0139,211,char-map,U+001A mapped to U+05B0; check against print,open
+A-0140,212,info,p212-x843.jpeg: no caption next to this image in print,open
+A-0141,213,intentional-change,a26-poem1: verse set as a poem (40 lines),open
+A-0142,213,info,p213-x847.jpeg: no caption next to this image in print,open
+A-0143,215,info,p215-x853.jpeg: no caption next to this image in print,open
+A-0144,222,info,a27-p033: paragraph continues across the page break (marker kept inside),open
+A-0145,226,info,a27-p047: paragraph continues across the page break (marker kept inside),open
+A-0146,227,info,a27-p054: paragraph continues across the page break (marker kept inside),open
+A-0147,228,info,a27-p057: paragraph continues across the page break (marker kept inside),open
+A-0148,229,info,p229-x896.jpeg: no caption next to this image in print,open
+A-0149,230,info,a28-p005: paragraph continues across the page break (marker kept inside),open
+A-0150,231,info,p231-x902.jpeg: no caption next to this image in print,open
+A-0151,233,info,p233-x908.jpeg: no caption next to this image in print,open
+A-0152,234,info,p234-x914.jpeg: no caption next to this image in print,open
+A-0153,234,intentional-change,fig-a29-03: QR code image links to its decoded target,open
+A-0154,234,info,a29-p005: paragraph continues across the page break (marker kept inside),open
+A-0155,235,info,p235-x920.jpeg: no caption next to this image in print,open
+A-0156,236,info,p236-x924.jpeg: no caption next to this image in print,open
+A-0157,237,info,p237-x929.jpeg: no caption next to this image in print,open
+A-0158,244,intentional-change,a30-poem1: verse set as a poem (7 lines),open
+A-0159,245,intentional-change,"Correction 'מבול בשלושה במאי' -> 'מבול בשני במאי': The Arugot flood was on 2 May 2001. The same article says 2 May twice (a31-p006, a31-p007). Israel Meteorological Service: storm in the night of 1-2 May 2001, the Arugot bridge collapsed. Evidence: https://ims.gov.il/sites/default/files/inline-files/%D7%A1%D7%A7%D7%99%D7%A8%D7%AA%20%D7%90%D7%99%D7%A8%D7%95%D7%A2%D7%99%D7%9D%20%D7%A7%D7%99%D7%A6%D7%95%D7%A0%D7%99%D7%99%D7%9D%20-%20%D7%A2%D7%93%D7%9B%D7%95%D7%95%D7%9F%20%D7%9E%D7%A8%D7%A5%202023_0.pdf",open
+A-0160,247,intentional-change,Correction 'של ה-3 במאי' -> 'של ה-2 במאי': Same event as 'ביום השיטפון ב-2 במאי' earlier in this paragraph. IMS dates the storm and the Arugot bridge collapse to 1-2 May 2001. Evidence: https://ims.gov.il/sites/default/files/inline-files/%D7%A1%D7%A7%D7%99%D7%A8%D7%AA%20%D7%90%D7%99%D7%A8%D7%95%D7%A2%D7%99%D7%9D%20%D7%A7%D7%99%D7%A6%D7%95%D7%A0%D7%99%D7%99%D7%9D%20-%20%D7%A2%D7%93%D7%9B%D7%95%D7%95%D7%9F%20%D7%9E%D7%A8%D7%A5%202023_0.pdf,open
+A-0161,247,intentional-change,"Correction 'דברים יד, 14-13' -> 'דברים יא, 14-13': The quoted verses ('והיה אם שמע תשמעו ... ונתתי מטר ארצכם בעתו יורה ומלקוש') are Deuteronomy 11:13-14. Deuteronomy 14:13-14 is about unclean birds. Evidence: https://www.sefaria.org/api/v3/texts/Deuteronomy.11.13-14",open
+A-0162,247,info,a31-p007: paragraph continues across the page break (marker kept inside),open
+A-0163,249,info,p249-x967.jpeg: no caption next to this image in print,open
+A-0164,253,info,a32-p013: paragraph continues across the page break (marker kept inside),open
+A-0165,254,info,a32-p017: paragraph continues across the page break (marker kept inside),open
+A-0166,255,info,p255-x987.jpeg: no caption next to this image in print,open
+A-0167,256,info,p256-x993.jpeg: no caption next to this image in print,open
+A-0168,257,note,a33: reference '3' has no single matching note; kept as superscript,open
+A-0169,257,note,a33: reference '2' has no single matching note; kept as superscript,open
+A-0170,257,note,a33: reference '12' has no single matching note; kept as superscript,open
+A-0171,257,note,a33: reference '13' has no single matching note; kept as superscript,open
+A-0172,259,info,p259-x1005.jpeg: no caption next to this image in print,open
+A-0173,260,info,p260-x1009.jpeg: no caption next to this image in print,open
+A-0174,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
+A-0175,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
+A-0176,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
+A-0177,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
+A-0178,262,note,a34: small print at the page foot without a number; kept as a paragraph,open
+A-0179,264,auto-fix,Bracket pair ') Katz et al. 1977 (' reordered around a left-to-right run; check against print,open
+A-0180,265,auto-fix,Bracket pair ') Begin et al. 1974 (' reordered around a left-to-right run; check against print,open
+A-0181,274,auto-fix,Bracket pair ') Neev and Hall 1979 (' reordered around a left-to-right run; check against print,open
+A-0182,277,auto-fix,"Bracket pair ') Wilkansky, 1936 (' reordered around a left-to-right run; check against print",open
+A-0183,279,intentional-change,Text fix 'ואילו 1934(Bass-Becking)' -> 'ואילו Bass-Becking (1934)': Name and year order inside a Hebrew line.,open
+A-0184,279,info,a35-p015: paragraph continues across the page break (marker kept inside),open
+A-0185,280,intentional-change,Text fix 'האמירה של 2009) Boetius and Joye):' -> 'האמירה של Boetius and Joye (2009):': Citation run with a year in brackets.,open
+A-0186,281,info,a35-p029: paragraph continues across the page break (marker kept inside),open
+A-0187,282,info,a35-p034: paragraph continues across the page break (marker kept inside),open
+A-0188,283,intentional-change,"Text fix 'החיפוש) Google Scholar, 2016).' -> 'החיפוש (Google Scholar, 2016).': Opening bracket before a Latin run.",open
+A-0189,283,intentional-change,"Text fix '(, Gay-Lussac, 1819; Ehrenberg, 1848; Lortet' -> '(Gay-Lussac, 1819; Ehrenberg, 1848; Lortet,': One citation run over two lines; print breaks it at the line end.",open
+A-0190,283,intentional-change,"Text fix 'Bass-Becking,1934; 1891),' -> '1891; Bass-Becking,1934),': End of the same citation run.",open
+A-0191,284,intentional-change,Text fix 'יתר(ולכן' -> 'יתר) ולכן': Closing bracket of the note that opens with (מלבד; print shows it after יתר.,open
+A-0192,284,info,a35-p045: paragraph continues across the page break (marker kept inside),open
+A-0193,286,intentional-change,"Text fix '(, Kaplan & Friedman, 1970; Oren & Shilo' -> '(Kaplan & Friedman, 1970; Oren & Shilo,': One citation run over two lines; print breaks it at the line end.",open
+A-0194,286,intentional-change,"Text fix 'Oren,1983a, 1993; 1982).' -> '1982; Oren,1983a, 1993).': End of the same citation run.",open
+A-0195,286,intentional-change,"Correction '(Bodaker et al., 2000)' -> '(Bodaker et al., 2010)': The book cites this paper as 2010 in a35-p005 and in the bibliography (sources-p053, The ISME Journal 4: 399-407). No Bodaker 2000 paper exists. Evidence: https://doi.org/10.1038/ismej.2009.141",open
+A-0196,287,intentional-change,"a35-t1: table printed as text, set as a table (10 lines)",open
+A-0197,287,info,a35-p058: paragraph continues across the page break (marker kept inside),open
+A-0198,288,intentional-change,Correction '(Coyn & Bellier' -> '(Coyne & Bellier': The French engineering firm that wrote the Red Sea - Dead Sea feasibility study is Coyne et Bellier. Evidence: https://www.eib.org/attachments/registers/82425040.pdf,open
+A-0199,290,intentional-change,a35-poem1: verse set as a poem (11 lines),open
+A-0200,291,intentional-change,"Text fix ') Bourcart, 1899).' -> '(Bourcart, 1899).': Opening bracket at the start of a line before a Latin run.",open
+A-0201,291,intentional-change,Text fix 'הנורווגי 1919(Hiorth) הציע' -> 'הנורווגי Hiorth (1919) הציע': Name and year order inside a Hebrew line.,open
+A-0202,293,info,p293-x1140.jpeg: no caption next to this image in print,open
+A-0203,294,intentional-change,"Text fix ') Wachs et al., 2000,' -> '(Wachs et al., 2000,': Opening bracket at the start of a line before a Latin run.",open
+A-0204,297,info,p297-x1152.jpeg: no caption next to this image in print,open
+A-0205,299,info,p299-x1163.jpeg: no caption next to this image in print,open
+A-0206,303,intentional-change,Text fix '(RB (.' -> '(RB).': Closing bracket after a Latin abbreviation.,open
+A-0207,303,intentional-change,"Correction 'לכמיליון עד סוף העשור' -> 'לכמיליארד עד סוף העשור': From about 600 million m³ a year to 'about a million' is impossible. Government Decision 3533 (June 2018) sets the 2030 desalination target at 1,100 million m³ a year. Evidence: https://www.ceci.org.il/wp-content/uploads/2023/10/%D7%AA%D7%9B%D7%A0%D7%99%D7%AA-%D7%90%D7%A1%D7%98%D7%A8%D7%98%D7%92%D7%99%D7%AA-%D7%9C%D7%94%D7%AA%D7%9E%D7%95%D7%93%D7%93%D7%95%D7%AA-%D7%A2%D7%9D-%D7%AA%D7%A7%D7%95%D7%A4%D7%AA-%D7%91%D7%A6%D7%95%D7%A8%D7%AA-%D7%91%D7%9E%D7%A9%D7%A7-%D7%94%D7%9E%D7%99%D7%9D-%D7%9C%D7%A9%D7%A0%D7%99%D7%9D-2018-2030.pdf",open
+A-0208,308,intentional-change,a36-poem1: verse set as a poem (34 lines),open
+A-0209,309,hyphen,Joined a line-end hyphen: 'Collapse-',open
+A-0210,309,intentional-change,"Correction 'תרח""ץ' -> 'תרצ""ח': Letters swapped in the Hebrew year. The entry is dated 1938, which is תרצ""ח (5698). Evidence: https://www.hebcal.com/converter?cfg=json&gy=1938&gm=6&gd=1&g2h=1",open
+A-0211,310,hyphen,Joined a line-end hyphen: 'High-',open
+A-0212,310,intentional-change,"Correction 'Geological Society of America Bulletin, v.116,pp. 555–571' -> 'Geological Survey of Israel Bulletin 63': Begin, Ehrlich and Nathan 1974 is Geological Survey of Israel Bulletin 63. GSA Bulletin 116: 555-571 is a different paper (Bookman/Ken-Tor et al. 2004, doi:10.1130/B25286.1). Evidence: https://www.cambridge.org/core/books/abs/quaternary-of-the-levant/lake-lisan/CF25D6DE02054F2F38A24D91617CBC85",open
+A-0213,311,intentional-change,Correction 'Coyn and Bellier' -> 'Coyne and Bellier': The firm name is Coyne et Bellier (same entry as a35-p070). Evidence: https://www.eib.org/attachments/registers/82425040.pdf,open
+A-0214,311,intentional-change,"Correction 'pp. 31–41' -> 'pp. 33–41': Oren 1983, Limnology and Oceanography 28(1): pages 33-41 (Crossref). Evidence: https://api.crossref.org/works/10.4319/lo.1983.28.1.0033",open
+A-0215,316,reuse,Image xref 1379 repeats; first file p001-x1379.jpeg,open
+A-0216,316,info,p316-x1379.jpeg: no caption next to this image in print,open
