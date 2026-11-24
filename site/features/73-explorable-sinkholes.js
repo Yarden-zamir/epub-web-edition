@@ -83,12 +83,14 @@ function dateOf(level, spec) {
   return first ? new Date(first[0]) : null;
 }
 
+// One formatter: toLocaleDateString with options builds a new one on every call, and this runs on every frame.
+const monthYear = new Intl.DateTimeFormat("he-IL", { month: "long", year: "numeric" });
 function valueParts(depth, spec) {
   const mark = spec.marks.find((m) => m.value === depth && m.year);
   const date = dateOf(-depth, spec);
   const firstMeasured = -spec.data.level.points[0][1];
   const when = mark ? mark.year
-    : date && depth >= firstMeasured ? date.toLocaleDateString("he-IL", { month: "long", year: "numeric" })
+    : date && depth >= firstMeasured ? monthYear.format(date)
     : "בין 1960 ל־1976";
   return { num: number(depth, 1), unit: spec.control.unit, note: when };
 }

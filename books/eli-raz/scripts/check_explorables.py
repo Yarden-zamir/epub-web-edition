@@ -30,7 +30,7 @@ import sys
 import threading
 from pathlib import Path
 
-from playwright.sync_api import Page, sync_playwright
+from playwright.sync_api import Page, TimeoutError as PlaywrightTimeout, sync_playwright
 
 ci = os.environ.get("GITHUB_ACTIONS") == "true"
 perf = "--perf" in sys.argv or ci
@@ -72,10 +72,20 @@ def shot(page: Page, locator, path: Path) -> None:
 
 
 def open_explainer(page: Page, fig_id: str):
+    """Scroll to the figure until its explainer shows. Deep in the book the chapters above still settle their
+    heights after the first scroll, which can move the figure out of view before it loads (on a slow runner); a
+    reader then scrolls to it again, and so does this."""
     fig = page.locator(f"#{fig_id}")
-    fig.scroll_into_view_if_needed()
     slider = fig.locator("input[type=range]")
-    slider.wait_for(state="visible", timeout=15000)
+    for _ in range(15):
+        fig.scroll_into_view_if_needed()
+        try:
+            slider.wait_for(state="visible", timeout=1000)
+            break
+        except PlaywrightTimeout:
+            continue
+    else:
+        raise SystemExit(f"{fig_id}: the explainer did not appear within 15 s of scrolling to its figure")
     page.evaluate("el => el.scrollIntoView({block: 'start'})", fig.locator(".xp-stage").element_handle())
     page.wait_for_timeout(400)
     return fig, slider

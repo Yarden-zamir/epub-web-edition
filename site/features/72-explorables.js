@@ -75,7 +75,7 @@ function markHintSeen(id) {
 
 // Colours, gradients and fonts come from the CSS tokens. A theme change clears them and redraws.
 function makeEnv(box) {
-  const colors = new Map(), gradients = new Map(), layers = new Map(), sprites = new Map();
+  const colors = new Map(), gradients = new Map(), layers = new Map(), sprites = new Map(), widths = new Map();
   let ctx = null, family = "";
   // A label as a bitmap at the current size, font and theme: text drawn left-aligned at (0, 0), with its box.
   function sprite(text, size, weight, color) {
@@ -113,7 +113,7 @@ function makeEnv(box) {
     wantsFrame: false,
     bind(context) { ctx = context; },
     pixel: 1, // Device pixels per drawing unit.
-    reset() { colors.clear(); gradients.clear(); layers.clear(); sprites.clear(); family = getComputedStyle(box).fontFamily; },
+    reset() { colors.clear(); gradients.clear(); layers.clear(); sprites.clear(); widths.clear(); family = getComputedStyle(box).fontFamily; },
     // Static parts are drawn once into a bitmap at the current size and theme; a frame only copies it.
     layer(key, [x, y, w, h], draw) {
       const id = `${key}@${env.pixel.toFixed(4)}`;
@@ -165,28 +165,26 @@ function makeEnv(box) {
       c.drawImage(s.bitmap, left - x + s.x0, s.y0, s.w, s.h);
       c.restore();
     },
+    // Measured once per text, size and font: drawings ask for the same widths on every frame.
     textWidth(c, text, { size = 13, weight = 600 } = {}) {
-      c.save();
-      c.font = `${weight} ${size * env.unit}px ${family}`;
-      const width = c.measureText(text).width;
-      c.restore();
-      return width;
+      const key = `${text}|${size}|${weight}|${env.unit}`;
+      if (!widths.has(key)) {
+        if (widths.size > 400) widths.clear(); // Texts with changing numbers must not grow the cache without end.
+        c.save();
+        c.font = `${weight} ${size * env.unit}px ${family}`;
+        widths.set(key, c.measureText(text).width);
+        c.restore();
+      }
+      return widths.get(key);
     },
     // A number whose digits all take the width of "0", right-aligned at x: it never shifts as it changes.
     figures(c, text, x, y, { size = 13, weight = 700, color = "--ink" } = {}) {
-      c.save();
-      c.font = `${weight} ${size * env.unit}px ${family}`;
-      c.direction = "ltr";
-      c.textAlign = "center";
-      c.lineJoin = "round";
-      c.lineWidth = 3.5 * env.unit;
-      c.strokeStyle = env.color("--paper");
-      c.fillStyle = env.color(color);
-      const digit = c.measureText("0").width;
-      const widths = [...text].map((ch) => (ch >= "0" && ch <= "9" ? digit : c.measureText(ch).width));
-      let at = x - widths.reduce((a, b) => a + b, 0);
-      [...text].forEach((ch, i) => { c.strokeText(ch, at + widths[i] / 2, y); c.fillText(ch, at + widths[i] / 2, y); at += widths[i]; });
-      c.restore();
+      // Each character is a cached label bitmap, so a changing number draws no text on a frame.
+      const look = { size, weight, color };
+      const digit = env.textWidth(c, "0", look);
+      const sizes = [...text].map((ch) => (ch >= "0" && ch <= "9" ? digit : env.textWidth(c, ch, look)));
+      let at = x - sizes.reduce((sum, w) => sum + w, 0);
+      [...text].forEach((ch, i) => { env.label(c, ch, at + sizes[i] / 2, y, look); at += sizes[i]; });
     },
   };
   env.reset();
