@@ -229,7 +229,9 @@ async function setUp(figure, box) {
     const steps = Math.min(400, Math.round(span / c.step));
     const samples = [...Array(steps + 1).keys()].map((i) => kind.valueParts(snap(c.min + (span * i) / steps), spec));
     const widest = (slot, text) => {
-      probe.font = getComputedStyle(slot).font;
+      // Not the `font` shorthand: Chrome returns "" for it once font-variant-numeric is set.
+      const cs = getComputedStyle(slot);
+      probe.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
       return Math.ceil(Math.max(...samples.map((p) => probe.measureText([...text(p)].map((ch) => (ch >= "0" && ch <= "9" ? "0" : ch)).join("")).width)));
     };
     numSlot.style.minWidth = `${widest(numSlot, (p) => p.num) + 3}px`;
