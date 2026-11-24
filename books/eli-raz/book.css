@@ -119,3 +119,6 @@ ol.timeline li.major { font-weight: bold; }
 span.tl-date { font-weight: bold; }
 /* The printed contents: page numbers and titles are in the text; the reader adds no list numbers. */
 ol.contents, ol.contents ol { list-style: none; padding: 0; }
+
+/* Section subheadings inside a chapter (bold in print, with a rule above). */
+h3.section-title { font-family: "Book Sans", "Arial", sans-serif; font-weight: bold; font-size: 1.05em; color: inherit; margin: 1.4em 0 0.4em; padding-top: 0.3em; border-top: 1px solid #999; }

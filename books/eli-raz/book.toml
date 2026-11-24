@@ -136,6 +136,98 @@ find = "Ehrenberg, C.G. 54.מובא"
 replace = "54. Ehrenberg, C.G. מובא"
 reason = "Entry 54 starts its own line in print; the label came out after the Latin run (errata/print-check.md row 68)."
 
+# From the page review (2026-11-24); each checked against a clip of the printed line.
+[[text_fix]]
+page = 136
+find = ".)Hadas et al. 2005("
+replace = "(Hadas et al. 2005)."
+reason = "Caption citation run; print reads (Hadas et al. 2005)."
+[[text_fix]]
+page = 141
+find = "'אדלה',(Adela) על"
+replace = "'אדלה', (Adela) על"
+reason = "Missing space; print reads 'אדלה', (Adela) על (glyph order checked)."
+[[text_fix]]
+page = 166
+find = "בקתדרה 2002,101,"
+replace = "בקתדרה 101, 2002,"
+reason = "Number order; print reads 101, 2002."
+[[text_fix]]
+page = 173
+find = "(,Barker"
+replace = "(Barker,"
+reason = "Citation run at the line end; print reads (Barker,"
+[[text_fix]]
+page = 278
+find = "(,Oren"
+replace = "(Oren,"
+reason = "Citation run at the line end; print reads (Oren,"
+[[text_fix]]
+page = 280
+find = "(2008, Calo, 2011; Oren)."
+replace = "(Calo, 2011; Oren, 2008)."
+reason = "Citation order; print reads (Calo, 2011; Oren, 2008)."
+[[text_fix]]
+page = 282
+find = "(, Oren et al.,2004"
+replace = "(Oren et al.,2004,"
+reason = "Citation run at the line end; print reads (Oren et al.,2004,"
+[[text_fix]]
+page = 285
+find = "בשנים 1980,1964"
+replace = "בשנים 1964, 1980"
+reason = "Number order; print reads 1964, 1980."
+[[text_fix]]
+page = 292
+find = "להרצל) Bourcart 1899)."
+replace = "להרצל (Bourcart 1899)."
+reason = "Opening bracket before a Latin run."
+[[text_fix]]
+page = 303
+find = "ה- GSI & Tahal(RD"
+replace = "ה-RD (GSI & Tahal"
+reason = "Run order; print reads ה-RD (GSI & Tahal"
+[[text_fix]]
+page = 304
+find = ".)GSI & Tahal Reports, 2011)"
+replace = "(GSI & Tahal Reports, 2011)."
+reason = "End of the same citation run."
+[[text_fix]]
+page = 305
+find = "(Neev and Emery, 1967 (."
+replace = "(Neev and Emery, 1967)."
+reason = "Closing bracket after a Latin run."
+[[text_fix]]
+page = 309
+find = "0 1. רז, אלי"
+replace = "10. רז, אלי"
+reason = "Entry number 10 came out as 0 1."
+[[text_fix]]
+page = 311
+find = "I onescu,D."
+replace = "Ionescu,D."
+reason = "Print reads Ionescu."
+
+# Line-edge and run-merge cases from the page review; the paragraph displays like the print.
+[[bidi_reviewed]]
+page = 136
+contains = "(Hadas et al. 2005)."
+[[bidi_reviewed]]
+page = 173
+contains = "(Barker,"
+[[bidi_reviewed]]
+page = 278
+contains = "(Oren,"
+[[bidi_reviewed]]
+page = 282
+contains = "(Oren et al.,2004,"
+[[bidi_reviewed]]
+page = 303
+contains = "ה-RD (GSI & Tahal"
+[[bidi_reviewed]]
+page = 304
+contains = "(GSI & Tahal Reports, 2011)."
+
 # Bracket defects that are in the print. tools/check_text.py skips paragraphs that contain these texts.
 [[print_quirk]]
 contains = "(בעברית: 'חורבת הנחושת' שוכנת"

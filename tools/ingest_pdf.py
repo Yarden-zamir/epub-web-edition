@@ -1097,6 +1097,11 @@ class Ingest:
             if not prev.rtl and prev.text.endswith("-") and cur.text[:1].islower():
                 out = out[:-1] + cur.html
                 self.issue(prev.page, "hyphen", f"Joined a line-end hyphen: {prev.text.split()[-1]!r}")
+            elif not prev.rtl and prev.text.endswith("-") and len(prev.text) > 1 and prev.text[-2].isalpha() and cur.text[:1].isupper():
+                out += cur.html  # A hyphenated compound broken at the line end keeps its hyphen: "Long-" + "Term".
+            elif (prev.rtl and prev.text.endswith(("-", "־")) and len(prev.text) > 1 and not prev.text[-2].isspace()
+                  and (is_hebrew(cur.text[:1]) or cur.text[:1].isdigit())):
+                out += cur.html  # A Hebrew compound or prefix with a hyphen at the line end: "קלעת-" + "סלע".
             else:
                 out += " " + cur.html
         return out
@@ -1553,6 +1558,8 @@ class Ingest:
             self.page_ids.update({p: [unit.id] for p in range(unit.start, unit.end + 1)})
             return body, [], heading
         counters = {"fig": 0, "n": 0}
+        seen_body = False  # A body paragraph of this unit came already.
+        author_para: list[Line] | None = None  # The unit's first byline paragraph.
         notes: dict[int, dict[str, object]] = {}
         last_note: int | None = None
         prev_note_y = -1e9
@@ -1574,7 +1581,8 @@ class Ingest:
             body_paras = [pa for pa in paras if pa[0].role == "body"]
             top_body = body_paras[0] if body_paras else None
             next_open: str | None = None
-            for para in paras:
+            is_byline = [pa[0].role == "byline" for pa in paras]
+            for i, para in enumerate(paras):
                 role, first = para[0].role, para[0]
                 text = self.join(para)
                 if para is top_body and open_para and self.continues(para, body_paras) and not figs_above(figs, first):
@@ -1619,6 +1627,17 @@ class Ingest:
                 tag = {"title": "p", "display": "p"}.get(role, "p")
                 cls = {"title": "display-title", "display": "display-title", "byline": "byline",
                        "subheading": "subheading", "caption": "small"}.get(role)
+                if role == "byline":
+                    # The first byline of a unit is the author. A later line in the byline font is a section subheading
+                    # (bold, a rule above in print) once the text has begun, or when it is short ("מבוא"), unless it
+                    # belongs to a block of such lines (the dedication in a13).
+                    in_block = ((i > 0 and is_byline[i - 1] and paras[i - 1] is not author_para)
+                                or (i + 1 < len(paras) and is_byline[i + 1]))
+                    if author_para is None:
+                        author_para = para
+                    elif not in_block and (seen_body or len(" ".join(ln.text for ln in para).split()) <= 5):
+                        tag, cls = "h3", "section-title"
+                seen_body = seen_body or role == "body"
                 cls_attr = f' class="{cls}"' if cls else ""
                 flow.append((first.y0, f'<{tag} id="{pid}"{cls_attr}{attrs}>{text}</{tag}>'))
                 ids.append(pid)
@@ -1925,12 +1944,18 @@ class Ingest:
         inv = self.inventory
         inv.mkdir(exist_ok=True)
         unit_of = {p: u for u in self.units for p in range(u.start, u.end + 1)}
+        # The review status and notes of each page are kept from the last file; a person or a review sets them.
+        review: dict[str, tuple[str, str]] = {}
+        if (inv / "pages.csv").exists():
+            with (inv / "pages.csv").open(encoding="utf-8", newline="") as f:
+                review = {r["page"]: (r["status"], r["notes"]) for r in csv.DictReader(f)}
         with (inv / "pages.csv").open("w", encoding="utf-8", newline="") as f:
             w = csv.writer(f, lineterminator="\n")
             w.writerow(["page", "printed", "unit", "kind", "target_ids", "status", "notes"])
             for p in sorted(unit_of):
                 u = unit_of[p]
-                w.writerow([p, self.label(p), u.id, u.kind, " ".join(self.page_ids.get(p, [])), "pending", ""])
+                status, notes = review.get(str(p), ("pending", ""))
+                w.writerow([p, self.label(p), u.id, u.kind, " ".join(self.page_ids.get(p, [])), status, notes])
         for name, rows in (("assets.csv", self.assets), ("issues.csv", self.issues), ("figures.csv", self.figure_log)):
             with (inv / name).open("w", encoding="utf-8", newline="") as f:
                 if rows:
