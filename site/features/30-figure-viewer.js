@@ -34,8 +34,9 @@ function schedule() { frame ||= requestAnimationFrame(render); }
 function fitImage() {
   const w = viewerImg.naturalWidth, h = viewerImg.naturalHeight;
   if (!w || !h) return;
-  const pad = viewerStage.clientWidth > 600 ? 48 : 16;
-  const k = Math.min((viewerStage.clientWidth - pad) / w, (viewerStage.clientHeight - pad / 2) / h, 2.5);
+  // With a mouse, the previous and next buttons stand beside the image, not on it.
+  const pad = viewerStage.clientWidth <= 600 ? 16 : matchMedia("(hover: hover)").matches ? 176 : 48;
+  const k = Math.min((viewerStage.clientWidth - pad) / w, (viewerStage.clientHeight - 32) / h, 2.5);
   viewerImg.style.width = `${Math.round(w * k)}px`;
   viewerImg.style.height = `${Math.round(h * k)}px`;
 }
@@ -96,8 +97,10 @@ async function showFigure(at, dir = 0) {
   const caption = figure.querySelector("figcaption");
   const viewerCaption = byId("viewer-caption");
   viewerCaption.replaceChildren(...[...(caption?.childNodes ?? [])].map((n) => n.cloneNode(true)));
-  viewerCaption.lang = caption?.closest("[lang]")?.lang ?? "";
-  viewerCaption.dir = caption?.closest("[dir]")?.dir || "auto"; // An English caption keeps its direction.
+  // The caption's own language and direction; else its text decides, so an English caption reads left to right.
+  const marked = caption?.closest("[lang]:not(html)") ?? caption?.querySelector("[lang]");
+  viewerCaption.lang = marked?.lang ?? "";
+  viewerCaption.dir = marked?.dir || "auto";
   const link = byId("viewer-original");
   link.hidden = !figure.dataset.original;
   if (figure.dataset.original) link.href = figure.dataset.original;
