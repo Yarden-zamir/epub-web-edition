@@ -10,7 +10,9 @@ Read this file fully before you start. Your own task message names your part.
 - Content repo (private, no remote): ~/Github/eli-raz-edition/main. book.toml, book.css, site/ (web-only data), scripts/, work/ (scratch, ignored by git), OPEN-POINTS.md, CONTENT-CHANGES.md.
 - Source PDF (read-only, never modify): ~/private-inputs/eli-raz/source-2026-11-23/source.pdf.
 - Release EPUB source tree (the public edition text): ~/Github/eli-raz-edition/main/epub-src-release/OEBPS/text/*.xhtml. Element IDs there are stable; all web additions attach by these IDs.
-- Live site (public, approved by the family): https://eli-raz.yarden-zamir.com. Only the orchestrator publishes. Do not publish, deploy, push, commit, or change access. Do not contact anyone.
+- Live site (public, approved by the family): https://eli-raz.yarden-zamir.com. Only the orchestrator publishes it with kitshn. Do not change access. Do not contact anyone.
+- Commit and push while you work (standing approval from the user, 2026-11-24). Both repos push to GitHub: the pipeline repo is public (Yarden-zamir/epub-web-edition; a push to main deploys the synthetic sample site), the content repo is private (Yarden-zamir/eli-raz-edition). Commit after each verified step, conventional commits, short bodies, no AI or tool credit lines. Several agents share each checkout: commit only your own paths with `git add <paths>`, never `git add -A`; pull with rebase before pushing if the push is rejected.
+- Never commit real book content (Hebrew text, images, data) to the public pipeline repo.
 
 ## Build commands (release edition)
 
@@ -49,6 +51,8 @@ Each file has one owner. Others only read it.
 | File | Owner | Format |
 |---|---|---|
 | site/enhancements.json | orchestrator | existing: related, places (old), tables, charts |
+| book.toml, book.css, replacements/ | EPUB/Kindle quality agent (from 2026-11-24); the maps agent hands it replacement images and the [[release.change]] text it needs | see book.toml comments |
+| site/figure-maps/<figure-id>.json | maps agent | {"figure", "title", "base": "opentopomap" or other tile layer id, "bounds": [[s, w], [n, e]], "markers": [{"name", "lat", "lon", "wikidata"?, "source", "target"?}], "lines": [{"name", "coords": [[lat, lon], …], "source"}], "areas"?: […], "attribution": ["© OpenStreetMap contributors (ODbL)", …], "note": "how it was made"} |
 | site/places.json | content-data agent | {"places": [{"id", "name", "lat", "lon", "wikidata": "Q…", "targets": [element IDs], "description": "one or two sentences, from the book, with the source element ID", "description_source": "element ID", "figures": [figure IDs of photos of this place]}]} |
 | site/timeline.json | content-data agent | {"events": [{"date": "1990-07-13" or "1972/1973", "label": "Hebrew display date", "text": "short Hebrew line", "quote": "exact sentence from the book", "target": "element ID of the quoted paragraph", "major": true/false}]} |
 | site/glossary.json | content-data agent | {"terms": [{"term", "forms": [inflected forms to match], "definition": "from the book, near-quote", "source": "element ID", "quote": "exact text"}]} |
@@ -57,6 +61,8 @@ Each file has one owner. Others only read it.
 | site/translations/<lang>/<unit>.json (built by translations/build.py from translations/<lang>/<unit>.txt) | translation agent (done) | {"unit", "lang", "translator": "machine translation (Claude), not reviewed", "items": {"element ID": "inner HTML of that element in the target language"}} |
 | site/then-now.json | orchestrator | then-and-now spec (fitted 1848 map) |
 | site/data/*.json, site/media/* | as created | data files and public-domain media referenced by the files above |
+
+Pipeline repo ownership: UI agent owns tools/build_web.py, tools/verify.py, site/*, kitshn.config.ts; the EPUB/Kindle quality agent owns tools/ingest_pdf.py, tools/build_epub.py, tools/check_*.py, tools/calibre_view.py, tools/figure_sheets.py.
 
 The UI agent makes tools/build_web.py read these files from the folder that holds enhancements.json, validate them (every element ID must exist in the EPUB), and render them.
 
