@@ -10,13 +10,16 @@ in the drawing, announce a summary in its live region, reset, toggle to the prin
 While a drag runs, the value line and the explanation must not move (stable numbers).
 Touch, on a phone (is_mobile, real touch events through CDP): dragging the handle changes the value without
 scrolling the page or selecting text; a swipe that starts on the handle does not scroll; one elsewhere on the drawing does.
-With --perf (heavy; run it on a CI machine): at phone width with the CPU slowed 4 times, a scripted drag must cause no
-long task over 50 ms and keep the 95th percentile frame interval at or under 20 ms; a trace of each drag goes to SHOT_DIR.
-With VIDEO_DIR (heavy too), it records a short video of each explainer at phone and desktop size (motion on).
-Usage: uv run scripts/check_explorables.py WEB_DIR AXE_JS [SHOT_DIR [VIDEO_DIR]] [--perf]
+Heavy parts, on by default in GitHub Actions (GITHUB_ACTIONS=true), or with --perf and VIDEO_DIR elsewhere:
+- performance: at phone width with the CPU slowed 4 times, a scripted drag must cause no long task over 50 ms and keep
+  the 95th percentile frame interval at or under 20 ms (--trace also saves a Chromium trace of each drag to SHOT_DIR);
+- videos (VIDEO_DIR, in CI SHOT_DIR/videos): each explainer at phone size, dragged with real touch events, and at desktop
+  size with a mouse, keys, a mark and reset (motion on).
+Usage: uv run scripts/check_explorables.py WEB_DIR AXE_JS [SHOT_DIR [VIDEO_DIR]] [--perf] [--trace]
 """
 import functools
 import http.server
+import os
 import shutil
 import sys
 import threading
@@ -24,11 +27,13 @@ from pathlib import Path
 
 from playwright.sync_api import Page, sync_playwright
 
-perf = "--perf" in sys.argv
-args = [a for a in sys.argv[1:] if a != "--perf"]
+ci = os.environ.get("GITHUB_ACTIONS") == "true"
+perf = "--perf" in sys.argv or ci
+trace = "--trace" in sys.argv
+args = [a for a in sys.argv[1:] if a not in ("--perf", "--trace")]
 web, AXE = Path(args[0]), Path(args[1])
 shots = Path(args[2]) if len(args) > 2 else None
-videos = Path(args[3]) if len(args) > 3 else None
+videos = Path(args[3]) if len(args) > 3 else (shots / "videos" if ci and shots else None)
 if not (web / "index.html").is_file() or not AXE.is_file():
     sys.exit(f"usage: check_explorables.py WEB_DIR AXE_JS [SHOT_DIR [VIDEO_DIR]]; missing {web / 'index.html'} or {AXE}")
 if shots:
@@ -227,7 +232,8 @@ with sync_playwright() as p:
 
     # Performance: phone size, CPU 4 times slower, motion on.
     page = browser.new_page(viewport={"width": 393, "height": 852}, reduced_motion="no-preference", has_touch=True)
-    page.goto(URL, wait_until="load", timeout=90000)
+    if perf:
+        page.goto(URL, wait_until="load", timeout=90000)
     cdp = page.context.new_cdp_session(page)
     for fig_id in ids if perf else []:
         fig, _ = open_explainer(page, fig_id)
@@ -240,11 +246,11 @@ with sync_playwright() as p:
           const tick = (now) => { window.__frames.push(now - last); last = now; if (window.__on) requestAnimationFrame(tick); };
           requestAnimationFrame(tick);
         }""")
-        if shots:
+        if shots and trace:
             browser.start_tracing(page=page, path=str(shots / f"{fig_id}-trace.json"), screenshots=False)
         drag(page, fig, 40, 4, pause=16)
         drag(page, fig, 40, -4, pause=16)
-        if shots:
+        if shots and trace:
             browser.stop_tracing()
         stats = page.evaluate("""() => {
           window.__on = false;
@@ -263,16 +269,31 @@ with sync_playwright() as p:
         for name, size in (("phone", {"width": 393, "height": 852}), ("desktop", {"width": 1280, "height": 800})):
             for fig_id in ids:
                 tmp = videos / "tmp"
+                phone = name == "phone"
                 context = browser.new_context(viewport=size, record_video_dir=str(tmp), record_video_size=size,
-                                              reduced_motion="no-preference", has_touch=name == "phone")
+                                              reduced_motion="no-preference", has_touch=phone, is_mobile=phone)
                 page = context.new_page()
                 page.goto(URL, wait_until="load", timeout=90000)
                 fig, slider = open_explainer(page, fig_id)
-                page.wait_for_timeout(2600)
-                drag(page, fig, 30, 5, pause=30)
-                page.wait_for_timeout(500)
-                drag(page, fig, 30, -5, pause=30)
-                page.wait_for_timeout(500)
+                page.evaluate("el => el.scrollIntoView({block: 'center'})", fig.locator(".xp-stage").element_handle())
+                page.wait_for_timeout(2600)  # The first-view hint plays.
+                if phone:
+                    # A real finger drag on the handle, down then up: the page must stay still in the video.
+                    tcdp = context.new_cdp_session(page)
+                    for sign in (1, -1):
+                        box = fig.locator(".xp-handle").bounding_box()
+                        x, y = box["x"] + box["width"] / 2, box["y"] + box["height"] / 2
+                        tcdp.send("Input.dispatchTouchEvent", {"type": "touchStart", "touchPoints": [{"x": x, "y": y}]})
+                        for i in range(1, 41):
+                            tcdp.send("Input.dispatchTouchEvent", {"type": "touchMove", "touchPoints": [{"x": x, "y": y + sign * i * 4}]})
+                            page.wait_for_timeout(30)
+                        tcdp.send("Input.dispatchTouchEvent", {"type": "touchEnd", "touchPoints": []})
+                        page.wait_for_timeout(600)
+                else:
+                    drag(page, fig, 30, 5, pause=30)
+                    page.wait_for_timeout(500)
+                    drag(page, fig, 30, -5, pause=30)
+                    page.wait_for_timeout(500)
                 slider.focus()
                 for _ in range(3):
                     page.keyboard.press("Shift+ArrowRight")
