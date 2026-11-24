@@ -9,6 +9,8 @@
 /* Glossary terms: a quiet dotted underline; the first use in each chapter. */
 .book button.term { padding: 0.1rem 0; min-height: 1.5rem; font: inherit; color: inherit; text-decoration: underline dotted color-mix(in srgb, var(--accent) 70%, transparent); text-decoration-thickness: 1.5px; text-underline-offset: 0.25em; cursor: help; }
 .book button.term:hover { text-decoration-style: solid; }
-.book a.crosslink { color: var(--accent); }
+.book :is(a.crosslink, a[role="doc-biblioref"]) { color: var(--accent); }
+/* Source list: the pages that cite an entry, after it. */
+.book .source-cited { color: var(--muted); font-size: 0.9em; }
 /* Popovers and the e-reader menu grow from their trigger's side (html.motion only). */
 .motion :is(.note-pop, .menu):popover-open { animation: pop-in var(--dur-base) var(--ease-out); transform-origin: top center; }

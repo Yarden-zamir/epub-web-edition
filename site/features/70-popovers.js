@@ -1,6 +1,7 @@
-// Footnotes and glossary terms open in a popover: on hover with a mouse, on tap, click or Enter otherwise.
+// Footnotes, source citations and glossary terms open in a popover: on hover with a mouse, on tap, click or Enter otherwise.
 // The browser handles light dismiss and Escape (popover attribute).
 const notePop = byId("note-popover");
+const NOTE_LINKS = "a[role='doc-noteref'], a[role='doc-biblioref']";
 const termPop = byId("term-popover");
 const glossary = JSON.parse(document.getElementById("glossary-data")?.textContent ?? "[]");
 function placePopover(pop, anchor) {
@@ -27,8 +28,21 @@ function goLink(href, label, pop) {
   go.addEventListener("click", (e) => { e.preventDefault(); pop.hidePopover(); goTo(href.slice(1), { from: pop.anchor ?? termAnchor }); });
   return go;
 }
+// A source citation (doc-biblioref) shows its whole entry of the source list, without the entry's back links.
+function sourceContent(ref) {
+  const entry = document.getElementById(ref.getAttribute("href").slice(1))?.closest("p");
+  if (!entry) throw new Error(`reader.js: source ${ref.getAttribute("href")} is missing`);
+  const body = document.createElement("div");
+  body.className = "pop-body";
+  const copy = entry.cloneNode(true);
+  for (const el of [copy, ...copy.querySelectorAll("[id]")]) el.removeAttribute("id");
+  copy.querySelector(".source-cited")?.remove();
+  body.append(copy);
+  return [body, goLink(ref.getAttribute("href"), "מעבר לרשימת המקורות", notePop)];
+}
 function noteContent(ref) {
   if (ref.matches(".edition-mark")) return correctionContent(ref); // 75-errata.js.
+  if (ref.matches("[role='doc-biblioref']")) return sourceContent(ref);
   const note = document.getElementById(ref.getAttribute("href").slice(1));
   if (!note) throw new Error(`reader.js: note ${ref.getAttribute("href")} is missing`);
   const body = document.createElement("div");
@@ -52,7 +66,7 @@ function termContent(button) {
   return [body, goLink(t.source, "מעבר למקור ההגדרה בספר", termPop)];
 }
 reading.addEventListener("click", (e) => {
-  const ref = e.target.closest("a[role='doc-noteref']");
+  const ref = e.target.closest(NOTE_LINKS);
   if (ref) {
     e.preventDefault();
     openPopover(notePop, ref, noteContent(ref));
@@ -87,6 +101,6 @@ function hover(selector, pop, content) {
   pop.addEventListener("pointerout", (e) => { if (!pop.contains(e.relatedTarget)) leave(e); });
   pop.addEventListener("pointerover", () => clearTimeout(hoverTimer));
 }
-hover("a[role='doc-noteref']", notePop, noteContent);
+hover(NOTE_LINKS, notePop, noteContent);
 hover("button.term", termPop, termContent);
 
