@@ -99,7 +99,6 @@ function create(spec) {
   const { min, max } = spec.control;
   const line = groundLine(0, W);
   const below = shape([...line, [W, H + 40], [0, H + 40]]);
-  const above = shape([[0, -40], [W, -40], ...[...line].reverse()]);
   const groundPath = shape(line, false);
   const BEDS = [12, 26, 42, 60, 82, 108, 136]; // Bedding lines: depth below the surface, in drawing units.
   const saltAngle = Math.atan(SALT.dip * SCALE);
@@ -227,7 +226,6 @@ function create(spec) {
     const surfacePts = [];
     const moving = active.length || settled;
     for (let x = 0; x <= W; x += STEP) surfacePts.push([x, Y(ground(x)) + (moving ? sagAt(x, 0) : 0)]);
-    const belowNow = moving ? shape([...surfacePts, [W, H + 40], [0, H + 40]]) : below;
 
     ctx.drawImage(env.layer("back", [0, 0, W, H], (c) => {
       c.fillStyle = env.gradient("sky", 0, 0, 0, H, [[0, "--xp-sky-top"], [1, "--xp-sky"]]);
@@ -259,14 +257,6 @@ function create(spec) {
       ctx.drawImage(layer, 0, 0, W, H);
       ctx.restore();
     }
-    // The sunken surface: sky in the strip between the old surface and the new one, over the salt only.
-    const sunk = surfacePts.filter(([x]) => x >= SALT.from - 40 && x <= SALT.to + 40);
-    if (moving && sunk.length) {
-      ctx.fillStyle = env.gradient("sky", 0, 0, 0, H, [[0, "--xp-sky-top"], [1, "--xp-sky"]]);
-      ctx.fill(shape([...sunk, ...sunk.map(([x]) => [x, Y(ground(x)) - 1]).reverse()]));
-    }
-    ctx.save();
-    ctx.clip(belowNow);
     // Bedding lines of the ground; over a collapse they bend down into the space the salt left.
     ctx.strokeStyle = env.color("--xp-land-edge");
     ctx.globalAlpha = 0.3;
@@ -304,7 +294,6 @@ function create(spec) {
     ctx.lineDashOffset = 0;
     ctx.strokeStyle = env.color("--ink");
     ctx.stroke(shape([[0, yI0], [xs, yL]], false));
-    ctx.restore();
 
     // Fresh groundwater flows east under, over and through the exposed salt; under reduced motion, still arrows (below).
     const streaks = () => {
@@ -321,11 +310,13 @@ function create(spec) {
       ctx.setLineDash([]);
       ctx.globalAlpha = 1;
     };
-    if (flowing) {
-      ctx.save();
-      ctx.clip(belowNow);
-      streaks();
-      ctx.restore();
+    if (flowing) streaks();
+    // The sunken surface, drawn over the lines and streaks above (no clip, which is slow on phones): sky in the strip
+    // between the old surface and the new one, over the salt only.
+    const sunk = surfacePts.filter(([x]) => x >= SALT.from - 40 && x <= SALT.to + 40);
+    if (moving && sunk.length) {
+      ctx.fillStyle = env.gradient("sky", 0, 0, 0, H, [[0, "--xp-sky-top"], [1, "--xp-sky"]]);
+      ctx.fill(shape([...sunk, ...sunk.map(([x]) => [x, Y(ground(x)) - 1]).reverse()]));
     }
     // The salt that is left: pieces between the gaps, each with an eaten top and bottom edge (drawn over the streaks,
     // which so show only around the pieces and through the gaps).
@@ -457,13 +448,13 @@ function create(spec) {
       }
     }
 
+    // The lake: between its surface and the ground east of the shoreline, as its own shape (no clip).
     ctx.save();
-    ctx.clip(above);
     ctx.fillStyle = env.gradient("lake", 0, Y(-395), 0, H, [[0, "--xp-lake"], [1, "--xp-lake-deep"]]);
-    ctx.fillRect(0, yL, W, H - yL);
+    ctx.fill(shape([[xs, yL], ...line.filter(([x]) => x > xs), [W, yL]]));
     ctx.strokeStyle = env.color("--xp-surface");
     ctx.lineWidth = 2.5;
-    ctx.stroke(shape([[0, yL], [W, yL]], false));
+    ctx.stroke(shape([[xs, yL], [W, yL]], false));
     ctx.lineWidth = 1.5;
     ctx.lineCap = "round";
     ctx.globalAlpha = 0.55;
