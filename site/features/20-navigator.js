@@ -157,7 +157,8 @@ onDialogOpen["toc-dialog"] = () => {
   // The current chapter: the last top-level section that starts above a third of the screen.
   let current = null;
   for (const section of reading.querySelectorAll(".doc > section[id]")) {
-    if (section.getBoundingClientRect().top < innerHeight / 3) current = section.id;
+    // The document box: the section of a skipped document has no layout, and reading it would force one (84-rail.js).
+    if (section.closest(".book > *").getBoundingClientRect().top < innerHeight / 3) current = section.id;
     else break;
   }
   for (const link of tocDialog.querySelectorAll("[aria-current]")) link.removeAttribute("aria-current");
