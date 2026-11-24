@@ -2,7 +2,7 @@
 # edition once and then runs the checks as parallel processes (books/eli-raz/scripts/check.py):
 # - pull request: ingest, build, check_release, EPUBCheck, the quick smoke test. Fast; it runs on every push.
 # - merge queue: everything a merge needs: also axe on the whole page at every width and scheme, the explainers, the
-#   sample edition (tools/verify.py, advisory: see below) and the text of each PR of the group (scripts/check-pr-text.sh).
+#   sample edition (tools/verify.py) and the text of each PR of the group (scripts/check-pr-text.sh).
 # - manual and scheduled runs: --full (fresh ingests with the INGEST_INPUTS comparison, every check). The nightly run is
 #   the safety net on main; it deploys nothing.
 # Videos, traces and load timings: a manual run with record (gh workflow run check.yml --ref <branch> -f record=true).
@@ -62,9 +62,6 @@ jobs:
             scripts/check-pr-text.sh "$n" || rc=1
           done
           exit "$rc"
-      # Advisory for now: the sample edition (tools/verify.py) failed "'/' opens search and Enter goes to the first hit"
-      # and timed out clicking "#fig-01-01 img" (run 45442257445). It warns and does not block. Make it blocking again
-      # (remove --advisory sample) once the UI lane confirms both pass.
       - name: Checks
         env:
           EVENT: ${{ github.event_name }}
@@ -72,8 +69,8 @@ jobs:
         run: |
           case "$EVENT" in
             pull_request) flags="--gate" ;;
-            merge_group) flags="--ingest --compare-ingest --epubcheck --axe-full --explorables --sample --advisory sample" ;;
-            *) flags="--full --advisory sample" ;;
+            merge_group) flags="--ingest --compare-ingest --epubcheck --axe-full --explorables --sample" ;;
+            *) flags="--full" ;;
           esac
           [[ "$RECORD" == true ]] && flags="$flags --record"
           uv run books/eli-raz/scripts/check.py $flags 2>&1 | tee check.log
