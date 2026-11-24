@@ -18,6 +18,8 @@ export default defineApps({
   // and passes this folder as an artifact.
   book: {
     static: { output: "books/eli-raz/dist/release/web" },
-    deploy: [{ on: "push", branch: "main", name: "prod", startsIn: "Everyone" }],
+    deploy: [
+      { on: "push", branch: "main", name: "prod", address: ["eli-raz.yarden-zamir.com"], startsIn: "Everyone" },
+    ],
   },
 });
