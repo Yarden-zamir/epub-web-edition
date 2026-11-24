@@ -16,6 +16,10 @@ Before this repository goes public, its history needs a rewrite (`books/eli-raz/
 
 A push to `main` runs `.github/workflows/kitshn.yml`, which deploys both apps of `kitshn.config.ts` with kitshn:
 the sample edition (`app`) and the Eli Raz edition (`book`, built by `books/eli-raz/scripts/build_release.py`).
+The book deploys first. Three things keep a deploy short:
+- kitshn uploads only files whose hash Cloudflare does not have yet, and both builds are byte-reproducible.
+- The workflow keeps the last checked book build under the hash of everything the build reads. A push that changes none of it (for example only the sample) restores that build and skips the build and checks.
+- `build_release.py` skips both PDF ingests when the hash of their inputs is unchanged (`INGEST_INPUTS`).
 
 ## Pipeline
 
