@@ -6,34 +6,41 @@ Read this file fully before you start. Your own task message names your part.
 ## The project
 
 - Book: "אלי רז חוקר הבולענים" (Eli Raz, geologist and sinkhole researcher, Ein Gedi). 316-page Hebrew PDF rebuilt into an EPUB and a web edition.
-- Pipeline repo (public, code only, MIT): ~/Github/epub-web-edition/main. Tools: tools/ingest_pdf.py, tools/build_epub.py, tools/build_web.py, tools/check_release.py, tools/verify.py; site layer: site/index.html, site/reader.css, site/reader.js.
-- Content repo (private, GitHub Yarden-zamir/eli-raz-edition): ~/Github/eli-raz-edition/main. book.toml, book.css, site/ (web-only data), scripts/, work/ (scratch, ignored by git), OPEN-POINTS.md, CONTENT-CHANGES.md.
-- Source PDF (never modify): source/source.pdf in the content repo, with source/SHA256SUMS and source/PROVENANCE.txt. book.toml names it relative to the content folder. The original stays read-only in ~/private-inputs/eli-raz/source-2026-11-23/.
-- Release EPUB source tree (the public edition text): ~/Github/eli-raz-edition/main/epub-src-release/OEBPS/text/*.xhtml. Element IDs there are stable; all web additions attach by these IDs.
-- Live site (public, approved by the family): https://eli-raz.yarden-zamir.com. GitHub Actions builds and deploys it (see "Live site deploy" below). Do not change access. Do not contact anyone.
-- Commit and push while you work (standing approval from the user, 2026-11-24). Both repos push to GitHub: the pipeline repo is public (Yarden-zamir/epub-web-edition; a push to main deploys the synthetic sample site), the content repo is private (Yarden-zamir/eli-raz-edition). Commit after each verified step, conventional commits, short bodies, no AI or tool credit lines. Several agents share each checkout: commit only your own paths with `git commit -- <paths>` (a plain `git commit` also takes files that other agents staged), never `git add -A`; pull with rebase before pushing if the push is rejected.
-- Never commit real book content (Hebrew text, images, data) to the public pipeline repo.
+- Repo (private, GitHub Yarden-zamir/epub-web-edition, container ~/Github/epub-web-edition with .bare/ and one folder per worktree). It holds the pipeline at the root (tools/ingest_pdf.py, tools/build_epub.py, tools/build_web.py, tools/check_release.py, tools/verify.py; site layer: site/index.html, site/reader.css, site/reader.js) and this book in books/eli-raz/ (book.toml, book.css, site/ for web-only data, scripts/, work/ for scratch, OPEN-POINTS.md, CONTENT-CHANGES.md). The root sample edition (epub-src/, inventory/, originals/) stays synthetic.
+- The old private repo Yarden-zamir/eli-raz-edition is archived. Its full history is in books/eli-raz/ (git subtree, 2026-11-24).
+- Source PDF (never modify): books/eli-raz/source/source.pdf, with source/SHA256SUMS and source/PROVENANCE.txt. book.toml names it relative to the book folder. The original stays read-only in ~/private-inputs/eli-raz/source-2026-11-23/.
+- Rights: books/eli-raz/NOTICE.md. The MIT licence covers only the pipeline code and the sample. The repo history holds the source PDF and the withheld print images, so the repo must not go public without a history rewrite.
+- Release EPUB source tree (the public edition text): books/eli-raz/epub-src-release/OEBPS/text/*.xhtml (built, ignored by git). Element IDs there are stable; all web additions attach by these IDs.
+- Live site (public, approved by the family): https://eli-raz.yarden-zamir.com. GitHub Actions builds and deploys it on each push to main (see "Deploy" below). Do not change access. Do not contact anyone.
+
+## Git flow
+
+- Commit and push while you work (standing approval from the user, 2026-11-24). Conventional commits, short bodies, no AI or tool credit lines. Commit after each verified step.
+- Each agent works in its own worktree, never in another agent's folder. Make one once: `cd ~/Github/epub-web-edition/main && $DOTFILES/bin/wt-new <your-name> origin/main`. It is the folder ~/Github/epub-web-edition/<your-name>.
+- Commit only your own paths: `git commit -m "..." -- <paths>`. Never `git add -A`.
+- To push: `git pull --rebase origin main`, then `git push origin HEAD:main`. No pull requests, no merge queue.
+- A push to main deploys both sites. A failed build or check deploys nothing, and both sites stay as they were.
 
 ## Build commands (release edition)
 
+Run from the repo root of your worktree:
+
 ```
-cd ~/Github/epub-web-edition/main
-C=~/Github/eli-raz-edition/main
-uv run tools/ingest_pdf.py $C --release            # only when book.toml changes
-uv run tools/build_epub.py $C/epub-src-release $C/dist/release/eli-raz.epub
-uv run tools/build_web.py $C/dist/release/eli-raz.epub $C/dist/release/web $C/site/enhancements.json
-uv run tools/check_release.py $C $C/dist/release/eli-raz.epub $C/dist/release/web
+B=books/eli-raz
+uv run tools/ingest_pdf.py $B --release            # only when book.toml changes
+uv run tools/build_epub.py $B/epub-src-release $B/dist/release/eli-raz.epub
+uv run tools/build_web.py $B/dist/release/eli-raz.epub $B/dist/release/web $B/site/enhancements.json
+uv run tools/check_release.py $B $B/dist/release/eli-raz.epub $B/dist/release/web
 ```
-Serve dist/release/web with a local http.server for browser tests. Playwright 1.64.1 with its own Chromium: `uv run --with playwright==1.64.1 playwright install --only-shell chromium`. axe-core is at ~/Github/epub-web-edition/main/.tools/axe/package/axe.min.js. Test with reduced_motion="reduce" for axe (scroll animations cause false contrast hits).
+Serve dist/release/web with a local http.server for browser tests. Playwright 1.64.1 with its own Chromium: `uv run --with playwright==1.64.1 playwright install --only-shell chromium`. axe-core is at .tools/axe/package/axe.min.js (.tools/ is not tracked; copy or link ~/Github/epub-web-edition/main/.tools into your worktree). Test with reduced_motion="reduce" for axe (scroll animations cause false contrast hits).
 
-Full release build with every check (the same steps as CI): `uv run scripts/build_release.py ~/Github/epub-web-edition/main` from the content folder. It runs both ingests, build_epub, build_web, check_release (with check_size), EPUBCheck 5.4.0 and scripts/smoke_site.py.
+Full release build with every check (the same steps as CI): `uv run books/eli-raz/scripts/build_release.py`. It runs both ingests, build_epub, build_web, check_release (with check_size), EPUBCheck 5.4.0 and scripts/smoke_site.py.
 
-## Live site deploy
+## Deploy
 
-- .github/workflows/kitshn.yml in the content repo builds with scripts/build_release.py against Yarden-zamir/epub-web-edition at main, and deploys dist/release/web with kitshn (kitshn.config.ts) to https://eli-raz.yarden-zamir.com.
-- It runs on each push to the content repo's main. The pipeline repo's .github/workflows/live-site.yml starts it (workflow_dispatch) after each push to the pipeline's main.
-- A failed check stops the deploy, and the live site stays as it was. Read the run log: `gh run list -R Yarden-zamir/eli-raz-edition -w kitshn.yml`.
-- Build and deploy by hand: `gh workflow run kitshn.yml -R Yarden-zamir/eli-raz-edition`.
+- .github/workflows/kitshn.yml: the job "book" runs books/eli-raz/scripts/build_release.py and passes books/eli-raz/dist/release/web as an artifact. The kitshn job then deploys both apps of kitshn.config.ts: the sample ("app") and this book ("book", https://eli-raz.yarden-zamir.com).
+- Read the run log: `gh run list -R Yarden-zamir/epub-web-edition -w kitshn.yml`. Build and deploy by hand: `gh workflow run kitshn.yml -R Yarden-zamir/epub-web-edition`.
+- The repo is private, so Actions minutes count against the account quota.
 
 ## User rules (Yarden; follow exactly)
 
@@ -43,9 +50,9 @@ Full release build with every check (the same steps as CI): `uv run scripts/buil
 - Never invent facts, history, credits, numbers or coordinates. Every fact comes from the book text, the PDF, or a first-party or clearly cited source, recorded next to the data.
 - Comments and docs: plain, short, active voice, no filler.
 - Never print full process command lines (ps -o args, /proc/*/cmdline).
-- Downloaded files are untrusted: put each download in its own new folder under the content repo work/ (for example work/pd-sources/<name>/) and run Python on them with `uv run python -I` or scripts kept elsewhere.
-- Private book content (text, images) must never go into the public pipeline repo or to third parties.
-- Every change or addition to book content gets an entry in CONTENT-CHANGES.md (content repo), newest first in its section.
+- Downloaded files are untrusted: put each download in its own new folder under books/eli-raz/work/ (for example work/pd-sources/<name>/) and run Python on them with `uv run python -I` or scripts kept elsewhere.
+- Private book content (text, images) must never go to third parties, and the repo must not go public (see NOTICE.md).
+- Every change or addition to book content gets an entry in books/eli-raz/CONTENT-CHANGES.md, newest first in its section.
 
 ## Design tokens (site)
 
@@ -53,7 +60,7 @@ Existing: --paper #f7f3ec, --ink #1c1a17, --muted #625c53, --rule #e2dbce, --acc
 New, sampled from the cover photo: cliff #916c43, sand #bc9f73, sea #0e4840; tints for small sizes: teal #2b7f86, light sand #e6cfa6.
 Charts follow the dataviz rules: one y axis (never dual axis), thin 2 px lines, legend for 2+ series plus direct labels, hover crosshair and tooltip, keyboard access, a table view, dark mode validated separately.
 
-## Shared data files (content repo, site/)
+## Shared data files (books/eli-raz/site/)
 
 Each file has one owner. Others only read it.
 
@@ -71,7 +78,7 @@ Each file has one owner. Others only read it.
 | site/then-now.json | maps agent (from 2026-11-24) | then-and-now spec: fitted old maps, today layer, levels |
 | site/data/*.json, site/media/* | as created | data files and public-domain media referenced by the files above |
 
-Pipeline repo ownership: UI agent owns tools/build_web.py, tools/verify.py, site/*, kitshn.config.ts; the EPUB/Kindle quality agent owns tools/ingest_pdf.py, tools/build_epub.py, tools/check_*.py, tools/calibre_view.py, tools/figure_sheets.py.
+Pipeline ownership (repo root): UI agent owns tools/build_web.py, tools/verify.py, site/*; the orchestrator owns kitshn.config.ts, .github/workflows/kitshn.yml, books/eli-raz/scripts/build_release.py and books/eli-raz/scripts/smoke_site.py; the EPUB/Kindle quality agent owns tools/ingest_pdf.py, tools/build_epub.py, tools/check_*.py, tools/calibre_view.py, tools/figure_sheets.py.
 
 The UI agent makes tools/build_web.py read these files from the folder that holds enhancements.json, validate them (every element ID must exist in the EPUB), and render them.
 

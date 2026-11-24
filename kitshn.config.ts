@@ -1,14 +1,23 @@
-import { defineApp } from "kitshn";
+import { defineApps } from "kitshn";
 
-export default defineApp({
-  static: {
-    // The build image has no uv. Each tool declares Python 3.15 and pinned dependencies in its PEP 723 header.
-    build:
-      "curl -LsSf https://astral.sh/uv/0.13.6/install.sh | sh && ~/.local/bin/uv run tools/build_epub.py && ~/.local/bin/uv run tools/build_web.py",
-    output: "dist/web",
+export default defineApps({
+  // The synthetic sample edition. The key "app" keeps the card and address of the former one-app recipe (K-804).
+  app: {
+    static: {
+      // The build image has no uv. Each tool declares Python 3.15 and pinned dependencies in its PEP 723 header.
+      build:
+        "curl -LsSf https://astral.sh/uv/0.13.6/install.sh | sh && ~/.local/bin/uv run tools/build_epub.py && ~/.local/bin/uv run tools/build_web.py",
+      output: "dist/web",
+    },
+    deploy: [
+      { on: "push", branch: "main", name: "prod", startsIn: "Everyone" },
+      { on: "pull_request", name: "pr-{pr}", ephemeral: true },
+    ],
   },
-  deploy: [
-    { on: "push", branch: "main", name: "prod", startsIn: "Everyone" },
-    { on: "pull_request", name: "pr-{pr}", ephemeral: true },
-  ],
+  // The Eli Raz edition. The "book" job of .github/workflows/kitshn.yml runs books/eli-raz/scripts/build_release.py
+  // and passes this folder as an artifact.
+  book: {
+    static: { output: "books/eli-raz/dist/release/web" },
+    deploy: [{ on: "push", branch: "main", name: "prod", startsIn: "Everyone" }],
+  },
 });

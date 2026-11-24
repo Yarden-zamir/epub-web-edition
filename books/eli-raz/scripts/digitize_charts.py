@@ -23,7 +23,7 @@ import pymupdf
 from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parent.parent
-SOURCE_PDF = Path.home() / "private-inputs/eli-raz/source-2026-11-23/source.pdf"
+SOURCE_PDF = Path(__file__).resolve().parents[1] / "source" / "source.pdf"
 OUT = ROOT / "site" / "charts"
 WORK = ROOT / "work" / "charts"
 ZOOM = 3  # overlay scale

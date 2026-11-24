@@ -15,7 +15,7 @@ from datetime import datetime, UTC
 from pathlib import Path
 
 UA = {"User-Agent": "public-domain-source-check/1.0 (research script; low volume)"}
-ROOT = Path.home() / "Github/eli-raz-edition/main/work/pd-sources"
+ROOT = Path(__file__).resolve().parents[2] / "work" / "pd-sources"
 
 
 def get(url: str) -> tuple[bytes, str]:

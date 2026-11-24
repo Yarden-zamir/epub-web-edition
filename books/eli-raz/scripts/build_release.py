@@ -4,12 +4,12 @@
 # ///
 """Build and check the release web edition, as GitHub Actions does before each deploy.
 
-Usage: uv run scripts/build_release.py PIPELINE_DIR
-PIPELINE_DIR is a checkout of Yarden-zamir/epub-web-edition with .tools/ (EPUBCheck 5.4.0 in
-.tools/epubcheck-5.4.0/, a Java runtime in .tools/jdk-*/, axe-core 4.14.0 in .tools/axe/package/).
+Usage: uv run books/eli-raz/scripts/build_release.py
+The pipeline is the root of this repo. It needs .tools/ there (EPUBCheck 5.4.0 in .tools/epubcheck-5.4.0/,
+a Java runtime in .tools/jdk-*/, axe-core 4.14.0 in .tools/axe/package/).
 The smoke test needs the Chromium of Playwright 1.64.1 (see scripts/smoke_site.py).
-Output: dist/release/eli-raz.epub and dist/release/web in this content folder. Exits 1 when a step fails.
-.github/workflows/kitshn.yml runs this script and deploys dist/release/web.
+Output: dist/release/eli-raz.epub and dist/release/web in the book folder (books/eli-raz). Exits 1 when a step fails.
+The repo workflow .github/workflows/kitshn.yml runs this script and deploys dist/release/web.
 """
 
 import subprocess
@@ -17,6 +17,7 @@ import sys
 from pathlib import Path
 
 CONTENT = Path(__file__).resolve().parent.parent
+PIPELINE = CONTENT.parent.parent
 SMOKE = CONTENT / "scripts" / "smoke_site.py"
 
 
@@ -31,9 +32,9 @@ def run(cmd: list[str | Path], cwd: Path | None = None) -> str:
 
 
 def main() -> None:
-    if len(sys.argv) != 2:
+    if len(sys.argv) != 1:
         sys.exit(__doc__)
-    pipeline = Path(sys.argv[1]).resolve()
+    pipeline = PIPELINE
     tools = pipeline / ".tools"
     java = next(tools.glob("jdk-*/bin/java"))  # StopIteration names a missing Java runtime.
     epub = CONTENT / "dist" / "release" / "eli-raz.epub"

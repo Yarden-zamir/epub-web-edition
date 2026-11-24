@@ -2,9 +2,20 @@
 
 Pipeline that turns a book into a reflowable EPUB 3 and a continuous web edition built from that EPUB.
 
-> **All book content in this repository is synthetic placeholder.**
-> Never commit real book text, images or source files here. This repository is public.
-> Real content enters as a private input at build time.
+This repository is private. It holds two editions:
+
+- The synthetic sample edition at the root (`epub-src/`, `inventory/`, `originals/`). Its content is placeholder.
+- The Eli Raz edition in `books/eli-raz/`, the real book "אלי רז חוקר הבולענים", live at https://eli-raz.yarden-zamir.com.
+  See `books/eli-raz/AGENTS-BRIEF.md` for its build and rules.
+
+Licences: the MIT licence in `LICENSE` covers the pipeline code and the sample edition only.
+The Eli Raz book content is © its authors and photographers, all rights reserved; see `books/eli-raz/NOTICE.md`.
+Before this repository goes public, its history needs a rewrite (`books/eli-raz/NOTICE.md` says why).
+
+## Deploy
+
+A push to `main` runs `.github/workflows/kitshn.yml`, which deploys both apps of `kitshn.config.ts` with kitshn:
+the sample edition (`app`) and the Eli Raz edition (`book`, built by `books/eli-raz/scripts/build_release.py`).
 
 ## Pipeline
 

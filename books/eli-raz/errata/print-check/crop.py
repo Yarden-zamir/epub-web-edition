@@ -22,7 +22,7 @@ from PIL import Image
 sys.path.insert(0, str(Path(__file__).parent))
 from entries import load_entries  # noqa: E402
 
-PDF = Path.home() / "private-inputs/eli-raz/source-2026-11-23/source.pdf"
+PDF = Path(__file__).resolve().parents[2] / "source" / "source.pdf"
 OUT = Path("errata/print-check")
 DPI = 350
 ZOOM_DPI = 700
