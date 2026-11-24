@@ -18,6 +18,7 @@ const railSections = [...reading.querySelectorAll(".doc > section[id]")]
 const railName = (s) => tocDialog.querySelector(`[data-chapter="${CSS.escape(s.id)}"] :is(.toc-name, .toc-part-title)`)?.textContent ?? "";
 let railMarks = [];
 function layoutRail() {
+  finishSizing(); // Marks sit by exact chapter positions (00-core.js).
   const height = document.documentElement.scrollHeight;
   railMarks = railSections.map((s) => ({ s, at: (s.getBoundingClientRect().top + scrollY) / height }));
   railTrack.replaceChildren(...railMarks.map(({ s, at }) => {

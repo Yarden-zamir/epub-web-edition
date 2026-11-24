@@ -237,9 +237,9 @@
 .book > .doc { content-visibility: auto; contain-intrinsic-size: auto 1200px; }
 .book > .fx-set { content-visibility: auto; contain-intrinsic-size: auto 40000px; } /* All facsimile pages: one box. */
 [data-render-all] .book > :is(.doc, .fx-set) { content-visibility: visible; }
-/* While 00-core.js measures documents: render them all, with the same containment that content-visibility applies,
+/* While 00-core.js measures a document: render it, with the same containment that content-visibility applies,
    so a document's child margins stay inside it and the measured height equals its rendered height. */
-[data-sizing] .book > :is(.doc, .fx-set) { content-visibility: visible; contain: layout style paint; }
+.book > :is(.doc, .fx-set)[data-sizing] { content-visibility: visible; contain: layout style paint; }
 @media print { .book > :is(.doc, .fx-set) { content-visibility: visible; } }
 
 /* Motion (html.motion only): the hero eases in on load; a chapter's accent rule draws in on first view; poem lines

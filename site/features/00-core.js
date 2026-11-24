@@ -90,6 +90,7 @@ function position() {
 // height is only an estimate until they come near: scrollIntoView renders the target first (scroll-padding-top in
 // 00-base.css equals jumpOffset()), and a second pass on the next frames corrects any shift that rendering caused.
 function placeAtJumpLine(el, dy = 0) {
+  finishSizing();
   el.scrollIntoView({ block: "start", behavior: "instant" });
   if (dy) scrollBy({ top: -dy, behavior: "instant" });
   const correct = () => {
@@ -101,7 +102,7 @@ function placeAtJumpLine(el, dy = 0) {
 function restorePosition(state) {
   const block = state.anchor && document.getElementById(state.anchor);
   if (block) placeAtJumpLine(block, state.dy);
-  else scrollTo({ top: state.y, behavior: "instant" });
+  else { finishSizing(); scrollTo({ top: state.y, behavior: "instant" }); }
 }
 function scrollToElement(el) {
   placeAtJumpLine(el);
@@ -240,15 +241,34 @@ addEventListener("scroll", () => {
 // find-in-page, test tools). So render every document once, measure it, and keep that height as its estimate.
 // Again after fonts load and when the width changes. Later changes near the reader (a chart drawing) update by
 // themselves, because the estimate is "auto" (the last rendered size).
-function sizeDocuments() {
-  const root = document.documentElement;
-  root.setAttribute("data-sizing", "");
-  const docs = [...reading.querySelectorAll(":scope > .doc, :scope > .fx-set")];
+// One pass over the whole page is a long task on a phone (about 300 ms). So a load that opens at the hero measures in
+// slices of about 30 ms, one task each, while the reader looks at the hero. A load that lands on a target (a deep
+// link, a reload) measures at once, and every jump first measures what is left (finishSizing), so jumps always land
+// by exact sizes.
+let unsized = []; // Documents that the slices did not measure yet, first to last.
+function measure(docs) {
+  for (const d of docs) d.setAttribute("data-sizing", "");
   const heights = docs.map((d) => d.getBoundingClientRect().height);
-  docs.forEach((d, i) => { d.style.containIntrinsicSize = `auto ${Math.ceil(heights[i])}px`; });
-  root.removeAttribute("data-sizing");
+  docs.forEach((d, i) => { d.style.containIntrinsicSize = `auto ${Math.ceil(heights[i])}px`; d.removeAttribute("data-sizing"); });
 }
-sizeDocuments();
+const allDocuments = () => [...reading.querySelectorAll(":scope > .doc, :scope > .fx-set")];
+function sizeDocuments() {
+  unsized = [];
+  measure(allDocuments());
+}
+function finishSizing() {
+  measure(unsized.splice(0));
+}
+async function sizeDocumentsInSlices() {
+  unsized = allDocuments();
+  while (unsized.length) {
+    const start = performance.now();
+    while (unsized.length && performance.now() - start < 30) measure([unsized.shift()]);
+    await new Promise((resolve) => setTimeout(resolve));
+  }
+}
+if (typeof history.state?.y === "number" || location.hash) sizeDocuments();
+else sizeDocumentsInSlices();
 // The fonts are preloaded and usually loaded before this deferred script runs. Then the first measure is final, and a
 // second one would only repeat a full-page layout (the costliest task of a load on a phone).
 if (document.fonts.status !== "loaded") document.fonts.ready.then(sizeDocuments);
