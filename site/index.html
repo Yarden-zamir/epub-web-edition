@@ -8,9 +8,11 @@
 <meta name="theme-color" content="#191715">
 <title>{{title}} · {{creator}}</title>
 {{icons}}
-{{hero_preload}}
+<link rel="preload" href="{{cover}}" as="image">
+{{preview_meta}}
 {{font_preload}}
-<link rel="stylesheet" href="{{book_css}}">
+<!-- The book stylesheet sits in a cascade layer, so every site rule overrides its print styles. -->
+<style>@import url("{{book_css}}") layer(book);</style>
 <link rel="stylesheet" href="reader.css">
 <script src="reader.js" defer></script>
 </head>
@@ -34,7 +36,7 @@
 </header>
 
 <section class="hero" id="top" aria-labelledby="hero-title">
-  {{hero_backdrop}}
+  <div class="hero-backdrop" aria-hidden="true"><img src="{{cover}}" alt=""></div>
   <div class="hero-inner">
     <div class="hero-text">
       <p class="hero-author">{{creator}}</p>
@@ -60,6 +62,7 @@
 <main id="read" class="book" tabindex="-1">
 {{book}}
 </main>
+{{closing_photo}}
 
 <footer class="footer">
   <div class="footer-inner">

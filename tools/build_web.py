@@ -747,32 +747,45 @@ def load_enhancements(out: Path, conv: Converter, path: Path | None) -> dict[str
     return result
 
 
-HERO_WIDTHS = (960, 1920)
+PHOTO_WIDTHS = (960, 1920)
+PREVIEW_SIZE = (1200, 630)  # Open Graph and Twitter large image.
 
 
-def hero_html(enhancements_file: Path | None, out: Path, cover: str) -> tuple[str, str]:
-    """Hero backdrop and its preload. With an enhancements "hero" block {image, alt, credit, caption, source}
-    the photograph shows sharp and credited, as WebP at two widths; without one, a blurred copy of the cover."""
-    hero = json.loads(enhancements_file.read_text(encoding="utf-8")).get("hero") if enhancements_file else None
-    if not hero:
-        return (f'<div class="hero-backdrop" aria-hidden="true"><img src="{html.escape(cover)}" alt=""></div>',
-                f'<link rel="preload" href="{html.escape(cover)}" as="image">')
-    if not (hero["alt"] and hero["credit"] and hero["source"]):
-        raise BookError("enhancements.json: hero needs alt, credit and source")
-    src = enhancements_file.resolve().parent.parent / hero["image"]
+def feature_photo(enhancements_file: Path | None, out: Path) -> tuple[str, str]:
+    """The enhancements "hero" block {image, alt, credit, caption, source}: a credited photograph that closes the
+    book above the footer, and the link preview image. Returns (closing figure HTML, preview image path);
+    empty strings when the block is absent."""
+    photo = json.loads(enhancements_file.read_text(encoding="utf-8")).get("hero") if enhancements_file else None
+    if not photo:
+        return "", ""
+    if not (photo["alt"] and photo["credit"] and photo["caption"] and photo["source"]):
+        raise BookError("enhancements.json: hero needs alt, caption, credit and source")
     (out / "media").mkdir(exist_ok=True)
-    with Image.open(src) as im:
-        for width in HERO_WIDTHS:
-            copy = im.convert("RGB")
+    with Image.open(enhancements_file.resolve().parent.parent / photo["image"]) as im:
+        rgb = im.convert("RGB")
+        for width in PHOTO_WIDTHS:
+            copy = rgb.copy()
             copy.thumbnail((width, width * 4))
-            copy.save(out / "media" / f"hero-{width}.webp", "WEBP", quality=80, method=6)
-    srcset = ", ".join(f"media/hero-{w}.webp {w}w" for w in HERO_WIDTHS)
-    caption = " · ".join(html.escape(x) for x in (hero.get("caption"), hero["credit"]) if x)
-    backdrop = (f'<figure class="hero-backdrop hero-photo"><img src="media/hero-{HERO_WIDTHS[-1]}.webp" srcset="{srcset}" '
-                f'sizes="100vw" alt="{html.escape(hero["alt"])}" fetchpriority="high">'
-                f'<figcaption class="hero-credit">{caption}</figcaption></figure>')
-    preload = f'<link rel="preload" as="image" imagesrcset="{srcset}" imagesizes="100vw">'
-    return backdrop, preload
+            copy.save(out / "media" / f"feature-{width}.webp", "WEBP", quality=80, method=6)
+        ImageOps.fit(rgb, PREVIEW_SIZE).save(out / "media" / "preview.jpg", "JPEG", quality=82, optimize=True)
+    srcset = ", ".join(f"media/feature-{w}.webp {w}w" for w in PHOTO_WIDTHS)
+    figure = (f'<aside aria-label="תמונת הכריכה במסגרתה המלאה"><figure class="closing-photo"><img src="media/feature-{PHOTO_WIDTHS[-1]}.webp" srcset="{srcset}" sizes="100vw" '
+              f'alt="{html.escape(photo["alt"])}" loading="lazy" decoding="async">'
+              f'<figcaption><span class="caption">{html.escape(photo["caption"])}</span>'
+              f'<span class="credit">{html.escape(photo["credit"])}</span>'
+              f'<span class="closing-note">תמונת הכריכה, במסגרתה המלאה.</span></figcaption></figure></aside>')
+    return figure, "media/preview.jpg"
+
+
+def preview_meta(title: str, description: str, image: str) -> str:
+    """Link preview tags. Limit: image URLs are relative, which some preview services do not follow;
+    revisit when the build learns the site's public URL."""
+    tags = [("og:type", "book"), ("og:title", title), ("og:description", description)]
+    if image:
+        tags += [("og:image", image), ("og:image:width", str(PREVIEW_SIZE[0])), ("og:image:height", str(PREVIEW_SIZE[1]))]
+    lines = [f'<meta property="{k}" content="{html.escape(v)}">' for k, v in tags]
+    lines.append(f'<meta name="twitter:card" content="{"summary_large_image" if image else "summary"}">')
+    return "\n".join(lines)
 
 
 def related_html(path: Path | None) -> str:
@@ -883,6 +896,9 @@ def places_html(data_dir: Path | None, conv: "Converter", thumbs: Thumbs) -> str
         for ref in [*place["targets"], place["description_source"]]:
             if ref not in conv.ids:
                 raise missing_id(where, ref)
+        kind = place["description_kind"]
+        if kind not in ("book", "edition") or (kind == "edition" and not place.get("description_url", "").startswith("https://")):
+            raise BookError(f"{where}: description_kind must be book or edition; an edition description needs an https description_url")
         if not isinstance(place.get("far", False), bool):
             raise BookError(f"{where}: far must be true or false")
         if not place["targets"]:
@@ -898,13 +914,14 @@ def places_html(data_dir: Path | None, conv: "Converter", thumbs: Thumbs) -> str
             "id": pid, "n": n, "name": name, "lat": lat, "lon": lon, "far": place.get("far", False),
             "wikidata": f"https://www.wikidata.org/wiki/{place['wikidata']}",
             "description": place["description"], "source": f"#{place['description_source']}",
+            "description_kind": kind, "description_url": place.get("description_url"),
             "chapters": chapters,
             "figures": [{"href": f"#{f}", "thumb": thumbs(conv.figure_img[f][0]), "alt": conv.figure_img[f][1]}
                         for f in place["figures"]],
         })
         links = "".join(f'<a href="{html.escape(c["href"])}">{html.escape(c["title"])}</a>' for c in chapters)
         items.append(f'<li id="place-{html.escape(pid)}" style="--place: var(--place-{n}); --ink: var(--place-ink-{n})">'
-                     f'<span class="place-n" aria-hidden="true">{n}</span>'
+                     f'<i class="place-dot" aria-hidden="true"></i>'
                      f'<span class="place-name">{html.escape(name)}</span><span class="place-chapters">{links}</span></li>')
     data = json.dumps(points, ensure_ascii=False).replace("</", "<\\/")
     return ('<section class="places" id="places" aria-labelledby="places-title">'
@@ -981,7 +998,7 @@ def build(epub: Path, out: Path, enhancements_file: Path | None = SITE / "enhanc
         timeline = timeline_html(data_dir, conv)
         conv.check_links()
     css = next(p for p in assets if p.endswith(".css"))
-    hero = hero_html(enhancements_file, out, f"book/{book.cover.path}")
+    closing = feature_photo(enhancements_file, out)
     # The Kindle download is the canonical EPUB itself. Send to Kindle accepts EPUB.
     download = out / "download" / epub.name
     download.parent.mkdir()
@@ -1010,8 +1027,8 @@ def build(epub: Path, out: Path, enhancements_file: Path | None = SITE / "enhanc
             ),
             "colophon": "\n".join(conv.colophon),
             "related": related_html(enhancements_file),
-            "hero_backdrop": hero[0],
-            "hero_preload": hero[1],
+            "closing_photo": closing[0],
+            "preview_meta": preview_meta(book.title, book.description, closing[1]),
             "icons": ICON_LINKS if brand_files(enhancements_file) else "",
             "short_title": html.escape(book.creator),  # The bar shows the author's name when the title does not fit.
             "book": "\n".join(docs),

@@ -71,7 +71,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .btn-small { min-height: 2.25rem; padding: 0.4rem 1rem; font-size: 0.9rem; }
 
 /* Navigation: transparent over the hero, translucent over the text. */
-.nav { position: fixed; inset: 0 0 auto; z-index: 1000; color: var(--on-night); font-family: var(--sans); font-size: 0.95rem; transition: background-color 200ms ease, color 200ms ease, box-shadow 200ms ease; }
+/* Over the hero the bar is transparent; a soft dark scrim behind it keeps its text readable on any photo. */
+.nav::before { content: ""; position: absolute; inset: 0 0 -1.5rem; z-index: -1; background: linear-gradient(rgb(14 12 10 / 0.6), rgb(14 12 10 / 0)); transition: opacity 200ms ease; pointer-events: none; }
+.nav[data-solid]::before { opacity: 0; }
+.nav { position: fixed; inset: 0 0 auto; z-index: 1000; isolation: isolate; color: var(--on-night); font-family: var(--sans); font-size: 0.95rem; transition: background-color 200ms ease, color 200ms ease, box-shadow 200ms ease; }
 .nav-inner { display: flex; align-items: center; gap: 0.75rem; max-width: 72rem; margin: 0 auto; padding: 0.6rem var(--gutter); }
 .nav-title { flex: 1 1 0; min-width: 0; overflow: hidden; font-weight: 600; text-decoration: none; white-space: nowrap; opacity: 0; transition: opacity 200ms ease; }
 .nav-title-full { display: inline-block; }
@@ -123,12 +126,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hero-backdrop { position: absolute; inset: -12% 0; z-index: -1; }
 .hero-backdrop img { width: 100%; height: 100%; object-fit: cover; filter: blur(36px) saturate(1.15) brightness(0.5); transform: scale(1.2); }
 .hero-backdrop::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 55%, var(--night)); }
-/* A credited hero photograph shows sharp; a gradient keeps the title readable over it. */
-.hero-photo { margin: 0; }
-.hero-photo img { filter: none; transform: none; }
-.hero-photo::after { background: linear-gradient(to bottom, rgb(14 12 10 / 0.55), rgb(14 12 10 / 0.35) 35%, rgb(14 12 10 / 0.6) 70%, var(--night)); }
-[dir="rtl"] .hero-photo::after, .hero-photo::after { z-index: 0; }
-.hero-credit { position: absolute; z-index: 1; bottom: calc(12% + 4.5rem); inset-inline-end: var(--gutter); max-width: calc(100% - 2 * var(--gutter)); margin: 0; font-family: var(--sans); font-size: 0.75rem; color: rgb(243 237 227 / 0.78); text-shadow: 0 1px 3px rgb(0 0 0 / 0.6); }
+/* Closing photograph above the footer: full bleed, with its caption and credit like the book's photos. */
+.closing-photo { margin: 0; padding-bottom: 2rem; background: var(--night); color: var(--on-night); }
+.closing-photo img { display: block; width: 100%; height: auto; max-height: 92vh; object-fit: cover; }
+.closing-photo figcaption { max-width: var(--measure); margin: 0 auto; padding: 1rem var(--gutter) 0; font-family: var(--sans); font-size: 0.9rem; line-height: 1.55; }
+.closing-photo figcaption span { display: block; }
+.closing-photo .credit, .closing-photo .closing-note { color: var(--on-night-soft); font-size: 0.9em; }
 .hero-inner { display: grid; gap: clamp(2.5rem, 6vw, 5rem); align-items: center; width: 100%; max-width: 72rem; margin: 0 auto; padding: 6rem var(--gutter) 6rem; box-sizing: border-box; }
 .hero-cover { order: -1; justify-self: center; width: min(52vw, 15rem); height: auto; border-radius: 3px; box-shadow: 0 30px 70px rgb(0 0 0 / 0.5), 0 0 0 1px rgb(255 255 255 / 0.06); }
 .hero-author { margin: 0 0 1rem; font-family: var(--sans); font-size: 0.95rem; font-weight: 600; letter-spacing: 0.08em; color: var(--on-night-soft); }
@@ -150,10 +153,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .book { padding: 0 var(--gutter) clamp(5rem, 12vw, 9rem); outline: none; }
 .book > .doc { width: 100%; max-width: var(--measure); margin-inline: auto; }
 
-/* Colour guard: book.css colours text for print. On the web every book element takes the site's text token,
-   so a new print colour can never break dark mode. The class rules below (muted text, accents) are more specific
-   and still apply. Keep this rule before them. */
-.book :is(h1, h2, h3, h4, h5, h6, p, span, div, section, aside, figcaption, caption, th, td, li, dt, dd, blockquote, em, strong, small, cite, sup, sub) { color: inherit; }
+/* Colour guard: book.css colours text for print, and it loads in the "book" cascade layer (index.html), so any
+   site rule wins over it. This zero-specificity rule gives every element of the EPUB documents the site's text
+   token, so a new print colour can never break dark mode; every site rule with a class still applies. */
+:where(.book .doc, .colophon) :where(h1, h2, h3, h4, h5, h6, p, span, div, section, aside, figcaption, caption, th, td, li, dt, dd, blockquote, em, strong, small, cite, sup, sub) { color: inherit; }
 .book figure .withheld { background: var(--mat); border-color: var(--rule); }
 .book table.text-table th { border-bottom-color: var(--muted); }
 /* Tables printed as text fit the column: fixed layout, and long cells wrap anywhere on a phone. */
@@ -229,11 +232,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .book figcaption { margin: 1rem auto 0; font-family: var(--sans); font-size: 0.9rem; line-height: 1.55; color: var(--ink); }
 .book figcaption .credit { margin-top: 0.25rem; color: var(--muted); opacity: 1; font-size: 0.9em; }
 
-/* Photos run full width. A landscape photo taller than the screen shows a band that pans with scroll.
-   Upright and square photos are never cropped: they show whole, at most 88vh tall. */
+/* Photos run full width and always show whole: at most 88vh tall, never cropped, never moving. */
 .book figure.photo { width: 100vw; margin-inline: calc(50% - 50vw); }
-.book figure.photo img { width: 100%; height: auto; max-height: 82vh; object-fit: cover; object-position: 50% 50%; }
-.book figure.photo img[data-shape="upright"] { width: auto; max-width: 100%; max-height: 88vh; object-fit: contain; margin: 0 auto; }
+.book figure.photo img { width: min(100%, calc(88vh * var(--ratio, 1))); height: auto; margin: 0 auto; }
 .book figure.photo figcaption { max-width: var(--measure); padding-inline: var(--gutter); }
 
 /* In-column images: never cropped, and enlarged at most 1.5 times their pixel width.
@@ -267,7 +268,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* Printed contents: parts with title and author. The site has no pages, so page numbers stay hidden. */
 .book ol.contents .page { display: none; }
 .book section.contents { padding-top: clamp(4rem, 10vw, 7rem); font-family: var(--sans); }
-.book section.contents > h2 { font-size: clamp(1.5rem, 1.1rem + 1.5vw, 2.2rem); margin: 0 0 1rem; }
+.book section.contents > h2 { font-size: clamp(1.35rem, 1.2rem + 0.4vw, 1.6rem); margin: 0 0 1rem; }
 .book ol.contents, .book ol.contents ol { list-style: none; margin: 0; padding: 0; }
 .book ol.contents > li.part { margin: 2rem 0 0; }
 .book ol.contents .part-title { display: block; margin-bottom: 0.5rem; font-family: var(--sans); font-size: 0.85rem; font-weight: 600; letter-spacing: 0.08em; color: var(--accent); }
@@ -286,19 +287,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   @supports (animation-timeline: view()) {
     .hero-backdrop { animation: drift linear both; animation-timeline: scroll(root); animation-range: 0 100vh; }
     @keyframes drift { to { transform: translateY(22%); } }
-    .hero-inner { animation: lift linear both; animation-timeline: scroll(root); animation-range: 0 90vh; }
-    @keyframes lift { to { opacity: 0.2; transform: translateY(-8vh); } }
-
-    .book figure.photo img[data-shape="landscape"] { animation: pan linear both; animation-timeline: view(); }
-    @keyframes pan { from { object-position: 50% 0%; } to { object-position: 50% 100%; } }
-    /* Upright photos only drift a little; nothing is cut off. */
-    .book figure.photo img[data-shape="upright"] { animation: drift-small linear both; animation-timeline: view(); }
-    @keyframes drift-small { from { transform: translateY(1.25rem); } to { transform: translateY(-1.25rem); } }
-
-    .book section.chapter > h2, .book figure.artwork img, .book blockquote.pullquote {
-      animation: rise ease-out both; animation-timeline: view(); animation-range: entry 0% entry 45%;
-    }
-    @keyframes rise { from { opacity: 0; transform: translateY(2.5rem); } }
+    /* Book images never move: no pan, no drift. Artwork only fades in a little as it enters, in place.
+       Text never fades, so it is readable at every moment of a scroll. */
+    .book figure.artwork img { animation: appear ease-out both; animation-timeline: view(); animation-range: entry 0% entry 40%; }
+    @keyframes appear { from { opacity: 0.4; } }
   }
   .hero-cue { animation: bob 2.6s ease-in-out infinite; }
   @keyframes bob { 50% { transform: translateY(6px); } }
@@ -392,16 +384,16 @@ dialog::backdrop { background: rgb(10 9 8 / 0.5); backdrop-filter: blur(2px); }
 /* Places. build_web.py writes one colour per place (--place-N) for light and dark mode next to the map. */
 .book section.places { margin: clamp(3rem, 8vw, 5rem) 0 0; font-family: var(--sans); }
 .places-head { max-width: var(--measure); margin: 0 auto 1.25rem; }
-.places h2 { color: var(--ink); margin: 0 0 0.4rem; font-size: clamp(1.5rem, 1.1rem + 1.5vw, 2.2rem); }
+.places h2 { color: var(--ink); margin: 0 0 0.4rem; font-size: clamp(1.35rem, 1.2rem + 0.4vw, 1.6rem); } /* Like the contents heading. */
 .places-intro { margin: 0; color: var(--soft); font-size: 0.9rem; line-height: 1.55; }
 /* Edge to edge like a photo, but shorter. Its own stacking context keeps Leaflet's panes under the bar. */
-.places-map { position: relative; z-index: 0; isolation: isolate; width: 100vw; margin-inline: calc(50% - 50vw); height: clamp(18rem, 60vh, 42rem); direction: ltr; background: var(--mat); }
+.places-map { position: relative; z-index: 0; isolation: isolate; width: 100vw; margin-inline: calc(50% - 50vw); height: clamp(18rem, 70vh, 46rem); direction: ltr; background: var(--mat); }
 .places-all { max-width: var(--measure); margin: 0.75rem auto 0; font-size: 0.9rem; }
 .places-all summary { cursor: pointer; color: var(--muted); padding: 0.4rem 0; }
 .places-list { margin: 0.5rem 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 0.4rem 0.5rem; font-size: 0.85rem; }
 .places-list li { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.25rem 0.7rem 0.25rem 0.3rem; border: 1px solid var(--rule); border-radius: 999px; }
 [dir="rtl"] .places-list li { padding: 0.25rem 0.3rem 0.25rem 0.7rem; }
-.place-n { display: inline-grid; place-items: center; width: 1.35rem; height: 1.35rem; border-radius: 50%; background: var(--place); color: var(--ink, #fff); font-size: 0.75rem; font-weight: 700; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.18); }
+.place-dot { width: 0.7rem; height: 0.7rem; border-radius: 50%; background: var(--place); box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.2); }
 .place-name { font-weight: 600; }
 .place-chapters { display: none; }
 .places-list button { font-weight: 600; padding: 0; }
@@ -410,19 +402,41 @@ dialog::backdrop { background: rgb(10 9 8 / 0.5); backdrop-filter: blur(2px); }
 .places-list:not([data-live]) .place-chapters a { margin-inline-start: 0.5rem; color: var(--muted); }
 
 /* Map markers: a numbered dot in the place colour with a paper ring. */
-.place-marker { display: grid; place-items: center; border-radius: 50%; background: var(--place); color: var(--ink, #fff); font: 700 12px/1 var(--sans); box-shadow: 0 0 0 2px #fff, 0 2px 6px rgb(0 0 0 / 0.35); }
-.map-popup { direction: rtl; text-align: right; font-family: var(--sans); font-size: 13px; line-height: 1.5; min-width: 14rem; }
-[dir="ltr"] .map-popup { direction: ltr; text-align: left; }
-.map-popup strong { display: flex; align-items: center; gap: 0.4rem; font-size: 15px; }
-.map-popup p { margin: 0.4rem 0; color: #3b3732; }
-.map-popup p a { color: #8f3f22; white-space: nowrap; }
-.map-popup ul { margin: 0.4rem 0 0; padding: 0; list-style: none; }
-.map-popup li a { color: #8f3f22; font-weight: 600; }
-.map-popup .thumbs { display: flex; gap: 6px; margin-top: 0.5rem; }
-.map-popup .thumbs img { display: block; width: 64px; height: 64px; border-radius: 6px; object-fit: cover; }
-.leaflet-container .leaflet-popup-content a { color: #8f3f22; }
+/* Map pins: a colour dot with a ring, and the place name beside it when there is room for it. */
+.place-pin { overflow: visible; }
+.pin-dot { position: absolute; inset: 0; border-radius: 50%; background: var(--place); box-shadow: 0 0 0 2px #fff, 0 1px 4px rgb(0 0 0 / 0.4); transition: transform 150ms ease; }
+.pin-label { position: absolute; top: 50%; right: calc(100% + 5px); translate: 0 -50%; padding: 1px 6px; border-radius: 4px; background: #fff; color: #1c1a17; text-shadow: 0 0 2px #fff; font: 600 12px/1.35 var(--sans); white-space: nowrap; box-shadow: 0 1px 3px rgb(0 0 0 / 0.25); pointer-events: none; }
+.place-pin.label-hidden .pin-label { visibility: hidden; }
+.place-pin:is(:hover, :focus-visible, .selected) { z-index: 1000 !important; }
+.place-pin:is(:hover, :focus-visible, .selected) .pin-label { visibility: visible; }
+.place-pin.selected .pin-dot { transform: scale(1.45); box-shadow: 0 0 0 2px #fff, 0 0 0 5px var(--place), 0 2px 6px rgb(0 0 0 / 0.4); }
+.place-pin:focus-visible { outline: none; }
+.place-pin:focus-visible .pin-dot { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--accent); }
+/* Place card: in a popup on desktop and in a sheet on phones. Site tokens, so it follows dark mode. */
+.place-popup .leaflet-popup-content-wrapper, .place-popup .leaflet-popup-tip { background: var(--paper); color: var(--ink); box-shadow: 0 12px 32px rgb(0 0 0 / 0.28); }
+.place-popup .leaflet-popup-content-wrapper { border-radius: 12px; padding: 0; }
+.place-popup .leaflet-popup-content { margin: 0; }
+.place-popup a.leaflet-popup-close-button { right: auto; left: 4px; top: 6px; width: 28px; height: 28px; font: 20px/28px var(--sans); color: var(--muted); }
+.place-card { direction: rtl; text-align: right; padding: 14px 16px 16px; font-family: var(--sans); font-size: 13.5px; line-height: 1.5; color: var(--ink); }
+[dir="ltr"] .place-card { direction: ltr; text-align: left; }
+.pc-title { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; padding-inline-end: 22px; font-size: 16px; line-height: 1.3; color: var(--ink); }
+.pc-title i { flex: none; width: 11px; height: 11px; border-radius: 50%; background: var(--place); }
+.pc-desc { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin: 0; color: var(--soft); }
+.leaflet-container a.pc-source, .pc-source { display: inline-block; margin-top: 2px; font-size: 12.5px; color: var(--accent); }
+.pc-chapters { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.leaflet-container .pc-chapters a, .pc-chapters a { padding: 3px 10px; border: 1px solid var(--rule); border-radius: 999px; background: var(--mat); color: var(--ink); font-size: 12.5px; text-decoration: none; line-height: 1.4; }
+.pc-chapters a:hover { border-color: var(--place); }
+.pc-thumbs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.pc-thumbs button { padding: 0; border-radius: 6px; overflow: hidden; line-height: 0; }
+.pc-thumbs img { width: 56px; height: 56px; object-fit: cover; }
+.pc-thumbs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* Phones: the card is a sheet along the bottom of the map. */
+.map-sheet { position: absolute; z-index: 1001; inset-inline: 8px; bottom: 8px; max-height: 70%; overflow-y: auto; border-radius: 12px; background: var(--paper); box-shadow: 0 10px 30px rgb(0 0 0 / 0.35); direction: rtl; }
+.map-sheet .place-card { padding-top: 12px; }
+.sheet-close { position: absolute; top: 4px; left: 4px; width: 2.25rem; height: 2.25rem; border-radius: 999px; font-size: 1.3rem; color: var(--muted); z-index: 1; }
 /* Hint shown when a gesture would scroll the page instead of moving the map. */
-.map-hint { position: absolute; inset: 0; z-index: 1001; display: grid; place-items: center; padding: 1rem; background: rgb(20 18 16 / 0.45); color: #fff; font: 600 1rem/1.4 var(--sans); text-align: center; direction: rtl; pointer-events: none; opacity: 0; transition: opacity 200ms ease; }
+.map-hint { position: absolute; inset: 0; z-index: 1001; display: grid; place-items: center; padding: 1rem; background: rgb(20 18 16 / 0.3); pointer-events: none; opacity: 0; transition: opacity 200ms ease; }
+.map-hint span { max-width: 22rem; padding: 0.6rem 1rem; border-radius: 10px; background: rgb(20 18 16 / 0.9); color: #fff; font: 600 0.95rem/1.4 var(--sans); text-align: center; direction: rtl; }
 [data-hint] > .map-hint { opacity: 1; }
 /* The folded map credit: a small © that opens on tap or hover. */
 .map-credit { display: flex; align-items: center; gap: 4px; margin: 0 6px 6px !important; font: 11px/1.4 var(--sans); direction: ltr; }
