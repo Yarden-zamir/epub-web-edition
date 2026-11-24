@@ -17,6 +17,8 @@ Heavy parts, on by default in GitHub Actions (GITHUB_ACTIONS=true), or with --pe
   --trace also saves a Chromium trace of each drag to SHOT_DIR;
 - videos (VIDEO_DIR, in CI SHOT_DIR/videos): each explainer at phone size, dragged with real touch events, and at desktop
   size with a mouse, keys, a mark and reset (motion on).
+No element of the book may reach past the viewport, and the page may not scroll sideways, during or after
+interaction (each explainer moved through its full range).
 Usage: uv run scripts/check_explorables.py WEB_DIR AXE_JS [SHOT_DIR [VIDEO_DIR]] [--perf] [--trace]
 """
 import functools
@@ -82,6 +84,29 @@ def center_handle(page: Page, fig) -> None:
     """The site's fixed top bar covers the top of the viewport: keep the handle clear of it before a drag."""
     page.evaluate("el => el.scrollIntoView({block: 'center'})", fig.locator(".xp-handle").first.element_handle())
     page.wait_for_timeout(200)
+
+
+# Elements of the book that reach past the viewport (with overlay scrollbars a full-bleed figure ends exactly at
+# its edges), and the page's own sideways overflow. Run during and after interaction.
+TOO_WIDE = """() => {
+  const vw = document.documentElement.clientWidth, out = [];
+  const name = (e) => e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (e.classList.length ? '.' + [...e.classList].slice(0, 2).join('.') : '');
+  if (document.documentElement.scrollWidth > vw) out.push('page ' + document.documentElement.scrollWidth + ' > ' + vw);
+  for (const el of document.querySelectorAll('#read *')) {
+    const r = el.getBoundingClientRect();
+    if (!r.width || (r.left >= -1 && r.right <= vw + 1)) continue;
+    const parent = el.parentElement.getBoundingClientRect();
+    if (parent.left < -1 || parent.right > vw + 1) continue; // Report the outermost element only.
+    out.push(name(el) + ' [' + Math.round(r.left) + ', ' + Math.round(r.right) + '] in ' + vw);
+    if (out.length >= 3) break;
+  }
+  return out;
+}"""
+
+
+def too_wide(page: Page, where: str, when: str) -> None:
+    for item in page.evaluate(TOO_WIDE):
+        problems.append(f"{where}: wider than the viewport {when}: {item}")
 
 
 def drag(page: Page, fig, steps: int, dy: float, pause: int = 0) -> bool:
@@ -171,6 +196,13 @@ with sync_playwright() as p:
                     page.mouse.up(); page.wait_for_timeout(300)
                     if shifted:
                         problems.append(f"{where}: the value line or the explanation moved inside the card during a drag: {shifted[:3]}")
+                # The full range, slowly, with the width checked while the drawing moves and after it settles.
+                for value in (slider.get_attribute("max"), slider.get_attribute("min")):
+                    slider.evaluate("(el, v) => { el.value = v; el.dispatchEvent(new Event('input')); el.dispatchEvent(new Event('change')); }", value)
+                    page.wait_for_timeout(250)
+                    too_wide(page, where, f"while moving to {value}")
+                    page.wait_for_timeout(1300)
+                    too_wide(page, where, f"after moving to {value}")
                 if not (drag(page, fig, 10, 12) or drag(page, fig, 10, -12)):
                     problems.append(f"{where}: dragging in the drawing does not change the value")
                 hit = page.evaluate("el => el.getBoundingClientRect().width", fig.locator(".xp-handle").first.element_handle())

@@ -255,8 +255,9 @@ function create(spec) {
     // Spots: holes inside the salt that is left, growing as the salt around them dissolves; the flow shows through.
     for (const spot of spots) {
       const [t, b] = eatenAt(spot.col, level);
-      const grow = ramp(t + b, 0.3, 0.8);
-      if (grow < 0.05 || t + b >= 0.97) continue;
+      // Only inside solid salt: it grows while at least half the layer is left there and fades as the salt thins.
+      const grow = ramp(t + b, 0.2, 0.45) * (1 - ramp(t + b, 0.45, 0.55));
+      if (grow < 0.05) continue;
       const left = (1 - t - b) * thickPx, cx = spot.col.x, cy = spot.col.top + t * thickPx + left / 2;
       const rx = 7 * spot.size * grow, ry = Math.min(left * 0.3, 4 * spot.size) * grow;
       const ring = spot.radii.map((r, i) => {
@@ -268,17 +269,20 @@ function create(spec) {
       blob.moveTo(...mid(0));
       for (let k = 1; k <= ring.length; k++) blob.quadraticCurveTo(...ring[k % ring.length], ...mid(k));
       blob.closePath();
+      ctx.save();
+      ctx.clip(pieces); // A spot is a hole in the salt, never a shape of its own.
+      ctx.globalAlpha = Math.min(1, grow * 1.5);
       ctx.fillStyle = env.color("--xp-fresh");
       ctx.fill(blob);
       ctx.strokeStyle = env.color("--xp-salt-edge");
       ctx.lineWidth = 1.2;
       ctx.stroke(blob);
+      ctx.globalAlpha = 1;
       if (flowing) {
-        ctx.save();
         ctx.clip(blob);
         streaks();
-        ctx.restore();
       }
+      ctx.restore();
     }
     if (flowing && deepest > 0.2) { // Grains of salt leave the eaten edges with the flow and fade.
       ctx.fillStyle = env.color("--xp-salt");
