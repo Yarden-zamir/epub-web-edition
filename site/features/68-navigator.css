@@ -12,7 +12,7 @@
 .toc-empty { margin: 1rem 1.5rem; color: var(--muted); }
 .panel-list .toc ol { padding: 0; }
 .toc-part { margin-top: 0.75rem; }
-.toc-part-title { display: block; padding: 0.4rem 0.75rem; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.06em; color: var(--accent); text-decoration: none; }
+.toc-part-title { display: block; padding: 0.4rem 0.75rem; font-size: 0.8rem; font-weight: 700; color: var(--accent); text-decoration: none; }
 .panel-list .toc-item a { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.1rem 0.6rem; padding: 0.55rem 0.75rem; }
 .toc-name { flex: 1 1 12rem; }
 .toc-author { font-size: 0.8rem; color: var(--muted); }

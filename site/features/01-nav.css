@@ -4,7 +4,7 @@
 .nav[data-solid]::before { opacity: 0; }
 .nav { position: fixed; inset: 0 0 auto; z-index: 1000; isolation: isolate; color: var(--on-night); font-family: var(--sans); font-size: 0.95rem; transition: background-color 200ms ease, color 200ms ease, box-shadow 200ms ease; }
 .nav-inner { display: flex; align-items: center; gap: 0.75rem; max-width: 72rem; margin: 0 auto; padding: 0.6rem var(--gutter); }
-.nav-title { flex: 1 1 0; min-width: 0; overflow: hidden; font-weight: 600; text-decoration: none; white-space: nowrap; opacity: 0; transition: opacity 200ms ease; }
+.nav-title { flex: 1 1 0; min-width: 0; overflow: hidden; font-weight: 600; text-decoration: none; white-space: nowrap; opacity: 0; visibility: hidden; transition: opacity 200ms ease, visibility 200ms; }
 .nav-title-full { display: inline-block; }
 .nav-title-short { display: none; }
 .nav-title[data-short] .nav-title-full { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
@@ -14,8 +14,8 @@
 .nav-text:hover, .nav .icon-btn:hover { background: color-mix(in srgb, currentColor 12%, transparent); }
 .icon-btn { display: inline-grid; place-items: center; width: 2.5rem; height: 2.5rem; padding: 0; border-radius: 999px; color: inherit; }
 .icon-btn svg, .split-more svg { width: 1.35rem; height: 1.35rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.nav[data-solid] { background: color-mix(in srgb, var(--paper) 72%, transparent); color: var(--ink); box-shadow: 0 1px 0 color-mix(in srgb, var(--rule) 80%, transparent); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); }
-.nav[data-solid] .nav-title { opacity: 1; }
+.nav[data-solid] { background: color-mix(in srgb, var(--paper) 94%, transparent); color: var(--ink); box-shadow: 0 1px 0 color-mix(in srgb, var(--rule) 80%, transparent); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); }
+.nav[data-solid] .nav-title { opacity: 1; visibility: visible; }
 /* The bar's download button appears only after the hero's download button scrolls away. */
 /* Hidden, it takes no room: width and the gap before it are 0, so search and chapters sit at the end edge.
    It grows in with the bar's 200 ms transition and pushes them to their places. */
@@ -51,3 +51,6 @@
   @keyframes progress { to { transform: scaleX(1); } }
 }
 
+/* Focus rings on dark ground (the hero, the transparent bar, the footer) use the light ink; split parts follow their shape. */
+:is(.hero, .nav:not([data-solid]), .footer) :focus-visible { outline-color: var(--on-night); }
+.split > :focus-visible { outline-offset: 3px; border-radius: inherit; }

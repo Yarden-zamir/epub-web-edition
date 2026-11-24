@@ -73,3 +73,8 @@
 .place-pill:hover { border-color: var(--place); }
 .place-pill i { width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--place); }
 
+/* Quieter base tiles so the place dots lead; darker in dark mode, so the map is not the brightest thing on the page. */
+.places-map .leaflet-tile-pane { filter: saturate(0.6) contrast(0.95); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .places-map .leaflet-tile-pane { filter: saturate(0.55) brightness(0.68) contrast(1.08); } }
+:root[data-theme="dark"] .places-map .leaflet-tile-pane { filter: saturate(0.55) brightness(0.68) contrast(1.08); }
+.map-chips button { background: var(--paper); color: var(--ink); }

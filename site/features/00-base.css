@@ -16,7 +16,8 @@
   --on-night-soft: #cbbfac;
   --measure: 38rem; /* About 34em of body text: 60-70 Hebrew characters a line. */
   --gutter: clamp(1.25rem, 5vw, 3rem);
-  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Hebrew", Arial, sans-serif;
+  /* "Book Sans" is the book's bundled Noto Sans Hebrew (Hebrew letters only); Latin letters fall through to the system sans. */
+  --sans: "Book Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {

@@ -125,9 +125,13 @@ if (placesMap) {
       el.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(p); } });
       markers.set(p.id, marker);
     }
+    // Places outside the first view stay in reach: one button shows every place except those marked "far",
+    // and each "far" place (abroad) gets a chip that flies there.
+    const all = L.latLngBounds(near.map((p) => [p.lat, p.lon])).pad(0.05);
     const far = places.filter((p) => p.far);
-    if (far.length) {
-      const Far = L.Control.extend({ options: { position: "bottomleft" }, onAdd() {
+    const outside = near.some((p) => !map.getBounds().contains([p.lat, p.lon]));
+    if (far.length || outside) {
+      const Chips = L.Control.extend({ options: { position: "bottomleft" }, onAdd() {
         const box = L.DomUtil.create("div", "map-chips");
         L.DomEvent.disableClickPropagation(box);
         const back = document.createElement("button");
@@ -135,18 +139,25 @@ if (placesMap) {
         back.textContent = "חזרה לתצוגה הראשונה";
         back.hidden = true;
         back.addEventListener("click", () => { map.fitBounds(home); back.hidden = true; });
+        if (outside) {
+          const every = document.createElement("button");
+          every.type = "button";
+          every.textContent = "כל המקומות";
+          every.addEventListener("click", () => { map.fitBounds(all); back.hidden = false; });
+          box.append(every);
+        }
         for (const p of far) {
           const chip = document.createElement("button");
           chip.type = "button";
           chip.style.setProperty("--place", `var(--place-${p.n})`);
-          chip.append(document.createElement("i"), `רחוק מכאן: ${p.name}`);
+          chip.append(document.createElement("i"), `מחוץ למפה: ${p.name}`);
           chip.addEventListener("click", () => { map.setView([p.lat, p.lon], 9); select(p); back.hidden = false; });
           box.append(chip);
         }
         box.append(back);
         return box;
       } });
-      new Far().addTo(map);
+      new Chips().addTo(map);
     }
     // Markers closer than a marker's width push each other apart a little, so each stays visible and tappable.
     // The popup and tooltip keep the true position. Limit: a dense group at a far zoom spreads into a small cloud;
