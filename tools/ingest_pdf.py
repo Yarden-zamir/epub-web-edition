@@ -1338,6 +1338,14 @@ class Ingest:
                 tag, cls = ("h3", "poem-title") if key == "title" else ("p", "poem-author")
                 html_parts.append(f'<{tag} class="{cls}" id="{eid}">{ln.html}</{tag}>')
             html_parts.append('<div class="poem-body">')
+            # Staircase lines (PDF page 308) start further in than the poem's start edge: one step per em.
+            edge = max(ln.x1 if ln.rtl else -ln.x0 for _, ln in verse)
+
+            def indent(ln: Line) -> str:
+                step = round((edge - (ln.x1 if ln.rtl else -ln.x0)) / ln.size)
+                if step > 6:
+                    raise IngestError(f"[[poem]] {unit.id}: line {ln.text!r} is indented {step} steps; the CSS has 1-6")
+                return f" indent-{step}" if step > 0 else ""
             it = iter(verse)
             page_now = pno
             for size in spec["stanzas"]:
@@ -1349,7 +1357,7 @@ class Ingest:
                     if page != page_now:
                         marker, page_now = self.page_marker(page), page
                         self.poem_markers.add(page)
-                    spans.append(f'{marker}<span class="line" id="{eid}">{ln.html}</span>')
+                    spans.append(f'{marker}<span class="line{indent(ln)}" id="{eid}">{ln.html}</span>')
                 html_parts.append('<p class="stanza">' + "<br/>".join(spans) + "</p>")
             html_parts.append("</div></section>")
             self.issue(pno, "intentional-change", f"{unit.id}-poem{k}: verse set as a poem ({len(verse)} lines)")
@@ -1734,7 +1742,7 @@ CONTAINER = """<?xml version="1.0" encoding="UTF-8"?>
 
 DOC = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="{lang}" lang="{lang}" dir="rtl">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" epub:prefix="z3998: http://www.daisy.org/z3998/2012/vocab/structure/#" xml:lang="{lang}" lang="{lang}" dir="rtl">
 <head><meta charset="utf-8"/><title>{title}</title><link rel="stylesheet" href="../css/book.css"/></head>
 <body>
 {body}

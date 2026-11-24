@@ -9,7 +9,8 @@ Usage: uv run tools/check_release.py CONTENT_DIR RELEASE_EPUB WEB_DIR
 Checks, from book.toml [release]:
 - no file in the EPUB or the web folder has the bytes of a changed image (PDF stream, or the
   complete build's derived file in CONTENT_DIR/epub-src/OEBPS/images);
-- each withheld or replaced figure, and each credited figure, carries its edition span in the EPUB text.
+- each withheld or replaced figure, and each credited figure, carries its edition span in the EPUB text;
+- the EPUB keeps its size budget (tools/check_size.py: at most 24 MB, each image at most 1 MB).
 Exits 1 when a check fails.
 """
 
@@ -21,6 +22,9 @@ import zipfile
 from pathlib import Path
 
 import pymupdf
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from check_size import over_budget  # noqa: E402
 
 
 def sha(data: bytes) -> str:
@@ -55,6 +59,7 @@ def main() -> None:
     for credit in release.get("credit", []):
         if html.escape(credit["text"]) not in text:
             missing.append(f"{credit['image']}: edition credit missing")
+    missing += over_budget(epub)
     print(f"changed images {len(release.get('change', []))} | banned files {len(banned)} | leaks {len(leaks)}")
     print(f"credits {len(release.get('credit', []))} | missing notes or credits {len(missing)}")
     for line in leaks + missing:
