@@ -57,6 +57,8 @@ MAP_TIMES = """async ([jump, box, layered]) => {
   placeAtJumpLine(document.querySelector(jump));
   const t0 = performance.now(), found = { library_before_jump: library };
   const frame = () => new Promise(r => requestAnimationFrame(r));
+  await frame(); await frame();
+  found.top_after_jump = Math.round(document.querySelector(jump).getBoundingClientRect().top);
   while (performance.now() - t0 < 60000) {
     await frame();
     const el = document.querySelector(box), ms = Math.round(performance.now() - t0);
@@ -65,6 +67,8 @@ MAP_TIMES = """async ([jump, box, layered]) => {
         && [...(el?.querySelectorAll('img.tn-layer') ?? [])].some(i => i.complete && i.naturalWidth && parseFloat(i.style.opacity) > 0)) found.first_layer_ms = ms;
     if (found.first_tile_ms !== undefined && (!layered || found.first_layer_ms !== undefined)) break;
   }
+  found.top_when_drawn = Math.round(document.querySelector(jump).getBoundingClientRect().top);
+  placeAtJumpLine(document.querySelector(jump)); // For the video: the map in view while it settles.
   return found;
 }"""
 
@@ -124,6 +128,7 @@ def record_maps(browser, port: int) -> dict:  # noqa: ANN001 (a Playwright Brows
         page.wait_for_timeout(3000)  # A reader on the first screen; idle work runs here.
         found = page.evaluate(MAP_TIMES, [jump, box, layered])
         page.wait_for_timeout(8000)  # Let the map finish its first view before the bytes are counted.
+        page.screenshot(path=str(out / "maps" / f"{name}.png"))
         results[name] = found | {"bytes": sizes | {"total": sum(sizes.values())}}
         video = page.video
         context.close()
