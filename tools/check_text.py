@@ -52,8 +52,8 @@ def main() -> None:
     total = 0
     for f in sorted(root.glob("*.xhtml")):
         for el in ET.parse(f).getroot().iter():
-            if el.tag not in BLOCKS or not el.attrib.get("id"):
-                continue
+            if el.tag not in BLOCKS or not el.attrib.get("id") or "edition-correction" in el.attrib.get("class", ""):
+                continue  # A correction note quotes the printed text as it is.
             text = " ".join("".join(el.itertext()).split())
             if hits := [q for q in quirks if q in text]:
                 used.update(hits)

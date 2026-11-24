@@ -751,17 +751,6 @@ class Ingest:
                     ln.html = ln.html.replace(html.escape(tf["find"], quote=False), html.escape(tf["replace"], quote=False))
                     self.text_fixes_used.add((pno, tf["find"]))
                     self.issue(pno, "intentional-change", f"Text fix {tf['find']!r} -> {tf['replace']!r}: {tf['reason']}")
-            for k, corr in enumerate(self.cfg.get("correction", []), start=1):
-                if corr["page"] != pno or corr["find"] not in ln.text:
-                    continue
-                esc = html.escape(corr["find"], quote=False)
-                if ln.text.count(corr["find"]) != 1 or ln.html.count(esc) != 1:
-                    raise IngestError(f"[[correction]] page {pno}: {corr['find']!r} must occur once in its printed line")
-                ln.text = ln.text.replace(corr["find"], corr["replace"])
-                # The marker resolves to a note reference in render_unit(), where the unit is known.
-                ln.html = ln.html.replace(esc, f'<span class="edition-correction">{html.escape(corr["replace"], quote=False)}</span>@@CORR{k}@@')
-                self.corrections_used.add(k)
-                self.issue(pno, "intentional-change", f"Correction {corr['find']!r} -> {corr['replace']!r}: {corr['reason']} Evidence: {corr['evidence']}")
             fix = next((f for f in self.cfg.get("note_ref_fix", []) if f["page"] == pno and f["contains"] in ln.text), None)
             if fix:
                 num = str(fix["number"])
@@ -1041,12 +1030,27 @@ class Ingest:
 
     def join(self, para: list[Line]) -> str:
         joined = self.join_lines(para)
-        if not para[0].rtl:
-            return joined
-        fixed_markup, fixed = swap_reversed_pairs(joined)
-        for f in fixed:
-            self.issue(para[0].page, "auto-fix", f"Bracket pair {f!r} reordered around a left-to-right run; check against print")
-        return fixed_markup
+        if para[0].rtl:
+            joined, fixed = swap_reversed_pairs(joined)
+            for f in fixed:
+                self.issue(para[0].page, "auto-fix", f"Bracket pair {f!r} reordered around a left-to-right run; check against print")
+        return self.correct(para[0].page, joined)
+
+    def correct(self, pno: int, markup: str) -> str:
+        """Apply book.toml [[correction]] entries of this page to a joined paragraph (a find may cross a line end).
+        The marker resolves to a note reference in link_corrections(), where the unit is known."""
+        for k, corr in enumerate(self.cfg.get("correction", []), start=1):
+            esc = html.escape(corr["find"], quote=False)
+            if corr["page"] != pno or esc not in markup:
+                continue
+            if markup.count(esc) != 1 or k in self.corrections_used:
+                raise IngestError(f"[[correction]] {k} page {pno}: {corr['find']!r} must occur once on its page")
+            printed = html.escape(corr["find"], quote=True)  # The web edition can show the printed text.
+            markup = markup.replace(esc, f'<span class="edition-correction" data-printed="{printed}">'
+                                         f'{html.escape(corr["replace"], quote=False)}</span>@@CORR{k}@@')
+            self.corrections_used.add(k)
+            self.issue(pno, "intentional-change", f"Correction {corr['find']!r} -> {corr['replace']!r}: {corr['reason']} Evidence: {corr['evidence']}")
+        return markup
 
     def join_lines(self, para: list[Line]) -> str:
         out = para[0].html
@@ -1615,6 +1619,7 @@ class Ingest:
         unused = sorted(set(self.cfg.get("alt", {})) - self.used_alt)
         if unused:
             raise IngestError(f"book.toml [alt] keys match no image: {unused}")
+        self.check_corrections()
         self.write_ids()
         self.write_inventory()
 
@@ -1705,6 +1710,20 @@ class Ingest:
             for u, href, _ in docs for p in u.pages)
         nav = NAV.format(lang=m["language"], toc=toc, pages=pages)
         (self.out / "OEBPS" / "nav.xhtml").write_text(nav, encoding="utf-8")
+
+    def check_corrections(self) -> None:
+        """Each [[correction]] with an "element" key must put its corrected text into that element."""
+        wanted = {c["element"]: [] for c in self.cfg.get("correction", []) if "element" in c}
+        for c in self.cfg.get("correction", []):
+            if "element" in c:
+                wanted[c["element"]].append(c["replace"])
+        for f in (self.out / "OEBPS" / "text").glob("*.xhtml"):
+            for el in ET.parse(f).getroot().iter():
+                if (el_id := el.get("id")) in wanted:
+                    text = "".join(el.itertext())
+                    wanted[el_id] = [r for r in wanted[el_id] if r not in text]
+        if wrong := {k: v for k, v in wanted.items() if v}:
+            raise IngestError(f"[[correction]] text not in its element: {wrong}")
 
     def write_ids(self) -> None:
         """Save the ID registry. A gone ID must have its text inside another paragraph: log the move, or stop."""
