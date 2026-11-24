@@ -21,6 +21,7 @@ const WATER_TABLE_WEST = -382; // Groundwater table at the west edge.
 // noise), up to half of the layer or less, so chunky pieces stay. At a few sites the two fronts meet: there the salt
 // is gone, the layer breaks into separate jagged pieces, and above each gap the ground collapses.
 const EAT = 9, GRID = 2.5, SEED = 7, GAPS = 4; // Any fixed seed: it fixes the shapes only.
+const COLLAPSE_S = 1.1; // Length of the collapse animation when a gap opens.
 const STREAKS = [0.15, 0.35, 0.55, 0.75, 0.92]; // Fresh-water flow lines, as fractions between water table and interface.
 
 // Seeded random numbers (mulberry32), so the front looks the same on every visit.
@@ -255,16 +256,34 @@ function create(spec) {
     }
 
     let fallen = 0;
+    // A collapse plays once when the gap below a site opens (COLLAPSE_S seconds): cracks, the roof breaks and the pit
+    // opens, the funnel tears down to the gap, soil falls into it, dust rises. Moving the level back up refills it.
+    // Under reduced motion the hole is there at once.
+    const easeOut = (q) => 1 - (1 - q) ** 3;
     for (const h of holes) {
       const [t, b] = eatenAt(h.col, level);
-      const down = ramp(t + b, 0.97, 1.05); // Only once the gap below is open.
-      if (down > 0.01) {
-        // The funnel shows from the surface down to a depth that grows with `down`, under the ground only.
-        const reach = h.surface(0) + (h.col.bottom - h.surface(0)) * down;
+      const gap = t + b >= 1;
+      if (!gap) { h.openedAt = null; continue; }
+      h.openedAt ??= env.time;
+      const p = reduceMotion.matches ? 1 : Math.min(1, (env.time - h.openedAt) / COLLAPSE_S);
+      if (p < 1) env.wantsFrame = true;
+      fallen++;
+      const top = h.surface(0), bottom = h.col.bottom;
+      const tear = easeOut(ramp(p, 0.18, 0.8)), sag = easeOut(ramp(p, 0.15, 0.55));
+      // Cracks in the surface, before the roof gives way.
+      const crack = ramp(p, 0, 0.15) * (1 - ramp(p, 0.45, 0.7));
+      if (crack > 0.01) {
+        ctx.globalAlpha = crack;
+        ctx.strokeStyle = env.color("--xp-void");
+        ctx.lineWidth = 1;
+        for (const [dx, dy] of [[-6, 7], [-1, 9], [5, 6]]) ctx.stroke(shape([[h.x, top + 1], [h.x + dx * h.size, top + dy * h.size]], false));
+        ctx.globalAlpha = 1;
+      }
+      if (tear > 0.01) { // The funnel, from the surface down as far as it has torn.
         ctx.save();
         ctx.clip(below);
         ctx.beginPath();
-        ctx.rect(0, 0, W, reach);
+        ctx.rect(0, 0, W, top + (bottom - top) * tear);
         ctx.clip();
         ctx.fillStyle = env.color("--xp-land-edge");
         ctx.globalAlpha = 0.32;
@@ -276,9 +295,10 @@ function create(spec) {
         ctx.stroke(h.funnel);
         ctx.setLineDash([]);
         ctx.restore();
-        // The pit: both ends on the ground line, its middle as deep as `down` allows.
+      }
+      if (sag > 0.01) { // The pit: both ends on the ground line, its middle as deep as the collapse has gone.
         const left = h.x - h.w * 1.7, right = h.x + h.w * 1.7;
-        const yl = h.surface(-h.w * 1.7), yr = h.surface(h.w * 1.7), mid = h.surface(0) + 10 * h.size * down;
+        const yl = h.surface(-h.w * 1.7), yr = h.surface(h.w * 1.7), mid = top + 10 * h.size * sag;
         ctx.fillStyle = env.color("--xp-void");
         ctx.beginPath();
         ctx.moveTo(left, yl);
@@ -286,7 +306,29 @@ function create(spec) {
         ctx.closePath();
         ctx.fill();
       }
-      if (down > 0.5) fallen++;
+      if (p < 1) {
+        // Soil falls down the funnel into the gap (accelerating), and dust rises over the pit.
+        ctx.fillStyle = env.color("--xp-land-edge");
+        for (let k = 0; k < 6; k++) {
+          const q = ramp(p, 0.22 + k * 0.06, 0.62 + k * 0.06);
+          if (q <= 0 || q >= 1) continue;
+          ctx.globalAlpha = 1 - ramp(q, 0.75, 1);
+          ctx.beginPath();
+          ctx.arc(h.x + (k - 2.5) * 1.8 * (1 - q), top + 3 + (bottom - top - 3) * q * q, 1.2 + (k % 3) * 0.4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        const puff = ramp(p, 0.2, 0.75);
+        if (puff > 0 && puff < 1) {
+          ctx.fillStyle = env.color("--xp-land");
+          ctx.globalAlpha = 0.45 * (1 - puff);
+          for (const [dx, r] of [[-5, 1], [0, 1.3], [5, 0.9]]) {
+            ctx.beginPath();
+            ctx.arc(h.x + dx * h.size * (0.6 + puff), top - 3 - 7 * puff, (2 + 6 * puff) * r, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+        ctx.globalAlpha = 1;
+      }
     }
     const open = deepest > 0.05 ? 1 : 0;
 

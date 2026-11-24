@@ -20,7 +20,8 @@
 //     resize?(env)                                redraws overlay canvases after a size or theme change
 //   }
 // }
-// env: unit (drawing units per CSS pixel), time (seconds, for slow motion), color(token), gradient(key, x0, y0, x1, y1, stops),
+// env: unit (drawing units per CSS pixel), time (seconds, for slow motion), wantsFrame (set it during draw to get the
+//      next frame too, for a one-off animation), color(token), gradient(key, x0, y0, x1, y1, stops),
 //      layer(key, [x, y, w, h], draw) -> a bitmap of draw() for parts that never change (copy it with ctx.drawImage),
 //      overlay(tag, className) -> an element over the canvas (and under the handle), scale (CSS px per unit), view,
 //      label(ctx, text, x, y, options), figures(ctx, text, x, y, options) for a number with fixed-width digits,
@@ -75,6 +76,7 @@ function makeEnv(box) {
   const env = {
     unit: 1,
     time: 0,
+    wantsFrame: false,
     bind(context) { ctx = context; },
     pixel: 1, // Device pixels per drawing unit.
     reset() { colors.clear(); gradients.clear(); layers.clear(); family = getComputedStyle(box).fontFamily; },
@@ -263,7 +265,12 @@ async function setUp(figure, box) {
     const text = scene.draw(ctx, v, env);
     if (!scene.move) summary = text;
     canvasValue = v;
+    if (env.wantsFrame) { // A one-off animation in the drawing runs: draw again next frame, unless a move draws anyway.
+      env.wantsFrame = false;
+      if (!followUp) followUp = requestAnimationFrame(() => { followUp = 0; if (!frame && !tween) drawCanvas(value); });
+    }
   }
+  let followUp = 0;
   function paint(v) {
     value = v;
     if (scene.followsValue !== false || Number.isNaN(canvasValue)) drawCanvas(v);
