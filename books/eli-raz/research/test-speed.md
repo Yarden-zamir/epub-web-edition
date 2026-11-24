@@ -66,3 +66,9 @@ CI after the change: see "CI after" below, filled from the first lane and main r
 
 | Run | Change | Push to done | Notes |
 |---|---|---|---|
+| [45442257445](https://github.com/Yarden-zamir/epub-web-edition/actions/runs/45442257445) | lane/live-build: this change (workflows, scripts) | 145 s, all jobs in parallel | build 50 s (three ingests in parallel, 15 s each, INGEST_INPUTS comparison passed), EPUBCheck 39 s, full axe at every width and scheme 52 s, explainers and videos 67 s, sample 84 s (failed: tools/verify.py, search and figure viewer on the sample edition) |
+| [45442878682](https://github.com/Yarden-zamir/epub-web-edition/actions/runs/45442878682) | main: deploy gate (`check.py --gate`) | 118 s | book job 73 s: two ingests 15 s in parallel, build_epub 1 s, build_web 3 s, check_release 1 s, EPUBCheck 20 s and quick smoke 17 s in parallel (axe on all 373 parts on its first run); deploy job 37 s |
+
+Billed minutes (each job rounds up to a whole minute): a lane run about 7, a main deploy about 3.
+
+Machine load (uptime, 1, 5, 15 minutes): 33.3, 31.1, 30.7 before (16:44 UTC, 25 headless Chrome processes, 2 Java, 1 ffmpeg); 11.4, 15.8, 22.4 after this change landed (16:59 UTC), before the lanes switched to the new flow.
