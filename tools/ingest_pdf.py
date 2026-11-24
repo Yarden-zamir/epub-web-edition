@@ -259,7 +259,9 @@ class IdRegistry:
         for i in [*range(start, len(rows)), *range(start)]:
             old_id, old_key = rows[i]
             n = min(len(old_key), len(key))
-            if old_id not in self.used and (old_key == key or (n >= 12 and old_key[:n] == key[:n])):
+            # A short text (a verse line) matches by prefix only as the next ID in order.
+            prefix = old_key[:n] == key[:n] and (n >= 12 or (i == start and old_key.startswith(key) and key))
+            if old_id not in self.used and (old_key == key or prefix):
                 self.used.add(old_id)
                 self.pos[unit] = i + 1
                 self.assigned.append((old_id, key))
@@ -527,6 +529,11 @@ def has_list_label(text: str) -> bool:
     return head.endswith(".") and ((len(label) == 1 and is_hebrew(label)) or (label.isdigit() and len(label) <= 2))
 
 
+def same_text(a: str, b: str) -> bool:
+    """Equal up to the order of points on a letter (canonical equivalence)."""
+    return unicodedata.normalize("NFC", a) == unicodedata.normalize("NFC", b)
+
+
 def span_groups(spans: list[dict]) -> list[list[dict]]:
     """Split a PDF text line into groups of spans that sit near each other.
 
@@ -671,6 +678,9 @@ class Ingest:
         self.units = self.load_units()
         self.ids = IdRegistry(content / "ids.csv", content / "id-moves.csv")
         self.text_tables_used: set[str] = set()
+        self.poem_taken: dict[int, set[tuple[float, str]]] = {}  # Lines that a poem from an earlier page took.
+        self.poem_markers: set[int] = set()  # Pages whose marker sits inside a poem.
+        self.poems_used: set[tuple[str, int]] = set()
 
     # ---------- structure ----------
 
@@ -882,6 +892,12 @@ class Ingest:
                 orig_dir.mkdir(parents=True, exist_ok=True)
                 (orig_dir / f"{stem}.{image['ext']}").write_bytes(image["image"])
                 width, height = pix.width, pix.height
+            elif image.get("smask") and min(pymupdf.Pixmap(self.doc, image["smask"]).samples) >= 250:
+                # The soft mask is opaque everywhere (alpha 250-255): it changes nothing visible. Keep the stream
+                # as it is (often JPEG), which is far smaller than a PNG with alpha.
+                name, data = f"{stem}.{image['ext']}", image["image"]
+                derivation = "unmodified PDF image stream; its soft mask is opaque (alpha 250 or more) and left out"
+                width, height = image["width"], image["height"]
             elif image.get("smask"):
                 base = pymupdf.Pixmap(self.doc, xref)
                 if base.n - base.alpha >= 4:
@@ -1268,6 +1284,79 @@ class Ingest:
                 rendered.append(part)
         return rendered
 
+    def page_marker(self, pno: int) -> str:
+        return f'<span epub:type="pagebreak" role="doc-pagebreak" id="pg-{pno}" title="{self.label(pno)}"/>'
+
+    def poems(self, unit: Unit, pno: int, lines: list[Line],
+              page_ids: dict[int, list[str]]) -> tuple[list[Line], list[tuple[float, str]]]:
+        """Set the verse that book.toml [[poem]] names as a poem: title, author, stanzas of lines.
+
+        Each printed line becomes one line span. Its ID comes from the ID registry, so a line keeps the ID of
+        the paragraph that started with it. A poem that runs onto the next page takes that page's lines and
+        holds its page marker before the first line there.
+        """
+        taken = self.poem_taken.get(pno, set())
+        lines = [ln for ln in lines if (round(ln.y0, 1), ln.text) not in taken]
+        flow: list[tuple[float, str]] = []
+        specs = [spec for spec in self.cfg.get("poem", []) if spec["unit"] == unit.id]
+        for k, spec in enumerate(specs, start=1):
+            if spec["pages"][0] != pno:
+                continue
+            head: list[tuple[str, Line]] = []
+            verse: list[tuple[int, Line]] = []
+            for n, page in enumerate(spec["pages"]):
+                body = [ln for ln in (lines if page == pno else self.lines(page)) if ln.role == "body"]
+                start = 0
+                if n == 0:
+                    for key in ("title", "author"):
+                        if key in spec:
+                            i = next((j for j in range(start, len(body)) if same_text(body[j].text, spec[key])), None)
+                            if i is None:
+                                raise IngestError(f"[[poem]] {unit.id} page {page}: no line {spec[key]!r}")
+                            head.append((key, body[i]))
+                            start = i + 1
+                    start = next((j for j in range(start, len(body)) if same_text(body[j].text, spec["first"])), -1)
+                    if start < 0:
+                        raise IngestError(f"[[poem]] {unit.id} page {page}: no first line {spec['first']!r}")
+                end = len(body)
+                if n == len(spec["pages"]) - 1:
+                    end = next((j + 1 for j in range(start, len(body)) if same_text(body[j].text, spec["last"])), -1)
+                    if end < 0:
+                        raise IngestError(f"[[poem]] {unit.id} page {page}: no last line {spec['last']!r}")
+                verse.extend((page, ln) for ln in body[start:end])
+                if page != pno:
+                    self.poem_taken.setdefault(page, set()).update((round(ln.y0, 1), ln.text) for p, ln in verse if p == page)
+            if sum(spec["stanzas"]) != len(verse):
+                raise IngestError(f"[[poem]] {unit.id}: stanzas {spec['stanzas']} hold {sum(spec['stanzas'])} lines; "
+                                  f"print has {len(verse)}")
+            used = {id(ln) for _, ln in head} | {id(ln) for _, ln in verse}
+            lines = [ln for ln in lines if id(ln) not in used]
+            html_parts = [f'<section class="poem" epub:type="z3998:poem" id="{unit.id}-poem{k}">']
+            for key, ln in head:
+                eid = self.ids.assign(unit.id, ln.text)
+                page_ids.setdefault(pno, []).append(eid)
+                tag, cls = ("h3", "poem-title") if key == "title" else ("p", "poem-author")
+                html_parts.append(f'<{tag} class="{cls}" id="{eid}">{ln.html}</{tag}>')
+            html_parts.append('<div class="poem-body">')
+            it = iter(verse)
+            page_now = pno
+            for size in spec["stanzas"]:
+                spans = []
+                for page, ln in (next(it) for _ in range(size)):
+                    eid = self.ids.assign(unit.id, ln.text)
+                    page_ids.setdefault(page, []).append(eid)
+                    marker = ""
+                    if page != page_now:
+                        marker, page_now = self.page_marker(page), page
+                        self.poem_markers.add(page)
+                    spans.append(f'{marker}<span class="line" id="{eid}">{ln.html}</span>')
+                html_parts.append('<p class="stanza">' + "<br/>".join(spans) + "</p>")
+            html_parts.append("</div></section>")
+            self.issue(pno, "intentional-change", f"{unit.id}-poem{k}: verse set as a poem ({len(verse)} lines)")
+            self.poems_used.add((unit.id, k))
+            flow.append(((head[0][1] if head else verse[0][1]).y0, "".join(html_parts)))
+        return lines, flow
+
     def text_tables(self, unit: Unit, pno: int, lines: list[Line]) -> tuple[list[Line], list[tuple[float, str]]]:
         """Replace the lines of a table printed as text with an XHTML table from book.toml [[text_table]].
 
@@ -1318,11 +1407,13 @@ class Ingest:
         open_para: str | None = None  # ID of the previous page's last body paragraph when its last line is full.
         for pno in unit.pages:
             ids = page_ids.setdefault(pno, [])
-            parts.append(f'<span epub:type="pagebreak" role="doc-pagebreak" id="pg-{pno}" title="{self.label(pno)}"/>')
+            if pno not in self.poem_markers:  # A poem that runs onto this page holds its page marker.
+                parts.append(self.page_marker(pno))
             figs = self.figures(pno)
             lines, tables = self.text_tables(unit, pno, self.lines(pno))
+            lines, poems = self.poems(unit, pno, lines, page_ids)
             lines = self.attach_captions(figs, lines)
-            flow: list[tuple[float, str]] = list(tables)
+            flow: list[tuple[float, str]] = list(tables) + poems
             ids.extend(t.split('id="', 1)[1].split('"', 1)[0] for _, t in tables)
             paras = self.paragraphs(lines, figs)
             body_paras = [pa for pa in paras if pa[0].role == "body"]
@@ -1469,6 +1560,11 @@ class Ingest:
             (self.out / "OEBPS" / "text" / f"{unit.id}.xhtml").write_text(xhtml, encoding="utf-8")
             docs.append((unit, f"text/{unit.id}.xhtml", heading))
         self.write_package(docs, self.write_cover(), self.write_facsimile())
+        poem_count: dict[str, int] = {}
+        for spec in self.cfg.get("poem", []):
+            poem_count[spec["unit"]] = poem_count.get(spec["unit"], 0) + 1
+        if unused_poems := {(u, k) for u, n in poem_count.items() for k in range(1, n + 1)} - self.poems_used:
+            raise IngestError(f"book.toml [[poem]] entries match no page: {sorted(unused_poems)}")
         if unused_tables := {t["id"] for t in self.cfg.get("text_table", [])} - self.text_tables_used:
             raise IngestError(f"book.toml [[text_table]] entries match no page: {sorted(unused_tables)}")
         stale = [(f["page"], f["find"]) for f in self.cfg.get("text_fix", []) if (f["page"], f["find"]) not in self.text_fixes_used]
