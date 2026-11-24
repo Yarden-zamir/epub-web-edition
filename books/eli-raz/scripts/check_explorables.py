@@ -31,6 +31,8 @@ shots = Path(args[2]) if len(args) > 2 else None
 videos = Path(args[3]) if len(args) > 3 else None
 if not (web / "index.html").is_file() or not AXE.is_file():
     sys.exit(f"usage: check_explorables.py WEB_DIR AXE_JS [SHOT_DIR [VIDEO_DIR]]; missing {web / 'index.html'} or {AXE}")
+if shots:
+    shots.mkdir(parents=True, exist_ok=True)
 LONG_TASK_MS, P95_FRAME_MS = 50, 20
 
 
