@@ -148,6 +148,12 @@ function applyFilter() {
   byId("toc-empty").hidden = shown > 0;
 }
 tocFilter.addEventListener("input", applyFilter);
+// The pill follows its tab when the tab row changes size (a phone turned with the navigator open). Without this the
+// selected tab, light text on the paper, disappears.
+new ResizeObserver(() => {
+  const selected = tabs.find((t) => t.getAttribute("aria-selected") === "true");
+  if (selected?.offsetWidth) placeTabPill(selected);
+}).observe(tabs[0].parentElement);
 onDialogOpen["toc-dialog"] = () => {
   placeTabPill(tabs.find((t) => t.getAttribute("aria-selected") === "true") ?? tabs[0]); // Sizes are known once open.
   let saved = null;

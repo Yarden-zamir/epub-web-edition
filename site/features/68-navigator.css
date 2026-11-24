@@ -1,7 +1,9 @@
 /* Navigator: tabs, a chapter filter, parts with their chapters, and the timeline. */
 #toc-dialog { height: min(85vh, 46rem); }
 #toc-dialog[open] { display: flex; flex-direction: column; }
-#toc-dialog .panel-body { flex: 1; min-height: 0; overflow-y: auto; }
+/* A row never grows wider than the panel; sideways overflow is clipped as a backstop. Rows show focus with a background
+   and the filter input's ring sits inside its padding, so the clip hides no focus ring. */
+#toc-dialog .panel-body { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; }
 .tabs { display: flex; gap: 0.25rem; padding: 0.25rem 1rem 0.5rem; border-bottom: 1px solid var(--rule); }
 .tabs:has(> [role="tab"]:only-of-type) { display: none; }
 .tabs [role="tab"] { padding: 0.45rem 0.9rem; border-radius: var(--radius-pill); font-size: 0.9rem; color: var(--muted); }
@@ -17,13 +19,13 @@
 .toc-part { margin-top: 0.75rem; }
 .toc-part-title { display: block; padding: 0.4rem 0.75rem; font-size: 0.8rem; font-weight: 700; color: var(--accent); text-decoration: none; }
 /* Title and author on the start side, place dots in their own column at the end. */
-.panel-list .toc-item a { display: grid; grid-template-columns: 1fr auto; grid-template-areas: "name dots" "printed dots" "author dots"; align-items: center; gap: 0.1rem 0.6rem; padding: 0.55rem 0.75rem; }
+.panel-list .toc-item a { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "name dots" "printed dots" "author dots"; align-items: center; gap: 0.1rem 0.6rem; padding: 0.55rem 0.75rem; }
 .toc-name { grid-area: name; }
 .toc-author { grid-area: author; }
 .toc-printed { grid-area: printed; font-size: 0.8125rem; color: var(--muted); }
-.toc-name { flex: 1 1 12rem; }
+.toc-name, .toc-printed, .toc-author { min-width: 0; overflow-wrap: anywhere; }
 .toc-author { font-size: 0.8rem; color: var(--muted); }
-.toc-places { grid-area: dots; display: inline-flex; align-items: center; gap: 3px; font-size: 0.7rem; color: var(--muted); }
+.toc-places { grid-area: dots; display: inline-flex; align-items: center; gap: 3px; font-size: 0.8125rem; color: var(--muted); white-space: nowrap; }
 .toc-places i { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--place); }
 .panel-list a[aria-current] { background: color-mix(in srgb, var(--accent) 12%, transparent); box-shadow: inset 3px 0 0 var(--accent); }
 [dir="rtl"] .panel-list a[aria-current] { box-shadow: inset -3px 0 0 var(--accent); }
@@ -44,7 +46,7 @@
 .pi-list { list-style: none; margin: 0; padding: 0 0.5rem 0.75rem; }
 .pi-group .toc-part-title { margin: 0.75rem 0 0; }
 .pi-item { padding: 0.35rem 0; border-bottom: 1px solid var(--rule); }
-.pi-place { display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: "dot name far" ". desc desc"; align-items: center; gap: 0.1rem 0.5rem; width: 100%; padding: 0.4rem 0.6rem; border-radius: calc(var(--radius-m) - 0.5rem); text-align: start; }
+.pi-place { display: grid; box-sizing: border-box; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "dot name far" ". desc desc"; align-items: center; gap: 0.1rem 0.5rem; width: 100%; padding: 0.4rem 0.6rem; border-radius: calc(var(--radius-m) - 0.5rem); text-align: start; }
 .pi-place:hover, .pi-place:focus-visible { background: var(--mat); }
 .pi-place i { grid-area: dot; width: 0.7rem; height: 0.7rem; border-radius: 50%; background: var(--place); }
 .pi-name { grid-area: name; font-weight: 600; }

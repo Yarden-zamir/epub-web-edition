@@ -122,6 +122,38 @@ async def full_check(browser: Browser, url: str, width: int, height: int, scheme
     return []
 
 
+# The navigator's scroll box on each tab, with a classic scrollbar simulated: the box is 15 px narrower, as a scrollbar
+# makes it (headless Chromium has none). A row wider than the box lets the panel scroll sideways.
+NAVIGATOR_WIDTH = """async (scrollbar) => {
+  const out = [];
+  if (!document.getElementById('toc-dialog').open) document.querySelector('[data-open="toc-dialog"]').click();
+  await new Promise(r => setTimeout(r, 400));
+  for (const tab of document.querySelectorAll('#toc-dialog [role="tab"]')) {
+    tab.click();
+    await new Promise(r => setTimeout(r, 200));
+    const box = document.getElementById(tab.getAttribute('aria-controls'));
+    box.style.width = `calc(100% - ${scrollbar}px)`;
+    const over = box.scrollWidth - box.clientWidth;
+    if (over > 0) out.push(`${tab.textContent.trim()} tab: ${over} px wider than its scroll box`);
+    box.style.width = '';
+  }
+  return out;
+}"""
+
+
+async def navigator_widths(browser: Browser, url: str) -> list[str]:
+    """The width guard on the navigator dialog: every tab at every width."""
+    page = await browser.new_page(viewport={"width": SIZES[0][0], "height": SIZES[0][1]}, reduced_motion="reduce")
+    await page.goto(url, wait_until="load", timeout=LOAD_TIMEOUT_MS)
+    problems = []
+    for width, height in SIZES:
+        await page.set_viewport_size({"width": width, "height": height})
+        await page.wait_for_timeout(300)
+        problems += [f"navigator {width}: {p}" for p in await page.evaluate(NAVIGATOR_WIDTH, SCROLLBAR)]
+    await page.close()
+    return problems
+
+
 async def errata_widths(browser: Browser, url: str) -> list[str]:
     """The width guard on the errata page, at every width. A book without errata has no such page."""
     page = await browser.new_page(viewport={"width": SIZES[0][0], "height": SIZES[0][1]})
@@ -202,15 +234,17 @@ async def main(url: str) -> list[str]:
             gate = asyncio.Semaphore(FULL_AT_ONCE)
             results = await asyncio.gather(*(full_check(browser, url, w, h, s, gate) for w, h in SIZES for s in SCHEMES))
             problems = [line for r in results for line in r] + await errata_widths(browser, url) + await live_views(browser, url)
+            problems += await navigator_widths(browser, url)
             passed = {} if problems else await all_hashes(browser, url)
         else:
-            phone, desktop, errata, live = await asyncio.gather(
+            phone, desktop, errata, live, navigator = await asyncio.gather(
                 quick_check(browser, url, [SIZES[0], SIZES[1]], None),
                 quick_check(browser, url, [SIZES[2]], None),
                 errata_widths(browser, url),
                 live_views(browser, url),
+                navigator_widths(browser, url),
             )
-            problems = phone[0] + desktop[0] + errata + live
+            problems = phone[0] + desktop[0] + errata + live + navigator
             # A section counts as passed only when both pages checked it.
             passed = {sel: h for sel, h in phone[1].items() if desktop[1].get(sel) == h}
         await browser.close()
