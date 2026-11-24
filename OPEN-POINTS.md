@@ -27,15 +27,7 @@ Clearance evidence: scratchpad clearance record of 2026-11-24, summarized in boo
 
 17. PDF page 78 caption of the part 1 video (fig-a10-13) is garbled: two overlapping caption lines merged ("הנספים לפני האסון הצסורותט…"). Fix in ingest or with a text fix.
 
-22. Possible errors in the printed text, found during translation; kept as printed in every edition. Decide whether the web edition marks them:
-   - a06-p022: "Leviticus 2:23" (the verse is 2:13).
-   - a06-p030: "3,300 years from Aristotle's time" (about 2,300).
-   - a10-p002 and a10-p012: one of the victims is "גבי" in p002 and "גדי" in p012.
-   - a10-p002: the Frying Pan camp "3,005 metres" (the base camp in a10 is at 3,600 m).
-   - a06-p027 and fn16: Blanckenhorn appointed by the Zionist Organization, while a07 says the Sultan funded his expedition.
-   - a31: the Arugot flood is on 2 May 2001 (a31-p006, a31-p007) and on 3 May (a31-p002, a31-p007).
-   - Lartet on the Lisan peninsula: 1869 in a34-p007, 1864 in a07-p021.
-   - Cross-references quote chapter titles that differ from the headings ("חזור למקום ממנו באת" against "חזור למדבר ממנו באת").
+22. Errors in the printed text: errata/ERRATA.md (67 entries, 2026-11-24). 22 verified corrections go into both editions with a visible edition note (EPUB/Kindle agent). Family decisions: a10-p012 victim's name "גדי" vs "גבי" (a10-p002 and the Israeli Mountain Guides wiki say גבי); a10-p020 the earlier rescue mission named as Turkey (in 1990 the recent one was Armenia, December 1988); the Alps trip year, 1981 (a09-p014) vs 1982 (a10-p037). 31 more for an editor, listed with evidence.
 23. Translations are machine translations, not reviewed by a person: he/a06, he/a36, en/a03, en/a10 (site/translations/). Translator notes and open questions: translations/eli-terms.md, translations/en-style.md, and the translation agent's report.
 
 24. Digitized charts (site/charts/, scripts/digitize_charts.py): values traced from the print, with stated accuracy. Checked 2026-11-24 in a browser: Nof, Abelson, Raz et al. 2019 has no data availability or supplementary section; its text (~6,000 total, ~700 new in 2015) matches the digitized series (5,940; 690). Exact yearly counts would need the Geological Survey of Israel sinkhole inventory. The density axis on PDF page 305 prints 170-174 "g/cm³". Published values from the same 1959-60 survey are about 1.19-1.205 (upper water) and 1.23 g/cm³ (lower water), a 40-unit step at x1000, but the chart steps about 3 units, so the printed quantity is not density x1000. Unit unresolved without Neev and Emery 1967 (GSI Bulletin 41); the chart keeps the printed numbers.
