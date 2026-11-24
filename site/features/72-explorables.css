@@ -68,7 +68,7 @@
 .xp-swatch-lake { background: var(--xp-lake); }
 .xp-swatch-sea { background: var(--xp-basin); }
 .xp-swatch-copper { background: var(--xp-copper); }
-.xp-swatch-scarp { background: repeating-linear-gradient(100deg, var(--ink) 0 1px, transparent 1px 4px), var(--xp-lake); }
+.xp-swatch-grid { background: linear-gradient(90deg, transparent 45%, color-mix(in srgb, var(--ink) 35%, transparent) 45% 55%, transparent 55%), linear-gradient(transparent 45%, color-mix(in srgb, var(--ink) 35%, transparent) 45% 55%, transparent 55%), var(--paper); }
 
 /* Handle: a 48 px touch target, moved only by transform. The page does not scroll while it is dragged. */
 .xp-handle {
