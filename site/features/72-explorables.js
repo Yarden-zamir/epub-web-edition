@@ -436,7 +436,8 @@ for (const figure of document.querySelectorAll("figure.has-explorable")) {
     const b = document.createElement("button");
     b.type = "button";
     b.textContent = text;
-    b.addEventListener("click", () => setView(explain));
+    // Scroll anchoring could move the page as the figure changes height: keep its top where it is (75-map-figures.js).
+    b.addEventListener("click", () => keepFigureTop(figure, () => setView(explain)));
     group.append(b);
     return b;
   };
@@ -455,7 +456,7 @@ for (const figure of document.querySelectorAll("figure.has-explorable")) {
     if (!entries[0].isIntersecting) return;
     observer.disconnect();
     setUp(figure, box)
-      .then(() => { ready = true; group.hidden = false; setView(true); })
+      .then(() => keepFigureTop(figure, () => { ready = true; group.hidden = false; setView(true); }))
       .catch((err) => { box.hidden = true; group.remove(); console.error(err); });
   }, { rootMargin: "400px" }).observe(figure);
 }
