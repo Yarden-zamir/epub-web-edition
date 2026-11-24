@@ -166,6 +166,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .book h2, .book .display-title { color: var(--ink); }
 .book .edition-note, .book .fx-label, .book .byline, .book figcaption .credit, .book figcaption .edition-credit, .book .source-note { color: var(--muted); }
 .book figcaption .edition-credit a { color: inherit; }
+.book .poem-title, .book .poem-author { color: var(--muted); } /* book.css colours them for print; dark mode needs tokens. */
 .book .byline { color: var(--muted); }
 
 .book blockquote.epigraph { margin: 2.5rem 0; padding: 0; padding-inline-start: 1.25rem; border: 0; border-inline-start: 2px solid var(--accent); color: var(--soft); font-size: 1.02em; }
