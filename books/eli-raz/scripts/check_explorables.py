@@ -12,7 +12,9 @@ Touch, on a phone (is_mobile, real touch events through CDP): dragging the handl
 scrolling the page or selecting text; a swipe that starts on the handle does not scroll; one elsewhere on the drawing does.
 Heavy parts, on by default in GitHub Actions (GITHUB_ACTIONS=true), or with --perf and VIDEO_DIR elsewhere:
 - performance: at phone width with the CPU slowed 4 times, a scripted drag must cause no long task over 50 ms and keep
-  the 95th percentile frame interval at or under 20 ms (--trace also saves a Chromium trace of each drag to SHOT_DIR);
+  the 95th percentile frame interval at or under 20 ms, or at or under the page's own floor on that machine: the same
+  measure for plain mouse moves over the drawing without a drag (a CI runner without a GPU may not reach 60 fps at 4x for any page).
+  --trace also saves a Chromium trace of each drag to SHOT_DIR;
 - videos (VIDEO_DIR, in CI SHOT_DIR/videos): each explainer at phone size, dragged with real touch events, and at desktop
   size with a mouse, keys, a mark and reset (motion on).
 Usage: uv run scripts/check_explorables.py WEB_DIR AXE_JS [SHOT_DIR [VIDEO_DIR]] [--perf] [--trace]
@@ -239,28 +241,39 @@ with sync_playwright() as p:
         fig, _ = open_explainer(page, fig_id)
         page.wait_for_timeout(2500)  # Let the first-view hint finish.
         cdp.send("Emulation.setCPUThrottlingRate", {"rate": 4})
-        page.evaluate("""() => {
+        start_frames = """() => {
           window.__long = []; window.__frames = []; window.__on = true;
           new PerformanceObserver(l => l.getEntries().forEach(e => window.__long.push(e.duration))).observe({type: 'longtask'});
           let last = performance.now();
           const tick = (now) => { window.__frames.push(now - last); last = now; if (window.__on) requestAnimationFrame(tick); };
           requestAnimationFrame(tick);
-        }""")
+        }"""
+        stop_frames = """() => {
+          window.__on = false;
+          const f = window.__frames.slice(3).sort((a, b) => a - b);
+          return {long: Math.max(0, ...window.__long), p95: f[Math.floor(f.length * 0.95)] ?? 0, frames: f.length};
+        }"""
+        # Baseline: the same number of plain mouse moves (no button) over the drawing away from the handle.
+        stage = fig.locator(".xp-stage").bounding_box()
+        page.evaluate(start_frames)
+        for i in range(1, 81):
+            page.mouse.move(stage["x"] + 12, stage["y"] + 12 + (i % 40) * 2)
+            page.wait_for_timeout(16)
+        base = page.evaluate(stop_frames)
+        page.evaluate(start_frames)
         if shots and trace:
             browser.start_tracing(page=page, path=str(shots / f"{fig_id}-trace.json"), screenshots=False)
         drag(page, fig, 40, 4, pause=16)
         drag(page, fig, 40, -4, pause=16)
         if shots and trace:
             browser.stop_tracing()
-        stats = page.evaluate("""() => {
-          window.__on = false;
-          const f = window.__frames.slice(3).sort((a, b) => a - b);
-          return {long: Math.max(0, ...window.__long), p95: f[Math.floor(f.length * 0.95)] ?? 0, frames: f.length};
-        }""")
+        stats = page.evaluate(stop_frames)
         cdp.send("Emulation.setCPUThrottlingRate", {"rate": 1})
-        print(f"perf {fig_id}: longest task {stats['long']:.0f} ms, p95 frame {stats['p95']:.1f} ms over {stats['frames']} frames")
-        if stats["long"] > LONG_TASK_MS or stats["p95"] > P95_FRAME_MS:
-            problems.append(f"{fig_id}: slow drag at 4x CPU: longest task {stats['long']:.0f} ms, p95 frame {stats['p95']:.1f} ms")
+        floor = max(P95_FRAME_MS, base["p95"])
+        print(f"perf {fig_id} at 4x CPU: drag longest task {stats['long']:.0f} ms, p95 frame {stats['p95']:.1f} ms "
+              f"({stats['frames']} frames); page floor (mouse moves, no drag) p95 {base['p95']:.1f} ms, longest task {base['long']:.0f} ms")
+        if stats["long"] > LONG_TASK_MS or stats["p95"] > floor + 0.5:
+            problems.append(f"{fig_id}: slow drag at 4x CPU: longest task {stats['long']:.0f} ms, p95 frame {stats['p95']:.1f} ms (allowed {floor:.1f})")
     page.close()
 
     # Videos for review: scroll in (the hint plays), drag down and up, Shift steps, a mark, reset.

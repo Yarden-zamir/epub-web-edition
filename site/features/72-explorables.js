@@ -14,10 +14,15 @@
 //     draw(ctx, value, env) -> summary string    draws one frame in drawing units
 //     handle(value) -> [x, y]                    where the drag handle sits
 //     drag(point, start) -> value               value for a pointer at point ({x, y} in drawing units)
+//     move?(value, env) -> summary string        moves overlay elements by transform and opacity only
+//     followsValue?: false                        the canvas does not change with the value (only move() does), so a
+//                                                 drag repaints nothing; the canvas redraws on resize, theme and motion
+//     resize?(env)                                redraws overlay canvases after a size or theme change
 //   }
 // }
 // env: unit (drawing units per CSS pixel), time (seconds, for slow motion), color(token), gradient(key, x0, y0, x1, y1, stops),
 //      layer(key, [x, y, w, h], draw) -> a bitmap of draw() for parts that never change (copy it with ctx.drawImage),
+//      overlay(tag, className) -> an element over the canvas (and under the handle), scale (CSS px per unit), view,
 //      label(ctx, text, x, y, options), figures(ctx, text, x, y, options) for a number with fixed-width digits.
 // All feature scripts share one scope (site/features/README.md): only explorableKit is global here.
 const explorableKit = (() => {
@@ -220,6 +225,13 @@ async function setUp(figure, box) {
     noteSlot.style.minWidth = `${widest((p) => (p.note ? `(${p.note})` : ""))}px`;
   }
   const env = makeEnv(box);
+  env.scale = 1;
+  env.view = kind.view;
+  env.overlay = (tag, className) => {
+    const e = el(tag, `xp-layer ${className}`);
+    stage.insertBefore(e, handle);
+    return e;
+  };
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error(`explorable ${figure.id}: no 2D canvas`);
   env.bind(ctx);
@@ -227,16 +239,20 @@ async function setUp(figure, box) {
   let value = c.start, summary = "", scale = 1, moving = false;
   let frame = 0, tween = 0, pending = c.start;
 
+  let canvasValue = NaN; // The value the canvas shows; NaN after a resize or theme change.
   function drawCanvas(v) {
     const dpr = devicePixelRatio || 1;
     env.time = performance.now() / 1000;
     ctx.setTransform(dpr * scale, 0, 0, dpr * scale, -vx * dpr * scale, -vy * dpr * scale);
     ctx.clearRect(vx, vy, vw, vh);
-    summary = scene.draw(ctx, v, env);
+    const text = scene.draw(ctx, v, env);
+    if (!scene.move) summary = text;
+    canvasValue = v;
   }
   function paint(v) {
     value = v;
-    drawCanvas(v);
+    if (scene.followsValue !== false || Number.isNaN(canvasValue)) drawCanvas(v);
+    if (scene.move) summary = scene.move(v, env);
     const [hx, hy] = scene.handle(v);
     handle.style.transform = `translate(${((hx - vx) * scale).toFixed(1)}px, ${((hy - vy) * scale).toFixed(1)}px)`;
     const parts = kind.valueParts(snap(v), spec);
@@ -332,9 +348,12 @@ async function setUp(figure, box) {
     const dpr = devicePixelRatio || 1;
     canvas.width = Math.round(width * dpr);
     canvas.height = Math.round(width * (vh / vw) * dpr);
+    env.scale = scale;
+    canvasValue = NaN;
+    scene.resize?.(env);
     show(value);
   }).observe(stage);
-  const retheme = () => { env.reset(); show(value); };
+  const retheme = () => { env.reset(); canvasValue = NaN; scene.resize?.(env); show(value); };
   // The canvas draws with the site font; draw again once it has loaded, or labels keep a fallback font.
   document.fonts.ready.then(retheme);
   document.fonts.addEventListener("loadingdone", retheme);

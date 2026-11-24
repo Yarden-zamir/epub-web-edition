@@ -27,7 +27,7 @@ function valueParts(km, spec) {
   return { num: number(km), unit: `${spec.control.unit} צפונה`, note: "" };
 }
 
-function create(spec) {
+function create(spec, env) {
   const L = spec.labels;
   const t = spec.texts;
   const { max } = spec.control;
@@ -81,28 +81,25 @@ function create(spec) {
     text.split("–").forEach((part, i, all) => env.label(ctx, i < all.length - 1 ? `${part}–` : part, x, y + i * 17));
   }
 
-  function draw(ctx, km, env) {
-    const u = env.unit;
-    // Fixed parts are cached bitmaps: the sea, the ripples, the west block, the whole east block and the labels.
-    // A frame copies them and moves two of them (ripples, east block); only the basin labels are drawn.
-    ctx.drawImage(env.layer("sea", [0, 0, W, H], (c) => {
-      c.fillStyle = env.gradient("sea", 0, 0, W, 0, [[0, "--xp-basin-light"], [1, "--xp-basin"]]);
-      c.fillRect(0, 0, W, H);
-    }), 0, 0, W, H);
-    const rippleBox = [-12, -4, W + 24, H + 8];
-    const rippleLayer = env.layer("ripples", rippleBox, (c) => {
-      c.strokeStyle = "rgb(255 255 255 / 0.16)";
-      c.lineWidth = 1;
-      c.stroke(ripples);
-    });
-    // Ripples drift slowly in the basins.
-    ctx.drawImage(rippleLayer, rippleBox[0] + (env.time * 3) % 12, rippleBox[1] + Math.sin(env.time * 0.8) * 2, rippleBox[2], rippleBox[3]);
-    ctx.drawImage(env.layer("west", [0, 0, W, H], (c) => {
-      plate(c, env, westShape, "west", "--xp-plate-a", "--xp-plate-a-deep");
-      ore(c, env, westShape);
-    }), 0, 0, W, H);
-    const eastBox = [0, -20, W, H + extra + 20];
-    ctx.drawImage(env.layer("east", eastBox, (c) => {
+  // The east block and the labels are canvases over the main canvas; basin names are HTML labels. A drag only moves
+  // them by transform and opacity, so it repaints nothing. The main canvas (sea, ripples, west block) redraws for the
+  // slow ripple motion only.
+  const eastBox = [0, -20, W, H + extra + 20];
+  const eastCanvas = env.overlay("canvas", "tf-east");
+  const topCanvas = env.overlay("canvas", "tf-top");
+  const tags = L.basins.map((name) => { const tag = env.overlay("span", "xp-tag"); tag.textContent = name; return tag; });
+
+  function paintOverlay(target, [x, y, w, h], drawFn) {
+    target.width = Math.ceil(w * env.pixel);
+    target.height = Math.ceil(h * env.pixel);
+    target.style.width = `${w * env.scale}px`;
+    target.style.height = `${h * env.scale}px`;
+    const c = target.getContext("2d");
+    c.setTransform(env.pixel, 0, 0, env.pixel, -x * env.pixel, -y * env.pixel);
+    drawFn(c);
+  }
+  function resize() {
+    paintOverlay(eastCanvas, eastBox, (c) => {
       c.lineJoin = "round";
       c.save();
       c.translate(3, 0);
@@ -119,8 +116,8 @@ function create(spec) {
       c.fill(arrow);
       lines(c, env, L.east_plate, 290, Y(250));
       env.label(c, L.feinan, COPPER.x + 30, Y(COPPER.km) + 4, { align: "left" });
-    }), eastBox[0], eastBox[1] - km * S, eastBox[2], eastBox[3]);
-    ctx.drawImage(env.layer("labels", [0, 0, W, H], (c) => {
+    });
+    paintOverlay(topCanvas, [0, 0, W, H], (c) => {
       c.lineJoin = "round";
       c.strokeStyle = env.color("--ink");
       c.lineWidth = 1.5;
@@ -129,23 +126,44 @@ function create(spec) {
       env.label(c, L.timna, COPPER.x - 26, Y(COPPER.km) + 4, { align: "right" });
       c.fillStyle = env.color("--ink");
       c.beginPath(); c.arc(faultX(EILAT_KM) - 5, Y(EILAT_KM), 3.5, 0, Math.PI * 2); c.fill();
-      if (u <= 1.3) env.label(c, L.eilat, faultX(EILAT_KM) - 12, Y(EILAT_KM) + 4, { align: "right" });
+      if (env.unit <= 1.3) env.label(c, L.eilat, faultX(EILAT_KM) - 12, Y(EILAT_KM) + 4, { align: "right" });
       env.label(c, `↑ ${L.north}`, 12, 18, { align: "left", size: 12, weight: 500, color: "--muted" });
-    }), 0, 0, W, H);
+    });
+  }
 
-    // One label per basin, west of it: it follows the basin's middle and fades in as the basin opens.
-    const open = [];
+  function draw(ctx, km, env) {
+    ctx.drawImage(env.layer("sea", [0, 0, W, H], (c) => {
+      c.fillStyle = env.gradient("sea", 0, 0, W, 0, [[0, "--xp-basin-light"], [1, "--xp-basin"]]);
+      c.fillRect(0, 0, W, H);
+    }), 0, 0, W, H);
+    const rippleBox = [-12, -4, W + 24, H + 8];
+    const rippleLayer = env.layer("ripples", rippleBox, (c) => {
+      c.strokeStyle = "rgb(255 255 255 / 0.16)";
+      c.lineWidth = 1;
+      c.stroke(ripples);
+    });
+    // Ripples drift slowly in the basins.
+    ctx.drawImage(rippleLayer, rippleBox[0] + (env.time * 3) % 12, rippleBox[1] + Math.sin(env.time * 0.8) * 2, rippleBox[2], rippleBox[3]);
+    ctx.drawImage(env.layer("west", [0, 0, W, H], (c) => {
+      plate(c, env, westShape, "west", "--xp-plate-a", "--xp-plate-a-deep");
+      ore(c, env, westShape);
+    }), 0, 0, W, H);
+    return "";
+  }
+
+  function move(km) {
+    const k = env.scale;
+    eastCanvas.style.transform = `translate(0, ${((eastBox[1] - km * S) * k).toFixed(2)}px)`;
+    // Each basin name sits west of its basin, right edge at x, and follows the basin's middle as it opens.
     const length = km - STEP;
+    const alpha = ramp(length, 6, 20).toFixed(3);
+    const open = [];
     SEGMENTS.slice(0, -1).forEach(([, stepKm], i) => {
-      const alpha = ramp(length, 6, 20);
-      if (alpha > 0.01) {
-        ctx.globalAlpha = alpha;
-        env.label(ctx, L.basins[i], SEGMENTS[i + 1][0] - 8, Y(stepKm + STEP + Math.max(0, length) / 2) + 4, { align: "right" });
-        ctx.globalAlpha = 1;
-      }
+      const x = (SEGMENTS[i + 1][0] - 8) * k, y = (Y(stepKm + STEP + Math.max(0, length) / 2) - 5) * k;
+      tags[i].style.transform = `translate(calc(${x.toFixed(1)}px - 100%), calc(${y.toFixed(1)}px - 50%))`;
+      tags[i].style.opacity = alpha;
       if (length > 0) open.push(L.basins[i]);
     });
-
     const shown = Math.round(km);
     if (shown === 0) return t.before;
     const apart = t.apart.replace("{km}", iso(number(shown)));
@@ -155,6 +173,9 @@ function create(spec) {
 
   return {
     draw,
+    move,
+    resize,
+    followsValue: false,
     handle: (km) => [290, Y(90) - km * S],
     drag: (point, start) => start.value + (start.point.y - point.y) / S,
   };
