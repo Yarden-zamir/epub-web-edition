@@ -49,6 +49,7 @@ XHTML = "http://www.w3.org/1999/xhtml"
 OPS = "http://www.idpf.org/2007/ops"
 XML = "http://www.w3.org/XML/1998/namespace"
 
+EPUB_ONLY = "epub-only"
 INDEXED_TAGS = {"p", "h1", "h2", "h3", "figure", "table", "li"}
 SEARCH_KIND = {"h1": "heading", "h2": "heading", "h3": "heading", "figure": "figure"}  # Others are "text".
 
@@ -160,6 +161,7 @@ class Converter:
         self.tags: dict[str, str] = {}  # Element ID -> tag name.
         self.tables: dict[str, dict] = {}  # Figure ID -> data table spec from the enhancements file.
         self.charts: dict[str, ET.Element] = {}  # Printed figure ID -> live chart figure placed after it.
+        self.skipped_docs: set[str] = set()  # Spine documents marked epub-only.
         self.links: list[tuple[str, str]] = []  # (source document, target ID) to check after all documents load.
         self.search: list[SearchEntry] = []
         self.bodies: list[tuple[Item, ET.Element]] = []
@@ -168,6 +170,8 @@ class Converter:
         self.kinds: list[str] = []  # Kind of each converted document (class of its top section), in spine order.
         self.chapter_of: dict[str, str] = {}  # Element ID -> ID of the top-level section that holds it.
         self.chapter_title: dict[str, str] = {}  # Top-level section ID -> its heading text, without a source-note mark.
+        self.byline: dict[str, tuple[str, str | None] | None] = {}  # Top-level section ID -> (byline text, lang).
+        self.kind_of: dict[str, str] = {}  # Top-level section ID -> its kind (class of the section).
         self.figure_img: dict[str, tuple[str, str]] = {}  # Figure ID -> (image path in the site, alt text).
 
     def load(self) -> None:
@@ -176,6 +180,17 @@ class Converter:
                 raise BookError(f"spine item {item.path} is {item.media_type}, expected XHTML")
             root = ET.fromstring(self.z.read(item.path))
             body = required(root.find(f"{{{XHTML}}}body"), f"body in {item.path}")
+            # Class "epub-only" marks content that the web edition replaces with its own feature.
+            top = next((el for el in body if local(el.tag) == "section"), None)
+            if top is not None and EPUB_ONLY in (top.get("class") or "").split():
+                self.skipped_docs.add(item.path)
+                continue
+            for parent in list(body.iter()):
+                for child in list(parent):
+                    if EPUB_ONLY in (child.get("class") or "").split():
+                        if (child.tail or "").strip():
+                            raise BookError(f"{item.path}: text follows epub-only element {child.get('id')!r}")
+                        parent.remove(child)
             for el in body.iter():
                 if (el_id := el.attrib.get("id")) is not None:
                     if el_id in self.ids:
@@ -187,11 +202,14 @@ class Converter:
                 raise BookError(f"{item.path} has no element with an id; deep links need one")
             self.bodies.append((item, body))
 
-    def resolve_href(self, doc: str, href: str) -> str:
+    def resolve_href(self, doc: str, href: str) -> str | None:
+        """In-page link for an EPUB href. None for a link into an epub-only document: the web shows its text only."""
         if not is_relative(href):
             return href
         path, _, fragment = href.partition("#")
         target_doc = posixpath.normpath(posixpath.join(posixpath.dirname(doc), unquote(path))) if path else doc
+        if target_doc in self.skipped_docs:
+            return None
         target = fragment or self.doc_anchor.get(target_doc, "")
         if not target:
             raise BookError(f"{doc}: link {href!r} points to a document outside the spine")
@@ -207,9 +225,8 @@ class Converter:
         chapter = top.get("id") if top is not None else None
         self.kinds.append(kind)
         if chapter and top is not None:
-            heading = next((h for h in top if local(h.tag) in ("h1", "h2", "h3")), None)
-            # A heading can end with a source-note asterisk and run on into a subtitle; keep the title part.
-            self.chapter_title[chapter] = clean_text(heading).split("*", 1)[0].strip() if heading is not None else ""
+            self.kind_of[chapter] = kind
+            self.chapter_title[chapter], self.byline[chapter] = title_and_byline(top, kind)
         for el in body.iter():
             el.tag = local(el.tag)
             attrs = dict(el.attrib)
@@ -223,7 +240,8 @@ class Converter:
                     case "src" if is_relative(value):
                         el.set("src", "book/" + posixpath.normpath(posixpath.join(posixpath.dirname(item.path), unquote(value))))
                     case "href":
-                        el.set("href", self.resolve_href(item.path, value))
+                        if (resolved := self.resolve_href(item.path, value)) is not None:
+                            el.set("href", resolved)
                     case _:
                         el.set(local(name), value)
             if el.tag == "img" and "cover" not in body.attrib.get("data-epub-type", ""):
@@ -295,20 +313,89 @@ def clean_text(el: ET.Element) -> str:
     return " ".join("".join(el.itertext()).split())
 
 
+def title_and_byline(top: ET.Element, kind: str) -> tuple[str, tuple[str, str | None] | None]:
+    """Heading text of a top-level section, and its first byline paragraph (text, lang) if it has one.
+    A part title continues in the display-title paragraphs right after its heading (print splits it in two)."""
+    children = list(top)
+    heading = next((c for c in children if local(c.tag) in ("h1", "h2", "h3")), None)
+    if heading is None:
+        return "", None
+    # A heading can end with a source-note asterisk and run on into a subtitle; keep the title part.
+    title = clean_text(heading).split("*", 1)[0].strip()
+    if kind == "part":
+        for el in children[children.index(heading) + 1:]:
+            if local(el.tag) == "p" and "display-title" in (el.get("class") or "").split():
+                title += " " + clean_text(el)
+            elif local(el.tag) != "span":  # Page markers sit between the lines.
+                break
+    byline = next((c for c in children if local(c.tag) == "p" and "byline" in (c.get("class") or "").split()), None)
+    lang = byline.get(f"{{{XML}}}lang", byline.get("lang")) if byline is not None else None
+    return title, ((clean_text(byline), lang) if byline is not None else None)
+
+
 def toc_html(z: zipfile.ZipFile, book: Book, conv: Converter) -> str:
-    """The EPUB toc nav as a plain list of in-page links."""
+    """The EPUB toc nav as a list of in-page links. Articles after a part sit inside that part; the title
+    comes from the chapter heading when the nav label is cut short, and the byline shows as the author."""
     nav_root = ET.fromstring(z.read(book.nav.path))
     toc = next(
         (n for n in nav_root.iter(f"{{{XHTML}}}nav") if n.attrib.get(f"{{{OPS}}}type") == "toc"),
         None,
     )
     toc = required(toc, "toc nav")
-    lines = ["<ol>"]
+
+    def item(chapter: str, label: str) -> str:
+        byline = conv.byline.get(chapter)
+        author = ""
+        if byline:
+            lang = f' lang="{html.escape(byline[1])}"' if byline[1] else ""
+            author = f'<span class="toc-author"{lang}>{html.escape(byline[0])}</span>'
+        return (f'<li class="toc-item" data-chapter="{html.escape(chapter)}"><a href="#{html.escape(chapter)}">'
+                f'<span class="toc-name">{html.escape(label)}</span>{author}</a></li>')
+
+    lines, in_part = ['<ol class="toc">'], False
     for a in toc.iter(f"{{{XHTML}}}a"):
-        href = conv.resolve_href(book.nav.path, a.attrib["href"])
-        lines.append(f'<li><a href="{html.escape(href)}">{html.escape(clean_text(a))}</a></li>')
-    lines.append("</ol>")
-    return "\n".join(lines)
+        if (href := conv.resolve_href(book.nav.path, a.attrib["href"])) is None:
+            continue  # An epub-only document.
+        target = href[1:]
+        chapter = conv.chapter_of.get(target, target)
+        kind = conv.kind_of.get(chapter, "")
+        label = conv.chapter_title.get(chapter) or clean_text(a)
+        if kind == "part":
+            lines.append("</ol></li>" if in_part else "")
+            lines.append(f'<li class="toc-part" data-chapter="{html.escape(chapter)}">'
+                         f'<a class="toc-part-title" href="#{html.escape(chapter)}">{html.escape(label)}</a><ol>')
+            in_part = True
+            continue
+        if in_part and kind != "article":
+            lines.append("</ol></li>")
+            in_part = False
+        lines.append(item(chapter, label))
+    lines.append("</ol></li></ol>" if in_part else "</ol>")
+    return "\n".join(line for line in lines if line)
+
+
+def timeline_html(data_dir: Path | None, conv: Converter) -> tuple[str, str]:
+    """Tab button and panel for timeline.json: {"events": [{date, label, text, quote, target, major,
+    date_source?}]}. Each event links to its quoted paragraph. Empty strings when the file is absent."""
+    path = data_dir / "timeline.json" if data_dir else None
+    if path is None or not path.is_file():
+        return "", ""
+    events = json.loads(path.read_text(encoding="utf-8"))["events"]
+    items = []
+    for i, ev in enumerate(events):
+        for ref in (ev["target"], ev.get("date_source", ev["target"])):
+            if ref not in conv.ids:
+                raise BookError(f"timeline.json: event {i} ({ev['label']}): {ref!r} is not an ID in the EPUB")
+        if not isinstance(ev["major"], bool):
+            raise BookError(f"timeline.json: event {i}: major must be true or false")
+        cls = "tl-event tl-major" if ev["major"] else "tl-event"
+        items.append(f'<li class="{cls}"><a href="#{html.escape(ev["target"])}">'
+                     f'<span class="tl-date">{html.escape(ev["label"])}</span>'
+                     f'<span class="tl-text">{html.escape(ev["text"])}</span></a></li>')
+    tab = '<button type="button" role="tab" id="tab-timeline" aria-selected="false" aria-controls="toc-timeline" tabindex="-1">ציר זמן</button>'
+    panel = (f'<div id="toc-timeline" class="panel-body" role="tabpanel" aria-labelledby="tab-timeline" hidden>'
+             f'<ol class="timeline">{"".join(items)}</ol></div>')
+    return tab, panel
 
 
 def leading_number(cell: str) -> float | None:
@@ -545,15 +632,19 @@ def places_html(data_dir: Path | None, conv: "Converter", thumbs: Thumbs) -> str
         for ref in [*place["targets"], place["description_source"]]:
             if ref not in conv.ids:
                 raise BookError(f"{where}: {ref!r} is not an ID in the EPUB")
+        if not isinstance(place.get("far", False), bool):
+            raise BookError(f"{where}: far must be true or false")
         if not place["targets"]:
             raise BookError(f"{where}: needs at least one target")
         for fig in place["figures"]:
             if fig not in conv.figure_img:
                 raise BookError(f"{where}: {fig!r} is not a figure with an image")
-        chapters = [{"href": f"#{t}", "chapter": conv.chapter_of[t], "title": conv.chapter_title[conv.chapter_of[t]]}
-                    for t in place["targets"]]
+        first_target: dict[str, str] = {}  # Chapter ID -> the place's first target in it, in file order.
+        for t in place["targets"]:
+            first_target.setdefault(conv.chapter_of[t], t)
+        chapters = [{"href": f"#{t}", "chapter": c, "title": conv.chapter_title[c]} for c, t in first_target.items()]
         points.append({
-            "id": pid, "n": n, "name": name, "lat": lat, "lon": lon,
+            "id": pid, "n": n, "name": name, "lat": lat, "lon": lon, "far": place.get("far", False),
             "wikidata": f"https://www.wikidata.org/wiki/{place['wikidata']}",
             "description": place["description"], "source": f"#{place['description_source']}",
             "chapters": chapters,
@@ -631,6 +722,7 @@ def build(epub: Path, out: Path, enhancements_file: Path | None = SITE / "enhanc
         at = conv.kinds.index("contents") + 1 if "contents" in conv.kinds else 0
         docs.insert(at, places_html(data_dir, conv, thumbs))
         toc = toc_html(z, book, conv)
+        timeline = timeline_html(data_dir, conv)
         conv.check_links()
     css = next(p for p in assets if p.endswith(".css"))
     # The Kindle download is the canonical EPUB itself. Send to Kindle accepts EPUB.
@@ -651,6 +743,8 @@ def build(epub: Path, out: Path, enhancements_file: Path | None = SITE / "enhanc
             "book_id": html.escape(book.identifier),
             "book_css": html.escape(f"book/{css}"),
             "toc": toc,
+            "timeline_tab": timeline[0],
+            "timeline": timeline[1],
             "font_preload": "\n".join(
                 f'<link rel="preload" href="{html.escape("book/" + i.path)}" as="font" type="{i.media_type}" crossorigin>'
                 for i in sorted(book.items.values(), key=lambda i: i.path)

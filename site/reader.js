@@ -56,8 +56,12 @@ sendMenu.addEventListener("toggle", (e) => {
 });
 
 // Dialogs
+const onDialogOpen = {}; // Dialog ID -> function run right after it opens.
 for (const button of document.querySelectorAll("[data-open]:not([data-open='search-dialog'])")) {
-  button.addEventListener("click", () => byId(button.dataset.open).showModal());
+  button.addEventListener("click", () => {
+    byId(button.dataset.open).showModal();
+    onDialogOpen[button.dataset.open]?.();
+  });
 }
 for (const dialog of document.querySelectorAll("dialog")) {
   dialog.addEventListener("click", (e) => {
@@ -71,6 +75,65 @@ byId("toc-dialog").addEventListener("click", (e) => {
   byId("toc-dialog").close();
   goTo(link.getAttribute("href").slice(1));
 });
+
+// Navigator: chapters (with a filter) and, when the book has one, a timeline tab.
+const tocDialog = byId("toc-dialog");
+const tabs = [...tocDialog.querySelectorAll("[role='tab']")];
+function selectTab(tab) {
+  for (const t of tabs) {
+    const on = t === tab;
+    t.setAttribute("aria-selected", String(on));
+    t.tabIndex = on ? 0 : -1;
+    byId(t.getAttribute("aria-controls")).hidden = !on;
+  }
+}
+for (const tab of tabs) {
+  tab.addEventListener("click", () => selectTab(tab));
+  tab.addEventListener("keydown", (e) => {
+    const step = { ArrowLeft: 1, ArrowRight: -1 }[e.key]; // Right to left: the next tab is on the left.
+    if (!step) return;
+    const next = tabs[(tabs.indexOf(tab) + (document.dir === "rtl" ? step : -step) + tabs.length) % tabs.length];
+    selectTab(next);
+    next.focus();
+  });
+}
+const tocFilter = byId("toc-filter");
+byId("toc-filter-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  tocDialog.querySelector(".toc-item:not([hidden]) a")?.click();
+});
+tocFilter.addEventListener("input", () => {
+  const words = tokenize(tocFilter.value).map((t) => t.word);
+  const matches = (el) => {
+    const text = tokenize(el.textContent).map((t) => t.word).join(" ");
+    return words.every((w) => text.includes(w));
+  };
+  let shown = 0;
+  for (const part of tocDialog.querySelectorAll(".toc-part")) part.hidden = false;
+  for (const item of tocDialog.querySelectorAll(".toc-item")) {
+    const part = item.closest(".toc-part");
+    item.hidden = !(matches(item) || (part && matches(part.querySelector(".toc-part-title"))));
+    if (!item.hidden) shown++;
+  }
+  for (const part of tocDialog.querySelectorAll(".toc-part")) {
+    part.hidden = !part.querySelector(".toc-item:not([hidden])") && !matches(part.querySelector(".toc-part-title"));
+  }
+  byId("toc-empty").hidden = shown > 0;
+});
+onDialogOpen["toc-dialog"] = () => {
+  // The current chapter: the last top-level section that starts above a third of the screen.
+  let current = null;
+  for (const section of reading.querySelectorAll(".doc > section[id]")) {
+    if (section.getBoundingClientRect().top < innerHeight / 3) current = section.id;
+    else break;
+  }
+  for (const link of tocDialog.querySelectorAll("[aria-current]")) link.removeAttribute("aria-current");
+  const link = current && tocDialog.querySelector(`[data-chapter="${CSS.escape(current)}"] > a`);
+  if (link) {
+    link.setAttribute("aria-current", "location");
+    if (tabs[0].getAttribute("aria-selected") === "true") link.scrollIntoView({ block: "center" });
+  }
+};
 
 // Deep links on chapter headings and figures
 for (const target of reading.querySelectorAll("section[id] > h2, figure[id] > figcaption")) {
@@ -558,16 +621,37 @@ if (placesMap) {
       const icon = L.divIcon({ className: "", iconSize: [24, 24], iconAnchor: [12, 12], popupAnchor: [0, -12],
         html: `<div class="place-marker" style="--place: var(--place-${p.n}); --ink: var(--place-ink-${p.n}); width: 24px; height: 24px">${p.n}</div>` });
       const marker = L.marker([p.lat, p.lon], { icon, title: p.name, alt: p.name, riseOnHover: true })
-        .bindPopup(() => placePopup(p, map), { maxWidth: 300 })
+        .bindPopup(() => placePopup(p, map), { maxWidth: Math.min(300, placesMap.clientWidth - 80), autoPanPadding: [16, 16] })
         .bindTooltip(p.name, { direction: "top", offset: [0, -12] })
         .addTo(map);
       markers.set(p.id, marker);
     }
-    // Fit the first view to the places near the median, so one far place (a mountain abroad) does not shrink the rest.
-    const median = (values) => values.toSorted((a, b) => a - b)[Math.floor(values.length / 2)];
-    const middle = L.latLng(median(places.map((p) => p.lat)), median(places.map((p) => p.lon)));
-    const near = places.filter((p) => middle.distanceTo([p.lat, p.lon]) < 120_000);
-    map.fitBounds(L.latLngBounds(near.map((p) => [p.lat, p.lon])).pad(0.08));
+    // The first view holds the places near the book's region; a place marked "far" (abroad) gets a chip that flies there.
+    const home = L.latLngBounds(places.filter((p) => !p.far).map((p) => [p.lat, p.lon])).pad(0.08);
+    map.fitBounds(home);
+    const far = places.filter((p) => p.far);
+    if (far.length) {
+      const Far = L.Control.extend({ options: { position: "bottomleft" }, onAdd() {
+        const box = L.DomUtil.create("div", "map-chips");
+        L.DomEvent.disableClickPropagation(box);
+        const back = document.createElement("button");
+        back.type = "button";
+        back.textContent = "חזרה לתצוגה הראשונה";
+        back.hidden = true;
+        back.addEventListener("click", () => { map.fitBounds(home); back.hidden = true; });
+        for (const p of far) {
+          const chip = document.createElement("button");
+          chip.type = "button";
+          chip.style.setProperty("--place", `var(--place-${p.n})`);
+          chip.append(document.createElement("i"), `רחוק מכאן: ${p.name}`);
+          chip.addEventListener("click", () => { map.setView([p.lat, p.lon], 9); markers.get(p.id).openPopup(); back.hidden = false; });
+          box.append(chip);
+        }
+        box.append(back);
+        return box;
+      } });
+      new Far().addTo(map);
+    }
     return { map, markers };
   });
   placesReady.catch((err) => { placesMap.hidden = true; console.error(err); });
@@ -600,6 +684,19 @@ for (const p of places) for (const c of p.chapters) {
   if (!placesByChapter.get(c.chapter).includes(p)) placesByChapter.get(c.chapter).push(p);
 }
 for (const [chapter, list] of placesByChapter) {
+  const item = tocDialog.querySelector(`.toc-item[data-chapter="${CSS.escape(chapter)}"] > a`);
+  if (item) {
+    const dots = document.createElement("span");
+    dots.className = "toc-places";
+    dots.title = list.map((p) => p.name).join(", ");
+    dots.setAttribute("aria-hidden", "true");
+    for (const p of list) {
+      const dot = document.createElement("i");
+      dot.style.setProperty("--place", `var(--place-${p.n})`);
+      dots.append(dot);
+    }
+    item.append(dots);
+  }
   for (const link of reading.querySelectorAll(`ol.contents a[href="#${CSS.escape(chapter)}"]`)) {
     const li = link.closest("li");
     const dots = document.createElement("button");
