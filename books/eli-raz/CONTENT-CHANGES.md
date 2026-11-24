@@ -12,6 +12,8 @@ Add an entry in the same change that makes it. Newest first within each section.
 
 | Where | Change | Why |
 |---|---|---|
+| Part titles s01-s03, chapter a29, the cover subtitle; chapters a10 and a31 (PDF pages 65, 245) | A title printed on two lines is one heading (part titles keep the printed line break). In a10 and a31 the smaller subtitle under the title is its own subtitle paragraph (a10-p054 is new), and the source-note star stays a note mark where print sets it. Old IDs of the second lines: id-moves.csv | Design review items 13 and 14; the page review (PDF pages 17, 51, 233) |
+| PDF page 183 (release) | The box of the withheld image shows its edition note inside it as text, instead of an empty box with the note only for screen readers | Design review item 3 |
 | Chapters a10, a11, a13-a18, a21, a22, a27, a30, a31, a34-a36 | Section subheadings (bold, a rule above in print) are headings (h3) instead of author lines; a line-end hyphen or maqaf inside a word joins without a space ("קלעת-סלע", "Long-Term") | Page review 2026-11-24 (inventory/pages.csv) |
 | PDF pages 136, 141, 166, 173, 278, 280, 282, 285, 292, 303, 304, 305, 309, 311 | 14 text fixes of run and bracket order, number order and split numbers, for example "(Calo, 2011; Oren, 2008)", "בשנים 1964, 1980", entry "10.", "Ionescu" | Page review; each checked against a clip of the printed line |
 | PDF pages 20, 31, 78, 118, 120, 151, 157, 159, 183, 267, 293 | Figures printed side by side in one row (tops in line) follow the page direction: right to left on Hebrew pages (for example the four QR codes on page 78: the victims' film first, then parts 1, 2, 3), left to right on English pages. Figure IDs do not change | Found in the page review: the EPUB listed row figures left to right. |

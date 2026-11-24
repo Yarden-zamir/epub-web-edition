@@ -19,8 +19,9 @@ body {
   widows: 2;
   orphans: 2;
 }
-/* English text: Times New Roman, as in print. */
-[lang="en"] { font-family: "Times New Roman", "Times", "Liberation Serif", serif; text-align: left; }
+/* English text: a sans that sits well with the Hebrew sans. The bundled Noto Sans Hebrew has no Latin letters, so the
+   stack names Latin sans fonts that e-readers carry (Kindle: Amazon Ember, Helvetica). Print sets English in Times. */
+[lang="en"] { font-family: "Noto Sans", "Amazon Ember", "Helvetica Neue", "Helvetica", "Arial", sans-serif; text-align: left; }
 
 /* Titles: Extrim, light grey display (print: Extrim 24-41 pt, colour #6d6e71). */
 h1, h2, h3, .display-title, .byline {
@@ -78,7 +79,9 @@ figure.facsimile img { max-width: 100%; max-height: 92vh; width: auto; height: a
 
 /* Release edition: edition credits and notes after the printed caption, and the box of a withheld image. */
 figcaption .edition-credit, figcaption .edition-note { display: block; font-size: 0.88em; color: #555659; margin-top: 0.3em; }
-figure .withheld { margin: 0 auto; max-width: 22em; height: 7em; border: 1px dashed #8b8478; background: #f1eee8; }
+/* The box of a withheld image holds its edition note as visible text. No fixed colours: dark readers and the web footer. */
+figure .withheld { margin: 0 auto; max-width: 22em; padding: 1.5em 1em; border: 1px dashed #8b8478; }
+figure .withheld p.withheld-note { margin: 0; font-size: 0.85em; text-align: center; }
 .fx-mask-note { text-align: center; font-size: 0.8em; margin: 0.3em 0; }
 
 /* Poems (book.toml [[poem]]): one line per printed line, stanzas as printed. No indent; title and author smaller than a chapter title. */

@@ -2,7 +2,10 @@
 <img src="../images/p065-x247.jpeg" width="1009" height="476" alt="A line of small climbers crosses a wide snow slope."/>
 
 ## a10-h
-The Pamir Disaster – the Worst in the History of Mountaineering: The Role and Contribution of the Israeli Team in the Search for the Missing<a epub:type="noteref" role="doc-noteref" id="a10-src1-ref" href="#a10-src1">*</a>
+The Pamir Disaster – the Worst in the History of Mountaineering
+
+## a10-p054
+The Role and Contribution of the Israeli Team in the Search for the Missing<a epub:type="noteref" role="doc-noteref" id="a10-src1-ref" href="#a10-src1">*</a>
 
 ## a10-p001
 Eli Raz

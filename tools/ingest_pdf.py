@@ -53,7 +53,7 @@ PIPELINE = Path(__file__).resolve().parent.parent
 FONT_DIR = PIPELINE / "epub-src" / "OEBPS" / "fonts"
 BOOK_CSS = PIPELINE / "epub-src" / "OEBPS" / "css" / "book.css"
 
-type Role = Literal["body", "display", "title", "byline", "subheading", "small", "caption", "footnote"]
+type Role = Literal["body", "display", "title", "subtitle", "byline", "subheading", "small", "caption", "footnote"]
 # "small": small print. attach_captions() turns it into "caption" (next to an image) or "footnote" (low on the page).
 type UnitKind = Literal["cover", "blank", "titlepage", "contents", "frontispiece", "article", "part",
                        "bibliography", "backcover", "end"]
@@ -1033,8 +1033,11 @@ class Ingest:
                 continue
             gap = cur.y0 - prev.y1
             # Lines of one paragraph can overlap a little: a tall glyph ("=" on PDF page 264) raises a line box.
-            overlap = 4 if cur.role == "body" else 2
-            if cur.role != prev.role or gap > max(cur.y1 - cur.y0, 6) * 0.9 or gap < -overlap:
+            # Display lines overlap more: the two lines of a 41 pt part title overlap by 7 pt (PDF page 17).
+            overlap = 4 if cur.role == "body" else max(2.0, 0.2 * cur.size)
+            # A change of type size starts a new unit: a 19 pt subtitle under a 30 pt title (PDF page 245).
+            resized = cur.role != "body" and abs(cur.size - prev.size) > 0.15 * max(cur.size, prev.size)
+            if cur.role != prev.role or resized or gap > max(cur.y1 - cur.y0, 6) * 0.9 or gap < -overlap:
                 paras.append([cur])
                 continue
             # The column edge near these lines: a figure beside the text narrows the column locally.
@@ -1059,6 +1062,8 @@ class Ingest:
             if cur.role in ("footnote", "caption", "small"):
                 # Notes and sources use hanging indents: only a leading number starts a new entry.
                 starts = cur.text.split(" ", 1)[0].rstrip(".").isdigit()
+            if cur.role in ("title", "display"):
+                starts = prev_short = False  # Title lines are ragged by design; only space and type size split them.
             if cur.role == "body" and has_list_label(cur.text):
                 starts = True  # A list item.
             if cur.role == "body" and gap >= float(self.layout["paragraph_gap"]):
@@ -1315,7 +1320,9 @@ class Ingest:
         if src_ids:
             sid = src_ids[0]
             for i, part in enumerate(out):
-                if (part.startswith("<h2") or 'class="display-title"' in part.split(">", 1)[0]) and "*" in part:
+                head_tag = part.split(">", 1)[0]
+                # The star of a source note ends the title, or the subtitle under it (a10).
+                if (part.startswith("<h2") or 'class="display-title"' in head_tag or 'class="subheading"' in head_tag) and "*" in part:
                     tag_end = part.index(">") + 1
                     body = part[tag_end:]
                     out[i] = part[:tag_end] + body.replace(
@@ -1567,6 +1574,7 @@ class Ingest:
         prev_note_y = -1e9
         parts: list[str] = []
         heading: str | None = None
+        heading_size = 0.0
         page_ids: dict[int, list[str]] = {}
         open_para: str | None = None  # ID of the previous page's last body paragraph when its last line is full.
         for pno in unit.pages:
@@ -1595,9 +1603,15 @@ class Ingest:
                 attrs = "" if first.rtl else ' lang="en" dir="ltr"'
                 if role in ("title", "display") and heading is None and unit.kind in ("article", "part"):
                     heading = " ".join(ln.text for ln in para)
+                    heading_size = first.size
+                    if role == "display" and len(para) > 1:
+                        # A part title set on two lines is a designed break; keep it as one heading with a break.
+                        text = "<br/> ".join(ln.html for ln in para)  # The space keeps the words apart in plain text.
                     flow.append((first.y0, f'<h2 id="{unit.id}-h"{attrs}>{text}</h2>'))
                     ids.append(f"{unit.id}-h")
                     continue
+                if role in ("title", "display") and heading is not None and first.size < 0.8 * heading_size:
+                    role = "subtitle"  # Smaller title type under the heading: the chapter subtitle.
                 if role == "footnote" and unit.kind != "bibliography":
                     plain = " ".join(ln.text for ln in para)
                     head = plain.split(" ", 1)[0]
@@ -1628,7 +1642,7 @@ class Ingest:
                 pid = self.ids.assign(unit.id, " ".join(ln.text for ln in para))
                 tag = {"title": "p", "display": "p"}.get(role, "p")
                 cls = {"title": "display-title", "display": "display-title", "byline": "byline",
-                       "subheading": "subheading", "caption": "small"}.get(role)
+                       "subheading": "subheading", "subtitle": "subheading", "caption": "small"}.get(role)
                 if role == "byline":
                     # The first byline of a unit is the author. A later line in the byline font is a section subheading
                     # (bold, a rule above in print) once the text has begun, or when it is short ("מבוא"), unless it
@@ -1668,13 +1682,14 @@ class Ingest:
                 if fig.change:
                     self.used_alt.update(k for k in alts if k.startswith(base + "-"))
                     alt = fig.change.alt or ""
-                    caption = with_edition_span(caption, "edition-note", ltr_runs(fig.change.note))
+                    if fig.change.action == "replace":  # A withheld image shows its note inside its box instead.
+                        caption = with_edition_span(caption, "edition-note", ltr_runs(fig.change.note))
                 elif credit := self.credits.get(base):
                     self.release_used.add(base)
                     caption = with_edition_span(caption, "edition-credit", credit_html(credit))
                 img = f'<img src="../images/{fig.file}" width="{fig.width}" height="{fig.height}" alt="{html.escape(alt or "")}"/>'
                 if fig.change and fig.change.action == "withhold":
-                    img = '<div class="withheld" role="img" aria-label="' + html.escape(fig.change.note) + '"></div>'
+                    img = f'<div class="withheld"><p class="withheld-note">{ltr_runs(fig.change.note)}</p></div>'
                 link = self.cfg.get("qr_links", {}).get(stem)
                 if link:
                     img = f'<a href="{html.escape(link)}" class="qr-link">{img}</a>'
@@ -1906,7 +1921,8 @@ class Ingest:
         texts: dict[str, str] = {}
         for f in (self.out / "OEBPS" / "text").glob("*.xhtml"):
             for el in ET.parse(f).getroot().iter():
-                if (el_id := el.get("id")) and el_id.rsplit("-p", 1)[-1].isdigit():
+                # Text elements only (a paragraph can join a heading, as a part title line does); not sections.
+                if (el_id := el.get("id")) and el.tag.rsplit("}", 1)[-1] in ("p", "h2", "h3", "span", "li", "td", "th", "aside"):
                     texts[el_id] = squash("".join(el.itertext()))
         moves, lost = [], []
         into_table = {old: t["id"] for t in self.cfg.get("text_table", []) for old in t.get("replaces", [])}
@@ -1917,6 +1933,10 @@ class Ingest:
                 moves.append({"old_id": old_id, "new_id": into_table[old_id]})
                 continue
             home = [i for i, t in texts.items() if key in t]
+            if len(home) > 1:  # A short key ("בימיקדם") occurs in other chapters too: keep the old ID's own unit.
+                home = [i for i in home if i.startswith(old_id.rsplit("-p", 1)[0] + "-")]
+            if len(home) > 1 and any(i.endswith("-h") for i in home):
+                home = [i for i in home if i.endswith("-h")]  # A title line that joined its heading ("לאליהוא").
             if len(home) != 1:
                 lost.append(f"{old_id} {key!r} -> {home or 'no paragraph'}")
                 continue

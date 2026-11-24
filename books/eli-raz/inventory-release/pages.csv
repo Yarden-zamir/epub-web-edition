@@ -1,5 +1,5 @@
 page,printed,unit,kind,target_ids,status,notes
-1,i,cover,cover,cover-p001 cover-p002 cover-p003 cover-p004 cover-p005 fig-cover-01,verified,page review 2026-11-24 (sheet: print vs EPUB)
+1,i,cover,cover,cover-p001 cover-p002 cover-p003 cover-p005 fig-cover-01,verified,page review 2026-11-24 (sheet: print vs EPUB)
 2,ii,blank-front,blank,,verified,page review 2026-11-24 (sheet: print vs EPUB); Blank page; EPUB side empty.
 3,iii,blank-front,blank,,verified,page review 2026-11-24 (sheet: print vs EPUB); Blank page; EPUB side empty.
 4,iv,blank-front,blank,,verified,page review 2026-11-24 (sheet: print vs EPUB); Blank page; EPUB side empty.
@@ -15,7 +15,7 @@ page,printed,unit,kind,target_ids,status,notes
 14,10,a03,article,a03-p007 fig-a03-02 a03-p006,verified,page review 2026-11-24 (sheet: print vs EPUB)
 15,11,a04,article,a04-h a04-p001 a04-p002 a04-p003 a04-p004 a04-p005 fig-a04-01,verified,page review 2026-11-24 (sheet: print vs EPUB)
 16,12,a04,article,a04-p006 a04-p007 a04-p008 a04-p009 a04-p010,verified,page review 2026-11-24 (sheet: print vs EPUB)
-17,13,s01,part,s01-h s01-p001 fig-s01-01,issue,"page review 2026-11-24: Part title 'ים המוות - האמנם?' is split: h2 holds only 'ים המוות -' and 'האמנם?' is a separate p.display-title, so the heading (and navigation) text is incomplete. Same pattern in s02 and s03."
+17,13,s01,part,s01-h fig-s01-01,issue,"page review 2026-11-24: Part title 'ים המוות - האמנם?' is split: h2 holds only 'ים המוות -' and 'האמנם?' is a separate p.display-title, so the heading (and navigation) text is incomplete. Same pattern in s02 and s03."
 18,14,s01,part,fig-s01-02,verified,page review 2026-11-24 (sheet: print vs EPUB); Full-page photo present.
 19,15,a05,article,a05-h a05-p001 a05-p002 a05-p003 a05-p004 fig-a05-01,verified,page review 2026-11-24 (sheet: print vs EPUB)
 20,16,a05,article,a05-p005 a05-p006 fig-a05-02 fig-a05-03 fig-a05-04 fig-a05-05 fig-a05-06 a05-p004,verified,"page review 2026-11-24 (sheet: print vs EPUB); All 5 collage photos present (duplicate layer omitted as known). Credit 'צילום: אייל סגל' is attached as figcaption of the last photo only, though in print it credits the collage; acceptable."
@@ -49,13 +49,13 @@ page,printed,unit,kind,target_ids,status,notes
 48,44,a07,article,a07-p023 a07-p024 a07-p025 a07-p026 a07-p027 a07-p028 a07-p029,verified,"page review 2026-11-24 (sheet: print vs EPUB); Citations '(1936; Elazari-Volcani, B)' and '(1981; Steinhorn, ...)' match the print's logical order."
 49,45,a07,article,fig-a07-09 a07-p029,verified,page review 2026-11-24 (sheet: print vs EPUB); Known edition credit present.
 50,46,a07,article,a07-p030 a07-p034 a07-p031 a07-p032 a07-p035 a07-p033 a07-p036 a07-p037,verified,"page review 2026-11-24 (sheet: print vs EPUB); Poem lines match. Aside (print, not conversion): poem author is printed 'גלית חזן-רוקם' here but 'גלית חזן-רוקח' in the thanks on PDF page 10."
-51,47,s02,part,s02-h s02-p001 fig-s02-01,issue,"page review 2026-11-24: Part title 'טיפוס ונפילה, איתור וחילוץ' is split: h2 holds only 'טיפוס ונפילה,' and 'איתור וחילוץ' is a separate p.display-title (heading and navigation text incomplete). Same pattern as s01 (PDF 17) and s03."
+51,47,s02,part,s02-h fig-s02-01,issue,"page review 2026-11-24: Part title 'טיפוס ונפילה, איתור וחילוץ' is split: h2 holds only 'טיפוס ונפילה,' and 'איתור וחילוץ' is a separate p.display-title (heading and navigation text incomplete). Same pattern as s01 (PDF 17) and s03."
 52,48,s02,part,fig-s02-02,verified,page review 2026-11-24 (sheet: print vs EPUB); Full-page photo present.
 53,49,a08,article,a08-h a08-p001 a08-p002 a08-p003 a08-p004 a08-p005 fig-a08-01,verified,page review 2026-11-24 (sheet: print vs EPUB)
 54,50,a08,article,a08-p006 a08-p007 a08-p008,verified,page review 2026-11-24 (sheet: print vs EPUB)
 55,51,a08,article,a08-p009 a08-p010 a08-p011,verified,page review 2026-11-24 (sheet: print vs EPUB)
 56,52,a08,article,fig-a08-02,verified,page review 2026-11-24 (sheet: print vs EPUB); Full-page photo present.
-57,53,a09,article,a09-h a09-p001 a09-p002 a09-p003 a09-p004 fig-a09-01,issue,"page review 2026-11-24: Minor: printed title and subtitle ('""חזור למדבר ממנו באת""' large, 'טיפוס מוואדי רושמיה אל מרומי האלפים' smaller on its own line) are merged into one h2 with no separator."
+57,53,a09,article,a09-h a09-p045 a09-p001 a09-p002 a09-p003 a09-p004 fig-a09-01,issue,"page review 2026-11-24: Minor: printed title and subtitle ('""חזור למדבר ממנו באת""' large, 'טיפוס מוואדי רושמיה אל מרומי האלפים' smaller on its own line) are merged into one h2 with no separator."
 58,54,a09,article,a09-p005 a09-p006 a09-p007 a09-p008,issue,page review 2026-11-24: Sidebar box 'על ה'סנפלינג'' (printed in a shaded box with a title bar) is not set apart: its title 'על ה'סנפלינג'' is a plain body paragraph (no heading/subheading role) and the box text is a plain paragraph in the main flow.; after review: subheadings now h3.section-title
 59,55,a09,article,a09-p009 a09-p010 a09-p011 a09-p012 a09-p013 a09-p014,verified,"page review 2026-11-24 (sheet: print vs EPUB); '(, The British Mountaineering Council BMC)' matches the print's own logical order (print shows ',(' before the English at line end). Print glitch, not conversion; candidate for an edition correction to '(The British Mountaineering Council, BMC)'."
 60,56,a09,article,a09-p015 a09-p016 a09-p017 a09-p018 a09-p019 fig-a09-02 a09-p014,issue,"page review 2026-11-24: Sidebar box 'טיפוס צוקים בסגנון קלאסי': its single paragraph is split mid-sentence around the photo ('...תיתכן נפילה חופשית' | photo | 'של המוביל, ששיעורה כפול...'). Also the box title is a plain body paragraph (no heading role) and the box is not set apart from the main text."
@@ -63,7 +63,7 @@ page,printed,unit,kind,target_ids,status,notes
 62,58,a09,article,a09-p027 a09-p028 a09-p029 a09-p030 a09-p031 a09-p032,verified,page review 2026-11-24 (sheet: print vs EPUB)
 63,59,a09,article,a09-p033 a09-p034 a09-p035 a09-p036 a09-p032,issue,"page review 2026-11-24: Minor: printed ''mess tin'' has spaces added inside the quote marks: ""' mess tin '""."
 64,60,a09,article,a09-p037 a09-p038 a09-p039 a09-p040 a09-p041 a09-p042 a09-p043 a09-p044 a09-p036,verified,page review 2026-11-24 (sheet: print vs EPUB); Edition note for 'בן אוויס' at article end.
-65,61,a10,article,a10-h a10-p001 a10-p002 a10-src1 fig-a10-01,issue,page review 2026-11-24: Minor: printed title 'אסון הר פאמיר - החמור ביותר בתולדות האלפיניזם' and its smaller subtitle 'תפקודו ותרומתו של הצוות הישראלי לניסיון איתור הנעדרים*' are merged into one h2 with no separator ('...האלפיניזם תפקודו...').
+65,61,a10,article,a10-h a10-p054 a10-p001 a10-p002 a10-src1 fig-a10-01,issue,page review 2026-11-24: Minor: printed title 'אסון הר פאמיר - החמור ביותר בתולדות האלפיניזם' and its smaller subtitle 'תפקודו ותרומתו של הצוות הישראלי לניסיון איתור הנעדרים*' are merged into one h2 with no separator ('...האלפיניזם תפקודו...').
 66,62,a10,article,a10-p003 a10-p004 fig-a10-02,verified,"page review 2026-11-24 (sheet: print vs EPUB); Known replacement map with edition note and known correction 'הישראלי' with dagger present. Aside (print, not conversion): the cross-reference says 'חזור למקום ממנו באת' but the article title is 'חזור למדבר ממנו באת'."
 67,63,a10,article,a10-p005 a10-p006 a10-p007 a10-p008 a10-p009 a10-p004,verified,page review 2026-11-24 (sheet: print vs EPUB)
 68,64,a10,article,a10-p010 a10-p011 a10-p012 a10-p013 a10-p015 a10-p016 fig-a10-03,issue,"page review 2026-11-24: Sidebar box 'בוריס' (one printed paragraph beside a photo) is split into 3 paragraphs with 2 mid-sentence breaks: '...וכששב למחבת בבוקר,' | photo | 'נדהם למצוא אותו ריק...ממוסקבה למחנה' | 'הבסיס של פאמיר.'. Box title 'בוריס' is a plain body paragraph (no heading role) and the box is not set apart."
@@ -123,7 +123,7 @@ page,printed,unit,kind,target_ids,status,notes
 122,118,a14,article,a14-p057 a14-p058 fig-a14-22,verified,page review 2026-11-24 (sheet: print vs EPUB)
 123,119,a14,article,a14-p059 a14-p060 a14-p061 a14-p062 a14-p063 a14-p064 fig-a14-23,issue,"page review 2026-11-24: Subheading 'סיכום' (bold, rule above in print) is a p.byline in the EPUB, not a heading.; after review: subheadings now h3.section-title"
 124,120,a14,article,a14-p065 a14-p066 a14-p067 fig-a14-24,issue,"page review 2026-11-24: Map figure: the map label 'עין גדי' (printed inside the map) is added as the first caption line. The legend 'מקרא' / 'אתרי בולענים', 'היתכנות גבוהה', 'היתכנות נמוכה' (printed beside the map with colour swatches) became two body paragraphs after the figure, without swatches, and the three legend items run together on one line."
-125,121,s03,part,s03-h s03-p001 fig-s03-01,verified,page review 2026-11-24 (sheet: print vs EPUB)
+125,121,s03,part,s03-h fig-s03-01,verified,page review 2026-11-24 (sheet: print vs EPUB)
 126,122,s03,part,fig-s03-02,verified,page review 2026-11-24 (sheet: print vs EPUB)
 127,123,a15,article,a15-h a15-p001 a15-p002 a15-p003 a15-p004 a15-p005 a15-p006 a15-p007 fig-a15-01,issue,"page review 2026-11-24: Subheading 'נווה המדבר' (bold, rule above in print) is a p.byline in the EPUB, not a heading.; after review: subheadings now h3.section-title"
 128,124,a15,article,a15-p008 a15-p009 a15-p010 a15-p011 a15-p007,issue,"page review 2026-11-24: Subheading 'חקלאות התמר' (bold, rule above in print) is a p.byline in the EPUB, not a heading.; after review: subheadings now h3.section-title"
@@ -203,7 +203,7 @@ page,printed,unit,kind,target_ids,status,notes
 202,198,s05,part,fig-s05-02,verified,page review 2026-11-24 (sheet: print vs EPUB)
 203,199,a23,article,a23-h a23-p001 a23-p002 a23-p003 a23-p004 a23-p005 a23-p006 fig-a23-01,verified,page review 2026-11-24 (sheet: print vs EPUB)
 204,200,a23,article,a23-p007 a23-p008 a23-p009 a23-p010 a23-p011 a23-p012 a23-p013 a23-p014 a23-p015 a23-p016,verified,page review 2026-11-24 (sheet: print vs EPUB)
-205,201,a24,article,a24-h a24-p001 a24-p002 a24-p003 a24-p004 a24-p005 a24-p006 fig-a24-01,issue,"page review 2026-11-24: Title and subtitle merged into one h2 with no break: 'זיכרונות מטיול בלתי נשכח שבועיים ברמת המדבר...'. Print has title 'זיכרונות מטיול בלתי נשכח' and a separate smaller subtitle 'שבועיים ברמת המדבר עם אלי רז, סתיו 1976'."
+205,201,a24,article,a24-h a24-p039 a24-p001 a24-p002 a24-p003 a24-p004 a24-p005 a24-p006 fig-a24-01,issue,"page review 2026-11-24: Title and subtitle merged into one h2 with no break: 'זיכרונות מטיול בלתי נשכח שבועיים ברמת המדבר...'. Print has title 'זיכרונות מטיול בלתי נשכח' and a separate smaller subtitle 'שבועיים ברמת המדבר עם אלי רז, סתיו 1976'."
 206,202,a24,article,a24-p007 a24-p008 a24-p009 a24-p010 a24-p011 a24-p006,verified,page review 2026-11-24 (sheet: print vs EPUB)
 207,203,a24,article,a24-p016 a24-p017 a24-p036 a24-p037 a24-p018 a24-p038 a24-p019 a24-p012 a24-p013 a24-p014 a24-p015 a24-p020 a24-p021 a24-p022 a24-p023 a24-p024,verified,page review 2026-11-24 (sheet: print vs EPUB)
 208,204,a24,article,a24-p025 a24-p026 a24-p034 a24-p027 a24-p028 a24-p029 a24-p030 a24-p031 a24-p032 a24-p033 a24-p035,verified,page review 2026-11-24 (sheet: print vs EPUB)
@@ -231,7 +231,7 @@ page,printed,unit,kind,target_ids,status,notes
 230,226,a28,article,a28-p006 a28-p007 a28-p008 a28-p009 a28-p010 a28-p011 a28-p005,verified,page review 2026-11-24 (sheet: print vs EPUB)
 231,227,a28,article,a28-p012 a28-p013 a28-p014 fig-a28-02,verified,page review 2026-11-24 (sheet: print vs EPUB)
 232,228,a28,article,a28-p015 a28-p016 a28-p017,verified,page review 2026-11-24 (sheet: print vs EPUB)
-233,229,a29,article,a29-h a29-p001 a29-p002 a29-p003 a29-p004 a29-p005 fig-a29-01,issue,"page review 2026-11-24: Two-line title 'קשר רב־שנים בין אלי רז / לאליהוא' is split into an h2 'קשר רב־שנים בין אלי רז' plus a separate <p class=""display-title""> 'לאליהוא'; it is one title in print."
+233,229,a29,article,a29-h a29-p002 a29-p003 a29-p004 a29-p005 fig-a29-01,issue,"page review 2026-11-24: Two-line title 'קשר רב־שנים בין אלי רז / לאליהוא' is split into an h2 'קשר רב־שנים בין אלי רז' plus a separate <p class=""display-title""> 'לאליהוא'; it is one title in print."
 234,230,a29,article,a29-p006 a29-p007 a29-p009 a29-p010 a29-p011 fig-a29-02 fig-a29-03 a29-p005,issue,"page review 2026-11-24: Paragraph split mid-sentence next to the photo: '...אלי סיפר על סלעי הדולומיט' ends one paragraph and 'והתפתחותם, על הבולבוסים...' starts another (one paragraph in print)."
 235,231,a29,article,fig-a29-04 fig-a29-05,verified,page review 2026-11-24 (sheet: print vs EPUB)
 236,232,a29,article,fig-a29-06,verified,page review 2026-11-24 (sheet: print vs EPUB)
@@ -243,7 +243,7 @@ page,printed,unit,kind,target_ids,status,notes
 242,238,a30,article,fig-a30-02,verified,page review 2026-11-24 (sheet: print vs EPUB)
 243,239,a30,article,a30-p020 a30-p021 a30-p022 a30-p023 a30-p024,verified,page review 2026-11-24 (sheet: print vs EPUB)
 244,240,a30,article,a30-p025 a30-p026 a30-p027 a30-p028 a30-p029 a30-p031 a30-p030 a30-p032 a30-p033,verified,page review 2026-11-24 (sheet: print vs EPUB)
-245,241,a31,article,a31-h a31-p001 a31-p002 a31-p003 a31-src1 fig-a31-01,issue,"page review 2026-11-24: Title and grey deck are merged into one <h2>: 'השתוללות איתני הטבע בירח מאי 2001* האם האירוע האקלימי הדרמטי...' The deck 'האם האירוע ... בהשפעת האדם?' is a separate subtitle in print, not part of the title. (2) Stray space after maqaf where a printed line broke: ''שקע ים־ סוף'' should be 'ים־סוף'.; after review: line-end hyphen joins fixed"
+245,241,a31,article,a31-h a31-p024 a31-p001 a31-p002 a31-p003 a31-src1 fig-a31-01,issue,"page review 2026-11-24: Title and grey deck are merged into one <h2>: 'השתוללות איתני הטבע בירח מאי 2001* האם האירוע האקלימי הדרמטי...' The deck 'האם האירוע ... בהשפעת האדם?' is a separate subtitle in print, not part of the title. (2) Stray space after maqaf where a printed line broke: ''שקע ים־ סוף'' should be 'ים־סוף'.; after review: line-end hyphen joins fixed"
 246,242,a31,article,a31-p004 a31-p005 a31-p006 a31-p007 a31-fn1,verified,page review 2026-11-24 (sheet: print vs EPUB)
 247,243,a31,article,a31-p008 a31-p009 a31-p010 a31-p011 a31-p012 a31-p013 a31-p007,issue,"page review 2026-11-24: (1) Item 'א) קצב ירידת מפלס ים המלח...' is split at printed line ends into 3 paragraphs (a31-p011 '...שיפוע הנחל מתמתן' / p012 'עם הזמן, ... וההתחתרות' / p013 'לעומק בו...'). (2) Bold quote 'והיה אם שמע תשמעו אל מצותי ... יורה ומלקוש' is bold in print to the end; EPUB <b> stops after 'אל'. (3) Bold subheading 'קריסת גשר ערוגות' is a <p class=""byline""> (systemic).; after review: subheadings now h3.section-title"
 248,244,a31,article,a31-p014 a31-p015 a31-p016 a31-p017 a31-p018 a31-p019 a31-p020 a31-p021 fig-a31-02,issue,"page review 2026-11-24: List items split at printed line ends: end of item א is split into a31-p014 '...שבתנאי ים המלח,' / p015 'הוא קצר במיוחד.'; item 'ב) אומנות הגשר נבנו פנימה...' is split into 4 paragraphs (p016-p019, last one 'בזרימות חזקות.')."
