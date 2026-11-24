@@ -11,8 +11,8 @@ const LEAFLET = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/";
 const MAP_CREDIT = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, SRTM · &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)';
 const WHEEL_HINT = "Ctrl + גלילה להגדלה · לחיצה על המפה כדי להזיז אותה";
 const TOUCH_HINT = "שתי אצבעות מזיזות ומגדילות את המפה";
-// Animation length in seconds for map moves; the CSS twin is --motion in 50-maps.css.
-const mapMotion = () => (reduceMotion.matches ? 0 : 0.35);
+// Animation length in seconds for map moves: --dur-slow of 00-base.css.
+const mapMotion = () => (reduceMotion.matches ? 0 : 0.3);
 let leafletReady = null;
 function loadLeaflet() {
   const load = (tag, attrs) => new Promise((resolve, reject) => {

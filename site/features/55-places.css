@@ -24,7 +24,7 @@
 .pc-desc { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; margin: 0; color: var(--soft); }
 .map-box.leaflet-container a.pc-source { display: inline-block; margin-top: 0.15rem; font-size: 0.8rem; color: var(--accent); }
 .pc-chapters { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 0.65rem; }
-.map-box.leaflet-container .pc-chapters a { display: inline-flex; align-items: center; min-height: 2rem; padding: 0 0.7rem; border: 1px solid var(--rule); border-radius: var(--radius-pill); background: var(--mat); color: var(--ink); font-size: 0.8rem; text-decoration: none; line-height: 1.3; transition: border-color var(--motion-fast) var(--motion-ease); }
+.map-box.leaflet-container .pc-chapters a { display: inline-flex; align-items: center; min-height: 2rem; padding: 0 0.7rem; border: 1px solid var(--rule); border-radius: var(--radius-pill); background: var(--mat); color: var(--ink); font-size: 0.8rem; text-decoration: none; line-height: 1.3; transition: border-color var(--dur-fast) var(--ease); }
 .map-box.leaflet-container .pc-chapters a:hover { border-color: var(--accent); }
 .pc-thumbs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 0.65rem; }
 .pc-thumbs button { padding: 0; border-radius: var(--radius-s); overflow: hidden; line-height: 0; }
@@ -34,7 +34,7 @@
 .map-sheet { position: absolute; z-index: 1001; inset-inline: 8px; bottom: 8px; max-height: 62%; overflow-y: auto; overscroll-behavior: contain; border: 1px solid var(--rule); border-radius: var(--radius-m); background: var(--paper); box-shadow: var(--map-shadow); direction: rtl; }
 .map-sheet::before { content: ""; display: block; width: 2.25rem; height: 4px; margin: 6px auto 0; border-radius: 2px; background: var(--rule); }
 @media (prefers-reduced-motion: no-preference) {
-  .map-sheet { transition: translate var(--motion) var(--motion-ease), opacity var(--motion) var(--motion-ease); }
+  .map-sheet { transition: translate var(--dur-slow) var(--ease), opacity var(--dur-slow) var(--ease); }
   @starting-style { .map-sheet { translate: 0 24px; opacity: 0; } }
 }
 .map-sheet .place-card { padding-top: 0.35rem; }
