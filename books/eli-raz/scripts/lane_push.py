@@ -22,7 +22,7 @@ import sys
 import time
 
 MAX_ROUNDS = 3
-WORKFLOW = "checks.yml"
+WORKFLOW = "checks"  # The name in .github/workflows/checks.yml. Matched by name: `gh run list -w` needs the file on main.
 POLL_S = 15
 
 
@@ -54,8 +54,9 @@ def rebase() -> str:
 def wait_for_checks(repo: str, branch: str, sha: str) -> None:
     run = None
     for _ in range(40):  # The run appears a few seconds after the push.
-        found = json.loads(sh("gh", "run", "list", "-R", repo, "-w", WORKFLOW, "-b", branch, "-c", sha,
-                              "--json", "databaseId,url", "-L", "1"))
+        runs = json.loads(sh("gh", "run", "list", "-R", repo, "-b", branch, "-c", sha,
+                             "--json", "databaseId,url,workflowName", "-L", "10"))
+        found = [r for r in runs if r["workflowName"] == WORKFLOW]
         if found:
             run = found[0]
             break
