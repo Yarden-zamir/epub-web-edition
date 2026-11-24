@@ -73,6 +73,16 @@ for p in places:
     for t in p["targets"]:
         need(t, w)
     need(p["description_source"], w)
+    match p.get("description_kind"):
+        case "book":  # Exact quote; a quote cut before its sentence ends carries a final "…".
+            if p["description_source"] in text and (" ".join(p["description"].removesuffix("…").split())
+                                                    not in " ".join(text[p["description_source"]].split())):
+                errors.append(f"{w}: description is not an exact quote of {p['description_source']}")
+        case "edition":  # Written for the edition, from a cited page.
+            if not p.get("description_url", "").startswith(("https://he.wikipedia.org/", "https://www.wikidata.org/")):
+                errors.append(f"{w}: edition description needs a Wikipedia or Wikidata description_url")
+        case kind:
+            errors.append(f"{w}: unknown description_kind {kind}")
     for fig in p["figures"]:
         if need(fig, w) and tag[fig] != "figure":
             errors.append(f"{w}: {fig} is not a figure")
