@@ -1,0 +1,35 @@
+{
+ "figure": "fig-a17-02",
+ "title": "מפה טופוגרפית עדכנית של סלע",
+ "tab": "מפה עדכנית",
+ "image": "site/media/sela-topo/fig-a17-02-modern.webp",
+ "width": 1418,
+ "height": 1402,
+ "bytes": 234104,
+ "alt": "מפה טופוגרפית עדכנית, צפון למעלה, באותו שטח ובאותו קנה מידה של המפה המודפסת: קווי גובה כל 100 מטר, קלעת סלע (877 מ'), הכפר א־סלע ושרידי הכפר הישן, ואדי חבס וואדי אל־הרש, דרך המלך ורחובות הכפרים שמצפון־מזרח, וקנה מידה של 500 מטר.",
+ "bounds": [
+  [
+   30.765548,
+   35.563095
+  ],
+  [
+   30.798973,
+   35.602282
+  ]
+ ],
+ "attribution": [
+  "Modern map drawn for this edition. Roads and places: © OpenStreetMap contributors (ODbL)",
+  "Contours, relief and wadis: produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved"
+ ],
+ "attribution_links": {
+  "OpenStreetMap": "https://www.openstreetmap.org/copyright"
+ },
+ "sources": {
+  "fortress": "OSM node 798883031 (wikidata=Q489724); Wikidata Q126824792 (castle) lies 50 m away",
+  "village": "OSM node 798883086; Wikidata Q489724",
+  "old_village": "OSM way 360854822, historic=archaeological_site",
+  "summit_height": "877 m: highest GLO-30 cell within 250 m of the fortress node (the print gives 879 m)",
+  "labels": "Names from the printed map and a17-p012; wadi labels at the printed label positions, on the nearest DEM valley line"
+ },
+ "note": "scripts/sela_topo.py. North up. Fit of the printed image to the OSM King's Highway and the DEM contours 700-1,200 m: 5.286 m per printed pixel (the printed scale bar gives 5.102), rotation 1.15°, residuals {'road_m': {'median': 7, 'p90': 56}, 'contours_m': {'median': 19, 'p90': 59}}. Not shown: Mit Dlib, which has no modern source."
+}

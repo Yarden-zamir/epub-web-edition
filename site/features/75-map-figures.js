@@ -1,6 +1,7 @@
-// Maps inside printed figures (build: tools/web/72_map_figures.py): figure maps and the then-and-now view.
+// Maps inside printed figures (build: tools/web/72_map_figures.py): figure maps, image maps and the then-and-now view.
 // Each figure gets a toggle between the map and the printed image. The map draws when the figure nears the view;
-// until it works, the printed image stays and the toggle stays hidden.
+// until it works, the printed image stays and the toggle stays hidden. An image map (a static map drawn for the
+// edition, to compare with the print) comes second: the printed image stays the first and default view.
 (() => {
 const el = (tag, className, text) => {
   const node = document.createElement(tag);
@@ -280,6 +281,18 @@ function thenNow(box, spec, img) {
   setMode(false);
 }
 
+// Image map: a static image of the same ground at the size of the printed image, with its credit under it.
+// The image loads only when the reader opens its tab: a lazy image in a hidden box waits.
+function imageMap(box, spec, img) {
+  const image = Object.assign(el("img", "mf-image"), { src: spec.image, alt: spec.alt, width: spec.width, height: spec.height, loading: "lazy", decoding: "async" });
+  if (img) image.setAttribute("style", img.getAttribute("style") ?? ""); // --w and --ratio of the printed image: the same size.
+  image.addEventListener("click", (e) => e.stopPropagation()); // The figure viewer would open the printed image.
+  const credit = el("p", "mf-credit");
+  credit.dir = "ltr";
+  credit.innerHTML = spec.credit; // Escaped HTML from the build (credit_html).
+  box.replaceChildren(el("p", "mf-title", spec.title), image, credit);
+}
+
 async function loadMapSpec(box) {
   const response = await fetch(box.dataset.map);
   if (!response.ok) throw new Error(`${box.dataset.map}: HTTP ${response.status}`);
@@ -289,6 +302,7 @@ function drawMap(figure, box, spec) {
   const img = figure.querySelector(":scope > img");
   if (spec.kind === "figure-map") figureMap(box, spec, img);
   else if (spec.kind === "then-now") thenNow(box, spec, img);
+  else if (spec.kind === "image-map") imageMap(box, spec, img);
   else throw new Error(`${box.dataset.map}: unknown map kind ${spec.kind}`);
 }
 // The swap between the printed image and the map changes the figure's height. When the figure is on screen, its top
@@ -315,8 +329,12 @@ for (const figure of document.querySelectorAll("figure.has-map")) {
     group.append(b);
     return b;
   };
-  const mapButton = make(box.dataset.kind === "then-now" ? "אז והיום" : "מפה אינטראקטיבית", true);
+  const label = { "figure-map": "מפה אינטראקטיבית", "then-now": "אז והיום", "image-map": box.dataset.tab }[box.dataset.kind];
+  if (!label) throw new Error(`${box.dataset.map}: no tab name for map kind ${box.dataset.kind}`);
+  const printFirst = box.dataset.kind === "image-map";
+  const mapButton = make(label, true);
   const printButton = make("המפה בספר", false);
+  if (printFirst) group.prepend(printButton);
   const setView = (live) => {
     mapButton.setAttribute("aria-pressed", String(live));
     printButton.setAttribute("aria-pressed", String(!live));
@@ -327,7 +345,7 @@ for (const figure of document.querySelectorAll("figure.has-map")) {
   figure.prepend(group);
   whenNear(figure, async () => {
     const spec = await loadMapSpec(box);
-    keepFigureTop(figure, () => { drawMap(figure, box, spec); group.hidden = false; setView(true); });
+    keepFigureTop(figure, () => { drawMap(figure, box, spec); group.hidden = false; setView(!printFirst); });
   }).catch((err) => { box.hidden = true; group.remove(); console.error(err); });
 }
 })();
