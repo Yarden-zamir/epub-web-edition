@@ -153,10 +153,9 @@ function create(spec, env) {
       env.label(c, L.mediterranean, 8, 150, { align: "left", size: 12, weight: 500, color: "--muted" });
       env.label(c, L.africa, ...at(110, 470));
       env.label(c, L.red_sea, ...at(192, 572), { size: 12, weight: 500 });
-      // The Gulf of Suez's name runs along it, its letters' tops toward Africa.
-      const [sx, sy] = P(...along(along(TIP, SUEZ_DIR, 120), SUEZ_ACROSS, 7));
-      const gulf = Math.atan2(SIN * SUEZ_DIR[0] + COS * SUEZ_DIR[1], COS * SUEZ_DIR[0] - SIN * SUEZ_DIR[1]);
-      env.label(c, L.suez, sx, sy, { size: 12, weight: 500, rotate: gulf });
+      // The Gulf of Suez's name stays horizontal, on the gulf near its mouth: turned along the gulf, it read as
+      // mirrored on a phone.
+      env.label(c, L.suez, ...at(...along(TIP, SUEZ_DIR, 30), 4), { size: 12, weight: 500 });
       lines(c, L.west_plate, at(124, Y(112)));
       env.label(c, `↑ ${L.north}`, W - 10, 4 + 12 * env.unit, { align: "right", size: 12, weight: 500, color: "--muted" });
     }), 0, 0, W, H);
