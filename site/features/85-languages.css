@@ -1,0 +1,82 @@
+/* Languages: the chapter switch, the element chip and the reading mode button with its menu. */
+
+/* Chapter switch: a small segmented control above the chapter title, with the machine translation note. */
+.lang-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.75rem; margin: 0 0 1.25rem; font-family: var(--sans); font-size: 0.8rem; line-height: 1.2; }
+.lang-switch { position: relative; isolation: isolate; display: inline-grid; grid-template-columns: repeat(var(--count, 2), 1fr); padding: 3px; border-radius: var(--radius-pill); background: var(--mat); box-shadow: inset 0 0 0 1px var(--rule); }
+.lang-switch::before {
+  content: ""; position: absolute; z-index: -1; inset-block: 3px; inset-inline-start: 3px;
+  width: calc((100% - 6px) / var(--count, 2)); border-radius: var(--radius-pill); background: var(--ink);
+  translate: calc(var(--at, 0) * 100%) 0; transition: translate var(--dur) var(--ease);
+}
+.lang-switch:dir(rtl)::before { translate: calc(var(--at, 0) * -100%) 0; }
+.lang-switch button { min-height: 2rem; padding: 0.3rem 0.85rem; border-radius: var(--radius-pill); color: var(--soft); font-weight: 600; transition: color var(--dur) var(--ease); }
+.lang-switch button:hover { color: var(--ink); }
+.lang-switch button[aria-pressed="true"] { color: var(--paper); }
+.lang-note { color: var(--muted); animation: lang-in var(--dur) var(--ease); }
+@keyframes lang-in { from { opacity: 0; } }
+
+/* An element the reader switched alone: a thin line beside it, so mixed languages stay visible. */
+.book .lang-single { position: relative; }
+.book .lang-single::before { content: ""; position: absolute; inset-block: 0.3em; inset-inline-start: -0.85rem; width: 2px; border-radius: 2px; background: color-mix(in srgb, var(--accent) 60%, transparent); }
+.book figure.lang-single::before { inset-block: auto 0; height: 3em; }
+
+/* Element chip. */
+.lang-chip {
+  position: absolute; z-index: 800; padding: 0.2rem 0.65rem; min-height: 1.75rem; border-radius: var(--radius-pill);
+  border: 1px solid var(--rule); background: var(--paper); color: var(--accent); font-family: var(--sans); font-size: 0.75rem; font-weight: 600; line-height: 1.2;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.1); opacity: 0; scale: 0.92;
+  transition: opacity var(--dur-fast) var(--ease), scale var(--dur-fast) var(--ease), background-color var(--dur-fast) var(--ease);
+}
+.lang-chip.shown { opacity: 1; scale: 1; }
+.lang-chip:hover { background: var(--mat); }
+/* Narrow screen: a pill at the bottom of the screen; the element it acts on gets a soft mat. */
+.lang-chip.docked {
+  position: fixed; inset-inline: 0; bottom: max(1rem, env(safe-area-inset-bottom)); width: fit-content; margin: 0 auto;
+  min-height: 2.75rem; padding: 0.6rem 1.2rem; border: 0; background: var(--ink); color: var(--paper); font-size: 0.9rem;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.25); scale: 1; translate: 0 0.5rem;
+  transition: opacity var(--dur) var(--ease), translate var(--dur) var(--ease);
+}
+.lang-chip.docked.shown { translate: 0 0; }
+.lang-chip.docked:hover { background: var(--ink); }
+.book .lang-target { border-radius: var(--radius-s); background: var(--mat); box-shadow: 0 0 0 0.5rem var(--mat); transition: background-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease); }
+@media (prefers-reduced-motion: reduce) { .lang-chip, .lang-chip.docked { scale: 1; translate: none; } }
+
+/* Reading mode button: small, on the side, after the cover. It moves up while a note sits at the bottom. */
+.lang-fab {
+  position: fixed; z-index: 890; inset-inline-end: max(1rem, env(safe-area-inset-left)); bottom: max(1rem, env(safe-area-inset-bottom));
+  display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: var(--radius-pill);
+  border: 1px solid var(--rule); background: color-mix(in srgb, var(--paper) 92%, transparent); color: var(--ink);
+  backdrop-filter: blur(12px) saturate(1.3); -webkit-backdrop-filter: blur(12px) saturate(1.3);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.12); font-family: var(--sans);
+  opacity: 0; visibility: hidden; translate: 0 0.5rem;
+  transition: opacity var(--dur) var(--ease), translate var(--dur) var(--ease), visibility var(--dur), background-color var(--dur-fast) var(--ease);
+}
+.lang-fab[data-shown] { opacity: 1; visibility: visible; translate: 0 0; }
+body:has(.resume:not(.leaving), .toast.shown, .back-chip:not([hidden])) .lang-fab[data-shown] { translate: 0 -3.5rem; }
+body:has(.resume:not(.leaving), .back-chip:not([hidden])) .lang-chip.docked { bottom: calc(max(1rem, env(safe-area-inset-bottom)) + 3.5rem); }
+.lang-fab[data-shown][data-tucked] { opacity: 0; visibility: hidden; translate: 0 1rem; }
+.lang-fab:hover { background: var(--mat); }
+.lang-glyph { position: relative; width: 1.5rem; height: 1.5rem; font-weight: 700; line-height: 1; }
+.lang-glyph::before, .lang-glyph::after { position: absolute; }
+.lang-glyph::before { content: "א" / ""; top: 0; inset-inline-start: 0; font-size: 1rem; }
+.lang-glyph::after { content: "A" / ""; bottom: 0; inset-inline-end: 0; font-size: 0.8rem; color: var(--muted); }
+.lang-fab[data-active]::after { content: ""; position: absolute; top: 0.3rem; inset-inline-end: 0.3rem; width: 0.45rem; height: 0.45rem; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--paper); }
+@media (prefers-reduced-motion: reduce) { .lang-fab, .lang-fab[data-shown], .lang-fab[data-shown][data-tucked], body:has(.resume:not(.leaving), .toast.shown, .back-chip:not([hidden])) .lang-fab[data-shown] { translate: none; } }
+@media print { .lang-fab, .lang-chip, .lang-bar { display: none; } }
+
+/* Reading mode menu (a popover, styled like the e-reader menu). */
+.lang-menu { width: min(21rem, calc(100vw - 2rem)); }
+.lang-modes { display: grid; gap: 2px; }
+.lang-modes button { display: grid; gap: 0.15rem; padding: 0.55rem 0.6rem; padding-inline-start: 2.1rem; position: relative; border-radius: calc(var(--radius-m) - 0.75rem); /* Inside the menu's 0.75rem padding. */ text-align: start; }
+.lang-modes button:hover, .lang-modes button:focus-visible { background: var(--mat); outline: none; }
+.lang-modes button::before { content: ""; position: absolute; inset-inline-start: 0.65rem; top: 0.8rem; width: 0.85rem; height: 0.85rem; box-sizing: border-box; border-radius: 50%; border: 1.5px solid var(--muted); transition: border-width var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease); }
+.lang-modes button[aria-checked="true"]::before { border: 0.28rem solid var(--accent); }
+.lang-mode-title { font-weight: 600; }
+/* Lines in the other direction sit at the same edge as the others. */
+.lang-modes button:dir(rtl) > [dir="ltr"] { text-align: right; }
+.lang-modes button:dir(ltr) > [dir="rtl"] { text-align: left; }
+.lang-menu ul { margin-top: 0.5rem; }
+
+/* Cross-fade of a language swap (85-languages.js). */
+:root.lang-swap::view-transition-old(root), :root.lang-swap::view-transition-new(root) { animation-duration: var(--dur); animation-timing-function: var(--ease); }
+.lang-menu ul a { flex-direction: column; align-items: stretch; gap: 0.15rem; }
