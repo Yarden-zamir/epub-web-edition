@@ -10,8 +10,13 @@ const W = 600, H = 330;
 // Schematic geometry in (x, elevation in metres). Fitted so that the two levels of the printed figure give
 // its two states: at -395 the salt lies fully below the interface; at -414 its western part lies above it.
 const GROUND = [[0, -365], [130, -380], [250, -395], [500, -442], [600, -470]];
-// Top 20 to 30 m below the ground (book: 20 to 70 m). The thickness is schematic (the book gives none for this shore).
-const SALT = { from: 105, to: 470, dip: 0.15, thick: 14 };
+// Top 20 to 30 m below the ground (book: 20 to 70 m). The thickness is schematic (the book gives none for this shore):
+// up to `thick` metres, tapering to a sliver at both ends, where the thin salt is eaten through first (small sinkholes).
+const SALT = { from: 105, to: 470, dip: 0.15, thick: 18 };
+const thickAt = (x) => {
+  const ease = (q) => q * q * (3 - 2 * q), edge = (v, a, b) => ease(Math.min(1, Math.max(0, (v - a) / (b - a))));
+  return SALT.thick * (0.12 + 0.88 * edge(x, SALT.from, SALT.from + 80)) * (0.12 + 0.88 * edge(x, SALT.to, SALT.to - 70));
+};
 const saltTop = (x) => -386 - SALT.dip * x;
 const INTERFACE_DIP = 0.03; // Metres per unit of x, down to the west.
 const WATER_TABLE_WEST = -382; // Groundwater table at the west edge.
@@ -51,7 +56,7 @@ function shoreline(level) {
   return lo;
 }
 const interfaceAt = (x, level, xs) => level - INTERFACE_DIP * (xs - x);
-// Fresh water reaches the salt at x, at the top of the layer (below = 0) or below the whole layer (below = SALT.thick).
+// Fresh water reaches the salt at x, at the top of the layer (below = 0) or below the whole layer (below = thickAt(x)).
 const exposed = (x, level, below = 0) => interfaceAt(x, level, shoreline(level)) < saltTop(x) - below;
 
 // The level at which fresh water first reaches the salt at x (its top, or below it), or null if never in range.
@@ -99,7 +104,6 @@ function create(spec) {
   const BEDS = [12, 26, 42, 60, 82, 108, 136]; // Bedding lines: depth below the surface, in drawing units.
   const saltAngle = Math.atan(SALT.dip * SCALE);
   const rand = random(SEED);
-  const thickPx = SALT.thick * SCALE;
   const smooth = (values, passes) => {
     let v = values;
     for (let k = 0; k < passes; k++) v = v.map((x, i) => (v[Math.max(0, i - 1)] + 2 * x + v[Math.min(v.length - 1, i + 1)]) / 4);
@@ -112,8 +116,8 @@ function create(spec) {
   const topRate = scaled(smooth(grid.map(() => rand()), 6)), bottomRate = scaled(smooth(grid.map(() => rand()), 6));
   const topJag = smooth(grid.map(() => rand() * 2 - 1), 1), bottomJag = smooth(grid.map(() => rand() * 2 - 1), 1);
   const cols = grid.map((x, i) => ({
-    x, top: Y(saltTop(x)), bottom: Y(saltTop(x) - SALT.thick),
-    atTop: exposureLevel(x, min, max), atBottom: exposureLevel(x, min, max, SALT.thick),
+    x, top: Y(saltTop(x)), bottom: Y(saltTop(x) - thickAt(x)), th: thickAt(x) * SCALE,
+    atTop: exposureLevel(x, min, max), atBottom: exposureLevel(x, min, max, thickAt(x)),
     rt: topRate[i], rb: bottomRate[i], jt: topJag[i], jb: bottomJag[i],
   }));
   const bite = (at, level, rate, most) => (at === null ? 0 : Math.max(0, Math.min(most, ((at - level) / EAT) * (0.35 + 1.1 * rate))));
@@ -132,7 +136,9 @@ function create(spec) {
     col.bottomMost = 0.1 + 0.3 * col.rb + 0.6 * near;
   }
   // The eaten share from the top and from the bottom at a level; their sum of 1 or more means a gap.
-  const eatenAt = (col, level) => [bite(col.atTop, level, col.rt, col.topMost), bite(col.atBottom, level, col.rb, col.bottomMost)];
+  // Shares of the local thickness. Fresh water eats metres of salt, so where the layer is thin it is eaten through sooner.
+  const share = (col, eaten) => (eaten * SALT.thick * SCALE) / col.th;
+  const eatenAt = (col, level) => [share(col, bite(col.atTop, level, col.rt, col.topMost)), share(col, bite(col.atBottom, level, col.rb, col.bottomMost))];
   // Spots: up to SPOTS holes inside the salt that is left, away from the gaps, like the closed loop in the print.
   const spots = [];
   for (const col of cols.filter((c) => c.atBottom !== null && sites.every((site) => Math.abs(site.x - c.x) > 18)).sort((c1, c2) => c2.rt - c1.rt))
@@ -173,8 +179,7 @@ function create(spec) {
     const flowing = !reduceMotion.matches;
 
     // Collapse state first: each hole runs toward open (its gap is open) or closed (COLLAPSE_S to open, REFILL_S to
-    // refill; at once under reduced motion). From it: how far the surface has sunk (crater) and how far the ground
-    // above the gap has moved down into it (deep, up to the removed salt).
+    // refill; at once under reduced motion). From it: how far its crater has sunk at the surface.
     let fallen = 0;
     for (const h of holes) {
       const [t, b] = eatenAt(h.col, level);
@@ -188,24 +193,35 @@ function create(spec) {
       if (h.p !== target) env.wantsFrame = true;
       if (target) fallen++;
       h.closing = target === 0;
-      h.crater = 16 * h.size * easeOut(ramp(h.p, 0.1, 0.55));
-      h.deep = thickPx * easeOut(ramp(h.p, 0.15, 0.85));
+      h.crater = 20 * h.size * easeOut(ramp(h.p, 0.1, 0.55));
     }
     const active = holes.filter((h) => h.p > 0);
+    // The salt that is gone at each point (drawing units), smoothed sideways: the ground above settles into it, fully
+    // at the salt and less toward the surface. It grows with every metre of level drop, so the ground subsides
+    // gradually before a sinkhole opens; over a gap the drop is deepest.
+    let removed = cols.map((col) => { const [t, b] = eatenAt(col, level); return Math.min(1, t + b) * col.th; });
+    for (let k = 0; k < 4; k++) removed = removed.map((v, i) => (removed[Math.max(0, i - 2)] + removed[Math.max(0, i - 1)] + v + removed[Math.min(removed.length - 1, i + 1)] + removed[Math.min(removed.length - 1, i + 2)]) / 5);
+    const settled = removed.some((v) => v > 0.2);
+    const removedAt = (x) => { // Linear between the grid points; a direct index, as it runs for every point drawn.
+      const at = (x - cols[0].x) / GRID, i = Math.floor(at);
+      if (i < 0 || i >= cols.length - 1) return 0;
+      return removed[i] + (removed[i + 1] - removed[i]) * (at - i);
+    };
     // How far the ground at x moves down, at depth fraction f between the surface (0) and the top of the salt (1):
-    // the crater at the surface, the removed salt at the gap, in a bell that narrows with depth.
+    // the removed salt below it, and over an open gap the crater, in a bell that narrows with depth.
     const sagAt = (x, f) => {
-      let amount = 0;
+      let amount = removedAt(x) * (0.3 + 0.7 * f);
       for (const h of active) {
         const half = h.w * (1 - 0.45 * f) + 4, q = (x - h.x) / half;
-        if (Math.abs(q) < 1) amount += (h.crater * (1 - f) + h.deep * f) * (1 + Math.cos(Math.PI * q)) / 2;
+        if (Math.abs(q) < 1) amount += h.crater * (1 - f) * (1 + Math.cos(Math.PI * q)) / 2;
       }
       return amount;
     };
     const STEP = 3;
     const surfacePts = [];
-    for (let x = 0; x <= W; x += STEP) surfacePts.push([x, Y(ground(x)) + (active.length ? sagAt(x, 0) : 0)]);
-    const belowNow = active.length ? shape([...surfacePts, [W, H + 40], [0, H + 40]]) : below;
+    const moving = active.length || settled;
+    for (let x = 0; x <= W; x += STEP) surfacePts.push([x, Y(ground(x)) + (moving ? sagAt(x, 0) : 0)]);
+    const belowNow = moving ? shape([...surfacePts, [W, H + 40], [0, H + 40]]) : below;
 
     ctx.drawImage(env.layer("back", [0, 0, W, H], (c) => {
       c.fillStyle = env.gradient("sky", 0, 0, 0, H, [[0, "--xp-sky-top"], [1, "--xp-sky"]]);
@@ -214,7 +230,7 @@ function create(spec) {
       c.fillStyle = env.gradient("land", 0, 0, 0, H, [[0, "--xp-land"], [1, "--xp-land-deep"]]);
       c.fillRect(0, 0, W, H);
     }), 0, 0, W, H);
-    if (active.length) { // The sunken surface: sky between the old surface and the new one.
+    if (moving) { // The sunken surface: sky between the old surface and the new one.
       ctx.save();
       ctx.clip(below);
       ctx.fillStyle = env.gradient("sky", 0, 0, 0, H, [[0, "--xp-sky-top"], [1, "--xp-sky"]]);
@@ -246,7 +262,7 @@ function create(spec) {
       ctx.beginPath();
       for (let x = 0; x <= W; x += STEP) {
         const g = Y(ground(x)), span = Y(saltTop(x)) - g, f = d / span;
-        const y = g + d + (active.length && f > 0 && f <= 1.05 && x >= SALT.from - 20 && x <= SALT.to ? sagAt(x, Math.min(1, f)) : 0);
+        const y = g + d + (moving && f > 0 && f <= 1.05 && x >= SALT.from - 20 && x <= SALT.to ? sagAt(x, Math.min(1, f)) : 0);
         x ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
       }
       ctx.stroke();
@@ -256,7 +272,7 @@ function create(spec) {
     for (const h of active) {
       const left = [], right = [];
       for (let k = 0; k <= 8; k++) {
-        const f = k / 8, g = h.surface(0), y = g + f * (h.col.top - g) + h.crater * (1 - f) + h.deep * f;
+        const f = k / 8, g = h.surface(0), y = g + f * (h.col.top - g) + sagAt(h.x, f);
         const half = (h.w * (1 - 0.45 * f) + 4) * 0.55;
         left.push([h.x - half, y]);
         right.unshift([h.x + half, y]);
@@ -324,7 +340,7 @@ function create(spec) {
       const [t, b] = eatenAt(col, level);
       if (t + b >= 0.97) { closeRun(); continue; } // A gap: no salt left here.
       const wobble = (side) => 2.4 * Math.min(1, side * 5); // Eaten edges are ragged; untouched ones stay straight.
-      run.push([col.x, col.top + t * thickPx + col.jt * wobble(t), col.bottom - b * thickPx + col.jb * wobble(b)]);
+      run.push([col.x, col.top + t * col.th + col.jt * wobble(t), col.bottom - b * col.th + col.jb * wobble(b)]);
       deepest = Math.max(deepest, t + b);
       if (t > 0.02) frontEnd = col.x;
     }
@@ -341,7 +357,7 @@ function create(spec) {
       // Only inside solid salt: it grows while at least half the layer is left there and fades as the salt thins.
       const grow = ramp(t + b, 0.2, 0.45) * (1 - ramp(t + b, 0.45, 0.55));
       if (grow < 0.05) continue;
-      const left = (1 - t - b) * thickPx, cx = spot.col.x, cy = spot.col.top + t * thickPx + left / 2;
+      const left = (1 - t - b) * spot.col.th, cx = spot.col.x, cy = spot.col.top + t * spot.col.th + left / 2;
       const rx = 7 * spot.size * grow, ry = Math.min(left * 0.3, 4 * spot.size) * grow;
       const ring = spot.radii.map((r, i) => {
         const a = (i / spot.radii.length) * Math.PI * 2;
@@ -375,7 +391,7 @@ function create(spec) {
         const phase = (env.time * 0.3 + i * 0.137) % 1;
         ctx.globalAlpha = (1 - phase) * 0.85;
         ctx.beginPath();
-        ctx.arc(col.x + phase * 16, col.top + t * thickPx * 0.6 - 2 - phase * 4, 1.3, 0, Math.PI * 2);
+        ctx.arc(col.x + phase * 16, col.top + t * col.th * 0.6 - 2 - phase * 4, 1.3, 0, Math.PI * 2);
         ctx.fill();
       });
       ctx.globalAlpha = 1;
@@ -422,7 +438,7 @@ function create(spec) {
     }
     ctx.restore();
     // The ground surface, with its craters.
-    const surfaceLine = active.length ? shape(surfacePts, false) : groundPath;
+    const surfaceLine = moving ? shape(surfacePts, false) : groundPath;
     ctx.save();
     ctx.translate(0, 2);
     ctx.globalAlpha = 0.5;
@@ -440,7 +456,7 @@ function create(spec) {
       env.label(c, L.east, W - 6, 14, { align: "right", size: 12, weight: 500, color: "--muted" });
       if (!small) env.label(c, L.slope, 70, Y(ground(70)) - 9);
       // Along the slab, at its east end, where the interface never reaches within the control range.
-      env.label(c, L.salt, 405, Y(saltTop(405) - SALT.thick / 2) + 5, { rotate: saltAngle });
+      env.label(c, L.salt, 395, Y(saltTop(395) - thickAt(395) / 2) + 5, { rotate: saltAngle });
       env.label(c, L.brine, W * 0.3, H - 14); // Below the interface at every level of the control.
     }), 0, 0, W, H);
 
