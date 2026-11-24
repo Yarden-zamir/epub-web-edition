@@ -22,8 +22,7 @@ async function saveWholeBook() {
   // Ask the browser not to evict the saved book when space runs low. It may say no; the book then stays cached
   // as long as the browser keeps it.
   await navigator.storage?.persist?.();
-  // The map library is the one file from another host that every map needs (LEAFLET in 50-maps.js).
-  registration.active.postMessage({ type: "save-all", extra: [`${LEAFLET}leaflet.js`, `${LEAFLET}leaflet.css`] });
+  registration.active.postMessage({ type: "save-all" });
 }
 
 if ("serviceWorker" in navigator) {
