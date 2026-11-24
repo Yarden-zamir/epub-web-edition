@@ -16,10 +16,25 @@ addEventListener("scroll", () => {
     catch { /* Storage blocked: the reader simply starts at the top next time. */ }
   }, 800);
 }, { passive: true });
+// A position the reader closed on purpose or already used stays done until they read meaningfully further:
+// at least DONE_STEP blocks past it, in reading order. Fading out by itself after 5 seconds is not "done".
+const DONE_KEY = `${POSITION_KEY}:done`;
+const DONE_STEP = 5;
+const readingOrder = (id) => [...document.querySelectorAll(".book .doc :is(p, h2, h3, figure, li)[id]")].findIndex((el) => el.id === id);
+function markDone(id) {
+  try { localStorage.setItem(DONE_KEY, id); } catch { /* Storage blocked: the offer may come back next time. */ }
+}
+function isDone(id) {
+  let done = null;
+  try { done = localStorage.getItem(DONE_KEY); } catch { return false; }
+  if (!done) return false;
+  const [d, n] = [readingOrder(done), readingOrder(id)];
+  return d >= 0 && n < d + DONE_STEP;
+}
 function offerResume() {
   let saved = null;
   try { saved = JSON.parse(localStorage.getItem(POSITION_KEY) ?? "null"); } catch { return; }
-  if (!saved?.id || location.hash || !document.getElementById(saved.id)) return;
+  if (!saved?.id || location.hash || !document.getElementById(saved.id) || isDone(saved.id)) return;
   const bar = document.createElement("div");
   bar.className = "resume";
   const go = document.createElement("a");
@@ -30,8 +45,14 @@ function offerResume() {
   close.textContent = "×";
   close.setAttribute("aria-label", "סגירה");
   const remove = () => bar.remove();
-  go.addEventListener("click", (e) => { e.preventDefault(); remove(); goTo(saved.id); });
-  close.addEventListener("click", remove);
+  const dismiss = () => { markDone(saved.id); remove(); };
+  go.addEventListener("click", (e) => { e.preventDefault(); dismiss(); goTo(saved.id); });
+  close.addEventListener("click", dismiss);
+  bar.addEventListener("keydown", (e) => { if (e.key === "Escape") dismiss(); });
+  // A sideways swipe of more than 60px throws it away.
+  let startX = null;
+  bar.addEventListener("pointerdown", (e) => { startX = e.clientX; });
+  bar.addEventListener("pointerup", (e) => { if (startX !== null && Math.abs(e.clientX - startX) > 60) dismiss(); startX = null; });
   bar.append(go, close);
   document.body.append(bar);
   // It leaves on its own after 5 seconds, but not while the pointer is over it or it has focus.

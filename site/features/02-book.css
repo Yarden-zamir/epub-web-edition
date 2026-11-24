@@ -219,3 +219,7 @@
 /* A long URL or word may break, so a narrow column (facsimile pages, phone notes) never grows past the screen. */
 .book .doc { overflow-wrap: break-word; }
 .book .fx-mask-note { overflow-wrap: anywhere; }
+/* The 316 facsimile pages skip style and layout until they come near the viewport; the browser keeps each one's
+   last rendered height. Limit: text chapters stay fully rendered, because axe (the publish gate) misreads colours
+   inside skipped chapters; revisit when axe handles content-visibility. */
+.book > .doc[data-epub-type~="appendix"] { content-visibility: auto; contain-intrinsic-size: auto 260px; }

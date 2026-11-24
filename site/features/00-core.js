@@ -86,13 +86,25 @@ function position() {
   const block = document.elementFromPoint(innerWidth / 2, line)?.closest(".book [id], #places");
   return { y: scrollY, anchor: block?.id ?? null, dy: block ? block.getBoundingClientRect().top - line : 0 };
 }
+// Place an element `dy` pixels below the jump line. Off-screen chapters render lazily (content-visibility), so their
+// height is only an estimate until they come near: scrollIntoView renders the target first (scroll-padding-top in
+// 00-base.css equals jumpOffset()), and a second pass on the next frames corrects any shift that rendering caused.
+function placeAtJumpLine(el, dy = 0) {
+  el.scrollIntoView({ block: "start", behavior: "instant" });
+  if (dy) scrollBy({ top: -dy, behavior: "instant" });
+  const correct = () => {
+    const off = el.getBoundingClientRect().top - jumpOffset() - dy;
+    if (Math.abs(off) > 2) scrollBy({ top: off, behavior: "instant" });
+  };
+  requestAnimationFrame(() => { correct(); requestAnimationFrame(correct); });
+}
 function restorePosition(state) {
   const block = state.anchor && document.getElementById(state.anchor);
-  if (block) scrollTo({ top: block.getBoundingClientRect().top + scrollY - jumpOffset() - state.dy, behavior: "instant" });
+  if (block) placeAtJumpLine(block, state.dy);
   else scrollTo({ top: state.y, behavior: "instant" });
 }
 function scrollToElement(el) {
-  scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + scrollY - jumpOffset()), behavior: "instant" });
+  placeAtJumpLine(el);
 }
 
 // Jump to an element: one new history entry. From inside overlays, the jump replaces the top overlay's entry,

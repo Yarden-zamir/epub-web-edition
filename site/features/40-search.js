@@ -237,7 +237,11 @@ function openSearch() {
   input.select();
   if (!input.value) showRecent();
 }
-for (const button of document.querySelectorAll("[data-open='search-dialog']")) button.addEventListener("click", openSearch);
+for (const button of document.querySelectorAll("[data-open='search-dialog']")) {
+  button.addEventListener("click", openSearch);
+  // Fetch and index the book while the reader is about to open search, so the first query answers at once.
+  for (const type of ["pointerenter", "focus"]) button.addEventListener(type, () => loadIndex().catch(() => {}), { once: true });
+}
 let searchTimer = 0;
 input.addEventListener("input", () => { clearTimeout(searchTimer); searchTimer = setTimeout(runSearch, 100); });
 byId("search-form").addEventListener("submit", (e) => { e.preventDefault(); results.querySelector("a")?.click(); });
