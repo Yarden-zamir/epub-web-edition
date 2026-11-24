@@ -88,14 +88,24 @@ def center_handle(page: Page, fig) -> None:
 
 
 # Elements of the book that reach past the viewport (with overlay scrollbars a full-bleed figure ends exactly at
-# its edges), and the page's own sideways overflow. Run during and after interaction.
+# its edges), and the page's own sideways overflow. Run during and after interaction. An element that an ancestor
+# clips inside the viewport (an SVG, or a box with overflow other than visible) does not widen the page.
 TOO_WIDE = """() => {
   const vw = document.documentElement.clientWidth, out = [];
   const name = (e) => e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (e.classList.length ? '.' + [...e.classList].slice(0, 2).join('.') : '');
+  const clipped = (e) => {
+    for (let a = e.parentElement; a && a.id !== 'read'; a = a.parentElement) {
+      const clips = a instanceof SVGSVGElement || getComputedStyle(a).overflowX !== 'visible';
+      if (!clips) continue;
+      const r = a.getBoundingClientRect();
+      if (r.left >= -1 && r.right <= vw + 1) return true;
+    }
+    return false;
+  };
   if (document.documentElement.scrollWidth > vw) out.push('page ' + document.documentElement.scrollWidth + ' > ' + vw);
   for (const el of document.querySelectorAll('#read *')) {
     const r = el.getBoundingClientRect();
-    if (!r.width || (r.left >= -1 && r.right <= vw + 1)) continue;
+    if (!r.width || (r.left >= -1 && r.right <= vw + 1) || clipped(el)) continue;
     const parent = el.parentElement.getBoundingClientRect();
     if (parent.left < -1 || parent.right > vw + 1) continue; // Report the outermost element only.
     out.push(name(el) + ' [' + Math.round(r.left) + ', ' + Math.round(r.right) + '] in ' + vw);
