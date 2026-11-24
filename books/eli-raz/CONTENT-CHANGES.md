@@ -80,6 +80,7 @@ The reader sees the corrected text with a dagger (†) that opens an edition not
 | Timeline appendix: 62 dates from the book, each linked to its sentence (site/timeline.json) | Before the facsimile appendix |
 | Facsimile appendix: one 56 dpi image (JPEG quality 55) of every printed page, with a Return link. Lowered from 64 dpi on 2026-11-24 to keep the release EPUB at most 24 MB | End of the book |
 | Alt text for all 217 images | book.toml [alt]; written from the images, not printed |
+| Alt text of p151-x597 and p151-x599 swapped back to their images (round opening, stairs), found in the page review | a17, PDF page 151 |
 | QR codes link to their decoded targets | book.toml [qr_links] |
 
 ## 4. Additions (web edition only, site/enhancements.json)
