@@ -39,6 +39,9 @@ for (const link of reading.querySelectorAll("figure a.qr-link")) {
     frame.focus();
   });
   figure.classList.add("has-video");
+  const watch = document.createElement("a");
+  Object.assign(watch, { href: link.href, className: "video-link", target: "_blank", rel: "noopener", textContent: "צפייה ב־YouTube" });
+  figure.querySelector("figcaption")?.append(watch);
   figure.insertBefore(box, figure.querySelector("figcaption"));
 }
 

@@ -13,10 +13,13 @@
 .panel-list .toc ol { padding: 0; }
 .toc-part { margin-top: 0.75rem; }
 .toc-part-title { display: block; padding: 0.4rem 0.75rem; font-size: 0.8rem; font-weight: 700; color: var(--accent); text-decoration: none; }
-.panel-list .toc-item a { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.1rem 0.6rem; padding: 0.55rem 0.75rem; }
+/* Title and author on the start side, place dots in their own column at the end. */
+.panel-list .toc-item a { display: grid; grid-template-columns: 1fr auto; grid-template-areas: "name dots" "author dots"; align-items: center; gap: 0.1rem 0.6rem; padding: 0.55rem 0.75rem; }
+.toc-name { grid-area: name; }
+.toc-author { grid-area: author; }
 .toc-name { flex: 1 1 12rem; }
 .toc-author { font-size: 0.8rem; color: var(--muted); }
-.toc-places { display: inline-flex; gap: 3px; align-self: center; }
+.toc-places { grid-area: dots; display: inline-flex; align-items: center; gap: 3px; font-size: 0.7rem; color: var(--muted); }
 .toc-places i { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--place); }
 .panel-list a[aria-current] { background: color-mix(in srgb, var(--accent) 12%, transparent); box-shadow: inset 3px 0 0 var(--accent); }
 [dir="rtl"] .panel-list a[aria-current] { box-shadow: inset -3px 0 0 var(--accent); }

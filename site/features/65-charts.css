@@ -22,7 +22,7 @@
 .key.s1 { background: var(--series); } .key.s2 { background: var(--series-2); }
 .chart { display: block; width: 100%; height: auto; overflow: visible; font-family: var(--sans); direction: ltr; }
 .chart .grid { stroke: var(--rule); stroke-width: 1; }
-.chart .tick { fill: var(--muted); font-size: 12px; }
+.chart .tick { fill: var(--muted); font-size: 13px; }
 .chart .line { fill: none; stroke: var(--series); stroke-width: 2; stroke-linejoin: round; }
 .chart .line.s2 { stroke: var(--series-2); }
 .chart .pt { fill: var(--series); }
@@ -41,7 +41,7 @@
 .chart-markers { margin: 0.4rem 0 0; padding-inline-start: 1.4rem; font-family: var(--sans); font-size: 0.78rem; color: var(--soft); }
 .chart-source, .chart-notes { margin: 0.6rem 0 0; font-family: var(--sans); font-size: 0.78rem; line-height: 1.5; color: var(--muted); }
 .chart-source a { color: inherit; }
-.csv-link { display: inline-block; margin-top: 0.5rem; font-family: var(--sans); font-size: 0.8rem; color: var(--accent); }
+.csv-link { display: inline-block; min-height: 1.5rem; padding-block: 0.2rem; margin-top: 0.5rem; font-family: var(--sans); font-size: 0.8rem; color: var(--accent); }
 .chart-tip { position: absolute; transform: translate(-50%, calc(-100% - 12px)); padding: 0.3rem 0.55rem; border-radius: 4px; background: var(--ink); color: var(--paper); font-family: var(--sans); font-size: 0.8rem; white-space: nowrap; pointer-events: none; }
 .colophon :is(section, p) { text-align: start; }
 

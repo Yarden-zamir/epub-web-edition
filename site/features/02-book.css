@@ -133,8 +133,9 @@
 .book section.opens-with-photo > figure.photo:first-of-type { margin-top: 0; }
 
 /* Facsimile appendix: page images as a grid of thumbnails on the web. */
-.book > .doc[data-epub-type~="appendix"] { display: inline-block; vertical-align: top; width: calc(50% - 1rem); max-width: none; margin: 0.5rem; }
-@media (min-width: 48rem) { .book > .doc[data-epub-type~="appendix"] { width: calc(25% - 1rem); } }
+/* Widths leave room for the white space between the inline blocks, so two (phone) or four pages share a row. */
+.book > .doc[data-epub-type~="appendix"] { display: inline-block; vertical-align: top; width: calc(50% - 1.3rem); max-width: none; margin: 0.5rem; }
+@media (min-width: 48rem) { .book > .doc[data-epub-type~="appendix"] { width: calc(25% - 1.3rem); } }
 .book section.facsimile-page { padding: 0; }
 .book .fx-nav { display: flex; justify-content: space-between; margin: 0 0 0.35rem; font-family: var(--sans); font-size: 0.75rem; }
 .book .fx-label { color: var(--muted); }
@@ -209,3 +210,12 @@
 .book section.frontispiece > figure + p { margin-top: clamp(1.5rem, 4vw, 2.5rem); }
 /* English text in the same sans as the Hebrew, not the print's Times (book.css sits in a lower cascade layer). */
 [lang="en"] { font-family: var(--sans); }
+/* Phones: text never under 13 px (credits, notes, captions). */
+@media (max-width: 40rem) {
+  .book :is(figcaption .credit, figcaption .edition-credit, .edition-note, .fx-label, .source-note) { font-size: max(0.8125rem, 0.9em); }
+}
+/* The footer shows the title once: the title page's own title stays in the EPUB only. */
+.colophon section.titlepage > .display-title { display: none; }
+/* A long URL or word may break, so a narrow column (facsimile pages, phone notes) never grows past the screen. */
+.book .doc { overflow-wrap: break-word; }
+.book .fx-mask-note { overflow-wrap: anywhere; }

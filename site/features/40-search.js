@@ -6,7 +6,7 @@ const PREFIX_LETTERS = "והבלמשכ";
 // A two-letter word like "ים" hides inside many words as prefix + word ("מים" is water, not "from the sea"),
 // so short words take only the article and the commonest prepositions. Limit: "מהים" ("from the sea") is missed.
 const SHORT_PREFIXES = new Set(["ה", "ב", "ל", "ו", "וה", "וב", "ול"]);
-const BOOST = { heading: 2.5, figure: 1.5, text: 1 };
+const BOOST = { heading: 2.5, figure: 1.1, text: 1 }; // A caption ranks just above text with the same words.
 const RECENT_KEY = "eli-raz:recent-searches";
 
 // Token: a run of letters, digits and marks, with geresh and gershayim inside words (צה"ל, ג'ורג').
@@ -197,13 +197,18 @@ function placeTile(chapter) {
   tile.style.setProperty("--place", `var(--place-${list[0].n})`);
   return tile;
 }
+// The empty panel offers the reader's recent searches, a few example queries and the page-jump hint.
+const EXAMPLES = ["בולענים", "ים המלח", "עמ' 100"];
 function showRecent() {
   results.replaceChildren();
   const recent = readRecent();
-  status.textContent = recent.length ? "חיפושים אחרונים" : "";
-  for (const q of recent) {
-    results.append(resultItem({ href: "#", body: q, onPick: () => { input.value = q; runSearch(); input.focus(); } }));
-  }
+  const offer = (q) => resultItem({ href: "#", body: q, onPick: () => { input.value = q; runSearch(); input.focus(); } });
+  status.textContent = recent.length ? "חיפושים אחרונים" : "למשל:";
+  for (const q of recent.length ? recent : EXAMPLES) results.append(offer(q));
+  const hint = document.createElement("li");
+  hint.className = "search-hint";
+  hint.textContent = "מספר עמוד, כמו 120 או עמ' 120, מוביל לעמוד בספר המודפס.";
+  results.append(hint);
 }
 async function runSearch() {
   const query = input.value;
@@ -218,7 +223,7 @@ async function runSearch() {
   const hits = terms.length ? rank(index, terms) : [];
   status.textContent = hits.length === 0 && jumps.length === 0 ? "לא נמצאו תוצאות" : hits.length === 1 ? "תוצאה אחת" : hits.length ? `${hits.length} תוצאות` : "";
   for (const { e, marks } of hits.slice(0, 80)) {
-    const where = [e.section, e.page ? `עמ' ${e.page}` : null, `מיקום ${e.loc}`].filter(Boolean).join(" · ");
+    const where = [e.section, e.page ? `עמ' ${e.page}` : null].filter(Boolean).join(" · ");
     results.append(resultItem({
       href: `#${e.id}`, where, body: snippet(e, marks), thumb: e.thumb,
       tile: e.kind === "heading" ? placeTile(e.chapter) : null, onPick: () => pick(e.id, [...new Set(marks.map((m) => e.text.slice(m.start, m.end)))]),
