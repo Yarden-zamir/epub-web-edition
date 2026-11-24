@@ -41,7 +41,8 @@
     "groundwater": "מי תהום",
     "west": "מערב",
     "east": "מזרח",
-    "drag": "גררו"
+    "drag": "גררו",
+    "fresh_dissolves": "מי תהום מתוקים ממיסים את המלח"
   },
   "texts": {
     "protected": "במפלס גבוה, אופפים מי ים המלח הרוויים (שאינם יכולים להמס מלח) את שכבת המלח, ומגינים עליה מפני המסה על ידי מי התהום.",
@@ -86,5 +87,8 @@
       "file": "charts/fig-a14-08.json",
       "series": "בולענים (מצטבר)"
     }
+  },
+  "label_notes": {
+    "fresh_dissolves": "Plain wording of the printed figure: the salt layer is exposed to dissolution by the undersaturated groundwater (fig-a14-07), while the saturated Dead Sea water cannot dissolve salt."
   }
 }

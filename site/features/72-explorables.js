@@ -9,7 +9,7 @@
 //   view: [x, y, width, height]                   drawing units shown in the canvas
 //   valueParts(value, spec) -> {num, unit, note} the value as text: a number (fixed decimals), its unit and an
 //                                                optional note. Each part sits in a fixed-width slot, so nothing moves.
-//   animated?: true                              water and salt move slowly: env.time runs (12 frames a second at most)
+//   animated?: true                              water and salt move slowly: env.time runs (FLOW_FPS frames a second at most)
 //   create(spec, env) -> {                       prepares fixed shapes once
 //     draw(ctx, value, env) -> summary string    draws one frame in drawing units
 //     handle(value) -> [x, y]                    where the drag handle sits
@@ -50,7 +50,7 @@ const number = (value, digits = 0) =>
 const iso = (text) => `\u2068${text}\u2069`;
 const MINUS = "\u2212";
 const valueText = (kind, v, spec) => { const p = kind.valueParts(v, spec); return `${p.num} ${p.unit}${p.note ? ` (${p.note})` : ""}`; };
-const FLOW_FPS = 12; // Slow motion of water and salt: few frames, so an idle explainer costs little.
+const FLOW_FPS = 20; // Slow motion of water and salt: enough frames to read as flow, few enough to cost little.
 const easeOut = (t) => 1 - (1 - t) ** 3;
 // A path through points, for a Path2D or the context itself.
 function polyline(target, points, close = false) {
