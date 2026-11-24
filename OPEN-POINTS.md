@@ -42,6 +42,8 @@ Clearance evidence: scratchpad clearance record of 2026-11-24, summarized in boo
 25. Places without a Wikidata item, not on the map: ואדי אל-הידאן, ואדי זרקא מעין (content-data/places.md).
 26. PDF page 297 (fig-a36-06): Eli's 2011 schematic has a three-row table of route lengths; it could become a sortable table.
 
+27. Pointed Hebrew (niqqud) attached to the wrong letters in every pointed passage (poems at chapter ends, Bible quotes); and poems shown as one paragraph per line. Assigned 2026-11-24: EPUB/Kindle agent (mark attachment by glyph position, poem markup), UI agent (poem styling).
+
 ## Design and assets
 
 13. Print fonts: bundle licensed font files, or keep Noto Sans Hebrew as the fallback.
