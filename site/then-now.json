@@ -99,6 +99,12 @@
       "date": "2026-11-01",
       "source": "site/data/dead-sea-level.json"
     },
-    "then": null
+    "then": {
+      "value": -401.3,
+      "date": "1848-05",
+      "label": "1,316.7 feet below the Mediterranean, measured by spirit levelling, 8-29 May 1848",
+      "source": "W. F. Lynch, Official Report of the United States Expedition to Explore the Dead Sea and River Jordan, Baltimore 1852, p. 43",
+      "url": "https://archive.org/details/OfficialReportOfTheUSExpedition"
+    }
   }
 }
