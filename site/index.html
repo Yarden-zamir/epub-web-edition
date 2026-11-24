@@ -8,7 +8,6 @@
 <meta name="theme-color" content="#191715">
 <title>{{title}} · {{creator}}</title>
 {{icons}}
-<link rel="preload" href="{{cover}}" as="image">
 {{preview_meta}}
 {{font_preload}}
 <!-- The book stylesheet sits in a cascade layer, so every site rule overrides its print styles. -->
@@ -36,7 +35,7 @@
 </header>
 
 <section class="hero" id="top" aria-labelledby="hero-title">
-  <div class="hero-backdrop" aria-hidden="true"><img src="{{cover}}" alt=""></div>
+  <div class="hero-backdrop" aria-hidden="true"><img src="{{hero_backdrop}}" alt="" fetchpriority="high"></div>
   <div class="hero-inner">
     <div class="hero-text">
       <h1 class="hero-title" id="hero-title">{{title}}</h1>
@@ -51,7 +50,7 @@
         </div>
       </div>
     </div>
-    <img class="hero-cover" src="{{cover}}" alt="כריכת הספר">
+    <img class="hero-cover" src="{{hero_src}}" srcset="{{hero_srcset}}" sizes="(min-width: 56rem) 22rem, min(52vw, 15rem)" width="{{hero_width}}" height="{{hero_height}}" fetchpriority="high" alt="כריכת הספר">
   </div>
   <a class="hero-cue" href="#read" aria-label="לתחילת הקריאה">
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 4v16m0 0-6-6m6 6 6-6"/></svg>
