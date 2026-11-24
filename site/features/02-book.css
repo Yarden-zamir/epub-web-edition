@@ -59,8 +59,8 @@
 .colophon [data-epub-type="pagebreak"] { display: none; }
 /* Credits and licences (tools/web/93_credits.py): the edition credits, then the web map, data and software credits. */
 .credits-title { margin: 0 0 0.9rem; font-size: 1rem; color: var(--on-night); }
-.credits-group { margin: 0 0 0.3rem; font-size: 0.85rem; color: var(--on-night); }
-.credits-web ul { margin: 0 0 1rem; padding: 0; list-style: none; display: grid; gap: 0.3rem; }
+.credits-group { margin: 0 0 0.3rem; font-size: 0.85rem; font-weight: 600; color: var(--on-night); }
+.credits-web ul { margin: 0 0 1rem; padding: 0; list-style: none; display: grid; gap: 0.3rem; font-size: 0.9em; }
 .credits-web li { overflow-wrap: anywhere; }
 
 .book section.chapter { padding-top: clamp(5rem, 14vw, 11rem); }

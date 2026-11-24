@@ -57,8 +57,9 @@ def map_groups(data_dir: Path) -> list[str]:
             credit = layer["credit"]
             if not credit["url"].startswith("https://"):
                 raise BookError(f"then-now.json: layer {layer['id']!r}: credit url must be https")
-            layers.append(item(f'<a href="{html.escape(credit["url"])}" rel="noopener">{html.escape(credit["text"])}</a>', "en"))
-        groups.append(group(f"שכבות המפה „{spec['title']}”", layers))
+            # The text stays plain and a short link follows, so long credits do not read as one underlined block.
+            layers.append(item(f'{html.escape(credit["text"])} <a href="{html.escape(credit["url"])}" rel="noopener">Source</a>', "en"))
+        groups.append(group(f'שכבות המפה "{spec["title"]}"', layers))
     return groups
 
 
