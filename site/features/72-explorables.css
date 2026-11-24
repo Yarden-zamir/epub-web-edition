@@ -1,0 +1,88 @@
+/* Interactive explainers inside printed figures (explorables.js). Colours come from the site tokens and the
+   cover palette in books/eli-raz/AGENTS-BRIEF.md: sand #e6cfa6, cliff #916c43, sea #0e4840, teal #2b7f86.
+   Text always sits on a paper-coloured halo, so it keeps AA contrast on any fill. */
+:root {
+  --xp-land: #e6cfa6; --xp-land-edge: #916c43; --xp-salt: #fbfaf7; --xp-salt-edge: #6f685d;
+  --xp-brine: #9fbcb8; --xp-fresh: #cfe5e6; --xp-lake: #4f8a85;
+  --xp-fresh-ink: #1d6a71; --xp-brine-ink: #8f3f22; --xp-void: #1c1a17; --xp-dissolve: #e7b49a;
+  --xp-plate-a: #e6cfa6; --xp-plate-b: #d6c29d; --xp-basin: #0e4840; --xp-copper: #3f8f6a;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --xp-land: #4a3d2b; --xp-land-edge: #bc9f73; --xp-salt: #d8d2c7; --xp-salt-edge: #f3ede3;
+    --xp-brine: #1f3d3a; --xp-fresh: #1d3437; --xp-lake: #2b7f86;
+    --xp-fresh-ink: #7cc9cf; --xp-brine-ink: #e3a07c; --xp-void: #050404; --xp-dissolve: #b8754f;
+    --xp-plate-a: #4a3d2b; --xp-plate-b: #3a3024; --xp-basin: #2b7f86; --xp-copper: #5fb98d;
+  }
+}
+:root[data-theme="dark"] {
+  --xp-land: #4a3d2b; --xp-land-edge: #bc9f73; --xp-salt: #d8d2c7; --xp-salt-edge: #f3ede3;
+  --xp-brine: #1f3d3a; --xp-fresh: #1d3437; --xp-lake: #2b7f86;
+  --xp-fresh-ink: #7cc9cf; --xp-brine-ink: #e3a07c; --xp-void: #050404; --xp-dissolve: #b8754f;
+  --xp-plate-a: #4a3d2b; --xp-plate-b: #3a3024; --xp-basin: #2b7f86; --xp-copper: #5fb98d;
+}
+
+.book figure.has-explorable { max-width: 48rem; margin-inline: auto; }
+.book figure.has-explorable > img { margin-inline: auto; }
+.explorable { font-family: var(--sans); }
+.xp-head { margin-bottom: 0.5rem; }
+.xp-title { margin: 0; font-weight: 700; font-size: 1rem; }
+.xp-instruction { margin: 0.15rem 0 0; color: var(--soft); font-size: 0.85rem; }
+.xp-stage { position: relative; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; background: var(--paper); }
+.xp-svg { display: block; width: 100%; height: auto; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.xp-svg .xp-label {
+  fill: var(--ink); font-size: calc(13px * var(--xp-unit, 1)); font-weight: 600;
+  paint-order: stroke; stroke: var(--paper); stroke-width: calc(3.5px * var(--xp-unit, 1)); stroke-linejoin: round;
+}
+.xp-narrow .xp-minor { display: none; }
+.xp-svg .xp-compass { fill: var(--muted); font-weight: 400; }
+.xp-handle { cursor: grab; touch-action: none; }
+.dragging .xp-handle { cursor: grabbing; }
+.xp-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.75rem; margin-top: 0.75rem; font-size: 0.85rem; }
+.xp-controls label { font-weight: 600; }
+.xp-controls input[type="range"] { flex: 1 1 12rem; min-width: 0; min-height: 2.75rem; margin: 0; accent-color: var(--accent); }
+.xp-controls output { flex: 1 0 100%; order: 3; color: var(--soft); font-variant-numeric: tabular-nums; }
+.xp-reset { padding: 0.35rem 0.9rem; border: 1px solid var(--rule); border-radius: 999px; color: var(--ink); font-size: 0.8rem; min-height: 2.25rem; }
+.xp-reset:hover { background: var(--mat); }
+.xp-readout { margin: 0.5rem 0 0; font-size: 0.9rem; line-height: 1.6; color: var(--ink); min-height: 4.8em; }
+.xp-schematic, .xp-sources { margin: 0.5rem 0 0; font-size: 0.78rem; line-height: 1.5; color: var(--muted); }
+.xp-sources a { color: inherit; }
+
+/* Sinkholes (sinkholes.js) */
+.sk-land { fill: var(--xp-land); }
+.sk-brine { fill: var(--xp-brine); }
+.sk-fresh { fill: var(--xp-fresh); }
+.sk-lake { fill: var(--xp-lake); opacity: 0.85; }
+.sk-salt { fill: var(--xp-salt); stroke: var(--xp-salt-edge); stroke-width: 1.2; }
+.sk-dissolving { fill: var(--xp-dissolve); }
+.sk-void { fill: var(--xp-void); }
+.sk-rubble { fill: var(--xp-land-edge); opacity: 0.55; }
+.sk-ground { fill: none; stroke: var(--xp-land-edge); stroke-width: 2; }
+.sk-table { stroke: var(--xp-fresh-ink); stroke-width: 1.5; stroke-dasharray: 6 4; }
+.sk-interface { stroke: var(--ink); stroke-width: 1.5; }
+.sk-surface { stroke: var(--xp-fresh-ink); stroke-width: 2.5; }
+.sk-arrow path { fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.sk-arrow.fresh path { stroke: var(--xp-fresh-ink); }
+.sk-arrow.brine path { stroke: var(--xp-brine-ink); }
+.sk-grip circle { fill: var(--paper); stroke: var(--ink); stroke-width: 1.5; }
+.sk-grip path { fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; }
+@media (prefers-reduced-motion: no-preference) {
+  .sk-arrow.fresh path { animation: xp-flow-east 1.8s ease-in-out infinite alternate; }
+  .sk-arrow.brine path { animation: xp-flow-west 1.8s ease-in-out infinite alternate; }
+}
+@keyframes xp-flow-east { from { transform: translateX(-4px); } to { transform: translateX(4px); } }
+@keyframes xp-flow-west { from { transform: translateX(4px); } to { transform: translateX(-4px); } }
+
+/* Transform (transform.js): a tall map, so it keeps a phone-like width on large screens. */
+.explorable[data-kind="transform"] .xp-svg { max-width: 26rem; margin-inline: auto; }
+.tf-basin { fill: var(--xp-basin); }
+.tf-west { fill: var(--xp-plate-a); stroke: var(--ink); stroke-width: 1.5; }
+.tf-plate-east { fill: var(--xp-plate-b); stroke: var(--ink); stroke-width: 1.5; }
+.tf-copper { fill: var(--xp-copper); }
+.tf-arrow { fill: none; stroke: var(--ink); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.tf-town { fill: var(--ink); }
+.tf-grip circle { fill: var(--paper); stroke: var(--ink); stroke-width: 1.5; }
+.tf-grip path { fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; }
+@media (prefers-reduced-motion: no-preference) {
+  .xp-stage:not(.dragging) .tf-east { transition: transform 120ms ease-out; }
+}

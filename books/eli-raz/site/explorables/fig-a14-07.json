@@ -1,0 +1,44 @@
+{
+  "figure": "fig-a14-07",
+  "kind": "sinkholes",
+  "title": "ירידת המפלס והיווצרות הבולענים",
+  "instruction": "גררו את פני האגם למטה, או הזיזו את המחוון, וראו מה קורה לשכבת המלח.",
+  "schematic": "שרטוט סכמטי לפי האיור המודפס, לא בקנה מידה. המפלסים לקוחים מהאיור ומנתוני רשות המים. קצב ההמסה והקריסה בשרטוט הוא להמחשה בלבד.",
+  "control": {"label": "מפלס ים המלח", "min": 395, "max": 441.5, "step": 0.5, "start": 395, "unit": "מטר מתחת לפני הים"},
+  "marks": [
+    {"value": 395, "year": "1960", "note": "מפלס 395- באיור המודפס"},
+    {"value": 414, "year": "2000", "note": "מפלס 414- באיור המודפס"}
+  ],
+  "labels": {
+    "slope": "מדרון החוף",
+    "water_table": "מפלס מי התהום",
+    "interface": "הפן הבייני",
+    "brine": "מי ים המלח רוויים",
+    "salt": "שכבת המלח",
+    "groundwater": "מי תהום",
+    "west": "מערב",
+    "east": "מזרח",
+    "drag": "גררו"
+  },
+  "texts": {
+    "protected": "במפלס גבוה, אופפים מי ים המלח הרוויים (שאינם יכולים להמס מלח) את שכבת המלח, ומגינים עליה מפני המסה על ידי מי התהום.",
+    "exposed": "ירידת מפלס ים המלח, והפן הבייני בעקבותיו, חושפים את שכבת המלח להמסה במי התהום התת־רוויים.",
+    "collapse": "בשכבת המלח נוצרים חללי המסה, והשכבות העליונות, שליכודן רופף, קורסות לתוכם: בולענים.",
+    "count": "מספר הבולענים המצטבר לאורך החוף",
+    "count_source": "לפי האיור שבהמשך",
+    "count_after": "האיור מסתיים ב־2016"
+  },
+  "geometry_note": "The cross-section follows the printed figure: in 1960 (level -395) the salt layer lies below the interface; in 2000 (level -414) its western part lies above it, in fresh groundwater. Positions between and after these levels are a linear schematic, not a model.",
+  "sources": [
+    {"label": "האיור המודפס וכיתובו (מפלסים 395- ו־414-, תוויות)", "element": "fig-a14-07"},
+    {"label": "שלבי היווצרות הבולען", "element": "fig-a14-06"},
+    {"label": "שכבת מלח בעומק 20 עד 70 מ' (Wachs et al. 2000)", "element": "a14-p013"},
+    {"label": "ממערב לשכבת המלח אין בולענים", "element": "a14-p060"},
+    {"label": "מספר הבולענים המצטבר (Nof, Abelson, Raz et al. 2019)", "element": "fig-a14-08"},
+    {"label": "מפלס ים המלח: רשות המים, data.gov.il", "url": "https://data.gov.il/dataset/https-www-data-gov-il-dataset-683"}
+  ],
+  "data": {
+    "level": {"file": "data/dead-sea-level.json"},
+    "sinkholes": {"file": "charts/fig-a14-08.json", "series": "בולענים (מצטבר)"}
+  }
+}
