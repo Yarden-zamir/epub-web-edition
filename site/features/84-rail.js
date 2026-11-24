@@ -19,7 +19,9 @@ const railName = (s) => tocDialog.querySelector(`[data-chapter="${CSS.escape(s.i
 let railMarks = [];
 function layoutRail() {
   const height = document.documentElement.scrollHeight;
-  railMarks = railSections.map((s) => ({ s, at: (s.getBoundingClientRect().top + scrollY) / height }));
+  // The top of the document box, not of the section: a section of a skipped document (content-visibility) has no
+  // layout, and reading its position would force one. The section starts at the top of its document.
+  railMarks = railSections.map((s) => ({ s, at: (s.closest(".book > *").getBoundingClientRect().top + scrollY) / height }));
   railTrack.replaceChildren(...railMarks.map(({ s, at }) => {
     const mark = document.createElement("i");
     mark.className = s.matches(".part") ? "part" : "";
@@ -64,6 +66,8 @@ rail.addEventListener("pointerdown", (e) => {
   scrubbing = true;
   document.documentElement.setAttribute("data-scrubbing", "");
   rail.setPointerCapture(e.pointerId);
+  // Right after a load some chapters may still have estimated sizes (00-core.js); a scrub needs exact ones.
+  if (finishSizing()) layoutRail();
   history.replaceState({ ...history.state, ...position(), back: null }, ""); // Back returns here.
   scrubSection = scrubTo(e.clientY);
 });

@@ -98,19 +98,19 @@ def check_reproducible() -> None:
         record("web build is byte-reproducible from the EPUB", same)
 
 
-def asset_versions(web: Path) -> tuple[str, str, str]:
-    """The service worker cache version and the reader.js and reader.css addresses of a built site."""
+def asset_versions(web: Path) -> tuple[str, str]:
+    """The service worker cache version and the reader.js address of a built site."""
     worker = (web / "sw.js").read_text(encoding="utf-8")
     version = worker.split('const VERSION = "', 1)[1].split('"', 1)[0]
     page = (web / "index.html").read_text(encoding="utf-8")
-    links = [page.split(f'="{name}?v=', 1)[1].split('"', 1)[0] if page.count(f'="{name}?v=') == 1 else ""
-             for name in ("reader.js", "reader.css")]
-    return version, *links
+    script = page.split('="reader.js?v=', 1)[1].split('"', 1)[0] if page.count('="reader.js?v=') == 1 else ""
+    return version, script
 
 
 def check_cache_busting() -> None:
     """A deploy with a changed script reaches a returning reader: the service worker cache gets a new name, and the
-    page asks for the script at a new address (tools/web/99_offline.py), while an unchanged file keeps its address."""
+    page asks for the script at a new address (tools/web/99_offline.py). The site styles are inline in index.html, so
+    they always match the page; site/pages/ link reader.css at a versioned address too."""
     bundle = build_web.bundle
     with tempfile.TemporaryDirectory() as tmp:
         build_web.bundle = lambda suffix: bundle(suffix) + ("\n// changed\n" if suffix == ".js" else "")
@@ -119,9 +119,9 @@ def check_cache_busting() -> None:
         finally:
             build_web.bundle = bundle
         before, after = asset_versions(WEB), asset_versions(Path(tmp) / "changed")
-    ok = all(before) and all(after) and before[0] != after[0] and before[1] != after[1] and before[2] == after[2]
+    ok = all(before) and all(after) and before[0] != after[0] and before[1] != after[1]
     record("a changed reader.js gets a new cache name and address", ok,
-           {"cache": [before[0], after[0]], "reader.js": [before[1], after[1]], "reader.css": [before[2], after[2]]})
+           {"cache": [before[0], after[0]], "reader.js": [before[1], after[1]]})
 
 
 def epub_texts() -> dict[str, str]:

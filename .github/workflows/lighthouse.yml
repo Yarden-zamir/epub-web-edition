@@ -1,0 +1,94 @@
+# Advisory Lighthouse scores of the Eli Raz web edition: the home page and a long chapter deep link, on mobile and
+# desktop (books/eli-raz/scripts/lighthouse.py). It is not a required check and low scores do not fail it, so it
+# never blocks the merge queue. The job summary shows the scores; the artifact "lighthouse" holds the HTML and JSON
+# reports.
+# - pull request: builds the edition of the PR and of its base (check.py) and measures both on local servers.
+#   Runners differ in speed by up to 2x, so only the two rows of one run compare; their runs take turns.
+# - by hand: the build of the branch, or the deployed site with
+#   gh workflow run lighthouse.yml -f url=https://eli-raz.yarden-zamir.com
+# Each page and device runs 3 times per site and keeps the median.
+name: lighthouse
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - "site/**"
+      - "tools/**"
+      - "books/eli-raz/**"
+      - ".github/workflows/lighthouse.yml"
+  workflow_dispatch:
+    inputs:
+      url:
+        description: Measure this site instead of a fresh build (for example https://eli-raz.yarden-zamir.com)
+        type: string
+        default: ""
+permissions:
+  contents: read
+concurrency:
+  group: lighthouse-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      # Restore only: check.yml and kitshn.yml own this cache.
+      - name: Restore check cache
+        if: inputs.url == ''
+        uses: actions/cache/restore@v6
+        with:
+          path: ~/.cache/eli-raz
+          key: eli-raz-cache-${{ github.run_id }}
+          restore-keys: eli-raz-cache-
+      - if: inputs.url == ''
+        uses: ./.github/actions/book-tools
+      - name: Build
+        if: inputs.url == ''
+        run: uv run books/eli-raz/scripts/check.py
+      - name: Build the base of the pull request
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          git worktree add "$RUNNER_TEMP/base" "$BASE_SHA"
+          cd "$RUNNER_TEMP/base" && uv run books/eli-raz/scripts/check.py
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Install Lighthouse 13.6.0 and serve 14.2.7
+        run: npm install --global lighthouse@13.6.0 serve@14.2.7
+      - name: Install uv 0.13.6
+        if: inputs.url != ''
+        run: |
+          curl -LsSf https://astral.sh/uv/0.13.6/install.sh | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Lighthouse
+        env:
+          URL: ${{ inputs.url }}
+        run: |
+          web=books/eli-raz/dist/release/web
+          if [[ -n "$URL" ]]; then
+            uv run books/eli-raz/scripts/lighthouse.py dist/lighthouse "live=$URL"
+          elif [[ "$GITHUB_EVENT_NAME" == pull_request ]]; then
+            uv run books/eli-raz/scripts/lighthouse.py dist/lighthouse "main=$RUNNER_TEMP/base/$web" "pr=$web"
+          else
+            uv run books/eli-raz/scripts/lighthouse.py dist/lighthouse "build=$web"
+          fi
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: lighthouse
+          path: dist/lighthouse/*.report.*
+          if-no-files-found: warn
+          retention-days: 14
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: lighthouse-traces
+          path: dist/lighthouse/runs/*-0-*
+          if-no-files-found: warn
+          retention-days: 3
