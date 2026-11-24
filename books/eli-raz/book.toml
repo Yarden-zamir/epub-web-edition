@@ -542,7 +542,7 @@ reason = "The star of the a16 title pointed to the note left out above ([[omit]]
 # Left as printed, without a link: a17 (1)-(68) cite the list of the original article (Cathedra 101), which this
 # book does not print; citations with no matching entry ("Steinhorn, 1983": the list has 1981; "ביין וחובריו, 2020";
 # "אבלסון ואחרים, 2009"; "Oren & Shilo, 1982"; "Consolidated Consultants, 2008"; "אלטנוילד, 1902"; "Hiorth (1919)";
-# "Ken-Tor ... ,2008" and "מרקו"); "אורן, 2008" (a35: the Hebrew paper is only inside entry 54, the English one is 67);
+# "Ken-Tor ... ,2008" and "מרקו"); "(Bodaker et al., 2010)" in a35-p058 (an edition correction); "אורן, 2008" (a35: the Hebrew paper is only inside entry 54, the English one is 67);
 # "רז, 1993" (a18 caption: entry 34 is in the a34 section). Buchalo et al. 2000 is printed twice (47, 51): links go to 47.
 # Each text must occur in its element, outside other links, as many times as it is listed.
 [sources]
@@ -744,12 +744,11 @@ sources = [["Oren and Shilo, 1985", 69]]
 [[cite]]
 element = "a35-p056"
 sources = [["Kaplan & Friedman, 1970", 59], ["Oren,1983a", 62], ["1993", 65]]
-[[cite]]
-element = "a35-p058"
-sources = [["Bodaker et al., 2010", 46]]
+# a35-p058 "(Bodaker et al., 2010)" stays as text: the whole citation is an edition correction ([[correction]]),
+# which holds only text. In a35-p070 the name is a correction, so the year after its mark is the link.
 [[cite]]
 element = "a35-p070"
-sources = [["Coyne & Bellier", 53]]
+sources = [["2010", 53]]
 [[cite]]
 element = "a35-p071"
 sources = [["Ionescu et al., 2012", 58]]

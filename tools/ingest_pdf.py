@@ -240,8 +240,9 @@ def element_range(doc: str, eid: str) -> tuple[int, int]:
 
 
 def text_hits(doc: str, start: int, end: int, esc: str) -> list[int]:
-    """Offsets of esc (escaped text) in the text runs of doc[start:end], outside tags and outside links."""
-    hits, i, in_link = [], start, 0
+    """Offsets of esc (escaped text) in the text runs of doc[start:end], outside tags, links and edition corrections
+    (a [[correction]] span holds only text, right before its mark: tools/web/35_errata.py)."""
+    hits, i, in_link, in_correction = [], start, 0, False
     while i < end:
         if doc[i] == "<":
             close = doc.index(">", i) + 1
@@ -249,11 +250,15 @@ def text_hits(doc: str, start: int, end: int, esc: str) -> list[int]:
                 in_link += 1
             elif doc.startswith("</a>", i):
                 in_link -= 1
+            elif doc.startswith('<span class="edition-correction"', i):
+                in_correction = True
+            elif in_correction and doc.startswith("</span>", i):  # A correction span holds no element.
+                in_correction = False
             i = close
             continue
         run_end = doc.find("<", i, end)
         run_end = end if run_end < 0 else run_end
-        if not in_link:
+        if not in_link and not in_correction:
             k = doc.find(esc, i, run_end)
             while k >= 0:
                 hits.append(k)
