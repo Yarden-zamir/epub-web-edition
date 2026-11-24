@@ -14,6 +14,11 @@
   --night: #191715;
   --on-night: #f3ede3;
   --on-night-soft: #cbbfac;
+  /* Radii: one small set, so equal parts share a corner. A part nested in a rounded box with padding takes
+     the outer radius minus that padding (see site/features/README.md), so the corners stay concentric. */
+  --radius-s: 0.5rem;     /* inputs, chips, thumbnails, small tips */
+  --radius-m: 0.875rem;   /* cards, popovers, dialogs, menus, video */
+  --radius-pill: 999px;   /* pill buttons and toggles */
   --measure: 38rem; /* About 34em of body text: 60-70 Hebrew characters a line. */
   --gutter: clamp(1.25rem, 5vw, 3rem);
   /* "Book Sans" is the book's bundled Noto Sans Hebrew (Hebrew letters only); Latin letters fall through to the system sans. */
@@ -47,7 +52,7 @@ body {
 }
 [dir="ltr"], [dir="rtl"] { unicode-bidi: isolate; }
 a { color: inherit; text-decoration-color: color-mix(in srgb, currentColor 40%, transparent); text-underline-offset: 0.22em; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; } /* The ring follows the element's own corners. */
 img { max-width: 100%; }
 p { text-indent: 0; } /* The book stylesheet indents paragraphs; site chrome must not inherit that. */
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
@@ -59,7 +64,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* Buttons */
 .btn {
   display: inline-flex; align-items: center; gap: 0.6rem; min-height: 2.9rem; box-sizing: border-box;
-  padding: 0.7rem 1.4rem; border-radius: 999px; border: 1px solid transparent;
+  padding: 0.7rem 1.4rem; border-radius: var(--radius-pill); border: 1px solid transparent;
   font-family: var(--sans); font-size: 1rem; font-weight: 600; line-height: 1.2; text-decoration: none;
   background: var(--accent); color: var(--on-accent);
   transition: transform 150ms ease, background-color 150ms ease;

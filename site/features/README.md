@@ -14,6 +14,21 @@ Each web feature lives in its own files. The build finds them by name. No shared
 - `00-core.js` holds the shared parts: `byId`, history, `goTo`, `highlight`, overlays (`openOverlay`, `overlayClosed`). `00-base.css`, `01-nav.css`, `02-book.css` and `03-panels.css` hold tokens, base, bar, hero, book and panel styles.
 - All scripts share one top-level scope. Do not reuse a top-level name of another feature.
 
+## Shared design tokens
+
+Use the tokens of `00-base.css`, never a literal value for the same purpose.
+
+| Token | Value | For |
+|---|---|---|
+| `--radius-s` | 0.5rem | Inputs, chips, thumbnails, small tooltips |
+| `--radius-m` | 0.875rem | Cards, popovers, dialogs, menus, sheets, video |
+| `--radius-pill` | 999px | Pill buttons, toggles, round icon buttons |
+
+- A part inside a rounded box with padding takes the outer radius minus the padding, so the corners stay concentric. For example, a row inside a `--radius-m` panel with 0.5rem padding uses `calc(var(--radius-m) - 0.5rem)`.
+- Circles (dots) use 50%. Book photos have no radius.
+- Colours: `--paper`, `--ink`, `--soft`, `--muted`, `--rule`, `--mat`, `--accent`, `--night`, `--on-night`, `--on-night-soft`. Text needs 4.5:1, and large text or a control needs 3:1, in light and dark mode. Text over a photo or a map always gets a solid backing or a scrim.
+- Focus: the global `:focus-visible` ring follows the element's own corners. Leave 4px of room around a focusable part inside a scroll or `overflow: hidden` box, so the ring is never cut. On dark ground the ring uses `--on-night`.
+
 ## Build module hooks
 
 A module defines any of these functions. Each one receives `site` (`build_web.Site`: `book`, `conv`, `out`, `data_dir`, `enhancements_file`, `thumbs`, `report`).

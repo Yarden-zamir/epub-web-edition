@@ -6,7 +6,7 @@
 .viewer-caption .credit { display: block; color: #a8a094; font-size: 0.9em; }
 .viewer-caption .deep-link { display: none; }
 .viewer-original { font-size: 0.85rem; color: #a8a094; }
-.viewer-close { position: absolute; top: 0.75rem; inset-inline-end: 0.75rem; width: 2.75rem; height: 2.75rem; border-radius: 999px; font-size: 1.5rem; color: inherit; }
+.viewer-close { position: absolute; top: 0.75rem; inset-inline-end: 0.75rem; width: 2.75rem; height: 2.75rem; border-radius: var(--radius-pill); font-size: 1.5rem; color: inherit; }
 .viewer-close:hover { background: rgb(255 255 255 / 0.1); }
 
 @media print {

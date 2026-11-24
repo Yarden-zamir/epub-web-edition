@@ -2,12 +2,12 @@
 #toc-dialog { height: min(85vh, 46rem); }
 #toc-dialog[open] { display: flex; flex-direction: column; }
 #toc-dialog .panel-body { flex: 1; min-height: 0; overflow-y: auto; }
-.tabs { display: flex; gap: 0.25rem; padding: 0 1rem 0.5rem; border-bottom: 1px solid var(--rule); }
+.tabs { display: flex; gap: 0.25rem; padding: 0.25rem 1rem 0.5rem; border-bottom: 1px solid var(--rule); }
 .tabs:has(> [role="tab"]:only-of-type) { display: none; }
-.tabs [role="tab"] { padding: 0.45rem 0.9rem; border-radius: 999px; font-size: 0.9rem; color: var(--muted); }
+.tabs [role="tab"] { padding: 0.45rem 0.9rem; border-radius: var(--radius-pill); font-size: 0.9rem; color: var(--muted); }
 .tabs [role="tab"][aria-selected="true"] { background: var(--ink); color: var(--paper); }
 .toc-filter { position: sticky; top: 0; z-index: 1; padding: 0.75rem 1rem 0.5rem; background: var(--paper); }
-.toc-filter input { width: 100%; box-sizing: border-box; padding: 0.6rem 0.9rem; border: 1px solid var(--rule); border-radius: 10px; background: var(--mat); color: inherit; font: inherit; font-size: 0.95rem; }
+.toc-filter input { width: 100%; box-sizing: border-box; padding: 0.6rem 0.9rem; border: 1px solid var(--rule); border-radius: var(--radius-s); background: var(--mat); color: inherit; font: inherit; font-size: 0.95rem; }
 .toc-filter input:focus { outline: 2px solid var(--accent); outline-offset: 0; }
 .toc-empty { margin: 1rem 1.5rem; color: var(--muted); }
 .panel-list .toc ol { padding: 0; }
@@ -25,7 +25,7 @@
 [dir="rtl"] .panel-list a[aria-current] { box-shadow: inset -3px 0 0 var(--accent); }
 .timeline { list-style: none; margin: 0; padding: 1rem 1.25rem 1.5rem; position: relative; }
 .timeline::before { content: ""; position: absolute; inset-block: 1rem; inset-inline-start: 1.6rem; width: 2px; background: var(--rule); }
-.tl-event a { position: relative; display: grid; gap: 0.1rem; padding: 0.45rem 0.6rem 0.45rem 0; padding-inline: 1.6rem 0.6rem; border-radius: 8px; text-decoration: none; line-height: 1.4; }
+.tl-event a { position: relative; display: grid; gap: 0.1rem; padding: 0.45rem 0.6rem 0.45rem 0; padding-inline: 1.6rem 0.6rem; border-radius: calc(var(--radius-m) - 0.5rem); text-decoration: none; line-height: 1.4; }
 .tl-event a::before { content: ""; position: absolute; inset-inline-start: 0.12rem; top: 0.85rem; width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--paper); box-shadow: 0 0 0 2px var(--muted); }
 .tl-event a:hover, .tl-event a:focus-visible { background: var(--mat); outline: none; }
 .tl-date { font-size: 0.78rem; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
@@ -35,6 +35,6 @@
 .tl-major .tl-date { color: var(--accent); font-size: 0.85rem; }
 .tl-major .tl-text { font-size: 1.02rem; font-weight: 600; }
 .map-chips { display: grid; gap: 6px; justify-items: start; direction: rtl; }
-.map-chips button { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; background: rgb(255 255 255 / 0.94); color: #1c1a17; font: 600 12px/1.3 var(--sans); box-shadow: 0 1px 4px rgb(0 0 0 / 0.3); }
+.map-chips button { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: var(--radius-pill); background: rgb(255 255 255 / 0.94); color: #1c1a17; font: 600 12px/1.3 var(--sans); box-shadow: 0 1px 4px rgb(0 0 0 / 0.3); }
 .map-chips i { width: 9px; height: 9px; border-radius: 50%; background: var(--place); }
 
