@@ -1,3 +1,7 @@
+# /// script
+# requires-python = ">=3.15"
+# dependencies = ["pillow==13.0.0"]
+# ///
 """Build the static web edition from the finished EPUB file.
 
 The EPUB is the only source of book content. The site layer (site/) adds
@@ -7,21 +11,33 @@ Usage: uv run tools/build_web.py [BOOK_EPUB] [OUT_DIR] [ENHANCEMENTS_JSON | none
 
 ENHANCEMENTS_JSON defaults to site/enhancements.json. Its "original" paths resolve
 against the folder above the file's folder (the content root). "none" uses no enhancements.
+Its optional "related" block adds plain outbound links (title, links: label, href, note) to the footer.
+An optional places.json next to the enhancements file adds a map section after the printed contents
+(format in places_html). The list works without JavaScript; reader.js draws the map with Leaflet.
+Its optional "tables" block turns a figure that prints a table as an image into a real table:
+{figure ID: {columns, rows, bar (column index drawn as bars), ltr (column indices), source}}.
+The printed image stays inside the figure, in a collapsed <details>.
+Its optional "charts" block adds a live line chart after a printed figure:
+{figure ID: {data (JSON file under the content root with source and [date, value] points), title, unit}}.
+The chart figure carries a yearly table, so it reads without JavaScript; reader.js draws the line.
+The site links out only: it never embeds or copies the linked media.
 """
 
 import hashlib
+import math
 import html
 import json
 import posixpath
 import shutil
 import sys
-import unicodedata
 import xml.etree.ElementTree as ET
 import zipfile
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Literal
 from urllib.parse import unquote, urlsplit
+
+from PIL import Image, ImageOps
 
 ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "site"
@@ -34,7 +50,7 @@ OPS = "http://www.idpf.org/2007/ops"
 XML = "http://www.w3.org/XML/1998/namespace"
 
 INDEXED_TAGS = {"p", "h1", "h2", "h3", "figure", "table", "li"}
-NIQQUD = range(0x0591, 0x05C8)  # Hebrew cantillation and vowel points. Search ignores them.
+SEARCH_KIND = {"h1": "heading", "h2": "heading", "h3": "heading", "figure": "figure"}  # Others are "text".
 
 type Direction = Literal["rtl", "ltr"]
 
@@ -71,6 +87,8 @@ class SearchEntry:
     page: str | None
     section: str | None
     text: str
+    chapter: str | None = None  # ID of the top-level section that holds the entry.
+    img: str | None = None  # Image path of a figure entry.
 
 
 def local(tag: str) -> str:
@@ -140,10 +158,17 @@ class Converter:
         self.ids: dict[str, str] = {}  # Element ID -> source document path.
         self.doc_anchor: dict[str, str] = {}  # Source document path -> first ID in that document.
         self.tags: dict[str, str] = {}  # Element ID -> tag name.
+        self.tables: dict[str, dict] = {}  # Figure ID -> data table spec from the enhancements file.
+        self.charts: dict[str, ET.Element] = {}  # Printed figure ID -> live chart figure placed after it.
         self.links: list[tuple[str, str]] = []  # (source document, target ID) to check after all documents load.
         self.search: list[SearchEntry] = []
         self.bodies: list[tuple[Item, ET.Element]] = []
-        self.colophon: list[str] = []  # Copyright-page sections. The site shows them in the footer.
+        self.colophon: list[str] = []  # Copyright-page and title-page sections. The site shows them in the footer.
+        self.pages: dict[str, str] = {}  # Printed page label -> page marker ID, for "go to page".
+        self.kinds: list[str] = []  # Kind of each converted document (class of its top section), in spine order.
+        self.chapter_of: dict[str, str] = {}  # Element ID -> ID of the top-level section that holds it.
+        self.chapter_title: dict[str, str] = {}  # Top-level section ID -> its heading text, without a source-note mark.
+        self.figure_img: dict[str, tuple[str, str]] = {}  # Figure ID -> (image path in the site, alt text).
 
     def load(self) -> None:
         for item in self.book.spine:
@@ -176,6 +201,15 @@ class Converter:
     def convert(self, item: Item, body: ET.Element, enhancements: dict[str, dict[str, str]]) -> str:
         page: str | None = None
         section: str | None = None
+        first_entry = len(self.search)
+        top = next((el for el in body if local(el.tag) == "section"), None)
+        kind = (top.get("class") or "").split(" ", 1)[0] if top is not None else ""
+        chapter = top.get("id") if top is not None else None
+        self.kinds.append(kind)
+        if chapter and top is not None:
+            heading = next((h for h in top if local(h.tag) in ("h1", "h2", "h3")), None)
+            # A heading can end with a source-note asterisk and run on into a subtitle; keep the title part.
+            self.chapter_title[chapter] = clean_text(heading).split("*", 1)[0].strip() if heading is not None else ""
         for el in body.iter():
             el.tag = local(el.tag)
             attrs = dict(el.attrib)
@@ -200,10 +234,16 @@ class Converter:
                     raise BookError(f"{item.path}: img {el.get('src')} needs numeric width and height to prevent layout shift")
                 # CSS sizes artwork from this ratio, so the box is final before the image loads.
                 el.set("style", f"--ratio: {int(width) / int(height):.4f}; --w: {int(width)}px")
+                # Only clearly wide photos may be cropped and panned on scroll; others always show whole.
+                el.set("data-shape", "landscape" if int(width) >= 1.3 * int(height) else "upright")
             if el.get("data-epub-type") == "pagebreak":
                 # Page markers carry the printed number in title. axe 4.14 rejects aria-label on doc-pagebreak.
                 page = el.get("title")
+                if page and el.get("id"):
+                    self.pages.setdefault(page, el.get("id"))
             el_id = el.get("id")
+            if el_id and chapter:
+                self.chapter_of[el_id] = chapter
             if el.tag == "section" and el_id:
                 heading = next((h for h in el if local(h.tag) in ("h1", "h2", "h3")), None)
                 section = clean_text(heading) if heading is not None else section
@@ -212,17 +252,35 @@ class Converter:
                     el.set(f"data-{key}", value)
             if el_id and el.tag in INDEXED_TAGS and (text := clean_text(el)):
                 self.search.append(SearchEntry(el_id, page, section, text))
+        images = {fig.get("id"): img.get("src") for fig in body.iter("figure")
+                  if fig.get("id") and (img := fig.find(".//img")) is not None}
+        self.figure_img |= {fig.get("id"): (img.get("src"), img.get("alt") or "") for fig in body.iter("figure")
+                            if fig.get("id") and (img := fig.find(".//img")) is not None}
+        self.search[first_entry:] = [replace(e, chapter=chapter, img=images.get(e.id)) for e in self.search[first_entry:]]
+        for fig in list(body.iter("figure")):
+            if (spec := self.tables.get(fig.get("id", ""))):
+                attach_table(fig, spec)
+        for parent in list(body.iter()):
+            for child in list(parent):
+                if child.tag == "figure" and (chart := self.charts.get(child.get("id", ""))) is not None:
+                    parent.insert(list(parent).index(child) + 1, chart)
         for parent in list(body.iter()):
             for child in list(parent):
                 if "copyright-page" in child.get("data-epub-type", "").split():
                     parent.remove(child)
                     child.tail = None
                     self.colophon.append(ET.tostring(child, encoding="unicode", method="html"))
+        if kind == "titlepage" and top is not None:
+            # The hero shows the title; the title page credits go to the footer in small type.
+            self.colophon.insert(0, ET.tostring(top, encoding="unicode", method="html"))
+            body.remove(top)
         body.tag = "div"
         epub_type = body.get("data-epub-type", "")
         body.attrib.clear()
         body.set("class", "doc")
         body.set("data-src", item.path)
+        if kind:
+            body.set("data-kind", kind)
         if epub_type:
             body.set("data-epub-type", epub_type)
         return ET.tostring(body, encoding="unicode", method="html")
@@ -235,11 +293,6 @@ class Converter:
 
 def clean_text(el: ET.Element) -> str:
     return " ".join("".join(el.itertext()).split())
-
-
-def normalize(text: str) -> str:
-    """Make text match the client search normalization in site/reader.js."""
-    return "".join(c for c in unicodedata.normalize("NFC", text) if ord(c) not in NIQQUD).lower()
 
 
 def toc_html(z: zipfile.ZipFile, book: Book, conv: Converter) -> str:
@@ -256,6 +309,112 @@ def toc_html(z: zipfile.ZipFile, book: Book, conv: Converter) -> str:
         lines.append(f'<li><a href="{html.escape(href)}">{html.escape(clean_text(a))}</a></li>')
     lines.append("</ol>")
     return "\n".join(lines)
+
+
+def leading_number(cell: str) -> float | None:
+    """First number in a printed cell, for example 3630 in "3630 (700%)" or 9010 in "9,010"."""
+    token = cell.strip().split(" ", 1)[0].replace(",", "")
+    try:
+        return float(token)
+    except ValueError:
+        return None
+
+
+def table_element(fig_id: str, spec: dict) -> ET.Element:
+    columns, rows, bar = spec["columns"], spec["rows"], spec.get("bar")
+    ltr = set(spec.get("ltr", []))
+    if any(len(r) != len(columns) for r in rows):
+        raise BookError(f"enhancements.json: table {fig_id}: every row needs {len(columns)} cells")
+    peak = max((leading_number(r[bar]) or 0) for r in rows) if bar is not None else 0
+    table = ET.Element("table", {"class": "data-table"})
+    head = ET.SubElement(ET.SubElement(table, "thead"), "tr")
+    for i, name in enumerate(columns):
+        th = ET.SubElement(head, "th", {"scope": "col"})
+        ET.SubElement(th, "button", {"type": "button", "data-sort": str(i)}).text = name
+    tbody = ET.SubElement(table, "tbody")
+    for row in rows:
+        tr = ET.SubElement(tbody, "tr")
+        for i, cell in enumerate(row):
+            attrs = {"dir": "ltr"} if i in ltr else {}
+            value = leading_number(cell)
+            if value is not None:
+                attrs["data-value"] = f"{value:g}"
+            if i == bar and value is not None and peak:
+                attrs["class"] = "bar"
+                attrs["style"] = f"--v: {value / peak:.3f}"
+            td = ET.SubElement(tr, "th" if i == 0 else "td", attrs | ({"scope": "row"} if i == 0 else {}))
+            ET.SubElement(td, "span").text = cell
+    return table
+
+
+def attach_table(fig: ET.Element, spec: dict) -> None:
+    """Put the data table first in the figure and fold the printed image into a details element."""
+    img = fig.find("img")
+    if img is None:
+        raise BookError(f"enhancements.json: table {fig.get('id')}: the figure has no direct img")
+    details = ET.Element("details", {"class": "print-version"})
+    ET.SubElement(details, "summary").text = "הטבלה כפי שהודפסה"
+    index = list(fig).index(img)
+    fig.remove(img)
+    details.append(img)
+    fig.insert(index, details)
+    fig.insert(0, table_element(fig.get("id", ""), spec))
+    fig.set("class", (fig.get("class", "") + " has-table").strip())
+
+
+def chart_element(fig_id: str, spec: dict, data: dict, href: str) -> ET.Element:
+    """Figure for a live chart: drawing area for reader.js, caption with source, and a yearly table."""
+    points = data["points"]
+    if len(points) < 2 or any(len(p) != 2 for p in points):
+        raise BookError(f"enhancements.json: chart for {fig_id}: needs at least two [date, value] points")
+    fig = ET.Element("figure", {"id": f"{fig_id}-live", "class": "web-chart", "data-chart": href,
+                                "data-unit": spec["unit"]})
+    ET.SubElement(fig, "div", {"class": "chart-area", "hidden": "hidden"})
+    cap = ET.SubElement(fig, "figcaption")
+    ET.SubElement(cap, "span", {"class": "caption"}).text = spec["title"]
+    credit = ET.SubElement(cap, "span", {"class": "edition-credit"})
+    credit.text = f"גרף עדכני שנוסף לאתר, {points[0][0][:4]}–{points[-1][0][:4]}. נתונים: "
+    ET.SubElement(credit, "a", {"href": data["source"]["url"], "rel": "noopener"}).text = data["source"]["label"]
+    yearly: dict[str, tuple[str, float]] = {}
+    for date, value in points:
+        yearly.setdefault(date[:4], (date, value))  # First reading of each year.
+    details = ET.SubElement(fig, "details", {"class": "print-version"})
+    ET.SubElement(details, "summary").text = "הנתונים בטבלה (הקריאה הראשונה בכל שנה)"
+    table = ET.SubElement(details, "table", {"class": "data-table"})
+    head = ET.SubElement(ET.SubElement(table, "thead"), "tr")
+    for name in ("תאריך", spec["unit"]):
+        ET.SubElement(head, "th", {"scope": "col"}).text = name
+    body = ET.SubElement(table, "tbody")
+    for date, value in yearly.values():
+        tr = ET.SubElement(body, "tr")
+        ET.SubElement(tr, "th", {"scope": "row"}).text = date
+        ET.SubElement(tr, "td", {"dir": "ltr"}).text = f"{value:.2f}"
+    return fig
+
+
+def load_charts(out: Path, path: Path | None, conv: "Converter") -> dict[str, ET.Element]:
+    charts = json.loads(path.read_text(encoding="utf-8")).get("charts", {}) if path else {}
+    result = {}
+    for fig_id, spec in charts.items():
+        if conv.tags.get(fig_id) != "figure":
+            raise BookError(f"enhancements.json: chart for {fig_id!r}: not a figure in the EPUB")
+        src = path.resolve().parent.parent / spec["data"]
+        data = json.loads(src.read_text(encoding="utf-8"))
+        if not data["source"]["url"].startswith("https://"):
+            raise BookError(f"enhancements.json: chart for {fig_id}: source URL must be https")
+        dest = out / "data" / src.name
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(src, dest)
+        result[fig_id] = chart_element(fig_id, spec, data, f"data/{src.name}")
+    return result
+
+
+def load_tables(path: Path | None, conv: "Converter") -> dict[str, dict]:
+    tables = json.loads(path.read_text(encoding="utf-8")).get("tables", {}) if path else {}
+    for fig_id in tables:
+        if conv.tags.get(fig_id) != "figure":
+            raise BookError(f"enhancements.json: table {fig_id!r} is not a figure in the EPUB")
+    return tables
 
 
 def load_enhancements(out: Path, conv: Converter, path: Path | None) -> dict[str, dict[str, str]]:
@@ -276,6 +435,161 @@ def load_enhancements(out: Path, conv: Converter, path: Path | None) -> dict[str
         shutil.copyfile(original, dest)
         result[fig_id] = {"original": f"originals/{original.name}"}
     return result
+
+
+def related_html(path: Path | None) -> str:
+    """Footer list of outbound links from the enhancements file. Empty when the file has none."""
+    related = json.loads(path.read_text(encoding="utf-8")).get("related") if path else None
+    if not related:
+        return ""
+    items = []
+    for link in related["links"]:
+        if not link["href"].startswith("https://"):
+            raise BookError(f"enhancements.json: related link {link['href'][:60]!r} must be an https URL")
+        note = f' <span class="related-note">{html.escape(link["note"])}</span>' if link.get("note") else ""
+        items.append(f'<li><a href="{html.escape(link["href"])}" rel="noopener">{html.escape(link["label"])}</a>{note}</li>')
+    title = html.escape(related["title"])
+    return f'<nav class="related" aria-label="{title}"><h2 class="related-title">{title}</h2><ul>{"".join(items)}</ul></nav>'
+
+
+class Thumbs:
+    """Square WebP thumbnails of site images, made once per image under OUT/thumbs/."""
+
+    SIZE = 160
+
+    def __init__(self, out: Path) -> None:
+        self.out = out
+        self.made: dict[str, str] = {}  # Image path in the site -> thumbnail path in the site.
+
+    def __call__(self, src: str) -> str:
+        if src in self.made:
+            return self.made[src]
+        name = posixpath.splitext(posixpath.basename(src))[0] + ".webp"
+        if f"thumbs/{name}" in self.made.values():
+            raise BookError(f"thumbnail name {name} is used by two images")
+        dest = self.out / "thumbs" / name
+        dest.parent.mkdir(exist_ok=True)
+        with Image.open(self.out / src) as im:
+            ImageOps.fit(im.convert("RGB"), (self.SIZE, self.SIZE)).save(dest, "WEBP", quality=72, method=6)
+        self.made[src] = f"thumbs/{name}"
+        return self.made[src]
+
+
+def oklch_hex(lightness: float, chroma: float, hue: float) -> str | None:
+    """sRGB hex for an OKLCH colour, or None when it is outside the sRGB gamut."""
+    a, b = chroma * math.cos(math.radians(hue)), chroma * math.sin(math.radians(hue))
+    l_ = (lightness + 0.3963377774 * a + 0.2158037573 * b) ** 3
+    m_ = (lightness - 0.1055613458 * a - 0.0638541728 * b) ** 3
+    s_ = (lightness - 0.0894841775 * a - 1.2914855480 * b) ** 3
+    rgb = (4.0767416621 * l_ - 3.3077115913 * m_ + 0.2309699292 * s_,
+           -1.2684380046 * l_ + 2.6097574011 * m_ - 0.3413193965 * s_,
+           -0.0041960863 * l_ - 0.7034186147 * m_ + 1.7076926715 * s_)
+    if any(not 0 <= c <= 1 for c in rgb):
+        return None
+    srgb = (12.92 * c if c <= 0.0031308 else 1.055 * c ** (1 / 2.4) - 0.055 for c in rgb)
+    return "#" + "".join(f"{round(255 * c):02x}" for c in srgb)
+
+
+def place_colours(count: int, lightness: tuple[float, float]) -> list[str]:
+    """One colour per place. Hues step by the golden angle and lightness alternates, so neighbours in the
+    list differ in hue and in lightness. Limit: with many places, some pairs far apart in the list look alike,
+    especially with colour blindness, so each place also shows its number and name. Revisit if places get a grouping."""
+    colours = []
+    for i in range(count):
+        hue, l_, chroma = (25 + i * 137.508) % 360, lightness[i % 2], 0.16
+        # Lower the chroma to fit sRGB, but not below 0.11 (grey territory); turn the hue a little instead.
+        while (colour := oklch_hex(l_, chroma, hue)) is None:
+            chroma -= 0.005
+            if chroma < 0.11:
+                hue, chroma = (hue + 7) % 360, 0.16
+        colours.append(colour)
+    return colours
+
+
+def number_ink(colour: str) -> str:
+    """White or near-black, whichever has more WCAG contrast on the colour, for the number on a place dot."""
+    channels = [int(colour[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+    lum = sum(w * (c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4)
+              for w, c in zip((0.2126, 0.7152, 0.0722), channels))
+    return "#ffffff" if 1.05 / (lum + 0.05) >= (lum + 0.05) / 0.0617 else "#1c1a17"  # 0.0617: luminance of #1c1a17 + 0.05.
+
+
+def place_style(count: int) -> str:
+    """CSS custom properties --place-N (colour) and --place-ink-N (number colour) for light and dark mode."""
+    def props(colours: list[str]) -> str:
+        return " ".join(f"--place-{i}: {c}; --place-ink-{i}: {number_ink(c)};" for i, c in enumerate(colours, start=1))
+    light = props(place_colours(count, (0.48, 0.7)))
+    dark = props(place_colours(count, (0.5, 0.665)))
+    return (f":root {{ {light} }}\n@media (prefers-color-scheme: dark) {{ :root:not([data-theme=\"light\"]) {{ {dark} }} }}\n"
+            f":root[data-theme=\"dark\"] {{ {dark} }}")
+
+
+def places_html(data_dir: Path | None, conv: "Converter", thumbs: Thumbs) -> str:
+    """Map section from places.json: {"places": [{id, name, lat, lon, wikidata, targets, description,
+    description_source, figures}]}. Every element ID must exist in the EPUB. Empty when the file is absent."""
+    path = data_dir / "places.json" if data_dir else None
+    if path is None or not path.is_file():
+        return ""
+    places = json.loads(path.read_text(encoding="utf-8"))["places"]
+    items, points, seen = [], [], set()
+    for n, place in enumerate(places, start=1):
+        pid, name, lat, lon = place["id"], place["name"], float(place["lat"]), float(place["lon"])
+        where = f"places.json: place {pid!r}"
+        if pid in seen or pid in conv.ids:
+            raise BookError(f"{where}: id is not unique")
+        seen.add(pid)
+        if not (-90 <= lat <= 90 and -180 <= lon <= 180):
+            raise BookError(f"{where}: bad coordinates")
+        if not (place["wikidata"].startswith("Q") and place["wikidata"][1:].isdigit()):
+            raise BookError(f"{where}: wikidata must be a Q identifier")
+        for ref in [*place["targets"], place["description_source"]]:
+            if ref not in conv.ids:
+                raise BookError(f"{where}: {ref!r} is not an ID in the EPUB")
+        if not place["targets"]:
+            raise BookError(f"{where}: needs at least one target")
+        for fig in place["figures"]:
+            if fig not in conv.figure_img:
+                raise BookError(f"{where}: {fig!r} is not a figure with an image")
+        chapters = [{"href": f"#{t}", "chapter": conv.chapter_of[t], "title": conv.chapter_title[conv.chapter_of[t]]}
+                    for t in place["targets"]]
+        points.append({
+            "id": pid, "n": n, "name": name, "lat": lat, "lon": lon,
+            "wikidata": f"https://www.wikidata.org/wiki/{place['wikidata']}",
+            "description": place["description"], "source": f"#{place['description_source']}",
+            "chapters": chapters,
+            "figures": [{"href": f"#{f}", "thumb": thumbs(conv.figure_img[f][0]), "alt": conv.figure_img[f][1]}
+                        for f in place["figures"]],
+        })
+        links = "".join(f'<a href="{html.escape(c["href"])}">{html.escape(c["title"])}</a>' for c in chapters)
+        items.append(f'<li id="place-{html.escape(pid)}" style="--place: var(--place-{n}); --ink: var(--place-ink-{n})">'
+                     f'<span class="place-n" aria-hidden="true">{n}</span>'
+                     f'<span class="place-name">{html.escape(name)}</span><span class="place-chapters">{links}</span></li>')
+    data = json.dumps(points, ensure_ascii=False).replace("</", "<\\/")
+    return ('<section class="places" id="places" aria-labelledby="places-title">'
+            '<div class="places-head"><h2 id="places-title">המקומות בספר</h2>'
+            '<p class="places-intro">לחיצה על מקום במפה מציגה את תיאורו מתוך הספר ואת הפרקים שבהם הוא מופיע.</p></div>'
+            '<div class="places-map" id="places-map" hidden></div>'
+            f'<details class="places-all"><summary>כל המקומות ({len(places)})</summary>'
+            f'<ol class="places-list">{"".join(items)}</ol></details>'
+            f'<style>{place_style(len(places))}</style>'
+            f'<script type="application/json" id="places-data">{data}</script></section>')
+
+
+BRAND_FILES = ("favicon.ico", "icon.svg", "apple-touch-icon.png", "icon-192.png", "icon-512.png", "icon-mask.png")
+ICON_LINKS = """<link rel="icon" href="favicon.ico" sizes="32x32">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">"""
+
+
+def brand_files(enhancements_file: Path | None) -> list[Path]:
+    """Icon files from the brand/ folder next to the enhancements file. A book without that folder has no icons."""
+    folder = enhancements_file.parent / "brand" if enhancements_file else None
+    if folder is None or not folder.is_dir():
+        return []
+    files = [folder / name for name in BRAND_FILES]
+    if missing := [f.name for f in files if not f.is_file()]:
+        raise BookError(f"{folder}: missing icon files {missing}")
+    return files
 
 
 def fill(template: str, values: dict[str, str]) -> str:
@@ -302,15 +616,22 @@ def build(epub: Path, out: Path, enhancements_file: Path | None = SITE / "enhanc
         book = read_book(z)
         conv = Converter(z, book)
         conv.load()
-        enhancements = load_enhancements(out, conv, enhancements_file)
-        docs = [conv.convert(item, body, enhancements) for item, body in conv.bodies]
-        toc = toc_html(z, book, conv)
-        conv.check_links()
         assets = sorted(i.path for i in book.items.values() if i.media_type != "application/xhtml+xml")
         for path in assets:
             dest = out / "book" / path
             dest.parent.mkdir(parents=True, exist_ok=True)
             dest.write_bytes(z.read(path))
+        thumbs = Thumbs(out)
+        data_dir = enhancements_file.parent if enhancements_file else None
+        enhancements = load_enhancements(out, conv, enhancements_file)
+        conv.tables = load_tables(enhancements_file, conv)
+        conv.charts = load_charts(out, enhancements_file, conv)
+        docs = [conv.convert(item, body, enhancements) for item, body in conv.bodies]
+        # The places map sits right after the printed contents, or before the book when it has none.
+        at = conv.kinds.index("contents") + 1 if "contents" in conv.kinds else 0
+        docs.insert(at, places_html(data_dir, conv, thumbs))
+        toc = toc_html(z, book, conv)
+        conv.check_links()
     css = next(p for p in assets if p.endswith(".css"))
     # The Kindle download is the canonical EPUB itself. Send to Kindle accepts EPUB.
     download = out / "download" / epub.name
@@ -336,17 +657,25 @@ def build(epub: Path, out: Path, enhancements_file: Path | None = SITE / "enhanc
                 if i.media_type.startswith("font/")
             ),
             "colophon": "\n".join(conv.colophon),
+            "related": related_html(enhancements_file),
+            "icons": ICON_LINKS if brand_files(enhancements_file) else "",
+            "short_title": html.escape(book.creator),  # The bar shows the author's name when the title does not fit.
             "book": "\n".join(docs),
         },
     )
     (out / "index.html").write_text(page, encoding="utf-8")
     for name in ("reader.css", "reader.js"):
         shutil.copyfile(SITE / name, out / name)
+    for path in brand_files(enhancements_file):
+        shutil.copyfile(path, out / path.name)
+    # Location: the running number of a text block (its index here plus one), like a Kindle location.
     search = [
-        {"id": e.id, "page": e.page, "section": e.section, "text": e.text, "norm": normalize(e.text)}
+        {"id": e.id, "page": e.page, "section": e.section, "chapter": e.chapter, "text": e.text,
+         "kind": SEARCH_KIND.get(conv.tags[e.id], "text")} | ({"thumb": thumbs(e.img)} if e.img else {})
         for e in conv.search
     ]
-    (out / "search.json").write_text(json.dumps(search, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    index = {"pages": conv.pages, "entries": search}
+    (out / "search.json").write_text(json.dumps(index, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     report: dict[str, object] = {
         "epub": epub.name,
         "epub_sha256": hashlib.sha256(epub_bytes).hexdigest(),

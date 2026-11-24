@@ -7,6 +7,7 @@
 <meta name="description" content="{{description}}">
 <meta name="theme-color" content="#191715">
 <title>{{title}} · {{creator}}</title>
+{{icons}}
 <link rel="preload" href="{{cover}}" as="image">
 {{font_preload}}
 <link rel="stylesheet" href="{{book_css}}">
@@ -18,11 +19,20 @@
 
 <header class="nav" id="nav">
   <div class="nav-inner">
-    <a class="nav-title" href="#top">{{title}}</a>
+    <a class="nav-title" href="#top"><span class="nav-title-full">{{title}}</span><span class="nav-title-short" aria-hidden="true">{{short_title}}</span></a>
     <div class="nav-actions">
-      <button type="button" data-open="toc-dialog" aria-haspopup="dialog">פרקים</button>
-      <button type="button" data-open="search-dialog" aria-haspopup="dialog" aria-keyshortcuts="/">חיפוש</button>
-      <a class="btn btn-small" href="{{epub_href}}" download>הורדה</a>
+      <button type="button" class="nav-text" data-open="toc-dialog" aria-haspopup="dialog">פרקים</button>
+      <button type="button" class="icon-btn" data-open="search-dialog" aria-haspopup="dialog" aria-keyshortcuts="/" aria-label="חיפוש בספר">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>
+      </button>
+      <div class="split nav-download" id="nav-download">
+        <a class="icon-btn split-main" href="{{epub_href}}" download aria-label="הורדת הספר, EPUB {{epub_size}}">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v12m0 0-5-5m5 5 5-5M5 20.5h14"/></svg>
+        </a>
+        <button type="button" class="split-more" popovertarget="send-menu" aria-label="דרכים לשלוח את הספר לקורא ספרים">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+        </button>
+      </div>
     </div>
   </div>
   <div class="progress" aria-hidden="true"></div>
@@ -37,9 +47,13 @@
       <p class="hero-lede">{{description}}</p>
       <div class="hero-actions">
         <a class="btn btn-light" href="#read">קריאה באתר</a>
-        <a class="btn btn-outline" href="{{epub_href}}" download>הורדה לקינדל <span class="btn-meta">EPUB · {{epub_size}}</span></a>
+        <div class="split" id="hero-download">
+          <a class="btn btn-outline split-main" href="{{epub_href}}" download>הורדה לקינדל <span class="btn-meta">EPUB · {{epub_size}}</span></a>
+          <button type="button" class="btn btn-outline split-more" popovertarget="send-menu" aria-label="דרכים לשלוח את הספר לקורא ספרים">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+          </button>
+        </div>
       </div>
-      <p class="hero-note">הקובץ עובד עם Send to Kindle ועם כל קורא ספרים דיגיטלי.</p>
     </div>
     <img class="hero-cover" src="{{cover}}" alt="כריכת הספר">
   </div>
@@ -56,11 +70,33 @@
   <div class="footer-inner">
     <p class="footer-title">{{title}}</p>
     <p class="footer-author">{{creator}}</p>
-    <a class="btn" href="{{epub_href}}" download>הורדה לקינדל <span class="btn-meta">EPUB · {{epub_size}}</span></a>
+    <div class="split">
+      <a class="btn split-main" href="{{epub_href}}" download>הורדה לקינדל <span class="btn-meta">EPUB · {{epub_size}}</span></a>
+      <button type="button" class="btn split-more" popovertarget="send-menu" aria-label="דרכים לשלוח את הספר לקורא ספרים">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+      </button>
+    </div>
     <a class="footer-top" href="#top">חזרה למעלה</a>
+{{related}}
+    <div class="colophon">
 {{colophon}}
+    </div>
   </div>
 </footer>
+
+<div id="send-menu" class="menu" popover>
+  <p class="menu-note">מורידים את הקובץ, ואז מעלים אותו לשירות של קורא הספרים:</p>
+  <a class="menu-download" href="{{epub_href}}" download>הורדת הקובץ <span class="btn-meta">EPUB · {{epub_size}}</span></a>
+  <ul>
+<!-- Services that accept an EPUB upload from a browser. Checked 2026-11-24. -->
+    <li><a href="https://www.amazon.com/sendtokindle" target="_blank" rel="noopener"><span lang="en" dir="ltr">Send to Kindle</span><span class="menu-meta">Amazon Kindle</span></a></li>
+    <li><a href="https://play.google.com/books/uploads" target="_blank" rel="noopener"><span lang="en" dir="ltr">Google Play Books</span><span class="menu-meta">העלאה לספרייה ב־Google</span></a></li>
+    <li><a href="https://help.kobo.com/hc/en-us/articles/42850160943511-Kobo-Cloud-upload-eBooks-and-documents-with-Kobo-Stack" target="_blank" rel="noopener"><span lang="en" dir="ltr">Kobo</span><span class="menu-meta">דורש מנוי Kobo Stack</span></a></li>
+    <li><a href="https://cloud.pocketbook.com/" target="_blank" rel="noopener"><span lang="en" dir="ltr">PocketBook Cloud</span><span class="menu-meta">PocketBook</span></a></li>
+    <li><a href="https://webreader.mytolino.com/" target="_blank" rel="noopener"><span lang="en" dir="ltr">tolino webreader</span><span class="menu-meta">tolino</span></a></li>
+    <li><a href="https://push.boox.com/" target="_blank" rel="noopener"><span lang="en" dir="ltr">BOOX Push</span><span class="menu-meta">Onyx BOOX</span></a></li>
+  </ul>
+</div>
 
 <dialog id="toc-dialog" class="panel" aria-labelledby="toc-title">
   <div class="panel-head"><h2 id="toc-title">פרקים</h2><button type="button" data-close aria-label="סגירה">×</button></div>
