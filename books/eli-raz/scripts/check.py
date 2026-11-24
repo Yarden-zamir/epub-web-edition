@@ -21,6 +21,8 @@ Usage, from the repo root (flags combine):
   --full                every check above; ingests run again in a copy of INGEST_INPUTS and of the whole book folder,
                         and fail when the two differ; EPUBCheck runs again
   --no-build            use the build that is already in books/eli-raz/dist/release (CI jobs after the build job)
+  --advisory sample     comma-separated groups (epubcheck, smoke, explorables, record, sample) whose failure only
+                        warns (a GitHub annotation in CI) and does not fail the run
 
 Lanes do not run the heavy checks here: scripts/lane_push.py pushes to lane/<name>, where .github/workflows/checks.yml
 runs all of them on GitHub's machines.
@@ -104,11 +106,14 @@ def command(cmd: list[str | Path]) -> list[str]:
     return [str(c) for c in cmd]
 
 
-def finish(args: list[str], code: int, out: str, start: float) -> str:
-    """Print a command's output and time; exit when it failed."""
+def finish(args: list[str], code: int, out: str, start: float, advisory: str | None = None) -> str:
+    """Print a command's output and time; exit when it failed, unless it is advisory (then warn)."""
     say(out[-4000:].rstrip())
     say(f"({time.monotonic() - start:.0f} s: {' '.join(args[:3])[-70:]})")
-    if code != 0:
+    if code != 0 and advisory:
+        # GitHub Actions shows this line as a warning annotation; scripts/lane_push.py prints it.
+        say(f"::warning title=advisory check failed::{advisory}: {' '.join(args[:3])[-70:]} exited {code}; it does not block")
+    elif code != 0:
         sys.exit(f"{args[:3]} failed with exit code {code}")
     return out
 
@@ -120,13 +125,14 @@ def run(cmd: list[str | Path], cwd: Path | None = None) -> str:
     return finish(args, res.returncode, res.stdout, start)
 
 
-def run_parallel(cmds: list[tuple[list[str | Path], Path | None]]) -> list[str]:
-    """Run independent commands at the same time; exit when one fails, after all ended."""
+def run_parallel(cmds: list[tuple[list[str | Path], Path | None]], advisory: dict[int, str] | None = None) -> list[str]:
+    """Run independent commands at the same time; exit when one fails, after all ended.
+    advisory: index of a command -> its group name; its failure only warns."""
     start = time.monotonic()
     procs = [(args, subprocess.Popen(args, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True))
              for args, cwd in ((command(c), cwd) for c, cwd in cmds)]
     outs = [(args, proc, proc.communicate()[0]) for args, proc in procs]
-    return [finish(args, proc.returncode, out, start) for args, proc, out in outs]
+    return [finish(args, proc.returncode, out, start, (advisory or {}).get(i)) for i, (args, proc, out) in enumerate(outs)]
 
 
 def copy_into(src: Path, dest: Path) -> None:
@@ -266,6 +272,7 @@ def main() -> None:
     for flag in ("ingest", "compare-ingest", "epubcheck", "smoke", "axe-full", "explorables", "record", "sample", "gate", "full", "no-build"):
         ap.add_argument(f"--{flag}", action="store_true")
     ap.add_argument("--preview", metavar="UNITS", default="a06", help="comma-separated unit IDs of preview.html")
+    ap.add_argument("--advisory", metavar="GROUPS", default="", help="groups whose failure only warns")
     a = ap.parse_args()
     started = time.monotonic()
     uv: list[str | Path] = ["uv", "run"]
@@ -277,22 +284,34 @@ def main() -> None:
         # check_release also runs tools/check_size.py: the EPUB at most 24 MB, under the 25 MB file limit of kitshn.
         run([*uv, "tools/check_release.py", CONTENT, EPUB, WEB], PIPELINE)
         preview(a.preview.split(","))
+    groups = set(filter(None, a.advisory.split(",")))
+    unknown = groups - {"epubcheck", "smoke", "explorables", "record", "sample"}
+    if unknown:
+        sys.exit(f"--advisory: unknown groups {sorted(unknown)}")
     heavy: list[tuple[list[str | Path], Path | None]] = []
+    names: list[str] = []  # The group of each heavy command, in order.
     check = epubcheck(force=a.full) if a.epubcheck or a.gate or a.full else None
     if check:
         heavy.append(check)
+        names.append("epubcheck")
     if a.smoke or a.gate or a.axe_full or a.full:
         heavy.append(([*uv, SMOKE, WEB, AXE] + (["--axe-full"] if a.axe_full or a.full else []), None))
+        names.append("smoke")
     if a.explorables or a.full:
         heavy.append(([*uv, EXPLORABLES, WEB, AXE, CONTENT / "dist" / "explorables"], None))
+        names.append("explorables")
     if a.record or a.full:
         heavy.append(([*uv, RECORD, WEB, CONTENT / "dist" / "record"], None))
+        names.append("record")
     if a.sample or a.full:
         heavy.append(([*uv, "tools/verify.py"], PIPELINE))
-    outs = run_parallel(heavy) if heavy else []
-    if check:
-        if "0 fatals / 0 errors" not in outs[0]:
+        names.append("sample")
+    outs = run_parallel(heavy, {i: n for i, n in enumerate(names) if n in groups}) if heavy else []
+    if check and "0 fatals / 0 errors" not in outs[0]:
+        if "epubcheck" not in groups:
             sys.exit("EPUBCheck reported errors")
+        say("::warning title=advisory check failed::epubcheck: EPUBCheck reported errors; it does not block")
+    elif check:  # Only bytes that passed skip EPUBCheck next time.
         ok = CACHE / "epubcheck-ok"
         ok.mkdir(parents=True, exist_ok=True)
         (ok / hashlib.sha256(EPUB.read_bytes()).hexdigest()).touch()

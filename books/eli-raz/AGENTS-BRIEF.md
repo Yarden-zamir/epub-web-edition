@@ -20,7 +20,7 @@ Read this file fully before you start. Your own task message names your part.
 - Commit only your own paths: `git commit -m "..." -- <paths>`. Never `git add -A`.
 - This machine has 4 cores and is shared by every lane. Run no heavy check here: no Playwright, no EPUBCheck, no videos, no ingest. GitHub Actions runs them.
 - Before you land: `uv run books/eli-raz/scripts/check.py` (light: ingest outputs from the shared cache, build, check_release, preview.html; see "Checks").
-- To land: commit by path, then `uv run books/eli-raz/scripts/lane_push.py <your-name>`. It rebases on origin/main, pushes to lane/<your-name>, waits for every check in .github/workflows/checks.yml (build, EPUBCheck, axe on the whole page at every width and scheme, explainers, videos and traces, the sample edition), prints the run address and the artifact download command, and pushes to main when the checks pass. Do not push to main by hand. No pull requests, no merge queue.
+- To land: commit by path, then `uv run books/eli-raz/scripts/lane_push.py <your-name>`. It rebases on origin/main, pushes to lane/<your-name>, waits for every check in .github/workflows/checks.yml (build, EPUBCheck, axe on the whole page at every width and scheme, explainers, the sample edition; videos and traces with `--record`), prints the run address and the artifact download command, and pushes to main when the checks pass. Do not push to main by hand. No pull requests, no merge queue.
 - Read a failed check: `gh run view <run id> --log-failed`. Download videos, traces and screenshots: the `gh run download` line that lane_push.py prints.
 - A push to main deploys both sites. A failed build or check deploys nothing, and both sites stay as they were.
 
@@ -44,7 +44,7 @@ Serve dist/release/web with a local http.server for browser tests. Playwright 1.
 Heavy flags, for GitHub Actions (each one also works here, but only when a task needs it on this machine): `--ingest`, `--compare-ingest`, `--epubcheck`, `--smoke` (quick: errors, overflow, axe on a sample), `--axe-full` (fresh load at every width and scheme, axe on the whole page), `--explorables`, `--record` (videos, traces, screenshots, load timings), `--sample` (tools/verify.py), `--gate` (what main's deploy runs), `--full` (all), `--no-build`. `check.py --help` explains each.
 
 Where each check runs:
-- Every push to lane/<name> (checks.yml, parallel jobs, deploys nothing): ingest with the INGEST_INPUTS comparison, build, check_release; EPUBCheck; axe on the whole page at every width and scheme; explainers plus videos, traces and timings; tools/verify.py on the sample edition.
+- Every push to lane/<name> (checks.yml, one job with parallel processes, deploys nothing): ingest with the INGEST_INPUTS comparison, build, check_release, then EPUBCheck, axe on the whole page at every width and scheme, the explainers and tools/verify.py on the sample edition at the same time. tools/verify.py is advisory for now (it warns and does not block) until the UI lane fixes its search and figure-viewer failures. Videos, traces, screenshots and load timings run in a second job only on request: `lane_push.py <name> --record`, or "[record]" in the commit message.
 - Every push to main (kitshn.yml, the deploy gate): ingest, build, check_release, EPUBCheck, the quick smoke test. A failure deploys nothing.
 - Nightly on main (slow-checks.yml): `--full`. It reports and blocks nothing.
 

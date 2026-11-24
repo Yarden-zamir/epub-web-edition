@@ -4,12 +4,15 @@
 # ///
 """Land a lane's commits on main after GitHub Actions checked them. Run it from your worktree, with your work committed.
 
-Usage: uv run books/eli-raz/scripts/lane_push.py <lane-name>
+Usage: uv run books/eli-raz/scripts/lane_push.py <lane-name> [--record]
+--record: also record videos, traces, screenshots and load timings (a second billed job). A commit message with
+"[record]" does the same.
 
 1. git fetch origin, then git rebase origin/main (with --autostash), so the checked commit is the commit that lands.
 2. git push --force-with-lease origin HEAD:lane/<lane-name>. The lane branch is yours alone; each rebase rewrites it.
-3. Wait for the "checks" run of that commit (.github/workflows/checks.yml). It prints the run address and the command
-   that downloads its artifacts (the build, videos, traces, screenshots, the sample report).
+3. Wait for the "checks" run of that commit (.github/workflows/checks.yml). It prints the run address, the command
+   that downloads its artifacts (the build, explainer screenshots, the sample report, and videos and traces when
+   recorded), and the warnings of advisory checks, which do not block.
 4. When the checks pass: if main did not move, git push origin HEAD:main. If main moved and its new commits touch a
    file that your commits touch, back to step 1 (at most MAX_ROUNDS times). If they touch other files, rebase and push
    without a new check; main's kitshn.yml checks again before it deploys anything.
@@ -51,12 +54,13 @@ def rebase() -> str:
     return sh("git", "rev-parse", "origin/main")
 
 
-def wait_for_checks(repo: str, branch: str, sha: str) -> None:
+def wait_for_checks(repo: str, branch: str, sha: str, event: str) -> None:
+    """Wait for the checks run of this commit that this event started (push, or workflow_dispatch for --record)."""
     run = None
     for _ in range(40):  # The run appears a few seconds after the push.
         runs = json.loads(sh("gh", "run", "list", "-R", repo, "-b", branch, "-c", sha,
-                             "--json", "databaseId,url,workflowName", "-L", "10"))
-        found = [r for r in runs if r["workflowName"] == WORKFLOW]
+                             "--json", "databaseId,url,workflowName,event", "-L", "10"))
+        found = [r for r in runs if r["workflowName"] == WORKFLOW and r["event"] == event]
         if found:
             run = found[0]
             break
@@ -65,7 +69,7 @@ def wait_for_checks(repo: str, branch: str, sha: str) -> None:
         sys.exit(f"No {WORKFLOW} run for {sha[:12]} on {branch} after 2 minutes. See: gh run list -R {repo} -b {branch}")
     rid = run["databaseId"]
     say(f"checks: {run['url']}")
-    say(f"artifacts: gh run download {rid} -R {repo} -n book-review -n sample-verify -n book-build -D dist/run-{rid}")
+    say(f"artifacts: gh run download {rid} -R {repo} -D dist/run-{rid}  (book-check; book-record when recorded)")
     last = ""
     while True:
         view = json.loads(sh("gh", "run", "view", str(rid), "-R", repo, "--json", "status,conclusion,jobs"))
@@ -76,14 +80,22 @@ def wait_for_checks(repo: str, branch: str, sha: str) -> None:
         if view["status"] == "completed":
             break
         time.sleep(POLL_S)
+    for job in view["jobs"]:  # Advisory checks (check.py --advisory) warn without failing the run.
+        notes = json.loads(sh("gh", "api", f"repos/{repo}/check-runs/{job['databaseId']}/annotations"))
+        for n in notes:
+            if n["title"] == "advisory check failed":
+                say(f"  advisory, does not block: {n['message']}")
     if view["conclusion"] != "success":
         sys.exit(f"checks {view['conclusion']}: {run['url']}\nlogs of the failed steps: gh run view {rid} -R {repo} --log-failed")
 
 
 def main() -> None:
-    if len(sys.argv) != 2 or not sys.argv[1] or "/" in sys.argv[1]:
+    args = sys.argv[1:]
+    record = "--record" in args
+    names = [a for a in args if a != "--record"]
+    if len(names) != 1 or not names[0] or "/" in names[0] or names[0].startswith("-"):
         sys.exit(__doc__)
-    branch = f"lane/{sys.argv[1]}"
+    branch = f"lane/{names[0]}"
     repo = sh("gh", "repo", "view", "--json", "nameWithOwner", "-q", ".nameWithOwner")
     for round_no in range(1, MAX_ROUNDS + 1):
         base = rebase()
@@ -93,7 +105,10 @@ def main() -> None:
         mine = files(base, sha)
         say(f"round {round_no}: {sh('git', 'rev-list', '--count', f'{base}..{sha}')} commits on main {base[:12]}, pushing {branch}")
         sh("git", "push", "-q", "--force-with-lease", "origin", f"HEAD:{branch}")
-        wait_for_checks(repo, branch, sha)
+        if record:
+            # A manual run with recording; it replaces the push run of the same lane (one run per lane at a time).
+            sh("gh", "workflow", "run", "checks.yml", "-R", repo, "--ref", branch, "-f", "record=true")
+        wait_for_checks(repo, branch, sha, "workflow_dispatch" if record else "push")
         for _ in range(5):
             sh("git", "fetch", "-q", "origin")
             main_now = sh("git", "rev-parse", "origin/main")
