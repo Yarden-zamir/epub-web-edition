@@ -1,0 +1,22 @@
+book_image	figure	candidate (folder under work/pd-sources/ or source)	inliers	good_matches	coverage	result
+p043-x181.jpeg	fig-a07-05	c-fuller-iuda-nli (NLI FL199985442, 1920 px thumbnail)	2060	2109	60.4%	match
+p043-x181.jpeg	fig-a07-05	c-fuller-tribe-of-judah (Commons Tribe of Judah.jpg)	3524	3552	91.2%	match
+p043-x181.jpeg	fig-a07-05	c-adrichem-iuda-108 / c-adrichem-iuda-143	7	33	0.0%	no match
+p044-x185.jpeg	fig-a07-06	c-irby-1823-backwater (British Library p. 507)	180	213	93.0%	match
+p047-x195.jpeg	fig-a07-08	ia-lynch-narrative-1849-leaf0171 (IA narrativeofunit00lync leaf 171)	425	441	76.8%	match
+p047-x195.jpeg	fig-a07-08	ia-lynch-narrative-1849-leaf0172 (blank verso)	0	0	0.0%	no match
+p031-x137.jpeg	fig-a06-05	c-matpc-01748	138	213	38.6%	match (one half of a stereo pair)
+p031-x139.jpeg	fig-a06-06	c-matpc-01747	173	272	34.5%	match (one half of a stereo pair)
+p293-x1138.jpeg	fig-a36-03	c-lowdermilk-1953 (GPO D850-104)	252	269	65.7%	match
+p042-x177.png	fig-a07-04	c-adrichem-iuda-108	6	17	0.8%	no match
+p042-x177.png	fig-a07-04	c-adrichem-iuda-143	5	18	0.0%	no match
+p042-x177.png	fig-a07-04	c-fuller-tribe-of-judah	6	10	55.9%	no match
+p040-x169.jpeg	fig-a07-02	c-peutinger-ortelius-bnf-4of4	6	17	0.3%	no match
+p040-x169.jpeg	fig-a07-02	c-peutinger-ortelius-bnf-3of4 (MATCH_MAX_SIDE=4000)	4	11	0.0%	no match
+p040-x169.jpeg	fig-a07-02	c-peutinger-ortelius-bnf-3of4, Dead Sea area cropped (MATCH_MAX_SIDE=4000)	5	19	0.0%	no match
+p045-x189.png	fig-a07-07	c-seetzen-1810-map	4	20	0.0%	no match
+p135-x535-masked.png	fig-a16-01	best of 29 c-matpc-* (c-matpc-09221)	6	15	4.3%	no match
+p140-x559.jpeg	fig-a16-06	best of 29 c-matpc-* (c-matpc-01798)	8	19	0.3%	no match
+p141-x563.jpeg	fig-a16-07	best of 29 c-matpc-* (c-matpc-09222)	9	30	0.0%	no match
+p142-x567.jpeg	fig-a16-08	best of 29 c-matpc-* (c-matpc-18266)	10	41	0.0%	no match
+p143-x571.jpeg	fig-a16-09	best of 29 c-matpc-* (c-matpc-01808)	8	22	0.6%	no match
