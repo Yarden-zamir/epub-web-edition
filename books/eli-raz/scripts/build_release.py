@@ -38,6 +38,11 @@ INGEST_INPUTS = [
     CONTENT / "source",
     CONTENT / "replacements",
     CONTENT / "fonts",
+    # book.toml [additions] data: tables, cross-references, glossary and timeline appendices.
+    CONTENT / "site" / "enhancements.json",
+    CONTENT / "site" / "crosslinks.json",
+    CONTENT / "site" / "glossary.json",
+    CONTENT / "site" / "timeline.json",
 ]
 
 
