@@ -3,7 +3,7 @@
   "kind": "transform",
   "title": "תנועת הגזירה לאורך הערבה",
   "instruction": "גררו את לוח ערב–ירדן, או הזיזו את המחוון, וראו את שני הלוחות נעים צפונה ואת האגנים נפתחים.",
-  "schematic": "מפת היום בקנה מידה: חופים ואגמים מ־Natural Earth, מקומות מ־Wikidata. התנועה לאחור היא הפשטה: שני גושים קשיחים נעים במהירויות של היום ביחס לאירואסיה (GSRM v2.1), כך שההפרש ביניהם הוא 105 הק\"מ של הספר. קו השבר סכמטי, ועומק האגנים אינו מוצג; הם נפתחים במקומם האמיתי.",
+  "schematic": "מפת היום בקנה מידה: חופים ואגמים מ־Natural Earth, מקומות מ־Wikidata. התנועה לאחור היא הפשטה: שני גושים קשיחים נעים במהירויות של היום ביחס לאירואסיה (GSRM v2.1), כך שההפרש ביניהם הוא 105 הק\"מ של הספר. קווי החוף הם של היום, והם מוזזים לאחור כמות שהם, אף שבעבר נראו אחרת. קו השבר סכמטי, ועומק האגנים אינו מוצג; הם נפתחים במקומם האמיתי.",
   "control": {
     "label": "התזוזה היחסית",
     "min": 0,
@@ -91,7 +91,7 @@
     "suez": "Gulf name as printed in fig-a18-05.",
     "red_sea": "Sea name as printed in fig-a18-05.",
     "mediterranean": "The shaded sea at the top left of fig-a18-05, unnamed there.",
-    "mm_per_year": "Speeds next to the arrows: GSRM v2.1 relative to Eurasia (geo.velocity_source), rounded."
+    "mm_per_year": "Speeds next to the arrows: the northward part of the GSRM v2.1 velocity relative to Eurasia (geo.velocity_source), rounded like the panel."
   },
   "legend": [
     {

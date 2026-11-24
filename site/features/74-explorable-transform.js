@@ -47,7 +47,7 @@ function create(spec, env) {
   ].map((b) => {
     const proj = b.rings.flat().map(([x, y]) => x * along[0] + y * along[1]);
     const xs = b.rings.flat().map(([x]) => x), ys = b.rings.flat().map(([, y]) => y);
-    return { ...b, path: ringsPath(b.rings), from: Math.min(...proj), to: Math.max(...proj), west: Math.min(...xs), mid: (Math.min(...ys) + Math.max(...ys)) / 2 };
+    return { ...b, path: ringsPath(b.rings), from: Math.min(...proj), to: Math.max(...proj), west: Math.min(...xs), centre: (Math.min(...xs) + Math.max(...xs)) / 2, mid: (Math.min(...ys) + Math.max(...ys)) / 2 };
   });
   const P = geo.places;
   const oreFeinan = new Path2D(), oreTimna = new Path2D();
@@ -58,6 +58,12 @@ function create(spec, env) {
   const HANDLE = at(36.15, 30.1);
   const dirA = [moveA[0] * S, -moveA[1] * S], dirLen = Math.hypot(...dirA); // Handle path on screen per full slip.
   let dots = null, dotsColor = "";
+  // Whether a point of the drawing is land, with each block at its offset: a sea label hides there.
+  const probe = document.createElement("canvas").getContext("2d");
+  const isLand = ([x, y], offW, offE) =>
+    (probe.isPointInPath(westSide, x - offW[0], y - offW[1]) && probe.isPointInPath(land, x - offW[0], y - offW[1])) ||
+    (probe.isPointInPath(eastSide, x - offE[0], y - offE[1]) && probe.isPointInPath(land, x - offE[0], y - offE[1]));
+  const inView = ([x, y]) => x > 20 && x < W - 20 && y > 14 && y < H - 14;
 
   function texture(c) { // A small dot pattern for the rock, one tile per theme.
     const color = env.color("--xp-dot");
@@ -191,22 +197,25 @@ function create(spec, env) {
     // Each block's arrow starts at its name, which sits below it.
     arrow(ctx, onE(ARABIA_AT), geo.velocity_mm_yr.arabia);
     arrow(ctx, onW(SINAI_AT), geo.velocity_mm_yr.sinai);
-    const speed = (v) => `${L.about}${number(Math.round(Math.hypot(...v)))} ${L.mm_per_year}`;
+    const speed = (v) => `${L.about}${number(Math.round(v[1]))} ${L.mm_per_year}`; // Northward, like the panel.
     const [ax, ay] = onE(ARABIA_AT), [sx, sy] = onW(SINAI_AT), line = 14 * env.unit;
     env.label(ctx, L.east_plate, ax, ay + line);
     env.label(ctx, speed(geo.velocity_mm_yr.arabia), ax, ay + 2 * line, { size: 11, weight: 500 });
     env.label(ctx, L.west_plate, sx, sy + line);
     env.label(ctx, speed(geo.velocity_mm_yr.sinai), sx, sy + 2 * line, { size: 11, weight: 500 });
     env.label(ctx, L.africa, ...onW(at(32.6, 27.75)), { align: "left", size: 12 });
-    env.label(ctx, L.suez, ...onW(at(33.1, 28.95)), { size: 11, weight: 500 });
-    env.label(ctx, L.mediterranean, ...at(33.4, 32.45), { size: 12, weight: 500 });
-    env.label(ctx, L.red_sea, ...at(35.05, 27.6), { size: 12, weight: 500 });
-    const shown = ramp(f, 0.15, 0.35), names = [];
+    // Sea names move with the Sinai–Africa block, like its coasts; each hides where its point is land or off the map.
+    for (const [name, lon, lat] of [[L.suez, 33.1, 28.95], [L.mediterranean, 33.4, 32.45], [L.red_sea, 35.05, 27.6]]) {
+      const p = onW(at(lon, lat));
+      if (inView(p) && !isLand(p, offW, offE)) env.label(ctx, name, ...p, { size: name === L.suez ? 11 : 12, weight: 500 });
+    }
+    const shown = ramp(f, 0.6, 0.85), names = []; // The basins' names fade in once they are mostly open.
     if (shown > 0.01) {
       ctx.globalAlpha = shown;
       for (const b of basins) {
-        const [bx, by] = onW(pt([b.west, b.mid]));
-        env.label(ctx, b.name, bx - 6, by + 4, { align: "right", size: 12 });
+        // The gulf's name on its water (Sinai beside it is narrow); the lakes' names west of them.
+        if (b.key === "gulf") env.label(ctx, b.name, ...onW(pt([b.centre, b.mid])), { size: 12 });
+        else { const [bx, by] = onW(pt([b.west, b.mid])); env.label(ctx, b.name, bx - 6, by + 4, { align: "right", size: 12 }); }
         names.push(b.name);
       }
       ctx.globalAlpha = 1;
