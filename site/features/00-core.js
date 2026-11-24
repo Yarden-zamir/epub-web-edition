@@ -83,7 +83,7 @@ function jumpOffset() {
 // that block stays exact when content above it changes height later (a chart or the map drawing).
 function position() {
   const line = jumpOffset();
-  const block = document.elementFromPoint(innerWidth / 2, line)?.closest(".book [id], #places");
+  const block = document.elementFromPoint(innerWidth / 2, line)?.closest(".book [id], #places, #read");
   return { y: scrollY, anchor: block?.id ?? null, dy: block ? block.getBoundingClientRect().top - line : 0 };
 }
 // Place an element `dy` pixels below the jump line. Off-screen chapters render lazily (content-visibility), so their
@@ -161,10 +161,11 @@ function closeOverlayElement(el) {
   if (el.matches("dialog")) el.close(); else el.hidePopover();
 }
 function openOverlay(el, show) {
+  const here = position(); // Before the overlay covers the page, which would hide the reading position.
   show();
   if (overlayStack.includes(el.id)) return;
   overlayStack = [...overlayStack, el.id];
-  history.replaceState({ ...history.state, ...position() }, "");
+  history.replaceState({ ...history.state, ...here }, "");
   history.pushState({ ...history.state, overlays: overlayStack, target: null, marks: [], back: null }, "");
 }
 function overlayClosed(el) {
@@ -207,12 +208,11 @@ addEventListener("scroll", () => {
 // themselves, because the estimate is "auto" (the last rendered size).
 function sizeDocuments() {
   const root = document.documentElement;
-  const keep = root.hasAttribute("data-render-all"); // A tool asked to see everything rendered: leave it so.
-  root.setAttribute("data-render-all", "");
+  root.setAttribute("data-sizing", "");
   const docs = [...reading.querySelectorAll(":scope > .doc, :scope > .fx-set")];
   const heights = docs.map((d) => d.getBoundingClientRect().height);
   docs.forEach((d, i) => { d.style.containIntrinsicSize = `auto ${Math.ceil(heights[i])}px`; });
-  if (!keep) root.removeAttribute("data-render-all");
+  root.removeAttribute("data-sizing");
 }
 sizeDocuments();
 document.fonts.ready.then(sizeDocuments);
