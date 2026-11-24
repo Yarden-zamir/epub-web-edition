@@ -215,17 +215,28 @@ def km_per_degree_lon(lat: float) -> float:
     return 111.32 * math.cos(math.radians(lat))
 
 
-def save_png(fig, path: Path, dpi: int = 200) -> None:
-    """Save as a 256-colour PNG with dithering: about 60% smaller, no visible loss on these maps.
+def save_jpeg(fig, path: Path, dpi: int = 200, max_bytes: int = 500_000) -> None:
+    """Save for the EPUB as a JPEG of at most max_bytes: quality 85, lowered in steps of 3 until it fits.
 
-    Limit: a map with smooth wide gradients can band. Save full RGB if a new map shows bands.
+    The release EPUB must stay under the 25 MB download limit of the site host, so each map gets a byte budget.
+    Crash below quality 70: then the map has too much fine detail and needs a lighter design, not a worse JPEG.
     """
-    path.parent.mkdir(parents=True, exist_ok=True)
+    if path.suffix != ".jpg":
+        raise ValueError(f"{path}: expected a .jpg path")
     buffer = io.BytesIO()
     fig.savefig(buffer, dpi=dpi, format="png")
-    image = Image.open(buffer).convert("RGB").quantize(256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.FLOYDSTEINBERG)
-    image.save(path, format="PNG", optimize=True)
-    print(f"wrote {path.relative_to(ROOT)} sha256={hashlib.sha256(path.read_bytes()).hexdigest()}")
+    image = Image.open(buffer).convert("RGB")
+    for quality in range(85, 69, -3):
+        out = io.BytesIO()
+        image.save(out, format="JPEG", quality=quality, optimize=True, progressive=True)
+        if out.tell() <= max_bytes:
+            break
+    else:
+        raise SystemExit(f"{path.name}: over {max_bytes} bytes even at quality 70")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(out.getvalue())
+    print(f"wrote {path.relative_to(ROOT)} {image.size[0]}x{image.size[1]} quality={quality} "
+          f"bytes={out.tell()} sha256={hashlib.sha256(out.getvalue()).hexdigest()}")
 
 
 def write_spec(figure: str, spec: dict) -> None:

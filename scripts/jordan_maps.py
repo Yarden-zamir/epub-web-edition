@@ -22,7 +22,7 @@ Data: Copernicus DEM GLO-90 (map_common.dem_credit), OpenStreetMap via Overpass 
 Natural Earth v5.1.2 borders (public domain).
 
 Usage: uv run scripts/jordan_maps.py
-Writes replacements/p301-x1169-open-map.png, replacements/p302-x1173-open-view.png and
+Writes replacements/p301-x1169-open-map.jpg, replacements/p302-x1173-open-view.jpg and
 site/figure-maps/fig-a36-09.json, site/figure-maps/fig-a36-10.json.
 """
 
@@ -38,10 +38,10 @@ from matplotlib.path import Path as PolyPath  # noqa: E402
 
 from map_common import (DEM_PIXELS_PER_DEGREE, NE_CREDIT, OSM_CREDIT, OTM_CREDIT, ROOT, credit_text, dem,  # noqa: E402
                         dem_credit, halo, hebrew_fonts, hillshade, km_per_degree_lon, natural_earth, osm_element,
-                        osm_line, osm_point, osm_rings, overpass, relief, rings, save_png, write_spec)
+                        osm_line, osm_point, osm_rings, overpass, relief, rings, save_jpeg, write_spec)
 
-MAP_OUT = ROOT / "replacements" / "p301-x1169-open-map.png"
-VIEW_OUT = ROOT / "replacements" / "p302-x1173-open-view.png"
+MAP_OUT = ROOT / "replacements" / "p301-x1169-open-map.jpg"
+VIEW_OUT = ROOT / "replacements" / "p302-x1173-open-view.jpg"
 DISI_SOURCE = ("Consolidated Consultants, ESA Disi-Mudawarra to Amman Water Conveyance System, Part C Final Report "
                "vol. 1 (2008), sections 3.1 and 3.3.3.5: the pipeline runs in the Desert Highway right-of-way "
                "from Al Jiza to Jurf al-Darawish")
@@ -218,7 +218,7 @@ def conveyance_map(font, bold, coords, water, countries) -> dict:
             linespacing=1.35)
     fig.text(0.98, 0.006, credit_text(f"{OSM_CREDIT} · Borders: {NE_CREDIT}", dem_credit(90) + ".", width=88),
              fontsize=5.4, color="#4d463e", ha="right", va="bottom", linespacing=1.3, path_effects=halo(2))
-    save_png(fig, MAP_OUT)
+    save_jpeg(fig, MAP_OUT)
     plt.close(fig)
 
     circle = [[round(p_lat + zone_km / 110.57 * math.sin(t), 5),
@@ -246,7 +246,7 @@ def conveyance_map(font, bold, coords, water, countries) -> dict:
         "attribution": [OSM_CREDIT, OTM_CREDIT],
         "note": ("New schematic map drawn for this edition from the text of chapter a36. It is not the figure of Bein et al. "
                  "(2020), which stays withheld. Quantities are phase A from the printed caption. The static EPUB image "
-                 "(replacements/p301-x1169-open-map.png, scripts/jordan_maps.py) adds Copernicus DEM relief and "
+                 "(replacements/p301-x1169-open-map.jpg, scripts/jordan_maps.py) adds Copernicus DEM relief and "
                  "Natural Earth borders. " + dem_credit(90) + "."),
     }
 
@@ -388,7 +388,7 @@ def plateau_view(font, bold, coords, water, roads) -> dict:
              fontsize=9, color=INK, ha="right", va="top", bbox=box)
     out.text(0.014, 0.014, credit_text(f"Roads: {OSM_CREDIT}", dem_credit(90) + ".", width=110), fontsize=5.2,
              color="#3d3730", ha="left", va="bottom", linespacing=1.3, bbox=box)
-    save_png(out, VIEW_OUT)
+    save_jpeg(out, VIEW_OUT)
     plt.close(out)
 
     frame = (35.35, 36.25, 30.62, 31.42)
@@ -438,7 +438,7 @@ def plateau_view(font, bold, coords, water, roads) -> dict:
         "note": ("New view drawn for this edition; the printed Google Earth image stays withheld. Highways from OSM; "
                  "the King's Highway is shown only in the area of the printed view. The printed alternative routes "
                  "ALT-1 to ALT-4 have no open source and are not shown. Amman is the end of the Desert Highway line "
-                 f"(OSM node {PLACES['amman'][0]}). The static EPUB image (replacements/p302-x1173-open-view.png, "
+                 f"(OSM node {PLACES['amman'][0]}). The static EPUB image (replacements/p302-x1173-open-view.jpg, "
                  "scripts/jordan_maps.py) is a perspective relief view. " + dem_credit(90) + "."),
     }
 

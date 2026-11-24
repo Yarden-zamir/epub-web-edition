@@ -16,7 +16,7 @@ Data:
   give the reference points.
 
 Usage: uv run scripts/pamir_map.py
-Writes replacements/p066-x251-open-map.png and site/figure-maps/fig-a10-02.json.
+Writes replacements/p066-x251-open-map.jpg and site/figure-maps/fig-a10-02.json.
 """
 
 import math
@@ -29,9 +29,9 @@ from matplotlib.patches import ConnectionPatch, Rectangle  # noqa: E402
 
 from map_common import (DEM_PIXELS_PER_DEGREE, NE_CREDIT, credit_text, OSM_CREDIT, OTM_CREDIT, ROOT, dem, dem_credit, halo, hebrew_fonts,  # noqa: E402
                         hillshade, km_per_degree_lon, natural_earth, osm_element, osm_line, osm_point, osm_rings,
-                        overpass, relief, rings, save_png, write_spec)
+                        overpass, relief, rings, save_jpeg, write_spec)
 
-OUT = ROOT / "replacements" / "p066-x251-open-map.png"
+OUT = ROOT / "replacements" / "p066-x251-open-map.jpg"
 FIGURE = "fig-a10-02"
 
 # Overview and detail frames: (west, east, south, north).
@@ -228,7 +228,7 @@ def main() -> None:
     credits = credit_text("New map drawn for this edition.", f"Places, camps, glaciers: {OSM_CREDIT}.",
                           f"Borders, rivers: {NE_CREDIT}.", dem_credit(90, 30) + ".", width=62)
     fig.text(0.012, 0.008, credits, fontsize=5.6, color="#4d463e", ha="left", va="bottom", linespacing=1.35)
-    save_png(fig, OUT)
+    save_jpeg(fig, OUT)
 
     markers = []
     for key, (kind, osm_id, qid, label, target) in PLACES.items():
@@ -249,7 +249,7 @@ def main() -> None:
                    "source": "Route as told in a10-p008 and a10-p010; straight line between the OSM points"}],
         "attribution": [OSM_CREDIT, OTM_CREDIT],
         "note": ("Places from OpenStreetMap (element IDs in each marker source). The book gives heights that differ from "
-                 "OSM; the map shows no heights. The static EPUB image (replacements/p066-x251-open-map.png, "
+                 "OSM; the map shows no heights. The static EPUB image (replacements/p066-x251-open-map.jpg, "
                  "scripts/pamir_map.py) adds Copernicus DEM relief and Natural Earth borders. " + dem_credit(90, 30) + "."),
     })
 
