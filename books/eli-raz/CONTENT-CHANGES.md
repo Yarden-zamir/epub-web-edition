@@ -63,6 +63,8 @@ The reader sees the corrected text with a dagger (†) that opens an edition not
 
 | Where | Change | Why |
 |---|---|---|
+| PDF page 44 (p044-x185, fig-a07-06) | Replaced by the British Library scan of the same plate (Irby and Mangles 1823, p. 507), cropped to the printed crop, 2000 px; hand-coloured like the scanned copy; edition note with the source and its terms. The facsimile page keeps the printed map | Better original; same image by SIFT + RANSAC (167 inliers). Terms on the British Library Flickr page, checked 2026-11-24: "No known copyright restrictions" |
+| PDF page 183 (p183-x713) | Edition credit: the object is from the Science Museum, London; image Wellcome Collection, CC BY 4.0; link to the archived record | The live Wellcome record is deleted (HTTP 410); the archived first-party record of 2023-10-11 states CC BY 4.0 and "Science Museum, London" |
 | PDF page 66 (p066-x251) | Replaced by a new relief map (scripts/pamir_map.py), with an edition note: Dushanbe to Lenin Peak with the flight and helicopter legs that a10 tells, and a detail of the base camp, the first camp, the Frying Pan and the peak. Places from OSM, borders from Natural Earth, relief from Copernicus DEM. Alt text and note in book.toml (JPEG, 474 KB) | Printed map looks like an unattributed Google Maps screenshot. |
 | PDF page 183 (p183-x717) | Withheld, labelled placeholder, masked on the facsimile page | No source found. |
 | PDF page 301 (p301-x1169) | Replaced (was withheld) by a new schematic map of the eastern RD conveyance drawn from the book text (replacements/p301-x1169-open-map.jpg, scripts/jordan_maps.py), with an edition note that it is not the figure of Bein et al. (2020). Facsimile page stays masked | Publication figure on a satellite base map; not cleared. |

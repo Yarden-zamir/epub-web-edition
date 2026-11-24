@@ -180,6 +180,7 @@ class ReleaseChange:
     reason: str  # For the issue log only.
     file: str = ""  # replace: replacement image, relative to CONTENT_DIR.
     alt: str = ""  # replace: alt text of the replacement image.
+    mask: bool = True  # Mask the image on its facsimile page. False for a better original of a public-domain image.
 
 
 @dataclass(frozen=True)
@@ -992,7 +993,8 @@ class Ingest:
     def release_figure(self, pno: int, bbox: tuple[float, float, float, float], xref: int, change: ReleaseChange) -> Figure:
         """A withheld image writes no file. A replaced image writes the replacement file instead of the PDF image."""
         self.release_used.add(change.image)
-        self.facsimile_masks.setdefault(pno, []).append((bbox, change.note))
+        if change.mask:
+            self.facsimile_masks.setdefault(pno, []).append((bbox, change.note))
         self.issue(pno, "intentional-change", f"Release: {change.image} {change.action}: {change.reason}")
         if change.action == "withhold":
             return Figure(pno, bbox, "", 0, 0, xref, change=change)

@@ -1109,6 +1109,17 @@ alt = "מבט תלת־ממדי מדרום־מערב לכיוון צפון־מז�
 note = "מבט חדש שצויר למהדורה זו מנתונים פתוחים, במקום תצלום Google Earth שאינו נכלל. הגבהים מוגדלים פי 2. מוביל דיסי–עמאן עובר בתחום הדרך של הכביש המדברי, לפי סקר ההשפעה על הסביבה של המוביל (Consolidated Consultants, 2008). במבט זה הכביש המדברי, 'הנתיב האופקי' שבכיתוב, עובר באלכסון. תוואי החלופות שבתצלום המקורי אינם מוצגים. נתוני מפה: © OpenStreetMap, openstreetmap.org/copyright. תבליט: produced using Copernicus WorldDEM™-90 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved."
 reason = "Google Earth print use needs Google plus the imagery providers next to the image; the print shows only 'Google' and the providers cannot be recovered. New perspective view by scripts/jordan_maps.py from OSM and Copernicus DEM."
 
+# Better originals of printed figures (pd-sources/REPORT.md, matches.tsv; same image by SIFT + RANSAC).
+# Cropped to the printed crop by scripts/crop_to_print.py; long side at most 2000 px, JPEG quality 85.
+[[release.change]]
+image = "p044-x185"
+action = "replace"
+file = "replacements/p044-x185-british-library.jpg"
+mask = false  # Public domain; the facsimile page keeps the printed map.
+alt = "מפה משורטטת באנגלית בשם Sketch of the Backwater at the South End of the Dead Sea: מפרץ בשם The Backwater בדרום ים המלח, מצר ומעבר, ומקרא של שלוש נקודות (A עד C)."
+note = "במהדורה זו: סריקה טובה יותר של אותה מפה, צבועה ביד כמו בעותק הסרוק. Irby and Mangles, Travels in Egypt and Nubia, Syria and Asia Minor, London 1823, עמ' 507. הספרייה הבריטית, No known copyright restrictions: flickr.com/photos/britishlibrary/11005555403"
+reason = "Higher-resolution original (2029 px British Library scan, via Commons, sha1 e6301012...) of the printed map; 167 SIFT inliers. Licence checked on the British Library Flickr page 2026-11-24: No known copyright restrictions."
+
 [[release.credit]]
 image = "p034-x147"
 text = "מקור: זאב שטיין, פיקיויקי. רישיון CC BY 2.5 IL. התמונה חתוכה."
@@ -1128,8 +1139,10 @@ links = [{ label = "רשומת המקור", url = "https://www.nli.org.il/en/map
 
 [[release.credit]]
 image = "p183-x713"
-text = "כלי לתריאק, איטליה, 1641. Wellcome Collection, רישיון CC BY 4.0. התמונה חתוכה."
-links = [{ label = "רשומת המקור", url = "https://commons.wikimedia.org/wiki/File:Albarello_vase_for_theriac,_Italy,_1641_Wellcome_L0057175.jpg" },
+# Wellcome L0057175: the live record returns HTTP 410 (deleted); the archived first-party record (2023-10-11) states
+# CC BY 4.0 and the credit "Science Museum, London" (object A43084). pd-sources/REPORT.md, rechecked 2026-11-24.
+text = "כלי לתריאק, איטליה, 1641. החפץ: Science Museum, London. התמונה: Wellcome Collection, רישיון CC BY 4.0. התמונה חתוכה."
+links = [{ label = "רשומת המקור (בארכיון)", url = "https://web.archive.org/web/20231011174412/https://wellcomecollection.org/works/mevaswyt" },
          { label = "הרישיון", url = "https://creativecommons.org/licenses/by/4.0/" }]
 
 [[release.credit]]
