@@ -24,6 +24,7 @@ import html
 import json
 import posixpath
 import shutil
+import subprocess
 import sys
 import xml.etree.ElementTree as ET
 import zipfile
@@ -451,6 +452,13 @@ def build(epub: Path, out: Path, enhancements_file: Path | None = SITE / "enhanc
         shutil.rmtree(out)
     out.mkdir(parents=True)
     epub_bytes = epub.read_bytes()
+    if enhancements_file:
+        # Site data must not use a paragraph ID that ingestion moved (tools/check_ids.py reads the content's id-moves.csv).
+        content = enhancements_file.resolve().parent.parent
+        if (content / "id-moves.csv").is_file():
+            check = subprocess.run([sys.executable, str(ROOT / "tools" / "check_ids.py"), str(content)], capture_output=True, text=True)
+            if check.returncode != 0:
+                raise BookError(f"tools/check_ids.py: site data uses moved IDs\n{check.stdout}{check.stderr}")
     features = load_features()
     hooked = lambda hook: [getattr(f, hook) for f in features if hasattr(f, hook)]  # noqa: E731
     with zipfile.ZipFile(epub) as z:
