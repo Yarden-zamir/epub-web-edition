@@ -21,15 +21,37 @@ jobs:
         with:
           persist-credentials: false
 
+      # A web build that passed every check is kept under the hash of everything the book build reads. A push that
+      # changes none of it (a sample-only change) restores that build and skips the rest. The cache saves only after
+      # all steps passed. Known limit: the list of inputs is kept by hand; revisit it when the build reads new files.
+      - name: Restore checked web build
+        id: web
+        uses: actions/cache@v6
+        with:
+          path: books/eli-raz/dist/release/web
+          key: book-web-${{ hashFiles('books/eli-raz/**', 'tools/**', 'site/**', 'epub-src/OEBPS/fonts/**', 'epub-src/OEBPS/css/**', '.github/workflows/kitshn.yml') }}
+      # Ingest outputs; build_release.py runs ingest only when work/ingest-key differs from the hash of its inputs.
+      - name: Restore ingest output
+        if: steps.web.outputs.cache-hit != 'true'
+        uses: actions/cache@v6
+        with:
+          path: |
+            books/eli-raz/epub-src
+            books/eli-raz/epub-src-release
+            books/eli-raz/work/ingest-key
+          key: ingest-${{ github.sha }}
+          restore-keys: ingest-
+
       # The layout of .tools is the one that books/eli-raz/scripts/build_release.py reads.
       - name: Restore tool downloads
+        if: steps.web.outputs.cache-hit != 'true'
         id: tools
         uses: actions/cache@v6
         with:
           path: .tools
           key: tools-jre-21.0.13.1+2-epubcheck-5.4.0-axe-4.14.0
       - name: Download tools
-        if: steps.tools.outputs.cache-hit != 'true'
+        if: steps.web.outputs.cache-hit != 'true' && steps.tools.outputs.cache-hit != 'true'
         run: |
           set -euo pipefail
           mkdir -p .tools/dl
@@ -49,10 +71,12 @@ jobs:
           rm -r dl
 
       - name: Install uv 0.13.6
+        if: steps.web.outputs.cache-hit != 'true'
         run: |
           curl -LsSf https://astral.sh/uv/0.13.6/install.sh | sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
       - name: Restore uv cache
+        if: steps.web.outputs.cache-hit != 'true'
         uses: actions/cache@v6
         with:
           path: |
@@ -61,16 +85,20 @@ jobs:
           key: uv-0.13.6-${{ hashFiles('tools/*.py', 'books/eli-raz/scripts/*.py') }}
           restore-keys: uv-0.13.6-
       - name: Restore Playwright browser
+        if: steps.web.outputs.cache-hit != 'true'
         uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
           key: playwright-1.64.1-chromium-headless-shell
       - name: Install Playwright browser
+        if: steps.web.outputs.cache-hit != 'true'
         run: uv run --with playwright==1.64.1 playwright install --with-deps --only-shell chromium
 
       - name: Build and check
+        if: steps.web.outputs.cache-hit != 'true'
         run: uv run books/eli-raz/scripts/build_release.py
       - name: Shrink uv cache
+        if: steps.web.outputs.cache-hit != 'true'
         run: uv cache prune --ci
       # Artifact storage of a private repo counts against the account quota, so keep each run's files one day.
       - uses: actions/upload-artifact@v7

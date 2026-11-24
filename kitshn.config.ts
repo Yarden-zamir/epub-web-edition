@@ -9,6 +9,8 @@ export default defineApps({
         "curl -LsSf https://astral.sh/uv/0.13.6/install.sh | sh && ~/.local/bin/uv run tools/build_epub.py && ~/.local/bin/uv run tools/build_web.py",
       output: "dist/web",
     },
+    // Deploy after the book, so the live book never waits for the sample (the CLI otherwise sorts apps by key).
+    needs: { apps: ["book"] },
     deploy: [
       { on: "push", branch: "main", name: "prod", startsIn: "Everyone" },
       { on: "pull_request", name: "pr-{pr}", ephemeral: true },
