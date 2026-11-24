@@ -242,8 +242,8 @@ addEventListener("scroll", () => {
 // Again after fonts load and when the width changes. Later changes near the reader (a chart drawing) update by
 // themselves, because the estimate is "auto" (the last rendered size).
 // One pass over the whole page is a long task (about 365 ms on a fast desktop CPU, more than a second on a phone). So
-// the load measures in slices of about 10 ms, one task each, after the task of this script: a 60 fps frame still fits
-// around each slice. Only the documents above an element move it, so a jump first measures the ones above its target
+// the load measures in slices of about 10 ms, one task each, after the first frame: a 60 fps frame still fits around
+// each slice. Only the documents above an element move it, so a jump first measures the ones above its target
 // that are left (finishSizing). Jumps, the arrival on a deep link and a reload land by exact sizes, as before.
 let unsized = []; // Documents that the slices did not measure yet, first to last.
 function measure(docs) {
@@ -266,6 +266,8 @@ function finishSizing(el = null) {
 }
 async function sizeDocumentsInSlices() {
   unsized = allDocuments();
+  // The first slice waits for the next frame, so the page (or a deep link's target) paints before the slices start.
+  await new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve)));
   while (unsized.length) {
     await new Promise((resolve) => setTimeout(resolve));
     const start = performance.now();
