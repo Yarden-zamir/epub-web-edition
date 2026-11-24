@@ -1,7 +1,7 @@
 # Private book configuration for tools/ingest_pdf.py in the epub-web-edition pipeline.
 # Every value here comes from the source PDF. The comments name where.
 
-pdf = "~/private-inputs/eli-raz/source-2026-11-23/source.pdf"
+pdf = "source/source.pdf"  # Relative to this folder. source/PROVENANCE.txt says where it came from.
 pdf_sha256 = "c7efc94efd4cbd42bf9d479a20ff1af763e017ec0ce1cfab75d2be7e3560e994"
 # Ornaments that are not book content. Checked visually on PDF pages 6-7.
 decorative = ["p006-x17", "p007-x21"]
