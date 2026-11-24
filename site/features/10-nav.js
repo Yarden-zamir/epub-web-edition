@@ -1,8 +1,9 @@
-// Navigation bar: solid once the hero leaves the viewport.
+// Navigation bar: transparent only at the very top; solid as soon as the page scrolls more than the bar's height,
+// so the hero never slides under a see-through bar.
 const nav = byId("nav");
-new IntersectionObserver(([entry]) => {
-  nav.toggleAttribute("data-solid", !entry.isIntersecting);
-}, { rootMargin: "-96px 0px 0px 0px" }).observe(byId("top")); // Solid before the hero shrinks under the bar.
+const setSolid = () => nav.toggleAttribute("data-solid", scrollY > nav.offsetHeight);
+addEventListener("scroll", setSolid, { passive: true });
+setSolid();
 // The bar's download button shows once the hero's download button is out of view (above the bar).
 new IntersectionObserver(([entry]) => {
   nav.toggleAttribute("data-download", !entry.isIntersecting && entry.boundingClientRect.top < innerHeight);
