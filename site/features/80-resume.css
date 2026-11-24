@@ -3,6 +3,6 @@
 .resume a { padding: 0.65rem 1.1rem; padding-inline-end: 0.4rem; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .resume button { width: 2.5rem; height: 2.5rem; border-radius: var(--radius-pill); color: inherit; font-size: 1.2rem; }
 @media print { .resume, .note-pop { display: none; } }
-.resume { transition: opacity 250ms ease; }
+.resume { transition: opacity var(--dur-slow) var(--ease); }
 .resume.leaving { opacity: 0; }
 @media (prefers-reduced-motion: reduce) { .resume { transition: none; } }

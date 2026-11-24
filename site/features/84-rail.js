@@ -1,0 +1,79 @@
+// Chapter rail: one mark per chapter and part on the inline-start edge, the current one lit. Dragging along it scrubs
+// the page and shows the chapter under the finger; letting go jumps to that chapter's start, as one history entry,
+// so Back returns to where the scrub began. Pointer only: keyboard and screen-reader users have the navigator.
+const rail = document.createElement("div");
+rail.className = "rail";
+rail.setAttribute("aria-hidden", "true");
+rail.hidden = true;
+const railTrack = document.createElement("div");
+railTrack.className = "rail-track";
+const railLabel = document.createElement("div");
+railLabel.className = "rail-label";
+railLabel.hidden = true;
+rail.append(railTrack, railLabel);
+document.body.append(rail);
+const railSections = [...reading.querySelectorAll(".doc > section[id]")]
+  .filter((s) => tocDialog.querySelector(`[data-chapter="${CSS.escape(s.id)}"]`));
+const railName = (s) => tocDialog.querySelector(`[data-chapter="${CSS.escape(s.id)}"] :is(.toc-name, .toc-part-title)`)?.textContent ?? "";
+let railMarks = [];
+function layoutRail() {
+  const height = document.documentElement.scrollHeight;
+  railMarks = railSections.map((s) => ({ s, at: (s.getBoundingClientRect().top + scrollY) / height }));
+  railTrack.replaceChildren(...railMarks.map(({ s, at }) => {
+    const mark = document.createElement("i");
+    mark.className = s.matches(".part") ? "part" : "";
+    mark.style.top = `${(at * 100).toFixed(2)}%`;
+    return mark;
+  }));
+}
+const sectionAt = (fraction) => railMarks.findLast((m) => m.at <= fraction + 1e-6)?.s ?? railSections[0];
+function markCurrent() {
+  const now = (scrollY + innerHeight / 3) / document.documentElement.scrollHeight;
+  const current = sectionAt(now);
+  railMarks.forEach((m, i) => railTrack.children[i]?.classList.toggle("current", m.s === current));
+}
+// Shown while the reader scrolls past the hero, hidden again after a pause (not while scrubbing or hovered).
+let railTimer = 0, scrubbing = false;
+const hero = byId("top");
+const showRail = () => {
+  if (scrollY < hero.offsetHeight * 0.8) { rail.hidden = true; return; }
+  if (rail.hidden) { layoutRail(); rail.hidden = false; }
+  markCurrent();
+  clearTimeout(railTimer);
+  railTimer = setTimeout(() => { if (!scrubbing && !rail.matches(":hover")) rail.hidden = true; }, 1600);
+};
+addEventListener("scroll", showRail, { passive: true });
+addEventListener("resize", () => { if (!rail.hidden) layoutRail(); });
+rail.addEventListener("pointerleave", () => { if (!scrubbing) showRail(); });
+// Scrub.
+function scrubTo(clientY) {
+  const box = railTrack.getBoundingClientRect();
+  const fraction = Math.min(1, Math.max(0, (clientY - box.top) / box.height));
+  const section = sectionAt(fraction);
+  scrollTo({ top: fraction * (document.documentElement.scrollHeight - innerHeight), behavior: "instant" });
+  railLabel.textContent = railName(section);
+  railLabel.style.top = `${clientY - rail.getBoundingClientRect().top}px`;
+  railLabel.hidden = false;
+  markCurrent();
+  return section;
+}
+let scrubSection = null;
+rail.addEventListener("pointerdown", (e) => {
+  e.preventDefault();
+  scrubbing = true;
+  document.documentElement.setAttribute("data-scrubbing", "");
+  rail.setPointerCapture(e.pointerId);
+  history.replaceState({ ...history.state, ...position(), back: null }, ""); // Back returns here.
+  scrubSection = scrubTo(e.clientY);
+});
+rail.addEventListener("pointermove", (e) => { if (scrubbing) scrubSection = scrubTo(e.clientY); });
+const endScrub = () => {
+  if (!scrubbing) return;
+  scrubbing = false;
+  document.documentElement.removeAttribute("data-scrubbing");
+  railLabel.hidden = true;
+  if (scrubSection) goTo(scrubSection.id, { keepOrigin: true });
+  showRail();
+};
+rail.addEventListener("pointerup", endScrub);
+rail.addEventListener("pointercancel", endScrub);

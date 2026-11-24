@@ -122,7 +122,8 @@ function goTo(id, options = {}) {
     for (const oid of open.toReversed()) closeOverlayElement(byId(oid));
     history.replaceState(entry, "", `#${id}`);
   } else {
-    history.replaceState({ ...history.state, ...position(), back }, "");
+    // options.keepOrigin: the caller already saved where the reader came from (the chapter rail does, before it scrubs).
+    if (!options.keepOrigin) history.replaceState({ ...history.state, ...position(), back }, "");
     history.pushState(entry, "", `#${id}`);
   }
   scrollToElement(el);
@@ -130,6 +131,8 @@ function goTo(id, options = {}) {
   if (!el.matches("a, button, input, [tabindex]")) el.setAttribute("tabindex", "-1");
   el.focus({ preventScroll: true });
   history.replaceState({ ...history.state, ...position() }, "");
+  // Features can react to a jump that followed a link in the text (the back chip names where Back goes).
+  if (back) dispatchEvent(new CustomEvent("reader:jump", { detail: { back } }));
 }
 
 // Overlays: dialogs and popovers that Back closes. Opening one pushes an entry; closing it any other way
@@ -173,7 +176,11 @@ addEventListener("popstate", (e) => {
 let positionSave = 0;
 addEventListener("scroll", () => {
   clearTimeout(positionSave);
-  positionSave = setTimeout(() => history.replaceState({ ...history.state, ...position() }, ""), 200);
+  positionSave = setTimeout(() => {
+    // A feature that moves the page on its own (the chapter rail while scrubbing) sets data-scrubbing, so the
+    // entry keeps the place the reader started from.
+    if (!document.documentElement.hasAttribute("data-scrubbing")) history.replaceState({ ...history.state, ...position() }, "");
+  }, 200);
 }, { passive: true });
 // Arrival: a reload returns to its saved position; a deep link from outside lands on and highlights its element.
 {

@@ -19,6 +19,11 @@
   --radius-s: 0.5rem;     /* inputs, chips, thumbnails, small tips */
   --radius-m: 0.875rem;   /* cards, popovers, dialogs, menus, video */
   --radius-pill: 999px;   /* pill buttons and toggles */
+  /* Motion: three durations and one easing for every transition. Reduced motion sets them to zero (instant). */
+  --dur-fast: 150ms;      /* hover and press feedback */
+  --dur: 200ms;           /* the bar, menus, fades */
+  --dur-slow: 300ms;      /* things that leave the screen */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --measure: 38rem; /* About 34em of body text: 60-70 Hebrew characters a line. */
   --gutter: clamp(1.25rem, 5vw, 3rem);
   /* "Book Sans" is the book's bundled Noto Sans Hebrew (Hebrew letters only); Latin letters fall through to the system sans. */
@@ -67,7 +72,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   padding: 0.7rem 1.4rem; border-radius: var(--radius-pill); border: 1px solid transparent;
   font-family: var(--sans); font-size: 1rem; font-weight: 600; line-height: 1.2; text-decoration: none;
   background: var(--accent); color: var(--on-accent);
-  transition: transform 150ms ease, background-color 150ms ease;
+  transition: transform var(--dur-fast) var(--ease), background-color var(--dur-fast) var(--ease);
 }
 .btn:hover { transform: translateY(-1px); }
 .btn-meta { font-weight: 400; opacity: 0.75; font-size: 0.85em; }
@@ -76,3 +81,4 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .btn-outline:hover { background: color-mix(in srgb, var(--on-night) 10%, transparent); }
 .btn-small { min-height: 2.25rem; padding: 0.4rem 1rem; font-size: 0.9rem; }
 
+@media (prefers-reduced-motion: reduce) { :root { --dur-fast: 0ms; --dur: 0ms; --dur-slow: 0ms; } }
