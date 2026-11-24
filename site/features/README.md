@@ -56,7 +56,7 @@ A module defines any of these functions. Each one receives `site` (`build_web.Si
 | `write(site)` | After `index.html` is written | Write extra files. Add keys to `site.report` (`build.json`). |
 
 - Keep module state in module globals. The build loads each module again for each build.
-- Shared helpers stay in `tools/build_web.py`: `BookError`, `missing_id`, `clean_text`, `text_slots`, `wrap_text`, `write_csv`, `Thumbs`, `title_and_byline`.
+- Shared helpers stay in `tools/build_web.py`: `BookError`, `missing_id`, `clean_text`, `text_slots`, `wrap_text`, `write_csv`, `credit_html`, `Thumbs`, `title_and_byline`.
 - A change to core is needed only when a feature cannot work through these hooks and the `head` and `end` slots.
 
 ## Check a change
