@@ -552,11 +552,15 @@ def build(epub: Path, out: Path, enhancements_file: Path | None = SITE / "enhanc
         "short_title": html.escape(book.creator),  # The bar shows the author's name when the title does not fit.
         "book": "\n".join(docs),
     }
+    reader_css = bundle(".css")
+    if "</style" in reader_css.lower():
+        raise BookError("site/features/*.css contains </style, which would end the inline style of index.html")
+    core["reader_css"] = reader_css
     if clash := core.keys() & values.keys():
         raise BookError(f"features fill core template markers {sorted(clash)}")
     page = fill((SITE / "index.html").read_text(encoding="utf-8"), core | values)
     (out / "index.html").write_text(page, encoding="utf-8")
-    (out / "reader.css").write_text(bundle(".css"), encoding="utf-8")
+    (out / "reader.css").write_text(reader_css, encoding="utf-8")  # For site/pages/; index.html has it inline.
     (out / "reader.js").write_text(bundle(".js"), encoding="utf-8")
     site.report.update({
         "epub": epub.name,

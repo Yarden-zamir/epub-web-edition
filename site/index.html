@@ -12,7 +12,8 @@
 {{font_preload}}
 <!-- The book stylesheet sits in a cascade layer, so every site rule overrides its print styles. -->
 <style>@import url("{{book_css}}") layer(book);</style>
-<link rel="stylesheet" href="reader.css">
+<!-- The site styles sit inline, so the first paint waits for no second request. pages/ link reader.css instead. -->
+<style>{{reader_css}}</style>
 <script src="reader.js" defer></script>
 {{head}}</head>
 <body>
