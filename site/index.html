@@ -101,12 +101,13 @@
   <div class="tabs" role="tablist" aria-labelledby="toc-title">
     <button type="button" role="tab" id="tab-chapters" aria-selected="true" aria-controls="toc-chapters">פרקים</button>
     {{timeline_tab}}
+    <button type="button" role="tab" id="tab-places" aria-selected="false" aria-controls="toc-places" tabindex="-1">מקומות</button>
   </div>
+  <form class="toc-filter" role="search" id="toc-filter-form">
+    <label for="toc-filter" class="visually-hidden" id="toc-filter-label">סינון פרקים לפי שם או כותב</label>
+    <input id="toc-filter" type="search" autocomplete="off" placeholder="סינון פרקים">
+  </form>
   <div id="toc-chapters" class="panel-body" role="tabpanel" aria-labelledby="tab-chapters">
-    <form class="toc-filter" role="search" id="toc-filter-form">
-      <label for="toc-filter" class="visually-hidden">סינון פרקים לפי שם או כותב</label>
-      <input id="toc-filter" type="search" autocomplete="off" placeholder="סינון פרקים">
-    </form>
     <nav class="panel-list" aria-labelledby="tab-chapters">
 {{toc}}
     </nav>
@@ -114,6 +115,14 @@
     {{errata_nav}}
   </div>
   {{timeline}}
+  <div id="toc-places" class="panel-body" role="tabpanel" aria-labelledby="tab-places" hidden>
+    <div class="view-toggle places-order" role="group" aria-label="סדר המקומות">
+      <button type="button" data-order="name" aria-pressed="true">לפי שם</button>
+      <button type="button" data-order="chapter" aria-pressed="false">לפי פרק</button>
+    </div>
+    <div id="places-index"></div>
+    <p class="toc-empty" id="places-empty" hidden>לא נמצאו מקומות</p>
+  </div>
 </dialog>
 
 <dialog id="search-dialog" class="panel" aria-labelledby="search-title">

@@ -35,3 +35,16 @@
 .tl-major .tl-date { color: var(--accent); font-size: 0.85rem; }
 .tl-major .tl-text { font-size: 1.02rem; font-weight: 600; }
 
+/* Places index: dot, name and one line of description as one button; the chapters that mention it as links below. */
+.places-order { margin: 0.25rem 1rem 0.5rem; font-size: 0.8rem; }
+.pi-list { list-style: none; margin: 0; padding: 0 0.5rem 0.75rem; }
+.pi-group .toc-part-title { margin: 0.75rem 0 0; }
+.pi-item { padding: 0.35rem 0; border-bottom: 1px solid var(--rule); }
+.pi-place { display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: "dot name far" ". desc desc"; align-items: center; gap: 0.1rem 0.5rem; width: 100%; padding: 0.4rem 0.6rem; border-radius: calc(var(--radius-m) - 0.5rem); text-align: start; }
+.pi-place:hover, .pi-place:focus-visible { background: var(--mat); }
+.pi-place i { grid-area: dot; width: 0.7rem; height: 0.7rem; border-radius: 50%; background: var(--place); }
+.pi-name { grid-area: name; font-weight: 600; }
+.pi-far { grid-area: far; font-size: 0.72rem; color: var(--muted); }
+.pi-desc { grid-area: desc; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 0.82rem; color: var(--soft); }
+.pi-chapters { display: flex; flex-wrap: wrap; gap: 0.2rem 0.75rem; padding: 0.15rem 0.6rem 0.25rem; padding-inline-start: 1.8rem; font-size: 0.8rem; }
+.pi-chapters a { color: var(--accent); min-height: 1.5rem; display: inline-flex; align-items: center; }
