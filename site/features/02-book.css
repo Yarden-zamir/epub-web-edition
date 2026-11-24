@@ -74,18 +74,21 @@
 .book .poem-title { margin: 0 0 0.35rem; font-size: 1.2em; font-weight: 600; line-height: 1.35; color: var(--ink); text-wrap: balance; }
 .book .poem-author { margin: 0 0 1.5rem; font-family: var(--sans); font-size: 0.78em; color: var(--muted); }
 .book .poem-author::before { content: "— "; }
-.book .poem-body p.stanza { margin: 0 0 1.4em; line-height: 1.9; text-indent: 0; }
+.book .poem-body p.stanza { margin: 0 0 1.4em; line-height: 1.5; text-indent: 0; } /* Tight, as printed; many lines hold one word. */
 .book .poem-body p.stanza:last-child { margin-bottom: 0; }
-.book .poem-body .line { display: block; padding-inline-start: 1.25em; text-indent: -1.25em; }
+/* A line that wraps: its continuation hangs 2.5 em in. With the script, a wrapped line also gets .wraps and its last
+   part sits at the far edge, the usual turnover in printed poetry, so a wrap never looks like a step. */
+.book .poem-body .line { display: block; padding-inline-start: 2.5em; text-indent: -2.5em; }
+.book .poem-body .line.wraps { text-align-last: end; }
 .book .poem-body br { display: none; } /* Each line is a block; the EPUB's line breaks are for e-readers. */
-/* Lines that step in, as printed (indent-1 .. indent-6, N em further in). The hanging indent still applies,
+/* Lines that step in, as printed (indent-1 .. indent-6, 1.75 em per step, as in the print). The hanging indent still applies,
    so a wrapped stepped line reads as one verse. */
-.book .poem-body .line.indent-1 { padding-inline-start: calc(1.25em + 1em); }
-.book .poem-body .line.indent-2 { padding-inline-start: calc(1.25em + 2em); }
-.book .poem-body .line.indent-3 { padding-inline-start: calc(1.25em + 3em); }
-.book .poem-body .line.indent-4 { padding-inline-start: calc(1.25em + 4em); }
-.book .poem-body .line.indent-5 { padding-inline-start: calc(1.25em + 5em); }
-.book .poem-body .line.indent-6 { padding-inline-start: calc(1.25em + 6em); }
+.book .poem-body .line.indent-1 { padding-inline-start: calc(2.5em + 1.75em); }
+.book .poem-body .line.indent-2 { padding-inline-start: calc(2.5em + 3.5em); }
+.book .poem-body .line.indent-3 { padding-inline-start: calc(2.5em + 5.25em); }
+.book .poem-body .line.indent-4 { padding-inline-start: calc(2.5em + 7.0em); }
+.book .poem-body .line.indent-5 { padding-inline-start: calc(2.5em + 8.75em); }
+.book .poem-body .line.indent-6 { padding-inline-start: calc(2.5em + 10.5em); }
 .book .byline { color: var(--muted); }
 
 .book blockquote.epigraph { margin: 2.5rem 0; padding: 0; padding-inline-start: 1.25rem; border: 0; border-inline-start: 2px solid var(--accent); color: var(--soft); font-size: 1.02em; }
