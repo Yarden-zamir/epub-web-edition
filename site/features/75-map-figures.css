@@ -9,7 +9,7 @@
 .book figure.has-map > img { margin-inline: auto; }
 .map-figure { font-family: var(--sans); }
 .mf-title { margin: 0 0 0.5rem; font-weight: 700; font-size: 1rem; }
-.mf-map, .tn-stage { box-sizing: border-box; position: relative; z-index: 0; isolation: isolate; width: 100%; max-height: min(80vh, 44rem); min-height: 18rem; border: 1px solid var(--rule); border-radius: var(--radius-m); overflow: hidden; direction: ltr; background: var(--mat); }
+.mf-map, .tn-stage { position: relative; z-index: 0; isolation: isolate; width: 100%; max-height: min(80vh, 44rem); min-height: 18rem; border: 1px solid var(--rule); border-radius: var(--radius-m); overflow: hidden; direction: ltr; background: var(--mat); }
 .tn-map { position: absolute; inset: 0; }
 
 /* Lines on a paper halo, so they read on any tile. */
@@ -37,7 +37,7 @@ path.mf-line.slot-3 { stroke: var(--line-3); stroke-dasharray: 1 6.5; stroke-wid
 .tn-stage.side { aspect-ratio: auto !important; height: min(80vh, 44rem); max-height: none; border: 0; border-radius: 0; overflow: visible; background: none; }
 .tn-panes { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; height: 100%; direction: rtl; }
 .tn-pane { display: grid; grid-template-rows: auto 1fr auto; gap: 0.35rem; min-width: 0; }
-.tn-pane .tn-map { box-sizing: border-box; position: relative; inset: auto; border: 1px solid var(--rule); border-radius: var(--radius-m); overflow: hidden; }
+.tn-pane .tn-map { position: relative; inset: auto; border: 1px solid var(--rule); border-radius: var(--radius-m); overflow: hidden; }
 .tn-pick { display: flex; justify-content: space-between; gap: 2px; padding: 3px; border: 1px solid var(--rule); border-radius: var(--radius-pill); }
 .tn-pick button, .tn-stops button { min-height: 2.5rem; padding: 0 0.5rem; border-radius: var(--radius-pill); color: var(--muted); font-weight: 600; font-size: 0.9rem; font-variant-numeric: tabular-nums; transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease); }
 .tn-pick button { flex: 1; min-height: 2.25rem; font-size: 0.85rem; }

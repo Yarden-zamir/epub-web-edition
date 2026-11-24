@@ -1,6 +1,10 @@
 /* Web edition presentation. Book typography comes from the EPUB stylesheet, loaded first.
    This file only adds site layout: hero, navigation, spacing, figures and motion. */
 
+/* Every box of the site measures its size with its padding and border (border-box), so width: 100% never overflows.
+   reader.css is web-only: the EPUB and its book.css on Kindle keep their own box model. A text measure with side
+   padding adds the padding to its cap (max-width: calc(var(--measure) + 2 * var(--gutter))), so the text keeps its width. */
+*, *::before, *::after { box-sizing: border-box; }
 :root {
   --paper: #f7f3ec;
   --ink: #1c1a17;
@@ -76,7 +80,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* Buttons */
 .btn {
-  display: inline-flex; align-items: center; gap: 0.6rem; min-height: 2.9rem; box-sizing: border-box;
+  display: inline-flex; align-items: center; gap: 0.6rem; min-height: 2.9rem;
   padding: 0.7rem 1.4rem; border-radius: var(--radius-pill); border: 1px solid transparent;
   font-family: var(--sans); font-size: 1rem; font-weight: 600; line-height: 1.2; text-decoration: none;
   background: var(--accent); color: var(--on-accent);

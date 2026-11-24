@@ -6,10 +6,10 @@
 /* Closing photograph above the footer: full bleed, with its caption and credit like the book's photos. */
 .closing-photo { margin: 0; padding-bottom: 2rem; background: var(--night); color: var(--on-night); }
 .closing-photo img { display: block; width: 100%; height: auto; max-height: 92vh; object-fit: cover; }
-.closing-photo figcaption { max-width: var(--measure); margin: 0 auto; padding: 1rem var(--gutter) 0; font-family: var(--sans); font-size: 0.9rem; line-height: 1.55; }
+.closing-photo figcaption { max-width: calc(var(--measure) + 2 * var(--gutter)); margin: 0 auto; padding: 1rem var(--gutter) 0; font-family: var(--sans); font-size: 0.9rem; line-height: 1.55; }
 .closing-photo figcaption span { display: block; }
 .closing-photo .credit, .closing-photo .closing-note { color: var(--on-night-soft); font-size: 0.9em; }
-.hero-inner { display: grid; gap: clamp(2.5rem, 6vw, 5rem); align-items: center; width: 100%; max-width: 72rem; margin: 0 auto; padding: 6rem var(--gutter) 6rem; box-sizing: border-box; }
+.hero-inner { display: grid; gap: clamp(2.5rem, 6vw, 5rem); align-items: center; width: 100%; max-width: calc(72rem + 2 * var(--gutter)); margin: 0 auto; padding: 6rem var(--gutter) 6rem; }
 .hero-cover { order: -1; justify-self: center; width: min(52vw, 15rem); height: auto; border-radius: 3px; /* A printed cover: nearly square corners on purpose. */ box-shadow: 0 30px 70px rgb(0 0 0 / 0.5), 0 0 0 1px rgb(255 255 255 / 0.06); }
 .hero-title { margin: 0 0 1.5rem; font-size: clamp(2.4rem, 1.5rem + 4vw, 5.5rem); line-height: 1.04; font-weight: bold; text-wrap: balance; }
 .hero-lede { margin: 0 0 2.5rem; max-width: 32rem; font-size: clamp(1.1rem, 1rem + 0.4vw, 1.35rem); line-height: 1.65; color: var(--on-night-soft); text-wrap: pretty; }
@@ -80,7 +80,7 @@
 .book figcaption .edition-credit a { color: inherit; }
 /* Poems and songs: a centred block with its own narrow measure, lines aligned to the start, a soft mat and
    a small ornament. A long line wraps with a hanging indent, so it still reads as one verse. */
-.book section.poem { width: fit-content; max-width: min(30rem, 100%); box-sizing: border-box; margin: clamp(2.5rem, 7vw, 4.5rem) auto; padding: clamp(1.75rem, 5vw, 2.75rem) clamp(1.25rem, 5vw, 3rem); border-radius: var(--radius-m); background: var(--mat); text-align: start; }
+.book section.poem { width: fit-content; max-width: min(30rem, 100%); margin: clamp(2.5rem, 7vw, 4.5rem) auto; padding: clamp(1.75rem, 5vw, 2.75rem) clamp(1.25rem, 5vw, 3rem); border-radius: var(--radius-m); background: var(--mat); text-align: start; }
 .book section.poem::before { content: ""; display: block; width: 2.25rem; height: 1px; margin: 0 auto 1.5rem; background: var(--accent); box-shadow: 0 4px 0 -0.5px color-mix(in srgb, var(--accent) 45%, transparent); }
 .book .poem-title { margin: 0 0 0.35rem; font-size: 1.2em; font-weight: 600; line-height: 1.35; color: var(--ink); text-wrap: balance; }
 .book .poem-author { margin: 0 0 1.5rem; font-family: var(--sans); font-size: 0.78em; color: var(--muted); }
@@ -134,7 +134,7 @@
 /* Photos run full width and always show whole: at most 88vh tall, never cropped, never moving. */
 .book figure.photo { width: var(--page); margin-inline: var(--bleed); }
 .book figure.photo img { width: min(100%, calc(88vh * var(--ratio, 1))); height: auto; margin: 0 auto; }
-.book figure.photo figcaption { max-width: var(--measure); padding-inline: var(--gutter); }
+.book figure.photo figcaption { max-width: calc(var(--measure) + 2 * var(--gutter)); padding-inline: var(--gutter); }
 
 /* In-column images: never cropped, and enlarged at most 1.5 times their pixel width.
    Phones run them edge to edge. On wider screens landscape images grow past the text column. */
@@ -181,7 +181,7 @@
 .book ol.contents .page { margin-inline-start: auto; color: var(--muted); font-family: var(--sans); font-size: 0.8em; font-variant-numeric: tabular-nums; }
 
 /* Artwork is never cropped: shown whole on a mat. */
-.book figure.artwork { width: min(var(--page), 62rem); margin-inline: calc(50% - min(50cqw + var(--gutter), 31rem)); padding: clamp(1.5rem, 6vw, 4.5rem) var(--gutter); box-sizing: border-box; background: var(--mat); }
+.book figure.artwork { width: min(var(--page), 62rem); margin-inline: calc(50% - min(50cqw + var(--gutter), 31rem)); padding: clamp(1.5rem, 6vw, 4.5rem) var(--gutter); background: var(--mat); }
 .book figure.artwork img { width: min(100%, calc(78vh * var(--ratio, 1))); height: auto; margin: 0 auto; box-shadow: 0 18px 40px rgb(0 0 0 / 0.18); }
 .book figure.artwork figcaption { max-width: var(--measure); text-align: center; }
 
@@ -212,7 +212,7 @@
 
 /* Footer */
 .footer { background: var(--night); color: var(--on-night); font-family: var(--sans); }
-.footer-inner { max-width: var(--measure); margin: 0 auto; padding: clamp(4rem, 10vw, 7rem) var(--gutter); display: grid; justify-items: start; gap: 0.5rem; }
+.footer-inner { max-width: calc(var(--measure) + 2 * var(--gutter)); margin: 0 auto; padding: clamp(4rem, 10vw, 7rem) var(--gutter); display: grid; justify-items: start; gap: 0.5rem; }
 .footer-title { margin: 0; font-size: clamp(1.8rem, 1.3rem + 2vw, 2.6rem); font-weight: bold; line-height: 1.15; }
 .footer-author { margin: 0 0 1.5rem; color: var(--on-night-soft); }
 .footer .btn { background: var(--on-night); color: var(--night); }
@@ -224,7 +224,7 @@
 .related-note { display: block; font-size: 0.85rem; color: var(--on-night-soft); }
 
 /* A withheld image: its box shows a muted "image removed" mark; the caption under it explains why. */
-.book figure .withheld { display: grid; place-items: center; }
+.book figure .withheld { display: grid; place-items: center; box-sizing: content-box; } /* book.css sizes it as the EPUB does (content-box). */
 .book figure .withheld::before { content: ""; width: 2.25rem; height: 2.25rem; background: var(--muted); mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round'%3E%3Crect x='3' y='5' width='18' height='14' rx='2'/%3E%3Cpath d='m3 16 5-5 4 4 3-3 6 6M3 3l18 18'/%3E%3C/svg%3E") center / contain no-repeat; }
 /* Part openings: the two printed lines of a part title are one title at one size, centred on the photo's axis. */
 .book section.part > h2 { position: relative; margin: clamp(1.5rem, 4vw, 2.5rem) 0 0; font-size: clamp(1.75rem, 1.2rem + 2vw, 3rem); line-height: 1.2; text-align: center; text-wrap: balance; }
