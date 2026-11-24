@@ -140,7 +140,7 @@ async function toggleElement(el) {
   });
 }
 
-// Chapter switch: the printed language and each translation, with the machine translation note.
+// Chapter switch: the printed language and each translation, with the AI translation note.
 const chapterBars = new Map(); // Chapter ID -> its switch.
 function makeChapterBar(chapter) {
   const section = byId(chapter);
