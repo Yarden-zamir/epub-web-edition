@@ -129,7 +129,7 @@ function create(spec) {
   const peaks = cols.filter((col, i) => col.atBottom !== null && sum(col) >= sum(cols[i - 1]) && sum(col) >= sum(cols[i + 1]) && sum(col) > 0.7);
   const sites = [];
   for (const col of [...peaks].sort((c1, c2) => sum(c2) - sum(c1))) if (sites.length < GAPS && sites.every((site) => Math.abs(site.x - col.x) >= GAP_SPACING)) sites.push(col);
-  for (const site of sites) site.size = 0.8 + rand(); // Sinkholes of different sizes: wider gap and crater.
+  for (const site of sites) site.size = 0.8 + rand(); // Gaps of different widths (the gap radius below scales with it).
   for (const col of cols) {
     const near = Math.max(0, ...sites.map((site) => 1 - Math.abs(site.x - col.x) / (6 + 9 * site.size)));
     col.topMost = 0.12 + 0.38 * col.rt + 0.6 * near;
@@ -143,9 +143,14 @@ function create(spec) {
   const spots = [];
   for (const col of cols.filter((c) => c.atBottom !== null && sites.every((site) => Math.abs(site.x - c.x) > 18)).sort((c1, c2) => c2.rt - c1.rt))
     if (spots.length < SPOTS && spots.every((spot) => Math.abs(spot.col.x - col.x) > 30)) spots.push({ col, size: 0.8 + 0.5 * rand(), radii: grid.slice(0, 10).map(() => 0.7 + 0.6 * rand()) });
-  // A collapse at each gap site: the ground above the gap moves down into the space the salt left. Half width at the
-  // surface: w; it narrows toward the gap.
-  const holes = sites.sort((c1, c2) => c1.x - c2.x).map((col) => ({ x: col.x, col, size: col.size, w: 16 * col.size, surface: (dx) => Y(ground(col.x + dx)) }));
+  // A collapse at each gap site: the ground above the gap moves down into the space the salt left. Its size follows
+  // the salt cleared there, the gap width times the local thickness: small over the thin ends, big where the layer is
+  // thick. Width and depth each take the square root, so the crater's cross-section follows the cleared area. The
+  // widest gap in the thickest salt gives size 1.8. Half width at the surface: w; it narrows toward the gap.
+  const holes = sites.sort((c1, c2) => c1.x - c2.x).map((col) => {
+    const size = Math.sqrt(col.size * (thickAt(col.x) / SALT.thick) * 1.8);
+    return { x: col.x, col, size, w: 16 * size, surface: (dx) => Y(ground(col.x + dx)) };
+  });
   let pores = null, poresColor = "";
   const poreTile = (ctx, env) => { // Small dots: water in the pores of the ground. One tile per theme.
     const color = env.color("--xp-fresh-ink");
@@ -434,7 +439,7 @@ function create(spec) {
       if (h) {
         const look = { weight: 700, size: small ? 11 : 12 };
         const [first, second] = L.sinkhole.split(" / ");
-        const g = h.surface(0), y = g - 34 * Math.max(1, u * 0.8);
+        const g = h.surface(0), y = Math.max(g - 34 * Math.max(1, u * 0.8), 30 * u); // Both lines stay inside the drawing.
         ctx.globalAlpha = explain;
         ctx.strokeStyle = env.color("--ink");
         ctx.lineWidth = 1;
