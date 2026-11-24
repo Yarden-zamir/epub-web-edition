@@ -17,9 +17,10 @@
 .toc-part { margin-top: 0.75rem; }
 .toc-part-title { display: block; padding: 0.4rem 0.75rem; font-size: 0.8rem; font-weight: 700; color: var(--accent); text-decoration: none; }
 /* Title and author on the start side, place dots in their own column at the end. */
-.panel-list .toc-item a { display: grid; grid-template-columns: 1fr auto; grid-template-areas: "name dots" "author dots"; align-items: center; gap: 0.1rem 0.6rem; padding: 0.55rem 0.75rem; }
+.panel-list .toc-item a { display: grid; grid-template-columns: 1fr auto; grid-template-areas: "name dots" "printed dots" "author dots"; align-items: center; gap: 0.1rem 0.6rem; padding: 0.55rem 0.75rem; }
 .toc-name { grid-area: name; }
 .toc-author { grid-area: author; }
+.toc-printed { grid-area: printed; font-size: 0.8125rem; color: var(--muted); }
 .toc-name { flex: 1 1 12rem; }
 .toc-author { font-size: 0.8rem; color: var(--muted); }
 .toc-places { grid-area: dots; display: inline-flex; align-items: center; gap: 3px; font-size: 0.7rem; color: var(--muted); }
@@ -31,7 +32,7 @@
 .tl-event a { position: relative; display: grid; gap: 0.1rem; padding: 0.45rem 0.6rem 0.45rem 0; padding-inline: 1.6rem 0.6rem; border-radius: calc(var(--radius-m) - 0.5rem); text-decoration: none; line-height: 1.4; }
 .tl-event a::before { content: ""; position: absolute; inset-inline-start: 0.12rem; top: 0.85rem; width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--paper); box-shadow: 0 0 0 2px var(--muted); }
 .tl-event a:hover, .tl-event a:focus-visible { background: var(--mat); outline: none; }
-.tl-date { font-size: 0.78rem; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+.tl-date { font-size: 0.8125rem; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
 .tl-text { font-size: 0.9rem; }
 .tl-major a { padding-block: 0.7rem; }
 .tl-major a::before { inset-inline-start: 0; top: 1.05rem; width: 0.8rem; height: 0.8rem; background: var(--accent); box-shadow: 0 0 0 3px var(--paper); }
@@ -47,7 +48,7 @@
 .pi-place:hover, .pi-place:focus-visible { background: var(--mat); }
 .pi-place i { grid-area: dot; width: 0.7rem; height: 0.7rem; border-radius: 50%; background: var(--place); }
 .pi-name { grid-area: name; font-weight: 600; }
-.pi-far { grid-area: far; font-size: 0.72rem; color: var(--muted); }
+.pi-far { grid-area: far; font-size: 0.8125rem; color: var(--muted); }
 .pi-desc { grid-area: desc; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 0.82rem; color: var(--soft); }
 .pi-chapters { display: flex; flex-wrap: wrap; gap: 0.2rem 0.75rem; padding: 0.15rem 0.6rem 0.25rem; padding-inline-start: 1.8rem; font-size: 0.8rem; }
 .pi-chapters a { color: var(--accent); min-height: 1.5rem; display: inline-flex; align-items: center; }

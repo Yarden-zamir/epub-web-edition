@@ -30,6 +30,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 import build_epub  # noqa: E402
 import build_web  # noqa: E402
+import check_meta  # noqa: E402
 
 TOOLS = ROOT / ".tools"
 DIST = ROOT / "dist"
@@ -340,6 +341,8 @@ def main() -> None:
     check_reproducible()
     check_inventory(texts)
     check_propagation()
+    found = check_meta.problems(WEB)  # The sample has no app.json, so no preview addresses at all.
+    record("link preview addresses are absolute", not found, found)
     server, url = serve(WEB)
     try:
         with sync_playwright() as p:
