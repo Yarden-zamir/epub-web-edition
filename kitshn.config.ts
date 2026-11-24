@@ -13,7 +13,6 @@ export default defineApps({
     needs: { apps: ["book"] },
     deploy: [
       { on: "push", branch: "main", name: "prod", startsIn: "Everyone" },
-      { on: "pull_request", name: "pr-{pr}", ephemeral: true },
     ],
   },
   // The Eli Raz edition. The "book" job of .github/workflows/kitshn.yml runs books/eli-raz/scripts/check.py

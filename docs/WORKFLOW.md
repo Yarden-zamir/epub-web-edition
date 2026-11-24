@@ -79,7 +79,7 @@ Here (`books/eli-raz/scripts/check.py`, `check.yml`):
 |---|---|
 | Build machine, before a push | `check.py`: build from the shared ingest cache, check_release, preview.html (light; no browser, no Java) |
 | PR (each push) | `--gate`: ingest, build, check_release (withheld images, credits, size budget), EPUBCheck, quick smoke (errors, overflow, axe on a sample) |
-| Merge queue | also axe on the whole page at every width and scheme, the explainers, tools/verify.py on the sample edition (advisory for now), the INGEST_INPUTS comparison when ingest runs, the PR text of each PR |
+| Merge queue | also axe on the whole page at every width and scheme, the explainers, tools/verify.py on the sample edition, the INGEST_INPUTS comparison when ingest runs, the PR text of each PR |
 | Nightly, by hand | `--full`, also videos and traces; by hand with `gh workflow run check.yml --ref <branch> [-f record=true]` |
 | Deploy (push to main) | `kitshn.yml`: `--gate` again, then kitshn deploys both apps |
 

@@ -47,7 +47,7 @@ Heavy flags, for GitHub Actions (each one also works here, but only when a task 
 
 Where each check runs (.github/workflows/check.yml, one job that builds once and runs the checks as parallel processes):
 - Each push to a PR (`--gate`): ingest, build, check_release, EPUBCheck, the quick smoke test.
-- The merge queue: also axe on the whole page at every width and scheme, the explainers, tools/verify.py on the sample edition, the INGEST_INPUTS comparison when ingest runs, and the PR text of each PR in the group. tools/verify.py is advisory for now (it warns and does not block) until the UI agent fixes its search and figure-viewer failures.
+- The merge queue: also axe on the whole page at every width and scheme, the explainers, tools/verify.py on the sample edition, the INGEST_INPUTS comparison when ingest runs, and the PR text of each PR in the group.
 - Nightly on main and by hand (`--full`, with videos and traces): `gh workflow run check.yml --ref <branch> [-f record=true]`. It deploys nothing.
 - Each push to main (kitshn.yml, the deploy): `--gate` again, then kitshn deploys both apps.
 

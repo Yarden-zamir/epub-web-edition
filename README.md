@@ -12,7 +12,10 @@ Licences: the MIT licence in `LICENSE` covers the pipeline code and the sample e
 The Eli Raz book content (its text, images and source PDF) is © its authors and photographers, all rights reserved,
 published with the family's permission; see `books/eli-raz/NOTICE.md`.
 
-How work reaches `main`: branches, pull requests and a merge queue (`docs/WORKFLOW.md`).
+## Contributing
+
+Every change goes through a pull request and the merge queue; nobody pushes to `main`.
+Agents start with `CLAUDE.md`. The workflow: `docs/WORKFLOW.md`. The steps from branch to merge: `.claude/skills/eli-raz-pr-flow/SKILL.md`.
 
 ## Deploy
 

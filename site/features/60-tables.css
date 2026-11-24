@@ -19,3 +19,6 @@
 .print-version summary { cursor: pointer; color: var(--muted); }
 .print-version img { margin-top: 0.75rem; }
 
+/* Rows of a data table fade in once, in a short stagger (html.motion only). */
+.motion table.data-table:not(.seen) tbody tr { opacity: 0; }
+.motion table.data-table.seen tbody tr { animation: fade-in var(--dur-base) var(--ease-out) both; animation-delay: calc(min(var(--i, 0), 10) * 30ms); }
