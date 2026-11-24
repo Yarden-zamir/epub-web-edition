@@ -137,11 +137,17 @@ class IdRegistry:
 
     CONTENT_DIR/ids.csv lists each paragraph ID with the key of its text, in book order. A new paragraph takes
     the next unused ID of its unit whose key starts like its own; otherwise it gets a new number after the
-    unit's highest. An ID whose paragraph joined another one is gone; run() records where its text went.
+    unit's highest, moved IDs included, so a number is never given twice. An ID whose paragraph joined
+    another one is gone; write_ids() adds it to CONTENT_DIR/id-moves.csv, which only grows.
     """
 
-    def __init__(self, path: Path) -> None:
+    def __init__(self, path: Path, moves_path: Path) -> None:
         self.path = path
+        self.moves_path = moves_path
+        self.moves: dict[str, str] = {}
+        if moves_path.exists():
+            with moves_path.open(encoding="utf-8", newline="") as f:
+                self.moves = {row["old_id"]: row["new_id"] for row in csv.DictReader(f)}
         self.rows: dict[str, list[tuple[str, str]]] = {}
         if path.exists():
             with path.open(encoding="utf-8", newline="") as f:
@@ -149,7 +155,10 @@ class IdRegistry:
                     self.rows.setdefault(row["id"].rsplit("-p", 1)[0], []).append((row["id"], row["key"]))
         self.used: set[str] = set()
         self.pos: dict[str, int] = {}
-        self.top = {u: max(int(i.rsplit("-p", 1)[1]) for i, _ in rows) for u, rows in self.rows.items()}
+        self.top: dict[str, int] = {}
+        for i in [i for rows in self.rows.values() for i, _ in rows] + [i for i in self.moves if i.rsplit("-p", 1)[-1].isdigit()]:
+            unit, num = i.rsplit("-p", 1)
+            self.top[unit] = max(self.top.get(unit, 0), int(num))
         self.assigned: list[tuple[str, str]] = []
 
     def assign(self, unit: str, text: str) -> str:
@@ -427,6 +436,38 @@ def has_list_label(text: str) -> bool:
     return head.endswith(".") and ((len(label) == 1 and is_hebrew(label)) or (label.isdigit() and len(label) <= 2))
 
 
+def span_groups(spans: list[dict]) -> list[list[dict]]:
+    """Split a PDF text line into groups of spans that sit near each other.
+
+    MuPDF can put two captions of neighbouring columns into one line (PDF page 78). Spans more than 15 pt
+    apart, measured on their printed characters, belong to different text units when they also sit on
+    different baselines. Spans on one baseline stay one line: the cells of a table row in the text.
+    Order inside a group stays.
+    """
+    def extent(s: dict) -> tuple[float, float] | None:
+        xs = [(c["bbox"][0], c["bbox"][2]) for c in s["chars"] if c["c"].strip()]
+        return (min(a for a, _ in xs), max(b for _, b in xs)) if xs else None
+
+    boxes = [(extent(s), i) for i, s in enumerate(spans)]
+    printed = sorted((e, i) for e, i in boxes if e is not None)
+    groups: list[list[int]] = []
+    right = float("-inf")
+    for (a, b), i in printed:
+        if groups and a - right <= 15:
+            groups[-1].append(i)
+        else:
+            groups.append([i])
+        right = max(right, b) if len(groups[-1]) > 1 else b
+    if len(groups) <= 1:
+        return [spans]
+    tops = [min(spans[i]["bbox"][1] for i in g) for g in groups]
+    if max(tops) - min(tops) < 2:
+        return [spans]
+    blank = [i for e, i in boxes if e is None]
+    groups[0].extend(blank)  # White-space spans carry no text; keep them with the first group.
+    return [[spans[i] for i in sorted(g)] for g in groups]
+
+
 def figs_above(figs: list["Figure"], line: Line) -> bool:
     return any(f.bbox[3] <= line.y0 + 2 for f in figs)
 
@@ -535,7 +576,8 @@ class Ingest:
         self.assets: list[dict[str, str]] = []
         self.seen_xrefs: dict[int, str] = {}
         self.units = self.load_units()
-        self.ids = IdRegistry(content / "ids.csv")
+        self.ids = IdRegistry(content / "ids.csv", content / "id-moves.csv")
+        self.text_tables_used: set[str] = set()
 
     # ---------- structure ----------
 
@@ -625,45 +667,54 @@ class Ingest:
             if block["type"] != 0:
                 continue
             for line in block["lines"]:
-                spans = [s for s in line["spans"] if "".join(c["c"] for c in s["chars"]).strip()]
-                if not spans:
-                    continue
-                y0, y1 = line["bbox"][1], line["bbox"][3]
-                main = max(spans, key=lambda s: len(s["chars"]))
-                font, size = main["font"].split("+")[-1], main["size"]
-                if y1 / height < float(self.layout["header_max_y"]) and self.is_running_head(font, size):
-                    continue
-                clusters: list[Cluster] = []
-                for s in line["spans"]:
-                    font = s["font"].split("+")[-1]
-                    digits = "".join(c["c"] for c in s["chars"]).strip()
-                    style: Literal["", "b", "sup"] = ""
-                    if digits.isdigit() and len(digits) <= 3 and s["size"] < size * 0.8:  # A 4-digit run is a year.
-                        style = "sup"
-                    elif s["flags"] & 16 and not main["flags"] & 16:
-                        style = "b"
-                    for ch in s["chars"]:
-                        c = ch["c"].replace("\t", " ")
-                        if c in self.char_map:
-                            if not self.char_map[c].isspace():
-                                self.issue(pno, "char-map", f"U+{ord(c):04X} mapped to U+{ord(self.char_map[c]):04X}; check against print")
-                            c = self.char_map[c]
-                        if ord(c) < 32:
-                            raise IngestError(f"PDF page {pno}: control character U+{ord(c):04X}; add it to [char_map] in book.toml")
-                        if c == "\ufffd":
-                            raise IngestError(f"PDF page {pno}: a glyph without a character code (U+FFFD); check the print and add it to [char_map] in book.toml")
-                        if unicodedata.combining(c) and clusters:
-                            clusters[-1].text += c  # Points stay with their letter.
-                            continue
-                        kind: Literal["", "hebrew", "latin"] = ""
-                        if c in MIRROR:
-                            kind = "hebrew" if any(h in font for h in self.layout["hebrew_fonts"]) else "latin"
-                        clusters.append(Cluster(ch["bbox"][0], ch["bbox"][2], c, style, kind))
-                plain = "".join(c.text for c in clusters)
-                role = role_for(font, size, self.rules)  # "small" resolves to caption or footnote later.
-                result.append(Line(pno, y0, y1, line["bbox"][0], line["bbox"][2], role, "", plain,
-                                   hebrew_share(plain) >= 0.5, size, clusters))
+                groups = span_groups(line["spans"])
+                for group in groups:
+                    box = line["bbox"] if len(groups) == 1 else (
+                        min(s["bbox"][0] for s in group), min(s["bbox"][1] for s in group),
+                        max(s["bbox"][2] for s in group), max(s["bbox"][3] for s in group))
+                    if (frag := self.fragment(pno, group, box, height)) is not None:
+                        result.append(frag)
         return result
+
+    def fragment(self, pno: int, spans: list[dict], box: tuple[float, float, float, float], height: float) -> Line | None:
+        """One text fragment from PDF spans. None for white space, a running head or a folio."""
+        x0, y0, x1, y1 = box
+        printed = [s for s in spans if "".join(c["c"] for c in s["chars"]).strip()]
+        if not printed:
+            return None
+        main = max(printed, key=lambda s: len(s["chars"]))
+        font, size = main["font"].split("+")[-1], main["size"]
+        if y1 / height < float(self.layout["header_max_y"]) and self.is_running_head(font, size):
+            return None
+        clusters: list[Cluster] = []
+        for s in spans:
+            font = s["font"].split("+")[-1]
+            digits = "".join(c["c"] for c in s["chars"]).strip()
+            style: Literal["", "b", "sup"] = ""
+            if digits.isdigit() and len(digits) <= 3 and s["size"] < size * 0.8:  # A 4-digit run is a year.
+                style = "sup"
+            elif s["flags"] & 16 and not main["flags"] & 16:
+                style = "b"
+            for ch in s["chars"]:
+                c = ch["c"].replace("\t", " ")
+                if c in self.char_map:
+                    if not self.char_map[c].isspace():
+                        self.issue(pno, "char-map", f"U+{ord(c):04X} mapped to U+{ord(self.char_map[c]):04X}; check against print")
+                    c = self.char_map[c]
+                if ord(c) < 32:
+                    raise IngestError(f"PDF page {pno}: control character U+{ord(c):04X}; add it to [char_map] in book.toml")
+                if c == "\ufffd":
+                    raise IngestError(f"PDF page {pno}: a glyph without a character code (U+FFFD); check the print and add it to [char_map] in book.toml")
+                if unicodedata.combining(c) and clusters:
+                    clusters[-1].text += c  # Points stay with their letter.
+                    continue
+                kind: Literal["", "hebrew", "latin"] = ""
+                if c in MIRROR:
+                    kind = "hebrew" if any(h in font for h in self.layout["hebrew_fonts"]) else "latin"
+                clusters.append(Cluster(ch["bbox"][0], ch["bbox"][2], c, style, kind))
+        plain = "".join(c.text for c in clusters)
+        role = role_for(font, size, self.rules)  # "small" resolves to caption or footnote later.
+        return Line(pno, y0, y1, x0, x1, role, "", plain, hebrew_share(plain) >= 0.5, size, clusters)
 
     def figures(self, pno: int) -> list[Figure]:
         """Figures of a page. Unmodified image streams where possible; derived images where print needs more.
@@ -793,6 +844,16 @@ class Ingest:
         indent, short = float(self.layout["indent_tolerance"]), float(self.layout["short_tolerance"])
         paras: list[list[Line]] = [[lines[0]]]
         for n, (prev, cur) in enumerate(zip(lines, lines[1:])):
+            if cur.role != "body" and min(prev.x1, cur.x1) <= max(prev.x0, cur.x0):
+                # Small print in side-by-side columns (credits under QR codes, PDF page 78): the lines of two
+                # columns alternate. A line joins the paragraph right above it in its own column.
+                above = next((pa for pa in reversed(paras[-3:]) if pa[-1].role == cur.role
+                              and min(pa[-1].x1, cur.x1) > max(pa[-1].x0, cur.x0) and -2 <= cur.y0 - pa[-1].y1 < 6), None)
+                if above is not None:
+                    above.append(cur)
+                else:
+                    paras.append([cur])
+                continue
             gap = cur.y0 - prev.y1
             # Lines of one paragraph can overlap a little: a tall glyph ("=" on PDF page 264) raises a line box.
             overlap = 4 if cur.role == "body" else 2
@@ -1088,6 +1149,40 @@ class Ingest:
                 rendered.append(part)
         return rendered
 
+    def text_tables(self, unit: Unit, pno: int, lines: list[Line]) -> tuple[list[Line], list[tuple[float, str]]]:
+        """Replace the lines of a table printed as text with an XHTML table from book.toml [[text_table]].
+
+        The rows must hold exactly the characters of the printed lines from "top" to "bottom" (spaces aside),
+        so a table can reorder printed text into cells but never add or drop text.
+        """
+        tables: list[tuple[float, str]] = []
+        for n, spec in enumerate(self.cfg.get("text_table", []), start=1):
+            if spec["unit"] != unit.id or spec["page"] != pno:
+                continue
+            top = [ln for ln in lines if ln.text == spec["top"]]
+            bottom = [ln for ln in lines if ln.text == spec["bottom"]]
+            if len(top) != 1 or len(bottom) != 1:
+                raise IngestError(f"[[text_table]] page {pno}: top and bottom must each match one line exactly")
+            inside = [ln for ln in lines if top[0].y0 - 1 <= ln.y0 and ln.y1 <= bottom[0].y1 + 1]
+            printed = sorted(squash("".join(ln.text for ln in inside)))
+            cells = sorted(squash("".join("".join(r) for r in spec["rows"])))
+            if printed != cells:
+                raise IngestError(f"[[text_table]] page {pno}: rows do not hold exactly the printed characters "
+                                  f"(printed {''.join(printed)!r}, rows {''.join(cells)!r})")
+            lines = [ln for ln in lines if ln not in inside]
+            rtl = top[0].rtl
+            attrs = "" if rtl else ' lang="en" dir="ltr"'
+            head, *body = spec["rows"]
+            esc = lambda c: html.escape(c, quote=False)
+            rows_html = "".join("<tr>" + "".join(f"<td>{esc(c)}</td>" for c in r) + "</tr>" for r in body)
+            table = (f'<table id="{spec["id"]}" class="text-table" data-pdf-page="{pno}"{attrs}><thead><tr>'
+                     + "".join(f'<th scope="col">{esc(c)}</th>' for c in head)
+                     + f"</tr></thead><tbody>{rows_html}</tbody></table>")
+            self.issue(pno, "intentional-change", f"{spec['id']}: table printed as text, set as a table ({len(inside)} lines)")
+            self.text_tables_used.add(spec["id"])
+            tables.append((top[0].y0, table))
+        return lines, tables
+
     def render_unit(self, unit: Unit) -> tuple[str, list[str], str | None]:
         """Return XHTML body content, the IDs per page, and the unit heading text."""
         if unit.kind == "contents":
@@ -1106,8 +1201,10 @@ class Ingest:
             ids = page_ids.setdefault(pno, [])
             parts.append(f'<span epub:type="pagebreak" role="doc-pagebreak" id="pg-{pno}" title="{self.label(pno)}"/>')
             figs = self.figures(pno)
-            lines = self.attach_captions(figs, self.lines(pno))
-            flow: list[tuple[float, str]] = []
+            lines, tables = self.text_tables(unit, pno, self.lines(pno))
+            lines = self.attach_captions(figs, lines)
+            flow: list[tuple[float, str]] = list(tables)
+            ids.extend(t.split('id="', 1)[1].split('"', 1)[0] for _, t in tables)
             paras = self.paragraphs(lines, figs)
             body_paras = [pa for pa in paras if pa[0].role == "body"]
             top_body = body_paras[0] if body_paras else None
@@ -1253,6 +1350,8 @@ class Ingest:
             (self.out / "OEBPS" / "text" / f"{unit.id}.xhtml").write_text(xhtml, encoding="utf-8")
             docs.append((unit, f"text/{unit.id}.xhtml", heading))
         self.write_package(docs, self.write_cover(), self.write_facsimile())
+        if unused_tables := {t["id"] for t in self.cfg.get("text_table", [])} - self.text_tables_used:
+            raise IngestError(f"book.toml [[text_table]] entries match no page: {sorted(unused_tables)}")
         stale = [(f["page"], f["find"]) for f in self.cfg.get("text_fix", []) if (f["page"], f["find"]) not in self.text_fixes_used]
         if stale:
             raise IngestError(f"book.toml [[text_fix]] entries match no text: {stale}")
@@ -1360,7 +1459,13 @@ class Ingest:
                 if (el_id := el.get("id")) and el_id.rsplit("-p", 1)[-1].isdigit():
                     texts[el_id] = squash("".join(el.itertext()))
         moves, lost = [], []
+        into_table = {old: t["id"] for t in self.cfg.get("text_table", []) for old in t.get("replaces", [])}
+        if kept := sorted(o for o in into_table if o in self.ids.used):
+            raise IngestError(f"book.toml [[text_table]] replaces IDs that still exist: {kept}")
         for old_id, key in self.ids.gone():
+            if old_id in into_table:
+                moves.append({"old_id": old_id, "new_id": into_table[old_id]})
+                continue
             home = [i for i, t in texts.items() if key in t]
             if len(home) != 1:
                 lost.append(f"{old_id} {key!r} -> {home or 'no paragraph'}")
@@ -1375,11 +1480,17 @@ class Ingest:
             w = csv.writer(f, lineterminator="\n")
             w.writerow(["id", "key"])
             w.writerows(self.ids.assigned)
-        self.inventory.mkdir(exist_ok=True)
-        with (self.inventory / "id-moves.csv").open("w", encoding="utf-8", newline="") as f:
-            w2 = csv.DictWriter(f, fieldnames=["old_id", "new_id"], lineterminator="\n")
-            w2.writeheader()
-            w2.writerows(moves)
+        # Earlier moves stay; a move whose target moved now points to the new home.
+        all_moves = self.ids.moves | {m["old_id"]: m["new_id"] for m in moves}
+        current = {i for i, _ in self.ids.assigned} | set(texts) | self.text_tables_used
+        for old_id, new_id in all_moves.items():
+            while new_id in all_moves and new_id not in current:
+                new_id = all_moves[new_id]
+            all_moves[old_id] = new_id
+        with self.ids.moves_path.open("w", encoding="utf-8", newline="") as f:
+            w2 = csv.writer(f, lineterminator="\n")
+            w2.writerow(["old_id", "new_id"])
+            w2.writerows(sorted(all_moves.items()))
 
     def write_inventory(self) -> None:
         inv = self.inventory
