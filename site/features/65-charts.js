@@ -245,10 +245,6 @@ for (const figure of reading.querySelectorAll("figure.has-chart")) {
   };
   figure.prepend(group);
   setView(true);
-  new IntersectionObserver((entries, observer) => {
-    if (!entries[0].isIntersecting) return;
-    observer.disconnect();
-    setUpChart(figure).catch((err) => { setView(false); group.remove(); console.error(err); });
-  }, { rootMargin: "300px" }).observe(figure);
+  onNear(figure, () => setUpChart(figure).catch((err) => { setView(false); group.remove(); console.error(err); }));
 }
 

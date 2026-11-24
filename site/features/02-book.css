@@ -134,8 +134,8 @@
 
 /* Facsimile appendix: page images as a grid of thumbnails on the web. */
 /* Widths leave room for the white space between the inline blocks, so two (phone) or four pages share a row. */
-.book > .doc[data-epub-type~="appendix"] { display: inline-block; vertical-align: top; width: calc(50% - 1.3rem); max-width: none; margin: 0.5rem; }
-@media (min-width: 48rem) { .book > .doc[data-epub-type~="appendix"] { width: calc(25% - 1.3rem); } }
+.book .fx-set > .doc { display: inline-block; vertical-align: top; width: calc(50% - 1.3rem); max-width: none; margin: 0.5rem; }
+@media (min-width: 48rem) { .book .fx-set > .doc { width: calc(25% - 1.3rem); } }
 .book section.facsimile-page { padding: 0; }
 .book .fx-nav { display: flex; justify-content: space-between; margin: 0 0 0.35rem; font-family: var(--sans); font-size: 0.75rem; }
 .book .fx-label { color: var(--muted); }
@@ -219,7 +219,11 @@
 /* A long URL or word may break, so a narrow column (facsimile pages, phone notes) never grows past the screen. */
 .book .doc { overflow-wrap: break-word; }
 .book .fx-mask-note { overflow-wrap: anywhere; }
-/* The 316 facsimile pages skip style and layout until they come near the viewport; the browser keeps each one's
-   last rendered height. Limit: text chapters stay fully rendered, because axe (the publish gate) misreads colours
-   inside skipped chapters; revisit when axe handles content-visibility. */
-.book > .doc[data-epub-type~="appendix"] { content-visibility: auto; contain-intrinsic-size: auto 260px; }
+/* Every document of the book (chapters, parts, facsimile pages) skips style, layout and paint until it comes near the
+   viewport; the browser keeps each one's last rendered height. The page has ~10,000 elements, so this is what keeps
+   frames cheap. Find-in-page still searches skipped text; jumps render their target first (00-core.js).
+   Tools that must see every element at once (axe in smoke_site.py) set data-render-all on <html>. */
+.book > .doc { content-visibility: auto; contain-intrinsic-size: auto 1200px; }
+.book > .fx-set { content-visibility: auto; contain-intrinsic-size: auto 40000px; } /* All facsimile pages: one box. */
+[data-render-all] .book > :is(.doc, .fx-set) { content-visibility: visible; }
+@media print { .book > :is(.doc, .fx-set) { content-visibility: visible; } }

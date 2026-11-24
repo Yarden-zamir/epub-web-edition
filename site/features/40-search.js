@@ -166,10 +166,12 @@ const searchDialog = byId("search-dialog");
 const input = byId("search-input");
 const results = byId("search-results");
 const status = byId("search-status");
+// A result is a link to its place in the book. An offer (a recent or example query) is a button that fills the field.
 function resultItem({ href, where, body, thumb, tile, onPick }) {
   const li = document.createElement("li");
-  const a = document.createElement("a");
-  a.href = href;
+  const a = document.createElement(href ? "a" : "button");
+  if (href) a.href = href;
+  else a.type = "button";
   if (thumb) {
     const img = document.createElement("img");
     Object.assign(img, { src: thumb, alt: "", width: 48, height: 48, loading: "lazy", className: "result-thumb" });
@@ -206,7 +208,7 @@ const EXAMPLES = ["בולענים", "ים המלח", "עמ' 100"];
 function showRecent() {
   results.replaceChildren();
   const recent = readRecent();
-  const offer = (q) => resultItem({ href: "#", body: q, onPick: () => { input.value = q; runSearch(); input.focus(); } });
+  const offer = (q) => resultItem({ href: null, body: q, onPick: () => { input.value = q; runSearch(); input.focus(); } });
   status.textContent = recent.length ? "חיפושים אחרונים" : "למשל:";
   for (const q of recent.length ? recent : EXAMPLES) results.append(offer(q));
   const hint = document.createElement("li");
@@ -248,8 +250,13 @@ for (const button of document.querySelectorAll("[data-open='search-dialog']")) {
   for (const type of ["pointerenter", "focus"]) button.addEventListener(type, () => loadIndex().catch(() => {}), { once: true });
 }
 let searchTimer = 0;
-input.addEventListener("input", () => { clearTimeout(searchTimer); searchTimer = setTimeout(runSearch, 100); });
-byId("search-form").addEventListener("submit", (e) => { e.preventDefault(); results.querySelector("a")?.click(); });
+input.addEventListener("input", () => { clearTimeout(searchTimer); searchTimer = setTimeout(() => { searchTimer = 0; runSearch(); }, 100); });
+// Enter opens the first result of what is in the field now, even when the typing pause has not run the search yet.
+byId("search-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (searchTimer) { clearTimeout(searchTimer); searchTimer = 0; await runSearch(); }
+  results.querySelector("a")?.click();
+});
 document.addEventListener("keydown", (e) => {
   if (e.key === "/" && !e.target.closest("input, textarea, dialog")) {
     e.preventDefault();

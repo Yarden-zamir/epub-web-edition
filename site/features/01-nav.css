@@ -14,7 +14,7 @@
 .nav-text:hover, .nav .icon-btn:hover { background: color-mix(in srgb, currentColor 12%, transparent); }
 .icon-btn { display: inline-grid; place-items: center; width: 2.5rem; height: 2.5rem; padding: 0; border-radius: var(--radius-pill); color: inherit; }
 .icon-btn svg, .split-more svg { width: 1.35rem; height: 1.35rem; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.nav[data-solid] { background: color-mix(in srgb, var(--paper) 94%, transparent); color: var(--ink); box-shadow: 0 1px 0 color-mix(in srgb, var(--rule) 80%, transparent); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); }
+.nav[data-solid] { background: color-mix(in srgb, var(--paper) 94%, transparent); color: var(--ink); box-shadow: 0 1px 0 color-mix(in srgb, var(--rule) 80%, transparent); } /* No backdrop blur: at 94% paper it showed little and repainted the bar's area each frame. */
 .nav[data-solid] .nav-title { opacity: 1; visibility: visible; }
 /* The bar's download button appears only after the hero's download button scrolls away. */
 /* Hidden, it takes no room: width and the gap before it are 0, so search and chapters sit at the end edge.

@@ -469,8 +469,18 @@ def build(epub: Path, out: Path, enhancements_file: Path | None = SITE / "enhanc
             load(site)
         transforms = [functools.partial(t, site) for t in hooked("transform")]
         docs = [conv.convert(item, body, transforms) for item, body in conv.bodies]
-        # Feature sections that sit right after the printed contents, or before the book when it has none.
-        at = conv.kinds.index("contents") + 1 if "contents" in conv.kinds else 0
+        # Consecutive facsimile pages share one container, so the browser tracks one off-screen box instead of
+        # hundreds (content-visibility in 02-book.css). Feature sections then go right after the printed contents.
+        grouped: list[str] = []
+        kinds: list[str] = []
+        for doc, kind in zip(docs, conv.kinds):
+            if kind == "facsimile-page" and kinds and kinds[-1] == "facsimile-page":
+                grouped[-1] = grouped[-1].removesuffix("</div>") + "\n" + doc + "</div>"
+            else:
+                grouped.append(f'<div class="fx-set">{doc}</div>' if kind == "facsimile-page" else doc)
+                kinds.append(kind)
+        docs = grouped
+        at = kinds.index("contents") + 1 if "contents" in kinds else 0
         docs.insert(at, "".join(part(site) for part in hooked("after_contents")))
         values: dict[str, str] = dict.fromkeys(SHARED_SLOTS, "")
         for feature_values in hooked("values"):

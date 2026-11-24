@@ -39,8 +39,9 @@ SCHEMES = ("light", "dark")
 SAMPLE = ["#nav", "#top", "#a06", "#places", "#toc-dialog", "#search-dialog", "footer"]
 AXE_OK = Path(os.environ.get("ELI_RAZ_CACHE", Path.home() / ".cache" / "eli-raz")) / "axe-ok" / "axe-4.14.0"
 # Each violation with the selectors of its first three elements, so a failed run says where to look.
-AXE_RUN = """(include) => axe.run(include ? {include: include.map(s => [s])} : document, {resultTypes: ['violations']})
-  .then(r => r.violations.map(v => v.id + ' ' + v.nodes.slice(0, 3).map(n => n.target.join(' ')).join(', ')))"""
+# data-render-all turns off content-visibility, so axe sees every chapter as rendered (it misreads skipped ones).
+AXE_RUN = """(include) => (document.documentElement.setAttribute('data-render-all', ''), axe.run(include ? {include: include.map(s => [s])} : document, {resultTypes: ['violations']})
+  .then(r => r.violations.map(v => v.id + ' ' + v.nodes.slice(0, 3).map(n => n.target.join(' ')).join(', '))))"""
 # Every book section (one per unit, plus the places section) with the SHA-256 of its HTML after the page scripts ran.
 SECTION_HASHES = """async () => {
   const out = {};

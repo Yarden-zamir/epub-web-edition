@@ -135,6 +135,24 @@ function goTo(id, options = {}) {
   if (back) dispatchEvent(new CustomEvent("reader:jump", { detail: { back } }));
 }
 
+// One shared IntersectionObserver for every "do this once when it comes near" (charts, maps, explainers): one pass per
+// frame for all targets instead of one observer each, and each target leaves the list after its first use.
+const nearCallbacks = new Map();
+const nearObserver = new IntersectionObserver((entries) => {
+  for (const entry of entries) {
+    if (!entry.isIntersecting) continue;
+    nearObserver.unobserve(entry.target);
+    const callback = nearCallbacks.get(entry.target);
+    nearCallbacks.delete(entry.target);
+    callback();
+  }
+}, { rootMargin: "400px 0px" });
+function onNear(el, callback) {
+  if (nearCallbacks.has(el)) throw new Error("reader.js: onNear called twice for one element");
+  nearCallbacks.set(el, callback);
+  nearObserver.observe(el);
+}
+
 // Overlays: dialogs and popovers that Back closes. Opening one pushes an entry; closing it any other way
 // (its button, Escape, a click outside) steps history back over its entry, so entries never pile up.
 function isOverlayOpen(el) { return el.matches("dialog") ? el.open : el.matches(":popover-open"); }
