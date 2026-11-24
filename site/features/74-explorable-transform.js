@@ -1,25 +1,45 @@
-// The Dead Sea transform (figure fig-a18-05). A schematic map, north up: the west block (Sinai–Israel)
-// stays still and the east block (Arabia–Jordan) slides north along the fault. The fault steps to the
-// left (west) three times; at each step the blocks move apart and a basin opens: the sea colour lies behind
-// both blocks and shows through the gap. The control value is the slip in km.
+// The Dead Sea transform (figure fig-a18-05). A schematic map after the printed figure, north up: the fault runs
+// north-north-east; at its south end the Gulf of Suez branches off to the north-west, with Africa beyond it. The
+// Sinai–Israel subplate stays still and the Arabia–Jordan plate slides north along the fault. The fault steps to the
+// left (west) three times; at each step the plates move apart and a basin opens. The control value is the slip in km.
 explorableKit.kinds.transform = (() => {
 const { number, iso, ramp, shape } = explorableKit;
 
 const W = 360, H = 600;
-const TOP_KM = 455, S = 0.9; // Drawing units per km along the fault.
-const Y = (km) => 24 + (TOP_KM - km) * S;
+// Shapes are drawn in a frame along the fault (x across it, y down along it), turned by TILT about the middle.
+const TILT = (20 * Math.PI) / 180, COS = Math.cos(TILT), SIN = Math.sin(TILT), MX = W / 2, MY = H / 2;
+const P = (x, y) => [MX + (x - MX) * COS - (y - MY) * SIN, MY + (x - MX) * SIN + (y - MY) * COS];
+const turned = (c) => { c.translate(MX, MY); c.rotate(TILT); c.translate(-MX, -MY); };
+const TOP_KM = 450, S = 0.84; // Drawing units per km along the fault.
+const Y = (km) => 20 + (TOP_KM - km) * S;
 const STEP = 6; // Length of each oblique step, km.
-// Fault segments from south to north: x of the segment, and the km where the next step starts (schematic).
-const SEGMENTS = [[232, -105], [202, 175], [172, 330], [142, Infinity]];
-const COPPER = { km: 25, x: 212, rx: 24, ry: 11 }; // One ore field across the fault, the larger part to the east.
+// Fault segments from south to north: x across the fault, and the km where the step to the next one starts. South
+// of the first step the fault is the Arabian shore of the Red Sea. Basins open at the steps: the Gulf of Eilat (sea),
+// the Dead Sea and the Kinneret (lakes).
+const SEGMENTS = [[220, -105], [202, 175], [184, 330], [166, Infinity]];
+const LAKES = [1, 2]; // Steps whose basins hold a lake; the first holds the sea.
+// Coasts (schematic, after the printed figure): the Gulf of Suez leaves the south tip of Sinai SUEZ off the fault,
+// 14 units wide at its mouth and 6 at its head; the Mediterranean shore runs from its head 12 degrees off the fault.
+const along = (p, d, t) => [p[0] + d[0] * t, p[1] + d[1] * t];
+const SUEZ = (34 * Math.PI) / 180, SUEZ_DIR = [-Math.sin(SUEZ), -Math.cos(SUEZ)], SUEZ_ACROSS = [-Math.cos(SUEZ), Math.sin(SUEZ)];
+const TIP = [SEGMENTS[1][0], Y(SEGMENTS[0][1] + STEP)]; // South tip of Sinai, at the mouth of the Gulf of Eilat.
+const HEAD = along(TIP, SUEZ_DIR, 250); // Head of the Gulf of Suez, on the Mediterranean shore.
+const SHORE = [Math.sin(0.21), -Math.cos(0.21)];
+const CROSS = [SEGMENTS[3][0], HEAD[1] + SHORE[1] * ((SEGMENTS[3][0] - HEAD[0]) / SHORE[0])]; // Shore meets fault.
+const AFRICA_HEAD = along(HEAD, SUEZ_ACROSS, 6), AFRICA_MOUTH = along(TIP, SUEZ_ACROSS, 14);
+const RED_SEA_DIR = [-0.349, 0.937]; // Africa's Red Sea shore, south of the Gulf of Suez.
+// The copper ore body before the slip (a18-p021): one field across the fault where Timna is, the larger part to the
+// east (Feinan holds about a hundred times the slag of Timna, a18-p022). Points around it, relative to the fault.
+const ORE_KM = 25;
+const ORE = [[-9, -6], [-11, 1], [-7, 8], [0, 10], [10, 14], [24, 13], [36, 7], [41, -2], [34, -11], [19, -15], [6, -12], [0, -9]];
 const EILAT_KM = 0;
 
-// Fault trace from far north to far south, as drawing points: each segment, then an oblique step to the next.
-function trace(north, south) {
+// Fault trace as points in the fault frame, from far south to far north.
+function trace(south, north) {
   const pts = [[SEGMENTS[0][0], south]];
   SEGMENTS.slice(0, -1).forEach(([x, stepKm], i) => pts.push([x, Y(stepKm)], [SEGMENTS[i + 1][0], Y(stepKm + STEP)]));
   pts.push([SEGMENTS.at(-1)[0], north]);
-  return pts.reverse();
+  return pts;
 }
 const faultX = (km) => SEGMENTS.find(([, stepKm]) => km < stepKm)[0];
 
@@ -31,24 +51,24 @@ function create(spec, env) {
   const L = spec.labels;
   const t = spec.texts;
   const { max } = spec.control;
-  const extra = max * S + 20; // The east block reaches below the frame, so moving it north leaves no hole.
-  const fault = trace(-20, H + extra);
-  const westShape = shape([[0, -20], ...fault.slice(0, -1), [fault.at(-1)[0], H + 20], [0, H + 20]]);
-  const eastShape = shape([[W, -20], ...fault, [W, H + extra]]);
-  const faultLine = shape(fault, false);
+  const fault = trace(1000, -500);
+  const westEdge = [...fault.slice(2, -1), CROSS]; // From the tip of Sinai north to the shore.
+  const sinai = shape([TIP, ...westEdge.slice(1), HEAD]);
+  const africa = shape([AFRICA_HEAD, AFRICA_MOUTH, along(AFRICA_MOUTH, RED_SEA_DIR, 700), [-500, 1000], [-500, AFRICA_HEAD[1] + 50]]);
+  const east = shape([[700, -500], ...[...fault].reverse(), [700, 1000]]);
+  const ore = shape(ORE.map(([dx, dy]) => [faultX(ORE_KM) + dx, Y(ORE_KM) + dy]));
+  const arrowUp = shape([[0, -24], [-9, -10], [-3, -10], [-3, 24], [3, 24], [3, -10], [9, -10]]);
   const ripples = new Path2D();
-  for (let y = 40; y < H; y += 26) { // Texture in the basins only.
-    ripples.moveTo(108, y);
-    for (let x = 108; x < 248; x += 12) ripples.quadraticCurveTo(x + 3, y - 3, x + 6, y), ripples.quadraticCurveTo(x + 9, y + 3, x + 12, y);
+  for (let y = -20; y < H + 40; y += 9) { // Wavelets across the basins' band.
+    ripples.moveTo(150, y);
+    for (let x = 150; x < 240; x += 10) ripples.quadraticCurveTo(x + 2.5, y - 1.6, x + 5, y), ripples.quadraticCurveTo(x + 7.5, y + 1.6, x + 10, y);
   }
-  const arrow = shape([[290, Y(150)], [281, Y(150) + 14], [287, Y(150) + 14], [287, Y(150) + 48], [293, Y(150) + 48], [293, Y(150) + 14], [299, Y(150) + 14]]);
-  const copper = new Path2D();
-  copper.ellipse(COPPER.x, Y(COPPER.km), COPPER.rx, COPPER.ry, 0, 0, Math.PI * 2);
   const list = new Intl.ListFormat("he", { type: "conjunction" });
+  const EAST_BOX = [-60, -60, W + 120, H + 200];
+  const HANDLE = [310, Y(EILAT_KM)];
   let dots = null, dotsColor = "";
 
-  function texture(ctx, env) {
-    // A small dot pattern for the rock, made once per theme.
+  function texture(c) { // A small dot pattern for the rock, one tile per theme.
     const color = env.color("--xp-dot");
     if (color !== dotsColor) {
       const tile = document.createElement("canvas");
@@ -56,128 +76,199 @@ function create(spec, env) {
       const tc = tile.getContext("2d");
       tc.fillStyle = color;
       tc.beginPath(); tc.arc(2, 2, 0.9, 0, Math.PI * 2); tc.arc(6.5, 6.5, 0.7, 0, Math.PI * 2); tc.fill();
-      dots = ctx.createPattern(tile, "repeat");
+      dots = c.createPattern(tile, "repeat");
       dotsColor = color;
     }
     return dots;
   }
-  function plate(ctx, env, path, key, top, bottom) {
-    ctx.fillStyle = env.gradient(key, 0, 0, 0, H, [[0, top], [1, bottom]]);
-    ctx.fill(path);
-    ctx.fillStyle = texture(ctx, env);
-    ctx.fill(path);
+  function land(c, path, top, bottom, key) {
+    c.fillStyle = env.gradient(key, 0, 0, 0, H, [[0, top], [1, bottom]]);
+    c.fill(path);
+    c.fillStyle = texture(c);
+    c.fill(path);
   }
-  function ore(ctx, env, clip) {
+  function copper(c, clip) {
+    c.save();
+    c.clip(clip);
+    c.fillStyle = env.color("--xp-copper");
+    c.fill(ore);
+    c.strokeStyle = env.color("--xp-copper-edge");
+    c.lineWidth = 1;
+    c.stroke(ore);
+    c.restore();
+  }
+  function arrow(c, x, y, dir) { // A plate's direction of motion; dir: a unit vector in the fault frame.
+    c.save();
+    c.translate(x, y);
+    c.rotate(Math.atan2(dir[0], -dir[1]));
+    c.fillStyle = env.color("--ink");
+    c.fill(arrowUp);
+    c.restore();
+  }
+  function lines(c, text, [x, y]) { // A plate name, broken after its dash.
+    text.split("–").forEach((part, i, all) => env.label(c, i < all.length - 1 ? `${part}–` : part, x, y + i * 17 * env.unit));
+  }
+  const at = (x, y, dy = 0) => { const [px, py] = P(x, y); return [px, py + dy]; };
+
+  function draw(ctx, km, env) {
+    const k = km * S, dx = SIN * k, dy = -COS * k; // The east plate's shift on screen.
+    ctx.drawImage(env.layer("water", [0, 0, W, H], (c) => {
+      c.fillStyle = env.gradient("sea", 0, 0, W, 0, [[0, "--xp-basin-light"], [1, "--xp-basin"]]);
+      c.fillRect(0, 0, W, H);
+      turned(c);
+      for (const i of LAKES) { // Lake water in the band each basin opens into, deepest in its middle.
+        const [x0, stepKm] = SEGMENTS[i], x1 = SEGMENTS[i + 1][0];
+        c.fillStyle = env.gradient(`lake-${i}`, x1, 0, x0, 0, [[0, "--xp-lake"], [0.5, "--xp-lake-deep"], [1, "--xp-lake"]]);
+        c.fillRect(x1, Y(stepKm + STEP + max + 2), x0 - x1, Y(stepKm) - Y(stepKm + STEP + max + 2));
+      }
+    }), 0, 0, W, H);
+    const rippleBox = [140, -30, 110, H + 80];
+    const rippleLayer = env.layer("ripples", rippleBox, (c) => {
+      c.strokeStyle = "rgb(255 255 255 / 0.18)";
+      c.lineWidth = 0.8;
+      c.stroke(ripples);
+    });
     ctx.save();
-    ctx.clip(clip);
-    ctx.fillStyle = env.color("--xp-copper");
-    ctx.fill(copper);
-    ctx.strokeStyle = env.color("--xp-copper-edge");
-    ctx.lineWidth = 1;
-    ctx.stroke(copper);
+    turned(ctx);
+    ctx.drawImage(rippleLayer, rippleBox[0], rippleBox[1] - ((env.time * 2.5) % 9), rippleBox[2], rippleBox[3]); // Drift.
     ctx.restore();
-  }
-  function lines(ctx, env, text, x, y) {
-    text.split("–").forEach((part, i, all) => env.label(ctx, i < all.length - 1 ? `${part}–` : part, x, y + i * 17));
-  }
 
-  // The east block and the labels are canvases over the main canvas; basin names are HTML labels. A drag only moves
-  // them by transform and opacity, so it repaints nothing. The main canvas (sea, ripples, west block) redraws for the
-  // slow ripple motion only.
-  const eastBox = [0, -20, W, H + extra + 20];
-  const eastCanvas = env.overlay("canvas", "tf-east");
-  const topCanvas = env.overlay("canvas", "tf-top");
-  const tags = L.basins.map((name) => { const tag = env.overlay("span", "xp-tag"); tag.textContent = name; return tag; });
+    ctx.drawImage(env.layer("land", [0, 0, W, H], (c) => {
+      c.save();
+      turned(c);
+      land(c, africa, "--xp-plate-a-deep", "--xp-plate-b-deep", "africa");
+      land(c, sinai, "--xp-plate-a", "--xp-plate-a-deep", "sinai");
+      copper(c, sinai);
+      c.strokeStyle = env.color("--xp-land-edge");
+      c.lineWidth = 0.8;
+      c.stroke(africa);
+      c.stroke(shape([HEAD, TIP], false));
+      c.stroke(shape([HEAD, CROSS], false));
+      c.strokeStyle = env.color("--ink");
+      c.lineWidth = 1.5;
+      c.lineJoin = "round";
+      c.stroke(shape(westEdge, false));
+      arrow(c, 118, 520, SUEZ_ACROSS);
+      c.restore();
+      env.label(c, L.mediterranean, 8, 150, { align: "left", size: 12, weight: 500, color: "--muted" });
+      env.label(c, L.africa, ...at(110, 470));
+      env.label(c, L.red_sea, ...at(192, 572), { size: 12, weight: 500 });
+      // The Gulf of Suez's name runs along it, its letters' tops toward Africa.
+      const [sx, sy] = P(...along(along(TIP, SUEZ_DIR, 120), SUEZ_ACROSS, 7));
+      const gulf = Math.atan2(SIN * SUEZ_DIR[0] + COS * SUEZ_DIR[1], COS * SUEZ_DIR[0] - SIN * SUEZ_DIR[1]);
+      env.label(c, L.suez, sx, sy, { size: 12, weight: 500, rotate: gulf });
+      lines(c, L.west_plate, at(124, Y(112)));
+      env.label(c, `↑ ${L.north}`, W - 10, 4 + 12 * env.unit, { align: "right", size: 12, weight: 500, color: "--muted" });
+    }), 0, 0, W, H);
 
-  function paintOverlay(target, [x, y, w, h], drawFn) {
-    target.width = Math.ceil(w * env.pixel);
-    target.height = Math.ceil(h * env.pixel);
-    target.style.width = `${w * env.scale}px`;
-    target.style.height = `${h * env.scale}px`;
-    const c = target.getContext("2d");
-    c.setTransform(env.pixel, 0, 0, env.pixel, -x * env.pixel, -y * env.pixel);
-    drawFn(c);
-  }
-  function resize() {
-    paintOverlay(eastCanvas, eastBox, (c) => {
+    ctx.drawImage(env.layer("east", EAST_BOX, (c) => {
+      c.save();
+      turned(c);
       c.lineJoin = "round";
       c.save();
       c.translate(3, 0);
       c.strokeStyle = env.color("--xp-shadow");
       c.lineWidth = 6;
-      c.stroke(faultLine);
+      c.stroke(shape(fault, false));
       c.restore();
-      plate(c, env, eastShape, "east", "--xp-plate-b", "--xp-plate-b-deep");
+      land(c, east, "--xp-plate-b", "--xp-plate-b-deep", "east");
+      copper(c, east);
       c.strokeStyle = env.color("--ink");
       c.lineWidth = 1.5;
-      c.stroke(faultLine);
-      ore(c, env, eastShape);
-      c.fillStyle = env.color("--ink");
-      c.fill(arrow);
-      lines(c, env, L.east_plate, 290, Y(250));
-      env.label(c, L.feinan, COPPER.x + 30, Y(COPPER.km) + 4, { align: "left" });
-    });
-    paintOverlay(topCanvas, [0, 0, W, H], (c) => {
-      c.lineJoin = "round";
-      c.strokeStyle = env.color("--ink");
-      c.lineWidth = 1.5;
-      c.stroke(faultLine);
-      lines(c, env, L.west_plate, 72, Y(260));
-      env.label(c, L.timna, COPPER.x - 26, Y(COPPER.km) + 4, { align: "right" });
-      c.fillStyle = env.color("--ink");
-      c.beginPath(); c.arc(faultX(EILAT_KM) - 5, Y(EILAT_KM), 3.5, 0, Math.PI * 2); c.fill();
-      if (env.unit <= 1.3) env.label(c, L.eilat, faultX(EILAT_KM) - 12, Y(EILAT_KM) + 4, { align: "right" });
-      env.label(c, `↑ ${L.north}`, 12, 18, { align: "left", size: 12, weight: 500, color: "--muted" });
-    });
-  }
+      c.stroke(shape(fault, false));
+      arrow(c, HANDLE[0], HANDLE[1] - 56, [0, -1]);
+      c.restore();
+      lines(c, L.east_plate, at(288, Y(165)));
+      env.label(c, L.feinan, ...at(faultX(ORE_KM) + 46, Y(ORE_KM), 4), { align: "left" });
+    }), EAST_BOX[0] + dx, EAST_BOX[1] + dy, EAST_BOX[2], EAST_BOX[3]);
 
-  function draw(ctx, km, env) {
-    ctx.drawImage(env.layer("sea", [0, 0, W, H], (c) => {
-      c.fillStyle = env.gradient("sea", 0, 0, W, 0, [[0, "--xp-basin-light"], [1, "--xp-basin"]]);
-      c.fillRect(0, 0, W, H);
-    }), 0, 0, W, H);
-    const rippleBox = [-12, -4, W + 24, H + 8];
-    const rippleLayer = env.layer("ripples", rippleBox, (c) => {
-      c.strokeStyle = "rgb(255 255 255 / 0.16)";
-      c.lineWidth = 1;
-      c.stroke(ripples);
+    // The open basins: steep walls (hachures on both sides, pointing down into the basin) and their names.
+    const opened = km - STEP;
+    const names = [];
+    ctx.save();
+    turned(ctx);
+    ctx.strokeStyle = env.color("--ink");
+    ctx.globalAlpha = 0.55;
+    ctx.lineWidth = 0.9;
+    const walls = new Path2D();
+    SEGMENTS.slice(0, -1).forEach(([x0, stepKm], i) => {
+      if (opened <= 0) return;
+      const x1 = SEGMENTS[i + 1][0];
+      for (let y = Y(stepKm + STEP) - 2; y > Y(stepKm + km) + 2; y -= 4) {
+        walls.moveTo(x1, y); walls.lineTo(x1 + 3.5, y - 1.2);
+        walls.moveTo(x0, y); walls.lineTo(x0 - 3.5, y - 1.2);
+      }
     });
-    // Ripples drift slowly in the basins.
-    ctx.drawImage(rippleLayer, rippleBox[0] + (env.time * 3) % 12, rippleBox[1] + Math.sin(env.time * 0.8) * 2, rippleBox[2], rippleBox[3]);
-    ctx.drawImage(env.layer("west", [0, 0, W, H], (c) => {
-      plate(c, env, westShape, "west", "--xp-plate-a", "--xp-plate-a-deep");
-      ore(c, env, westShape);
-    }), 0, 0, W, H);
-    return "";
-  }
+    ctx.stroke(walls);
+    ctx.restore();
+    const shown = ramp(opened, 6, 20);
+    if (shown > 0.01) {
+      ctx.globalAlpha = shown;
+      SEGMENTS.slice(0, -1).forEach(([x0, stepKm], i) => {
+        const mid = Y(stepKm + STEP + opened / 2);
+        // The Gulf's name sits east of it (Sinai is narrow there), the lakes' names west of them.
+        if (i === 0) env.label(ctx, L.basins[i], ...at(x0 + 6, mid, 4), { align: "left" });
+        else env.label(ctx, L.basins[i], ...at(SEGMENTS[i + 1][0] - 6, mid, 4), { align: "right" });
+        names.push(L.basins[i]);
+      });
+      ctx.globalAlpha = 1;
+    }
 
-  function move(km) {
-    const k = env.scale;
-    eastCanvas.style.transform = `translate(0, ${((eastBox[1] - km * S) * k).toFixed(2)}px)`;
-    // Each basin name sits west of its basin, right edge at x, and follows the basin's middle as it opens.
-    const length = km - STEP;
-    const alpha = ramp(length, 6, 20).toFixed(3);
-    const open = [];
-    SEGMENTS.slice(0, -1).forEach(([, stepKm], i) => {
-      const x = (SEGMENTS[i + 1][0] - 8) * k, y = (Y(stepKm + STEP + Math.max(0, length) / 2) - 5) * k;
-      tags[i].style.transform = `translate(calc(${x.toFixed(1)}px - 100%), calc(${y.toFixed(1)}px - 50%))`;
-      tags[i].style.opacity = alpha;
-      if (length > 0) open.push(L.basins[i]);
-    });
-    const shown = Math.round(km);
-    if (shown === 0) return t.before;
-    const apart = t.apart.replace("{km}", iso(number(shown)));
-    if (shown === spec.slip_km) return `${t.today} ${apart}`;
-    return `${t.moving}${open.length ? `: ${list.format(open)}.` : "."} ${apart}`;
+    // Timna, Eilat and the offset between the two parts of the copper field: a gauge west of the fault.
+    const [ex, ey] = P(faultX(EILAT_KM) - 4, Y(EILAT_KM));
+    ctx.fillStyle = env.color("--ink");
+    ctx.beginPath(); ctx.arc(ex, ey, 3.2, 0, Math.PI * 2); ctx.fill();
+    if (env.unit <= 1.3) env.label(ctx, L.eilat, ex - 8, ey + 4, { align: "right" });
+    env.label(ctx, L.timna, ...at(faultX(ORE_KM) - 34, Y(ORE_KM), 4), { align: "right" });
+    const gauge = ramp(km, 4, 12);
+    if (gauge > 0.01) {
+      const gx = faultX(ORE_KM) - 26, y0 = Y(ORE_KM), y1 = Y(ORE_KM) - k;
+      ctx.save();
+      turned(ctx);
+      ctx.globalAlpha = gauge;
+      ctx.strokeStyle = env.color("--xp-copper-edge");
+      ctx.lineWidth = 1.2;
+      ctx.stroke(shape([[faultX(ORE_KM) - 12, y0], [gx - 4, y0]], false));
+      ctx.stroke(shape([[faultX(ORE_KM) + 2, y1], [gx - 4, y1]], false));
+      ctx.setLineDash([3, 3]);
+      ctx.stroke(shape([[gx, y0], [gx, y1]], false));
+      ctx.restore();
+      if (km >= 20) {
+        ctx.globalAlpha = ramp(km, 20, 30);
+        const [lx, ly] = P(gx - 6, (y0 + y1) / 2);
+        env.label(ctx, `${number(Math.round(km))} ${spec.control.unit}`, lx, ly + 4, { align: "right", weight: 700, color: "--xp-copper-edge" });
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    // Once the basins are open: what a left step does, on the empty Arabian land in the south-east, with a pointer to
+    // the Gulf of Eilat (the nearest basin; the labels further north leave no room on phones).
+    const explain = ramp(opened, 25, 45);
+    if (explain > 0.01) {
+      const rows = L.explain.split(" / "), size = env.unit > 1.3 ? 11 : 12, gap = (size + 4) * env.unit;
+      const [x0, stepKm] = SEGMENTS[0], x1 = SEGMENTS[1][0];
+      const [bx, by] = P((x0 + x1) / 2 + 3, Y(stepKm + STEP + opened * 0.35));
+      const lx = W - 92, ly = H - 34 - (rows.length - 1) * gap;
+      ctx.globalAlpha = explain;
+      ctx.strokeStyle = env.color("--ink");
+      ctx.lineWidth = 1;
+      ctx.stroke(shape([[lx - 30, ly - gap], [bx + 6, by + 2]], false));
+      rows.forEach((row, i) => env.label(ctx, row, lx, ly + i * gap, { weight: 700, size }));
+      ctx.globalAlpha = 1;
+    }
+
+    const whole = Math.round(km);
+    if (whole === 0) return t.before;
+    const apart = t.apart.replace("{km}", iso(number(whole)));
+    if (whole === spec.slip_km) return `${t.today} ${apart}`;
+    return `${t.moving}${names.length && opened > 0 ? `: ${list.format(names)}.` : "."} ${apart}`;
   }
 
   return {
     draw,
-    move,
-    resize,
-    followsValue: false,
-    handle: (km) => [290, Y(90) - km * S],
-    drag: (point, start) => start.value + (start.point.y - point.y) / S,
+    handle: (km) => P(HANDLE[0], HANDLE[1] - km * S),
+    // The plate moves along the fault: the pointer's movement along the fault's direction on screen.
+    drag: (point, start) => start.value + ((point.x - start.point.x) * SIN - (point.y - start.point.y) * COS) / S,
   };
 }
 return { view: [0, 0, W, H], animated: true, valueParts, create };

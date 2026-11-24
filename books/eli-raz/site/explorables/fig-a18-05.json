@@ -3,7 +3,7 @@
   "kind": "transform",
   "title": "תנועת הגזירה לאורך הערבה",
   "instruction": "גררו את לוח ערב–ירדן צפונה, או הזיזו את המחוון, וראו היכן נפתחים אגנים.",
-  "schematic": "שרטוט סכמטי: שני גושים קשיחים, השבר מיושר לקו אחד, ומיקום המדרגות להמחשה. בשרטוט כל מדרגה נפתחת במלוא התזוזה, ולכן כל האגנים יוצאים באותו אורך; האגנים האמיתיים שונים זה מזה. התזוזה היא יחסית לתת־לוח סיני–ישראל.",
+  "schematic": "שרטוט סכמטי לפי האיור המודפס: גושים קשיחים, השבר בקטעים ישרים, ומיקום המדרגות והחופים להמחשה. בשרטוט כל מדרגה נפתחת במלוא התזוזה, ולכן כל האגנים יוצאים באותו אורך; האגנים האמיתיים שונים זה מזה. התזוזה היא יחסית לתת־לוח סיני–ישראל.",
   "control": {
     "label": "תזוזה צפונה",
     "min": 0,
@@ -27,7 +27,12 @@
     "timna": "תמנע",
     "feinan": "פונון",
     "eilat": "אילת",
-    "copper": "שדה הנחושת"
+    "copper": "שדה הנחושת",
+    "africa": "לוח אפריקה",
+    "suez": "מפרץ סואץ",
+    "red_sea": "ים סוף",
+    "mediterranean": "הים התיכון",
+    "explain": "מדרגה שמאלה בשבר: / הלוחות מתרחקים / ונפתח אגן"
   },
   "texts": {
     "before": "לפני תנועת הגזירה: שני החלקים של שדות מרבצי הנחושת, תמנע ופונון, נמצאים זה מול זה משני צדי השבר.",
@@ -49,6 +54,10 @@
       "element": "a18-p018"
     },
     {
+      "label": "שני חלקים בלתי שווים: בפונון פי מאה סיגים מאשר בתמנע",
+      "element": "a18-p022"
+    },
+    {
       "label": "אגנים נפתחים במדרגות של שבר הטרנספורם: Garfunkel 1981, Tectonophysics 80",
       "url": "https://doi.org/10.1016/0040-1951(81)90143-8"
     }
@@ -61,6 +70,31 @@
     {
       "value": 105,
       "label": "היום"
+    }
+  ],
+  "label_notes": {
+    "africa": "Plate name as printed in fig-a18-05.",
+    "suez": "Gulf name as printed in fig-a18-05.",
+    "red_sea": "Sea name as printed in fig-a18-05.",
+    "mediterranean": "The shaded sea at the top left of fig-a18-05, unnamed there.",
+    "explain": "Short form of texts.moving (after Garfunkel 1981): where the fault steps left, the plates move apart and a basin opens. ' / ' splits the lines."
+  },
+  "legend": [
+    {
+      "swatch": "sea",
+      "label": "ים"
+    },
+    {
+      "swatch": "lake",
+      "label": "אגם באגן"
+    },
+    {
+      "swatch": "scarp",
+      "label": "דופן תלולה של אגן"
+    },
+    {
+      "swatch": "copper",
+      "label": "מרבץ נחושת"
     }
   ]
 }
