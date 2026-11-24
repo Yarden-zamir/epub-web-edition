@@ -17,12 +17,15 @@ An optional places.json next to the enhancements file adds a map section after t
 Its optional "tables" block turns a figure that prints a table as an image into a real table:
 {figure ID: {columns, rows, bar (column index drawn as bars), ltr (column indices), source}}.
 The printed image stays inside the figure, in a collapsed <details>.
-Its optional "charts" block adds a live line chart after a printed figure:
+Its optional "charts" block adds a live measured series to a printed figure:
 {figure ID: {data (JSON file under the content root with source and [date, value] points), title, unit}}.
-The chart figure carries a yearly table, so it reads without JavaScript; reader.js draws the line.
+Files charts/<figure ID>.json next to it add digitized or dataset charts (format in chart_panel).
+A figure with charts gets the interactive chart and a toggle back to the printed image. All panels of one
+figure share the x axis (small multiples). Each figure carries data tables and a CSV file, so it reads without JavaScript.
 The site links out only: it never embeds or copies the linked media.
 """
 
+import csv
 import hashlib
 import math
 import html
@@ -59,6 +62,26 @@ type Direction = Literal["rtl", "ltr"]
 
 class BookError(Exception):
     """The EPUB breaks a rule that the web build depends on."""
+
+
+ID_MOVES: dict[str, tuple[str, Path]] = {}  # Old element ID -> (new ID, the id-moves.csv that says so). Set by build().
+
+
+def load_id_moves(content_root: Path) -> None:
+    """Read the id-moves.csv files that tools/ingest_pdf.py writes into the content inventory folders."""
+    ID_MOVES.clear()
+    for path in sorted(content_root.glob("inventory*/id-moves.csv")):
+        with path.open(encoding="utf-8", newline="") as f:
+            for row in csv.DictReader(f):
+                ID_MOVES[row["old_id"]] = (row["new_id"], path)
+
+
+def missing_id(where: str, ref: str, what: str = "an ID") -> BookError:
+    """Error for site data that names an element ID the EPUB does not have, with its new ID when it moved."""
+    if ref in ID_MOVES:
+        new, path = ID_MOVES[ref]
+        return BookError(f"{where}: {ref!r} moved to {new!r} (see {path.parent.name}/{path.name}); update the data file")
+    return BookError(f"{where}: {ref!r} is not {what} in the EPUB (moved IDs are listed in the content inventory's id-moves.csv)")
 
 
 @dataclass(frozen=True)
@@ -161,7 +184,7 @@ class Converter:
         self.doc_anchor: dict[str, str] = {}  # Source document path -> first ID in that document.
         self.tags: dict[str, str] = {}  # Element ID -> tag name.
         self.tables: dict[str, dict] = {}  # Figure ID -> data table spec from the enhancements file.
-        self.charts: dict[str, ET.Element] = {}  # Printed figure ID -> live chart figure placed after it.
+        self.charts: dict[str, ET.Element] = {}  # Printed figure ID -> chart box placed inside it.
         self.skipped_docs: set[str] = set()  # Spine documents marked epub-only.
         self.crosslinks: dict[str, list[dict]] = {}  # Element ID -> crosslinks.json entries inside it.
         self.glossary: list[dict] = []  # glossary.json terms, in file order.
@@ -287,10 +310,11 @@ class Converter:
         for fig in list(body.iter("figure")):
             if (spec := self.tables.get(fig.get("id", ""))):
                 attach_table(fig, spec)
-        for parent in list(body.iter()):
-            for child in list(parent):
-                if child.tag == "figure" and (chart := self.charts.get(child.get("id", ""))) is not None:
-                    parent.insert(list(parent).index(child) + 1, chart)
+        for fig in list(body.iter("figure")):
+            if (box := self.charts.get(fig.get("id", ""))) is not None:
+                caption = fig.find("figcaption")
+                fig.insert(list(fig).index(caption) if caption is not None else len(fig), box)
+                fig.set("class", (fig.get("class", "") + " has-chart").strip())
         for parent in list(body.iter()):
             for child in list(parent):
                 if "copyright-page" in child.get("data-epub-type", "").split():
@@ -406,8 +430,10 @@ def load_glossary(data_dir: Path | None, conv: "Converter") -> list[dict]:
         return []
     terms = json.loads(path.read_text(encoding="utf-8"))["terms"]
     for t in terms:
-        if t["source"] not in conv.ids or not t["forms"] or not t["definition"]:
-            raise BookError(f"glossary.json: term {t['term']!r}: needs forms, a definition and a source ID in the EPUB")
+        if t["source"] not in conv.ids:
+            raise missing_id(f"glossary.json: term {t['term']!r}", t["source"])
+        if not t["forms"] or not t["definition"]:
+            raise BookError(f"glossary.json: term {t['term']!r}: needs forms and a definition")
     return terms
 
 
@@ -417,8 +443,9 @@ def load_crosslinks(data_dir: Path | None, conv: "Converter") -> dict[str, list[
         return {}
     result: dict[str, list[dict]] = {}
     for link in json.loads(path.read_text(encoding="utf-8"))["links"]:
-        if link["element"] not in conv.ids or link["target"] not in conv.ids:
-            raise BookError(f"crosslinks.json: {link['element']} -> {link['target']}: both must be IDs in the EPUB")
+        for ref in (link["element"], link["target"]):
+            if ref not in conv.ids:
+                raise missing_id(f"crosslinks.json: {link['element']} -> {link['target']}", ref)
         result.setdefault(link["element"], []).append(link)
     return result
 
@@ -501,7 +528,7 @@ def timeline_html(data_dir: Path | None, conv: Converter) -> tuple[str, str]:
     for i, ev in enumerate(events):
         for ref in (ev["target"], ev.get("date_source", ev["target"])):
             if ref not in conv.ids:
-                raise BookError(f"timeline.json: event {i} ({ev['label']}): {ref!r} is not an ID in the EPUB")
+                raise missing_id(f"timeline.json: event {i} ({ev['label']})", ref)
         if not isinstance(ev["major"], bool):
             raise BookError(f"timeline.json: event {i}: major must be true or false")
         cls = "tl-event tl-major" if ev["major"] else "tl-event"
@@ -562,53 +589,132 @@ def attach_table(fig: ET.Element, spec: dict) -> None:
     details.append(img)
     fig.insert(index, details)
     fig.insert(0, table_element(fig.get("id", ""), spec))
+    link = ET.Element("a", {"class": "csv-link", "href": f"data/tables/{fig.get('id')}.csv", "download": ""})
+    link.text = "הורדת הטבלה (CSV)"
+    fig.insert(1, link)
     fig.set("class", (fig.get("class", "") + " has-table").strip())
 
 
-def chart_element(fig_id: str, spec: dict, data: dict, href: str) -> ET.Element:
-    """Figure for a live chart: drawing area for reader.js, caption with source, and a yearly table."""
+def chart_panel(spec: dict, where: str) -> dict:
+    """Check one charts/<figure>.json file and return the panel that reader.js draws. Format:
+    {figure, title, source: {kind, label, url?, method, accuracy?: {x, y}, ...}, x: {label, unit, type: year|number},
+    y: {label, unit}, series: [{name, kind: line|points, points: [[x, y], ...]}], bands?: [{axis, from, to, label}],
+    markers?: [{axis, at, label}], notes?}. Line points keep their drawing order: x may repeat or step back."""
+    if spec["x"]["type"] not in ("year", "number") or not spec["series"]:
+        raise BookError(f"{where}: x.type must be year or number, and there must be series")
+    for series in spec["series"]:
+        if series["kind"] not in ("line", "points") or len(series["points"]) < 2:
+            raise BookError(f"{where}: series {series['name']!r} needs kind line or points and two or more points")
+        if any(len(pt) != 2 or not all(isinstance(v, (int, float)) for v in pt) for pt in series["points"]):
+            raise BookError(f"{where}: series {series['name']!r} has a point that is not [x, y]")
+    for item in [*spec.get("bands", []), *spec.get("markers", [])]:
+        if item["axis"] not in ("x", "y"):
+            raise BookError(f"{where}: band or marker axis must be x or y")
+    source = spec["source"]
+    if source.get("url") and not source["url"].startswith("https://"):
+        raise BookError(f"{where}: source URL must be https")
+    accuracy = source.get("accuracy")
+    line = source["label"]
+    if source["kind"] == "digitized":
+        line += ". דיגיטציה של האיור המודפס"
+        if accuracy:
+            line += f"; דיוק: {accuracy['x']} בציר האופקי, {accuracy['y']} בציר האנכי"
+    # Only public fields go to the site; source.overlay is a private review image.
+    return {"title": spec["title"], "x": spec["x"], "y": spec["y"], "series": spec["series"],
+            "bands": spec.get("bands", []), "markers": spec.get("markers", []), "notes": spec.get("notes", ""),
+            "source": {"line": line + ".", "url": source.get("url"), "method": source.get("method", "")}}
+
+
+def measured_panel(spec: dict, data: dict, where: str) -> dict:
+    """Panel for a live measured series from the enhancements file: [ISO date, value] points."""
     points = data["points"]
-    if len(points) < 2 or any(len(p) != 2 for p in points):
-        raise BookError(f"enhancements.json: chart for {fig_id}: needs at least two [date, value] points")
-    fig = ET.Element("figure", {"id": f"{fig_id}-live", "class": "web-chart", "data-chart": href,
-                                "data-unit": spec["unit"]})
-    ET.SubElement(fig, "div", {"class": "chart-area", "hidden": "hidden"})
-    cap = ET.SubElement(fig, "figcaption")
-    ET.SubElement(cap, "span", {"class": "caption"}).text = spec["title"]
-    credit = ET.SubElement(cap, "span", {"class": "edition-credit"})
-    credit.text = f"גרף עדכני שנוסף לאתר, {points[0][0][:4]}–{points[-1][0][:4]}. נתונים: "
-    ET.SubElement(credit, "a", {"href": data["source"]["url"], "rel": "noopener"}).text = data["source"]["label"]
-    yearly: dict[str, tuple[str, float]] = {}
-    for date, value in points:
-        yearly.setdefault(date[:4], (date, value))  # First reading of each year.
-    details = ET.SubElement(fig, "details", {"class": "print-version"})
-    ET.SubElement(details, "summary").text = "הנתונים בטבלה (הקריאה הראשונה בכל שנה)"
-    table = ET.SubElement(details, "table", {"class": "data-table"})
+    if len(points) < 2 or any(len(pt) != 2 for pt in points):
+        raise BookError(f"{where}: needs at least two [date, value] points")
+    if not data["source"]["url"].startswith("https://"):
+        raise BookError(f"{where}: source URL must be https")
+    years = f"{points[0][0][:4]}–{points[-1][0][:4]}"
+    return {"title": spec["title"], "x": {"label": "תאריך", "unit": "", "type": "date"},
+            "y": {"label": spec["unit"], "unit": ""}, "series": [{"name": spec["title"], "kind": "line", "points": points}],
+            "bands": [], "markers": [], "notes": "",
+            "source": {"line": f"נתונים עדכניים שנוספו לאתר, {years}: {data['source']['label']}.", "url": data["source"]["url"], "method": ""}}
+
+
+def panel_table(panel: dict) -> ET.Element:
+    """Data table of one panel. A dated series shows its first reading of each year."""
+    table = ET.Element("table", {"class": "data-table"})
+    ET.SubElement(table, "caption").text = panel["title"]
     head = ET.SubElement(ET.SubElement(table, "thead"), "tr")
-    for name in ("תאריך", spec["unit"]):
+    x_name = " ".join(filter(None, [panel["x"]["label"], panel["x"]["unit"] and f"({panel['x']['unit']})"]))
+    y_name = " ".join(filter(None, [panel["y"]["label"], panel["y"]["unit"] and f"({panel['y']['unit']})"]))
+    names = ["סדרה", x_name, y_name] if len(panel["series"]) > 1 else [x_name, y_name]
+    for name in names:
         ET.SubElement(head, "th", {"scope": "col"}).text = name
     body = ET.SubElement(table, "tbody")
-    for date, value in yearly.values():
-        tr = ET.SubElement(body, "tr")
-        ET.SubElement(tr, "th", {"scope": "row"}).text = date
-        ET.SubElement(tr, "td", {"dir": "ltr"}).text = f"{value:.2f}"
-    return fig
+    for series in panel["series"]:
+        points = series["points"]
+        if panel["x"]["type"] == "date":
+            first: dict[str, list] = {}
+            for pt in points:
+                first.setdefault(pt[0][:4], pt)
+            points = list(first.values())
+        for x, y in points:
+            tr = ET.SubElement(body, "tr")
+            if len(panel["series"]) > 1:
+                ET.SubElement(tr, "td").text = series["name"]
+            ET.SubElement(tr, "th", {"scope": "row", "dir": "ltr"}).text = f"{x:g}" if isinstance(x, float) else str(x)
+            ET.SubElement(tr, "td", {"dir": "ltr"}).text = f"{y:g}"
+    return table
 
 
-def load_charts(out: Path, path: Path | None, conv: "Converter") -> dict[str, ET.Element]:
-    charts = json.loads(path.read_text(encoding="utf-8")).get("charts", {}) if path else {}
+def write_csv(path: Path, header: list[str], rows: list[list]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8-sig", newline="") as f:  # The BOM lets spreadsheet apps read Hebrew.
+        writer = csv.writer(f)
+        writer.writerow(header)
+        writer.writerows(rows)
+
+
+def chart_box(fig_id: str, panels: list[dict], href: str, csv_href: str) -> ET.Element:
+    """Drawing area for reader.js, the source line of each panel, data tables and a CSV link."""
+    box = ET.Element("div", {"class": "chart-box", "data-chart": href})
+    ET.SubElement(box, "div", {"class": "chart-area", "hidden": "hidden"})
+    for panel in panels:
+        line = ET.SubElement(box, "p", {"class": "chart-source"})
+        if panel["source"]["url"]:
+            ET.SubElement(line, "a", {"href": panel["source"]["url"], "rel": "noopener"}).text = panel["source"]["line"]
+        else:
+            line.text = panel["source"]["line"]
+        if panel["notes"]:
+            ET.SubElement(box, "p", {"class": "chart-notes"}).text = panel["notes"]
+    details = ET.SubElement(box, "details", {"class": "print-version"})
+    ET.SubElement(details, "summary").text = "הנתונים בטבלה"
+    for panel in panels:
+        details.append(panel_table(panel))
+    ET.SubElement(box, "a", {"class": "csv-link", "href": csv_href, "download": ""}).text = "הורדת הנתונים (CSV)"
+    return box
+
+
+def load_charts(out: Path, enhancements_file: Path | None, data_dir: Path | None, conv: "Converter") -> dict[str, ET.Element]:
+    panels: dict[str, list[dict]] = {}
+    measured = json.loads(enhancements_file.read_text(encoding="utf-8")).get("charts", {}) if enhancements_file else {}
+    for fig_id, spec in measured.items():
+        data = json.loads((enhancements_file.resolve().parent.parent / spec["data"]).read_text(encoding="utf-8"))
+        panels.setdefault(fig_id, []).append(measured_panel(spec, data, f"enhancements.json: chart for {fig_id}"))
+    for path in sorted((data_dir / "charts").glob("*.json")) if data_dir else []:
+        spec = json.loads(path.read_text(encoding="utf-8"))
+        if spec["figure"] != path.stem:
+            raise BookError(f"{path.name}: figure {spec['figure']!r} does not match the file name")
+        panels.setdefault(path.stem, []).append(chart_panel(spec, f"charts/{path.name}"))
     result = {}
-    for fig_id, spec in charts.items():
+    for fig_id, figure_panels in panels.items():
         if conv.tags.get(fig_id) != "figure":
-            raise BookError(f"enhancements.json: chart for {fig_id!r}: not a figure in the EPUB")
-        src = path.resolve().parent.parent / spec["data"]
-        data = json.loads(src.read_text(encoding="utf-8"))
-        if not data["source"]["url"].startswith("https://"):
-            raise BookError(f"enhancements.json: chart for {fig_id}: source URL must be https")
-        dest = out / "data" / src.name
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(src, dest)
-        result[fig_id] = chart_element(fig_id, spec, data, f"data/{src.name}")
+            raise missing_id("chart", fig_id, "a figure")
+        (out / "data" / "charts").mkdir(parents=True, exist_ok=True)
+        (out / "data" / "charts" / f"{fig_id}.json").write_text(
+            json.dumps({"figure": fig_id, "panels": figure_panels}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+        rows = [[panel["title"], series["name"], x, y] for panel in figure_panels for series in panel["series"] for x, y in series["points"]]
+        write_csv(out / "data" / "charts" / f"{fig_id}.csv", ["גרף", "סדרה", "x", "y"], rows)
+        result[fig_id] = chart_box(fig_id, figure_panels, f"data/charts/{fig_id}.json", f"data/charts/{fig_id}.csv")
     return result
 
 
@@ -616,7 +722,7 @@ def load_tables(path: Path | None, conv: "Converter") -> dict[str, dict]:
     tables = json.loads(path.read_text(encoding="utf-8")).get("tables", {}) if path else {}
     for fig_id in tables:
         if conv.tags.get(fig_id) != "figure":
-            raise BookError(f"enhancements.json: table {fig_id!r} is not a figure in the EPUB")
+            raise missing_id("enhancements.json: table", fig_id, "a figure")
     return tables
 
 
@@ -629,7 +735,7 @@ def load_enhancements(out: Path, conv: Converter, path: Path | None) -> dict[str
     result: dict[str, dict[str, str]] = {}
     for fig_id, fig in data["figures"].items():
         if conv.tags.get(fig_id) != "figure":
-            raise BookError(f"enhancements.json: {fig_id!r} is not a figure in the EPUB")
+            raise missing_id("enhancements.json: figures", fig_id, "a figure")
         original = content_root / fig["original"]
         if not original.is_file():
             raise BookError(f"enhancements.json: {fig_id}: {original} does not exist")
@@ -747,14 +853,14 @@ def places_html(data_dir: Path | None, conv: "Converter", thumbs: Thumbs) -> str
             raise BookError(f"{where}: wikidata must be a Q identifier")
         for ref in [*place["targets"], place["description_source"]]:
             if ref not in conv.ids:
-                raise BookError(f"{where}: {ref!r} is not an ID in the EPUB")
+                raise missing_id(where, ref)
         if not isinstance(place.get("far", False), bool):
             raise BookError(f"{where}: far must be true or false")
         if not place["targets"]:
             raise BookError(f"{where}: needs at least one target")
         for fig in place["figures"]:
             if fig not in conv.figure_img:
-                raise BookError(f"{where}: {fig!r} is not a figure with an image")
+                raise missing_id(where, fig, "a figure with an image")
         first_target: dict[str, str] = {}  # Chapter ID -> the place's first target in it, in file order.
         for t in place["targets"]:
             first_target.setdefault(conv.chapter_of[t], t)
@@ -830,9 +936,12 @@ def build(epub: Path, out: Path, enhancements_file: Path | None = SITE / "enhanc
             dest.write_bytes(z.read(path))
         thumbs = Thumbs(out)
         data_dir = enhancements_file.parent if enhancements_file else None
+        load_id_moves(enhancements_file.resolve().parent.parent if enhancements_file else ROOT)
         enhancements = load_enhancements(out, conv, enhancements_file)
         conv.tables = load_tables(enhancements_file, conv)
-        conv.charts = load_charts(out, enhancements_file, conv)
+        for fig_id, spec in conv.tables.items():
+            write_csv(out / "data" / "tables" / f"{fig_id}.csv", spec["columns"], spec["rows"])
+        conv.charts = load_charts(out, enhancements_file, data_dir, conv)
         conv.crosslinks = load_crosslinks(data_dir, conv)
         conv.glossary = load_glossary(data_dir, conv)
         docs = [conv.convert(item, body, enhancements) for item, body in conv.bodies]
