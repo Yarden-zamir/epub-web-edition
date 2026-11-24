@@ -5,7 +5,7 @@
   padding: 0.65rem 1.1rem; border-radius: var(--radius-pill); background: var(--ink); color: var(--paper);
   font-family: var(--sans); font-size: 0.9rem; line-height: 1.4; box-shadow: 0 10px 30px rgb(0 0 0 / 0.25);
   opacity: 0; transform: translateY(0.5rem);
-  transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
 }
 .toast.shown { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) { .toast { transform: none; } }
