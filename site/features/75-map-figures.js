@@ -280,14 +280,26 @@ function thenNow(box, spec, img) {
   setMode(false);
 }
 
-async function setUp(figure, box) {
+async function loadMapSpec(box) {
   const response = await fetch(box.dataset.map);
   if (!response.ok) throw new Error(`${box.dataset.map}: HTTP ${response.status}`);
-  const spec = await response.json();
+  return response.json();
+}
+function drawMap(figure, box, spec) {
   const img = figure.querySelector(":scope > img");
   if (spec.kind === "figure-map") figureMap(box, spec, img);
   else if (spec.kind === "then-now") thenNow(box, spec, img);
   else throw new Error(`${box.dataset.map}: unknown map kind ${spec.kind}`);
+}
+// The swap between the printed image and the map changes the figure's height. When the figure is on screen, its top
+// stays where it was: Chrome's scroll anchoring can pick the printed image, which the swap hides, and then moves the
+// page by hundreds of pixels. Off screen, the browser's anchoring keeps the text in view in place.
+function keepFigureTop(figure, change) {
+  const before = figure.getBoundingClientRect();
+  const onScreen = before.top < innerHeight && before.bottom > 0;
+  change();
+  const shift = figure.getBoundingClientRect().top - before.top;
+  if (onScreen && Math.abs(shift) > 1) scrollBy({ top: shift, behavior: "instant" });
 }
 
 for (const figure of document.querySelectorAll("figure.has-map")) {
@@ -299,7 +311,7 @@ for (const figure of document.querySelectorAll("figure.has-map")) {
   const make = (text, live) => {
     const b = el("button", "", text);
     b.type = "button";
-    b.addEventListener("click", () => setView(live));
+    b.addEventListener("click", () => keepFigureTop(figure, () => setView(live)));
     group.append(b);
     return b;
   };
@@ -313,8 +325,9 @@ for (const figure of document.querySelectorAll("figure.has-map")) {
   };
   group.hidden = true;
   figure.prepend(group);
-  whenNear(figure, () => setUp(figure, box))
-    .then(() => { group.hidden = false; setView(true); })
-    .catch((err) => { box.hidden = true; group.remove(); console.error(err); });
+  whenNear(figure, async () => {
+    const spec = await loadMapSpec(box);
+    keepFigureTop(figure, () => { drawMap(figure, box, spec); group.hidden = false; setView(true); });
+  }).catch((err) => { box.hidden = true; group.remove(); console.error(err); });
 }
 })();
