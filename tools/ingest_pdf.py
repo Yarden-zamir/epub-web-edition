@@ -36,6 +36,7 @@ import unicodedata
 import xml.etree.ElementTree as ET
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
+from itertools import takewhile
 from pathlib import Path
 from typing import Literal
 
@@ -472,10 +473,15 @@ def render(clusters: list[Cluster], size: float, rtl: bool) -> tuple[str, str]:
         parts.append({"b": f"<b>{chunk}</b>", "sup": f'<sup class="ref">{chunk}</sup>'}.get(style, chunk))
         buf.clear()
 
-    for c in clusters:
+    for n, c in enumerate(clusters):
         if prev is not None:
-            # Distance between the two glyph boxes in either direction (digit runs inside Hebrew read left to right).
-            gap = max(prev.x0 - c.x1, c.x0 - prev.x1)
+            # The visible gap between the two pieces of text that meet here: in mixed lines the next character in
+            # reading order is not always the one printed next to it ("ה-14": the hyphen faces "4", not "1").
+            # So take the smallest gap between the glyphs before and after this point, up to the nearest spaces.
+            before = list(takewhile(lambda x: not x.text.isspace(), reversed(clusters[max(0, n - 8):n])))
+            after = list(takewhile(lambda x: not x.text.isspace(), clusters[n:n + 8]))
+            gap = min((max(a.x0 - b.x1, b.x0 - a.x1) for a in before for b in after),
+                      default=max(prev.x0 - c.x1, c.x0 - prev.x1))
             if (gap > 0.25 * size and not prev.text.isspace() and not c.text.isspace()
                     and c.text not in CLOSERS and prev.text not in OPENERS):
                 text.append(" ")
