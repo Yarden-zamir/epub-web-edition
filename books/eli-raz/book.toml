@@ -4,7 +4,8 @@
 pdf = "source/source.pdf"  # Relative to this folder. source/PROVENANCE.txt says where it came from.
 pdf_sha256 = "c7efc94efd4cbd42bf9d479a20ff1af763e017ec0ce1cfab75d2be7e3560e994"
 # Ornaments that are not book content. Checked visually on PDF pages 6-7.
-decorative = ["p006-x17", "p007-x21"]
+# p020-x91: a cut-out copy of the book photo p020-x82, printed exactly on top of it (same box); one picture in print.
+decorative = ["p006-x17", "p007-x21", "p020-x91"]
 # Reader note before the printed form of a [[correction]] (an edition note at the end of the chapter).
 correction_note = "תיקון של מהדורה זו. בדפוס:"
 
@@ -817,7 +818,6 @@ fonts = "fonts"      # Noto Sans Hebrew (SIL OFL) as the bundled fallback.
 "p020-x85" = "פסל של שמלה מגובשת במלח לבן ומסולסל, תלוי באוויר על רקע אפור."
 "p020-x87" = "כינור מכוסה בגבישי מלח לבנים על רקע שחור."
 "p020-x82" = "ספר בכריכה קשה בשם SIGALIT LANDAU – SALT YEARS, בתמונה אלכסונית."
-"p020-x91-masked" = "ספר בכריכה קשה בשם SIGALIT LANDAU – SALT YEARS, בתמונה אלכסונית."
 "p020-x93" = "ידיים מרימות מן המים בד מגובש במלח לבן, קשור למקל עץ."
 "p020-x95" = "גבר ואישה בכובע ובשמלה צבעונית מורידים מעגורן אל המים שמלה מגובשת במלח, על חוף ים המלח."
 "p021-x103" = "מבט מגובה על מפרץ ים המלח: כתם מים חום־כתום עגול בתוך המים הטורקיזיים, בין מצוקים."

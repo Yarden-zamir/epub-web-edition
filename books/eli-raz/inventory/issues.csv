@@ -10,10 +10,10 @@ A-0008,15,info,p015-x54.jpeg: no caption next to this image in print,open
 A-0009,17,info,p017-x60.jpeg: no caption next to this image in print,open
 A-0010,18,info,p018-x64.jpeg: no caption next to this image in print,open
 A-0011,19,info,p019-x68.jpeg: no caption next to this image in print,open
-A-0012,20,info,p020-x85.jpeg: no caption next to this image in print,open
-A-0013,20,info,p020-x87.jpeg: no caption next to this image in print,open
-A-0014,20,info,p020-x82.jpeg: no caption next to this image in print,open
-A-0015,20,info,p020-x91-masked.png: no caption next to this image in print,open
+A-0012,20,info,p020-x91: decorative per book.toml; not in the EPUB,open
+A-0013,20,info,p020-x85.jpeg: no caption next to this image in print,open
+A-0014,20,info,p020-x87.jpeg: no caption next to this image in print,open
+A-0015,20,info,p020-x82.jpeg: no caption next to this image in print,open
 A-0016,20,info,p020-x95.jpeg: no caption next to this image in print,open
 A-0017,20,info,a05-p004: paragraph continues across the page break (marker kept inside),open
 A-0018,23,intentional-change,Note reference 3 restored: Print sets reference 3 as a full-size digit (typesetting slip). Note 3 exists at the page foot.,open

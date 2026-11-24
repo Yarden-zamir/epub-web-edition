@@ -1624,6 +1624,14 @@ class Ingest:
                 ids.append(pid)
                 if role == "body" and para is body_paras[-1]:
                     next_open = pid if self.ends_full(para, body_paras) else None
+            # Figures side by side in one row (tops within 6 pt) read in the page direction (PDF page 78: four QR
+            # codes, right to left). Each figure sorts at the top of its row, with a tiny step per place in the row.
+            page_rtl = sum(ln.rtl for ln in lines) * 2 >= len(lines)
+            row_key: dict[int, float] = {}
+            for fig in figs:
+                row = [f for f in figs if abs(f.bbox[1] - fig.bbox[1]) < 6]  # Tops in line; a collage keeps top-to-bottom order.
+                order = sorted(row, key=lambda f: -(f.bbox[0] + f.bbox[2]) if page_rtl else f.bbox[0] + f.bbox[2])
+                row_key[id(fig)] = min(f.bbox[1] for f in row) + order.index(fig) * 1e-3
             for fig in figs:
                 counters["fig"] += 1
                 fid = f"fig-{unit.id}-{counters['fig']:02d}"
@@ -1653,7 +1661,7 @@ class Ingest:
                 figure_html = f'<figure id="{fid}" class="figure {kind}" data-pdf-page="{pno}">{img}{caption}</figure>'
                 if fid in self.add_tables:
                     figure_html += self.addition_table(fid, self.add_tables[fid])
-                flow.append((fig.bbox[1], figure_html))
+                flow.append((row_key[id(fig)], figure_html))
                 ids.append(fid)
                 if alt is None and not fig.change:
                     self.issue(pno, "alt-text", f"{fid} ({stem}): needs alt text written from the image (not in the PDF)")

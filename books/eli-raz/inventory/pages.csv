@@ -18,7 +18,7 @@ page,printed,unit,kind,target_ids,status,notes
 17,13,s01,part,s01-h s01-p001 fig-s01-01,pending,
 18,14,s01,part,fig-s01-02,pending,
 19,15,a05,article,a05-h a05-p001 a05-p002 a05-p003 a05-p004 fig-a05-01,pending,
-20,16,a05,article,a05-p005 a05-p006 fig-a05-02 fig-a05-03 fig-a05-04 fig-a05-05 fig-a05-06 fig-a05-07 a05-p004,pending,
+20,16,a05,article,a05-p005 a05-p006 fig-a05-02 fig-a05-03 fig-a05-04 fig-a05-05 fig-a05-06 a05-p004,pending,
 21,17,a06,article,a06-h a06-p001 a06-p002 a06-p003 a06-fn1 fig-a06-01,pending,
 22,18,a06,article,a06-fn4 fig-a06-02 a06-p005,pending,
 23,19,a06,article,a06-p004 a06-p005 a06-fn2 a06-fn3 a06-p003,pending,
