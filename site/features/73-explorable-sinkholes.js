@@ -17,13 +17,11 @@ const WATER_TABLE_WEST = -382; // Groundwater table at the west edge.
 // Dissolution (schematic, like the printed figure, not a model of the rate): along the salt layer, how deep fresh water
 // has eaten (0 to 1, above 1 is through the layer) grows with the metres of level drop since fresh water reached
 // that point, EAT metres for the full depth, up to a seeded limit per point: the layer stays riddled, not removed,
-// and only some points are eaten through. Seeded noise makes the front jagged and connects the pockets.
-const EAT = 10, GRID = 3, SEED = 7; // Any fixed seed: it only fixes the shapes of the pockets.
-// Collapse sites: x and a size factor. A roof falls once the salt below is eaten through.
-const SITES = [[122, 0.8], [158, 1.1], [184, 0.7], [221, 1], [259, 0.9], [296, 1.2], [327, 0.8], [362, 1]];
+// and only some points are eaten through. Seeded low-frequency noise gives the front a few broad lobes.
+const EAT = 10, GRID = 3, SEED = 7; // Any fixed seed: it only fixes the shape of the front.
 const STREAKS = [0.15, 0.35, 0.55, 0.75, 0.92]; // Fresh-water flow lines, as fractions between water table and interface.
 
-// Seeded random numbers (mulberry32), so the pockets look the same on every visit.
+// Seeded random numbers (mulberry32), so the front looks the same on every visit.
 function random(seed) {
   let a = seed;
   return () => {
@@ -103,26 +101,40 @@ function create(spec) {
   const saltAngle = Math.atan(SALT.dip * SCALE);
   const rand = random(SEED);
   const thickPx = SALT.thick * SCALE;
-  const cols = [];
-  for (let x = SALT.from + 2; x <= SALT.to - 8; x += GRID) cols.push({ x, at: exposureLevel(x, min, max), n: rand(), jag: rand() * 2 - 1 });
-  for (let pass = 0; pass < 2; pass++) // Smooth the depth noise, so pockets are lobes, not spikes.
-    cols.forEach((col, i) => { col.n = (cols[Math.max(0, i - 1)].n + col.n * 2 + cols[Math.min(cols.length - 1, i + 1)].n) / 4; });
-  const eaten = (col, level) => (col.at === null ? 0 : Math.min(0.3 + 0.95 * col.n, Math.max(0, ((col.at - level) / EAT) * (0.5 + col.n))));
-  const colAt = (x) => cols[Math.max(0, Math.min(cols.length - 1, Math.round((x - cols[0].x) / GRID)))];
-  // Pockets inside the salt that open as the front nears them and merge with it.
-  const pockets = Array.from({ length: 16 }, () => ({
-    x: SALT.from + 8 + rand() * (SALT.to - SALT.from - 30), depth: 0.35 + rand() * 0.45, r: 3 + rand() * 4.5,
-    shape: Array.from({ length: 9 }, () => 0.6 + rand() * 0.8),
-  }));
-  const holes = SITES.map(([x, size]) => {
-    const top = Y(saltTop(x)), g = Y(ground(x)), w = 9 * size;
-    // A collapse cone: the loose layers fall into the cavity, wide at the surface and narrow at the salt.
-    const cone = shape([[-w * 1.5, 4], [-3 * size, top - g + 3], [3 * size, top - g + 3], [w * 1.5, 4]]);
+  const smooth = (values, passes) => {
+    let v = values;
+    for (let k = 0; k < passes; k++) v = v.map((x, i) => (v[Math.max(0, i - 1)] + 2 * x + v[Math.min(v.length - 1, i + 1)]) / 4);
+    return v;
+  };
+  const grid = [];
+  for (let x = SALT.from + 2; x <= SALT.to - 8; x += GRID) grid.push(x);
+  // Low-frequency noise, so the front is a few broad lobes, not spikes: how deep each point can be eaten (its limit,
+  // scaled to 0..1) and a small wobble of the edge.
+  const depth = smooth(grid.map(() => rand()), 8);
+  const wobble = smooth(grid.map(() => rand() * 2 - 1), 3);
+  const lo = Math.min(...depth), hi = Math.max(...depth);
+  const cols = grid.map((x, i) => ({ x, at: exposureLevel(x, min, max), n: (depth[i] - lo) / (hi - lo), w: wobble[i] }));
+  // Sinkhole sites: the broad peaks of the noise, at least 34 units apart, at most 6, west to east. Only there is the
+  // salt eaten through (a dip in the front); elsewhere at most 85% of the layer, so the salt that is left stays visible.
+  const peaks = cols.filter((col, i) => col.n >= (cols[i - 1]?.n ?? 0) && col.n >= (cols[i + 1]?.n ?? 0) && col.n > 0.35);
+  const sites = [];
+  for (const col of [...peaks].sort((p1, p2) => p2.n - p1.n)) if (sites.length < 6 && sites.every((site) => Math.abs(site.x - col.x) >= 34)) sites.push(col);
+  sites.sort((p1, p2) => p1.x - p2.x);
+  for (const col of cols) {
+    const near = Math.max(0, ...sites.map((site) => 1 - Math.abs(site.x - col.x) / 9));
+    col.limit = Math.max(0.25 + 0.6 * col.n, near * 1.05);
+  }
+  const eaten = (col, level) => (col.at === null ? 0 : Math.max(0, Math.min(col.limit, ((col.at - level) / EAT) * (0.6 + 0.6 * col.n))));
+  const holes = sites.map((col) => {
+    const x = col.x, size = 0.85 + 0.3 * col.n, top = Y(saltTop(x)), g = Y(ground(x)), w = 8 * size;
+    // A collapse cone straight above the deepest point: wide at the surface, narrow where it enters the pocket.
+    const bottom = top + thickPx * 0.5 - g;
+    const cone = shape([[-w * 1.5, 4], [-2.5 * size, bottom], [2.5 * size, bottom], [w * 1.5, 4]]);
     const pit = new Path2D();
     pit.moveTo(-w * 1.7, Y(ground(x - w * 1.7)) - g);
     pit.quadraticCurveTo(0, 16 * size, w * 1.7, Y(ground(x + w * 1.7)) - g);
     pit.closePath();
-    return { x, size, top, g, cone, pit, col: colAt(x) };
+    return { x, col, g, cone, pit };
   });
   const arrowRight = new Path2D("M-12 0 H9 M3 -5 L10 0 L3 5");
   const arrowLeft = new Path2D("M12 0 H-9 M-3 -5 L-10 0 L-3 5");
@@ -167,27 +179,53 @@ function create(spec) {
     ctx.stroke(shape([[0, yI0], [xs, yL]], false));
     ctx.restore();
 
+    // Fresh groundwater flows east under and through the exposed salt; under reduced motion, still arrows (below).
+    const flowing = !reduceMotion.matches;
+    const streaks = (alpha) => {
+      ctx.strokeStyle = env.color("--xp-fresh-ink");
+      ctx.globalAlpha = alpha;
+      ctx.lineWidth = 1.3;
+      ctx.lineCap = "round";
+      ctx.setLineDash([5, 9]);
+      STREAKS.forEach((f, i) => {
+        const end = xs - 4;
+        ctx.lineDashOffset = -env.time * 14 - i * 5;
+        ctx.stroke(shape([[0, wt0 + f * (yI0 - wt0)], [end, wt(end) + f * (yI(end) - wt(end))]], false));
+      });
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
+    };
+    if (flowing) {
+      ctx.save();
+      ctx.clip(below);
+      streaks(0.6);
+      ctx.restore();
+    }
+
     ctx.drawImage(env.layer("salt", [0, 0, W, H], (c) => {
       c.fillStyle = env.gradient("salt", 0, Y(saltTop(SALT.from)), 0, Y(saltTop(SALT.to) - SALT.thick), [[0, "--xp-salt"], [1, "--xp-salt-shade"]]);
       c.fill(salt);
+      c.strokeStyle = env.color("--xp-salt-edge");
+      c.lineWidth = 1.2;
+      c.stroke(salt);
     }), 0, 0, W, H);
-    ctx.save();
-    ctx.clip(salt);
-    ctx.clip(shape([[0, yI0], [xs, yL], [xs, 0], [0, 0]])); // Salt above the interface, in fresh water.
-    ctx.globalAlpha = 0.92;
-    ctx.fillStyle = env.color("--xp-dissolve");
-    ctx.fillRect(0, 0, W, H);
-    ctx.restore();
 
-    // Eaten salt: the jagged front from the top of the layer down, and pockets inside it; filled with fresh water.
+    // Eaten salt: a front from the top of the layer down, as deep as the fresh water has eaten at each point, filled
+    // with fresh water. Its top edge sits just above the salt, in fresh water, so it also hides the salt's old top line.
     let deepest = 0, frontEnd = SALT.from;
     const hole = new Path2D();
     let run = [];
     const closeRun = () => {
       if (run.length > 1) {
-        hole.moveTo(run[0][0], run[0][1] - 3);
-        for (const [x, y] of run) hole.lineTo(x, y - 3);
-        for (const [x, , yb] of [...run].reverse()) hole.lineTo(x, yb);
+        hole.moveTo(run[0][0], run[0][1] - 2);
+        hole.lineTo(run.at(-1)[0], run.at(-1)[1] - 2);
+        const back = [...run].reverse();
+        hole.lineTo(back[0][0], back[0][2]);
+        for (let i = 1; i < back.length; i++) { // A smooth bottom edge through the midpoints.
+          const [x0, , y0] = back[i - 1], [x1, , y1] = back[i];
+          hole.quadraticCurveTo(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2);
+        }
+        hole.lineTo(back.at(-1)[0], back.at(-1)[2]);
         hole.closePath();
       }
       run = [];
@@ -196,39 +234,44 @@ function create(spec) {
       const e = eaten(col, level);
       if (e > 0.02) {
         const top = Y(saltTop(col.x));
-        run.push([col.x, top, top + Math.min(e, 1.1) * thickPx + col.jag * 3 * Math.min(1, e * 3)]);
+        run.push([col.x, top, top + Math.min(e, 1) * thickPx + col.w * 1.5 * Math.min(1, e * 4)]);
         deepest = Math.max(deepest, e);
         frontEnd = col.x;
       } else closeRun();
     }
     closeRun();
-    for (const pk of pockets) {
-      const grow = ramp(eaten(colAt(pk.x), level), 0.25, 0.9);
-      if (grow < 0.02) continue;
-      const cx = pk.x, cy = Y(saltTop(pk.x)) + pk.depth * thickPx, r = pk.r * grow;
-      pk.shape.forEach((f, i) => {
-        const a = (i / pk.shape.length) * Math.PI * 2;
-        const px = cx + Math.cos(a) * r * f * 1.5, py = cy + Math.sin(a) * r * f * 0.8;
-        i ? hole.lineTo(px, py) : hole.moveTo(px, py);
-      });
-      hole.closePath();
-    }
     if (deepest > 0.02) {
+      ctx.fillStyle = env.color("--xp-fresh");
+      ctx.fill(hole);
       ctx.save();
       ctx.clip(salt);
-      ctx.fillStyle = env.color("--xp-cavity");
-      ctx.fill(hole);
       ctx.strokeStyle = env.color("--xp-salt-edge");
-      ctx.lineWidth = 1;
+      ctx.lineWidth = 1.2;
       ctx.lineJoin = "round";
-      ctx.stroke(hole);
+      ctx.stroke(hole); // Only the edge inside the salt shows: the outline of the salt that is left.
+      if (flowing) {
+        ctx.clip(hole);
+        streaks(0.6); // The flow continues through the pockets.
+        if (deepest > 0.2) { // Grains of salt leave the pockets with the flow and fade.
+          ctx.fillStyle = env.color("--xp-salt");
+          cols.forEach((col, i) => {
+            const e = eaten(col, level);
+            if (i % 9 || e < 0.3) return;
+            const phase = (env.time * 0.3 + i * 0.137) % 1;
+            ctx.globalAlpha = (1 - phase) * 0.9;
+            ctx.beginPath();
+            ctx.arc(col.x + phase * 18, Y(saltTop(col.x)) + e * thickPx * 0.45 - phase * 3, 1.3, 0, Math.PI * 2);
+            ctx.fill();
+          });
+          ctx.globalAlpha = 1;
+        }
+      }
       ctx.restore();
     }
 
     let fallen = 0;
     for (const h of holes) {
-      const near = cols.filter((col) => Math.abs(col.x - h.x) <= 6).map((col) => eaten(col, level));
-      const down = ramp(Math.max(...near), 0.92, 1.08);
+      const down = ramp(eaten(h.col, level), 0.92, 1.02);
       if (down > 0.01) {
         ctx.save();
         ctx.translate(h.x, h.g);
@@ -250,41 +293,6 @@ function create(spec) {
     }
     const open = deepest > 0.05 ? 1 : 0;
 
-    // Fresh groundwater flows east, washes the exposed salt and carries dissolved salt out. Under reduced
-    // motion the drawing shows still arrows instead (below).
-    const flowing = !reduceMotion.matches;
-    if (flowing) {
-      ctx.save();
-      ctx.clip(below);
-      ctx.strokeStyle = env.color("--xp-fresh-ink");
-      ctx.globalAlpha = 0.6;
-      ctx.lineWidth = 1.3;
-      ctx.lineCap = "round";
-      ctx.setLineDash([5, 9]);
-      STREAKS.forEach((f, i) => {
-        const end = xs - 4;
-        ctx.lineDashOffset = -env.time * 14 - i * 5;
-        ctx.stroke(shape([[0, wt0 + f * (yI0 - wt0)], [end, wt(end) + f * (yI(end) - wt(end))]], false));
-      });
-      ctx.setLineDash([]);
-      ctx.restore();
-      if (deepest > 0.15) { // Grains of salt leave the pockets with the flow and fade.
-        ctx.fillStyle = env.color("--xp-salt");
-        ctx.strokeStyle = env.color("--xp-salt-edge");
-        ctx.lineWidth = 0.6;
-        cols.forEach((col, i) => {
-          if (i % 7 || eaten(col, level) < 0.2) return;
-          for (let k = 0; k < 2; k++) {
-            const phase = (env.time * 0.35 + k * 0.5 + i * 0.137) % 1;
-            const x = col.x + phase * 30, y = Y(saltTop(col.x)) + thickPx * 0.3 - phase * 6;
-            ctx.globalAlpha = (1 - phase) * 0.9;
-            ctx.beginPath(); ctx.arc(x, y, 1.6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-          }
-        });
-        ctx.globalAlpha = 1;
-      }
-    }
-
     ctx.save();
     ctx.clip(above);
     ctx.fillStyle = env.gradient("lake", 0, Y(-395), 0, H, [[0, "--xp-lake"], [1, "--xp-lake-deep"]]);
@@ -302,9 +310,6 @@ function create(spec) {
     }
     ctx.restore();
     ctx.drawImage(env.layer("top", [0, 0, W, H], (c) => {
-      c.strokeStyle = env.color("--xp-salt-edge");
-      c.lineWidth = 1.2;
-      c.stroke(salt);
       c.save();
       c.translate(0, 2);
       c.globalAlpha = 0.5;
