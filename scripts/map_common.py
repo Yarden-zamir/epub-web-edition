@@ -8,7 +8,6 @@ import hashlib
 import io
 import json
 import math
-import textwrap
 import time
 import urllib.error
 import urllib.parse
@@ -30,21 +29,25 @@ DEM_URL = {90: "https://copernicus-dem-90m.s3.amazonaws.com/Copernicus_DSM_COG_3
            30: "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_{tile}_DEM/Copernicus_DSM_COG_10_{tile}_DEM.tif"}
 DEM_PIXELS_PER_DEGREE = {90: 1200, 30: 3600}
 
-OSM_CREDIT = "© OpenStreetMap contributors (ODbL)"
-NE_CREDIT = "Natural Earth (public domain)"
-OTM_CREDIT = "Map style: © OpenTopoMap (CC BY-SA)"
+OSM_CREDIT = "© OpenStreetMap contributors (ODbL)"  # In source notes of the specs, not shown to readers.
+# Minimal credits; the clauses behind each one are quoted in content-data/attribution.md.
+OSM_IMAGE_CREDIT = "© OpenStreetMap"  # Shortest accepted form (OSMF Attribution Guidelines, "Attribution text").
+OSM_COPYRIGHT_URL = "https://www.openstreetmap.org/copyright"
+WEB_ATTRIBUTION = ["Map data: © OpenStreetMap contributors, SRTM", "Map display: © OpenTopoMap (CC-BY-SA)"]
+WEB_ATTRIBUTION_LINKS = {"OpenStreetMap": OSM_COPYRIGHT_URL, "OpenTopoMap": "https://opentopomap.org",
+                         "CC-BY-SA": "https://creativecommons.org/licenses/by-sa/3.0/"}
+# Copernicus DEM licence, Article 6(b): notice for adapted or modified data, word for word (GLO-90 writes "™").
+DEM_NOTICE = {
+    90: ("produced using Copernicus WorldDEM™-90 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 "
+         "provided under COPERNICUS by the European Union and ESA; all rights reserved"),
+    30: ("produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 "
+         "provided under COPERNICUS by the European Union and ESA; all rights reserved"),
+}
 
 
-def dem_credit(*resolutions: int) -> str:
-    """Attribution that the Copernicus DEM licence (Article 6) asks for on modified data."""
-    products = " and ".join(f"WorldDEM-{r}" for r in resolutions)
-    return (f"Relief produced using Copernicus {products} © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH "
-            "2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved")
-
-
-def credit_text(*parts: str, width: int) -> str:
-    """Credit lines for the corner of a static map, wrapped to `width` characters."""
-    return "\n".join(textwrap.fill(part, width) for part in parts)
+def image_credit(fig, x: float = 0.008, y: float = 0.008, ha: str = "left") -> None:
+    """The only text credit inside a static map image: a small "© OpenStreetMap" in a corner."""
+    fig.text(x, y, OSM_IMAGE_CREDIT, fontsize=7.5, color="#3d3730", ha=ha, va="bottom", path_effects=halo(2.5))
 
 
 def download(url: str, path: Path) -> bytes:

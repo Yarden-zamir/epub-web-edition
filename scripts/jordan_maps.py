@@ -18,7 +18,7 @@ Part C Final Report vol. 1 (2008), section 3.1 segment B and section 3.3.3.5,
 https://www.dfc.gov/sites/default/files/esia/2008/ammanwater/Part%20C%20-Final%20Report-Vol1.pdf
 The alternative routes ALT-1 to ALT-4 in the printed image have no open source, so the view leaves them out.
 
-Data: Copernicus DEM GLO-90 (map_common.dem_credit), OpenStreetMap via Overpass (ODbL),
+Data: Copernicus DEM GLO-90 (notice in map_common.DEM_NOTICE), OpenStreetMap via Overpass (ODbL),
 Natural Earth v5.1.2 borders (public domain).
 
 Usage: uv run scripts/jordan_maps.py
@@ -36,8 +36,9 @@ import numpy as np  # noqa: E402
 from matplotlib.patches import Circle, FancyArrowPatch  # noqa: E402
 from matplotlib.path import Path as PolyPath  # noqa: E402
 
-from map_common import (DEM_PIXELS_PER_DEGREE, NE_CREDIT, OSM_CREDIT, OTM_CREDIT, ROOT, credit_text, dem,  # noqa: E402
-                        dem_credit, halo, hebrew_fonts, hillshade, km_per_degree_lon, natural_earth, osm_element,
+from map_common import (DEM_NOTICE, DEM_PIXELS_PER_DEGREE, OSM_CREDIT, ROOT, WEB_ATTRIBUTION,  # noqa: E402
+                        WEB_ATTRIBUTION_LINKS, dem, halo, hebrew_fonts, hillshade, image_credit, km_per_degree_lon,
+                        natural_earth, osm_element,
                         osm_line, osm_point, osm_rings, overpass, relief, rings, save_jpeg, write_spec)
 
 MAP_OUT = ROOT / "replacements" / "p301-x1169-open-map.jpg"
@@ -216,8 +217,7 @@ def conveyance_map(font, bold, coords, water, countries) -> dict:
     lg.text(0.96, 0.25, "מפה חדשה שצוירה למהדורה זו לפי הטקסט בפרק.\nאינה האיור של ביין וחובריו (2020).\n"
             "התוואי ומיקום המתקן אינם מדויקים.", fontproperties=font, fontsize=8.5, color=INK, ha="right", va="center",
             linespacing=1.35)
-    fig.text(0.98, 0.006, credit_text(f"{OSM_CREDIT} · Borders: {NE_CREDIT}", dem_credit(90) + ".", width=88),
-             fontsize=5.4, color="#4d463e", ha="right", va="bottom", linespacing=1.3, path_effects=halo(2))
+    image_credit(fig, x=0.985, ha="right")  # Full credits: edition note (book.toml) and content-data/attribution.md.
     save_jpeg(fig, MAP_OUT)
     plt.close(fig)
 
@@ -243,11 +243,12 @@ def conveyance_map(font, bold, coords, water, countries) -> dict:
                    "source": schematic.format("a36-p045, a36-p048, fig-a36-09 caption")}],
         "areas": [{"name": "מתקן התפלה, מיקום משוער", "coords": circle,
                    "source": "The book says only 'near the Dead Sea' (a36-p045); zone drawn for this edition"}],
-        "attribution": [OSM_CREDIT, OTM_CREDIT],
+        "attribution": WEB_ATTRIBUTION,
+        "attribution_links": WEB_ATTRIBUTION_LINKS,
         "note": ("New schematic map drawn for this edition from the text of chapter a36. It is not the figure of Bein et al. "
                  "(2020), which stays withheld. Quantities are phase A from the printed caption. The static EPUB image "
                  "(replacements/p301-x1169-open-map.jpg, scripts/jordan_maps.py) adds Copernicus DEM relief and "
-                 "Natural Earth borders. " + dem_credit(90) + "."),
+                 "Natural Earth borders. " + "Relief notice: " + DEM_NOTICE[90] + "."),
     }
 
 
@@ -386,8 +387,7 @@ def plateau_view(font, bold, coords, water, roads) -> dict:
     box = {"facecolor": "white", "alpha": 0.85, "edgecolor": "none", "boxstyle": "round,pad=0.35"}
     out.text(0.985, 0.97, "מבט חדש שצויר למהדורה זו, לכיוון צפון־מזרח. הגבהים מוגדלים פי 2.", fontproperties=font,
              fontsize=9, color=INK, ha="right", va="top", bbox=box)
-    out.text(0.014, 0.014, credit_text(f"Roads: {OSM_CREDIT}", dem_credit(90) + ".", width=110), fontsize=5.2,
-             color="#3d3730", ha="left", va="bottom", linespacing=1.3, bbox=box)
+    image_credit(out, x=0.012, y=0.012)  # Full credits: edition note (book.toml) and content-data/attribution.md.
     save_jpeg(out, VIEW_OUT)
     plt.close(out)
 
@@ -434,12 +434,13 @@ def plateau_view(font, bold, coords, water, roads) -> dict:
                    for c in web_line(road_lines(roads, "15"), web_north)]
                   + [{"name": "דרך המלך (כביש 35)", "coords": c, "source": f"OSM ways tagged ref=35 ({OSM_CREDIT})"}
                      for c in web_line(road_lines(roads, "35"), north)]),
-        "attribution": [OSM_CREDIT, OTM_CREDIT],
+        "attribution": WEB_ATTRIBUTION,
+        "attribution_links": WEB_ATTRIBUTION_LINKS,
         "note": ("New view drawn for this edition; the printed Google Earth image stays withheld. Highways from OSM; "
                  "the King's Highway is shown only in the area of the printed view. The printed alternative routes "
                  "ALT-1 to ALT-4 have no open source and are not shown. Amman is the end of the Desert Highway line "
                  f"(OSM node {PLACES['amman'][0]}). The static EPUB image (replacements/p302-x1173-open-view.jpg, "
-                 "scripts/jordan_maps.py) is a perspective relief view. " + dem_credit(90) + "."),
+                 "scripts/jordan_maps.py) is a perspective relief view. " + "Relief notice: " + DEM_NOTICE[90] + "."),
     }
 
 

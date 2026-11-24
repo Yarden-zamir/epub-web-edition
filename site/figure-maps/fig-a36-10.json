@@ -8801,8 +8801,13 @@
   }
  ],
  "attribution": [
-  "© OpenStreetMap contributors (ODbL)",
-  "Map style: © OpenTopoMap (CC BY-SA)"
+  "Map data: © OpenStreetMap contributors, SRTM",
+  "Map display: © OpenTopoMap (CC-BY-SA)"
  ],
- "note": "New view drawn for this edition; the printed Google Earth image stays withheld. Highways from OSM; the King's Highway is shown only in the area of the printed view. The printed alternative routes ALT-1 to ALT-4 have no open source and are not shown. Amman is the end of the Desert Highway line (OSM node 1643504896). The static EPUB image (replacements/p302-x1173-open-view.jpg, scripts/jordan_maps.py) is a perspective relief view. Relief produced using Copernicus WorldDEM-90 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved."
+ "attribution_links": {
+  "OpenStreetMap": "https://www.openstreetmap.org/copyright",
+  "OpenTopoMap": "https://opentopomap.org",
+  "CC-BY-SA": "https://creativecommons.org/licenses/by-sa/3.0/"
+ },
+ "note": "New view drawn for this edition; the printed Google Earth image stays withheld. Highways from OSM; the King's Highway is shown only in the area of the printed view. The printed alternative routes ALT-1 to ALT-4 have no open source and are not shown. Amman is the end of the Desert Highway line (OSM node 1643504896). The static EPUB image (replacements/p302-x1173-open-view.jpg, scripts/jordan_maps.py) is a perspective relief view. Relief notice: produced using Copernicus WorldDEM™-90 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved."
 }

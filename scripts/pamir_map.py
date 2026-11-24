@@ -9,7 +9,7 @@ It shows the places that chapter a10 names: Dushanbe (a10-p007), the Jirgatal ai
 at Achik-Tash (a10-p010), the first camp at 4,400 m (a10-p016, a10-p018), the Frying Pan (a10-p002) and Lenin Peak.
 
 Data:
-- Relief: Copernicus DEM GLO-90 (overview) and GLO-30 (detail), free licence with attribution (map_common.dem_credit).
+- Relief: Copernicus DEM GLO-90 (overview) and GLO-30 (detail), free licence; notice in map_common.DEM_NOTICE.
 - Places, camps, glaciers, rivers in the detail: OpenStreetMap via Overpass, ODbL. Element IDs in PLACES.
 - Borders, rivers and lakes in the overview: Natural Earth v5.1.2, public domain.
 - Range and valley labels: placed by hand along the relief; Wikidata Q1206886 (Trans-Alay Range) and Q2282164 (Alay Valley)
@@ -27,7 +27,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 from matplotlib.patches import ConnectionPatch, Rectangle  # noqa: E402
 
-from map_common import (DEM_PIXELS_PER_DEGREE, NE_CREDIT, credit_text, OSM_CREDIT, OTM_CREDIT, ROOT, dem, dem_credit, halo, hebrew_fonts,  # noqa: E402
+from map_common import (DEM_NOTICE, DEM_PIXELS_PER_DEGREE, OSM_CREDIT, ROOT, WEB_ATTRIBUTION, WEB_ATTRIBUTION_LINKS,  # noqa: E402
+                        dem, halo, hebrew_fonts, image_credit,
                         hillshade, km_per_degree_lon, natural_earth, osm_element, osm_line, osm_point, osm_rings,
                         overpass, relief, rings, save_jpeg, write_spec)
 
@@ -209,7 +210,7 @@ def main() -> None:
     legend.plot([0.86, 0.97], [y, y], color="#5c5047", linewidth=1.1, dashes=(5, 2))
     legend.text(0.83, y, "גבול מדינה", fontproperties=font, fontsize=10, color=INK, ha="right", va="center")
 
-    loc = fig.add_axes((0.03, 158 / height_px, 0.3, 200 / height_px))
+    loc = fig.add_axes((0.03, 70 / height_px, 0.3, 260 / height_px))
     lw, le, ls, ln = 58.0, 81.0, 34.5, 45.0
     loc.set_xlim(lw, le)
     loc.set_ylim(ls, ln)
@@ -225,9 +226,7 @@ def main() -> None:
     loc.add_patch(Rectangle((MAIN[0], MAIN[2]), MAIN[1] - MAIN[0], MAIN[3] - MAIN[2], fill=False, edgecolor=ACCENT, linewidth=1.5))
     loc.text(0.98, 0.04, "מרכז אסיה", transform=loc.transAxes, fontproperties=font, fontsize=8, color=INK, ha="right", va="bottom")
 
-    credits = credit_text("New map drawn for this edition.", f"Places, camps, glaciers: {OSM_CREDIT}.",
-                          f"Borders, rivers: {NE_CREDIT}.", dem_credit(90, 30) + ".", width=62)
-    fig.text(0.012, 0.008, credits, fontsize=5.6, color="#4d463e", ha="left", va="bottom", linespacing=1.35)
+    image_credit(fig)  # Full credits: edition note (book.toml) and content-data/attribution.md.
     save_jpeg(fig, OUT)
 
     markers = []
@@ -247,10 +246,12 @@ def main() -> None:
                    "source": "Route as told in a10-p008; straight line between the OSM points, not the flight path"},
                   {"name": "מסוק מג'ירגיטל למחנה הבסיס (קו ישר, סכמטי)", "coords": [[round(j_lat, 6), round(j_lon, 6)], [round(b_lat, 6), round(b_lon, 6)]],
                    "source": "Route as told in a10-p008 and a10-p010; straight line between the OSM points"}],
-        "attribution": [OSM_CREDIT, OTM_CREDIT],
+        "attribution": WEB_ATTRIBUTION,
+        "attribution_links": WEB_ATTRIBUTION_LINKS,
         "note": ("Places from OpenStreetMap (element IDs in each marker source). The book gives heights that differ from "
                  "OSM; the map shows no heights. The static EPUB image (replacements/p066-x251-open-map.jpg, "
-                 "scripts/pamir_map.py) adds Copernicus DEM relief and Natural Earth borders. " + dem_credit(90, 30) + "."),
+                 "scripts/pamir_map.py) adds Copernicus DEM relief and Natural Earth borders. Relief notice: "
+                 + DEM_NOTICE[90] + "; " + DEM_NOTICE[30] + "."),
     })
 
 

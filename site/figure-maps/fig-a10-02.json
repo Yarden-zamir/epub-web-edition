@@ -90,8 +90,13 @@
   }
  ],
  "attribution": [
-  "© OpenStreetMap contributors (ODbL)",
-  "Map style: © OpenTopoMap (CC BY-SA)"
+  "Map data: © OpenStreetMap contributors, SRTM",
+  "Map display: © OpenTopoMap (CC-BY-SA)"
  ],
- "note": "Places from OpenStreetMap (element IDs in each marker source). The book gives heights that differ from OSM; the map shows no heights. The static EPUB image (replacements/p066-x251-open-map.jpg, scripts/pamir_map.py) adds Copernicus DEM relief and Natural Earth borders. Relief produced using Copernicus WorldDEM-90 and WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved."
+ "attribution_links": {
+  "OpenStreetMap": "https://www.openstreetmap.org/copyright",
+  "OpenTopoMap": "https://opentopomap.org",
+  "CC-BY-SA": "https://creativecommons.org/licenses/by-sa/3.0/"
+ },
+ "note": "Places from OpenStreetMap (element IDs in each marker source). The book gives heights that differ from OSM; the map shows no heights. The static EPUB image (replacements/p066-x251-open-map.jpg, scripts/pamir_map.py) adds Copernicus DEM relief and Natural Earth borders. Relief notice: produced using Copernicus WorldDEM™-90 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved; produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved."
 }
