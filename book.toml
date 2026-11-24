@@ -9,6 +9,7 @@ decorative = ["p006-x17", "p007-x21"]
 # Wrong code points in the PDF text layer, mapped to what the print shows.
 # U+0007: InDesign "indent to here" after note and source numbers (130 cases). Prints as a space.
 # U+001A: a zero-width glyph under ayin in "מעין" (PDF pages 210, 211). The render shows a shva.
+# U+FFFD: one FrankRuhlMFBold glyph without a character code (PDF page 70, "הקַשָרים"); the only one in the PDF. The render shows a patach under ק.
 # Note references that print as full-size digits. Each one is restored as a reference and logged.
 [[note_ref_fix]]
 page = 23
@@ -28,6 +29,7 @@ reason = "Print-only reading note for the two-page spreads. The EPUB puts the En
 [char_map]
 "\u0007" = " "
 "\u001a" = "\u05b0"
+"\ufffd" = "\u05b7"
 
 [meta]
 # As printed on the title page (PDF page 5) and the cover (PDF page 1).
@@ -371,7 +373,7 @@ fonts = "fonts"      # Noto Sans Hebrew (SIL OFL) as the bundled fallback.
 "p301-x1169" = "מפת לוויין של האזור מים סוף עד ים המלח, עם קו המוביל המתוכנן לאורך הערבה בצד הירדני, מתקן התפלה מסומן בעיגול אדום, ומקרא של מי ים, מי ים ורכז, ומים מותפלים, וקנה מידה של 100 ק\"מ."
 "p302-x1173" = "מבט אוויר תלת־ממדי בסגנון Google Earth על רמת המדבר הירדני, עם קווי תוואים צבעוניים, הכיתובים Desert Highway ו־King's Highway, וחץ אדום לכיוון עמאן."
 "p304-x1179" = "תרשים מתוך הדוח הסופי של תוכנית המחקר להולכת מים מים סוף לים המלח (Final Report, Red Sea – Dead Sea Water Conveyance Study Program): לפי כמות המים המוזרמת, מ־0 עד 1,000 מלמ\"ש בשנה, שינויים צפויים במפלס, בשכבתיות, בפריחה ביולוגית (ציאנובקטריה ודונליאלה), בהלבנת גבס, בבולענים, במי התהום ובתעשייה, עם קווים אנכיים ב־400 וב־700."
-"p305-x1185-masked" = "גרף פיזור של צפיפות מי ים המלח (גרם לסמ\"ק, 170 עד 174) לפי עומק (0 עד מינוס 350 מטר): קו אופקי אדום בעומק של כ־50 מטר מפריד בין גוף מים עליון – הניזון, מהגגר, מושפע מתנאים מטאורולוגיים ומכיל חיים – לבין גוף מים תחתון – מלוח, צפוף, מבודד וחסר חמצן."
+"p305-x1185-masked" = "גרף פיזור של צפיפות מי ים המלח (גרם לסמ\"ק, 170 עד 174) לפי עומק (0 עד מינוס 350 מטר): קו אופקי אדום בעומק של כ־65 מטר מפריד בין גוף מים עליון – הניזון, מהגגר, מושפע מתנאים מטאורולוגיים ומכיל חיים – לבין גוף מים תחתון – מלוח, צפוף, מבודד וחסר חמצן."
 "p121-x482" = "הדמיה של חתך כביש לחוף ים המלח: מתחת לאספלט שכבת אגרגטים, רשת גיאוגריד, שכבת חצץ מהודקת ויריעות גיאוטכניות, והבולענים שנפערו מתחת נשארים מכוסים בלי שהכביש קורס."
 "p114-x437-render" = "תצלום אוויר של חוף ים המלח ובו שורה של בולענים לאורך קו ישר, עם הכיתוב שעל התמונה: השפעת העתק גיאולוגי סמוי על התפתחות ליניארית של אתר שלם."
 "p078-qr1" = "קוד QR לסרט שצולם בידי צוות המחפשים, חלק 3."
@@ -555,3 +557,73 @@ fonts = "fonts"      # Noto Sans Hebrew (SIL OFL) as the bundled fallback.
 "p078-qr4" = "https://www.youtube.com/watch?v=9BM5qcA22kY&t=672s"
 "p166-qr1" = "https://files.ybz.org.il/periodicals/Cathedra/101/Article_101.2.pdf?_gl=1*q194nn*_gcl_au*MzM2MzA3NjcuMTc3NTQ5NzA2Ng"
 "p234-qr1" = "https://www.youtube.com/watch?v=yfMGHdqRdJs&t=7s"
+
+# Public (release) edition only: uv run tools/ingest_pdf.py CONTENT_DIR --release.
+# The complete edition keeps every printed image. Evidence for each entry: clearance record of 2026-11-24.
+# Images that stay carry an edition credit with the source record and the licence. All of them are crops of the source.
+
+[[release.change]]
+image = "p066-x251"
+action = "replace"
+file = "replacements/p066-x251-open-map.png"
+alt = "מפה של מרכז אסיה: טג'יקיסטן מודגשת במרכז, קירגיזסטן מצפון ואפגניסטן מדרום, הערים דושנבה, טשקנט וקאבול, ומשולש אדום על פסגת לנין ברכס פאמיר, בגבול טג'יקיסטן וקירגיזסטן."
+note = "מפה חלופית למהדורה זו, משורטטת מנתוני Natural Earth (נחלת הכלל). המפה המודפסת אינה נכללת עד לבירור זכויותיה."
+reason = "Printed map looks like a Google Maps screenshot without attribution; Google allows only embeds, links and APIs on the web. Replacement drawn by scripts/pamir_map.py."
+
+[[release.change]]
+image = "p183-x717"
+action = "withhold"
+note = "התמונה (כלי רוקחים עם הכיתוב Theriaca Reformata) הוסרה זמנית ממהדורה זו, עד לבירור זכויותיה."
+reason = "No source found among 411 Commons candidates."
+
+[[release.change]]
+image = "p301-x1169"
+action = "withhold"
+note = "המפה (ביין וחובריו, 2020) הוסרה זמנית ממהדורה זו, עד לקבלת רשות מבעלי הזכויות."
+reason = "Figure from a publication on a satellite base map; neither source is cleared."
+
+[[release.change]]
+image = "p302-x1173"
+action = "withhold"
+note = "תצלום האוויר (Google Earth) הוסר זמנית ממהדורה זו, עד להשלמת הייחוס הנדרש."
+reason = "Google Earth view shows only 'Google'; Google requires the imagery providers too. Pending decision."
+
+[[release.credit]]
+image = "p034-x147"
+text = "מקור: זאב שטיין, פיקיויקי. רישיון CC BY 2.5 IL. התמונה חתוכה."
+links = [{ label = "רשומת המקור", url = "https://www.pikiwiki.org.il/image/view/81831" },
+         { label = "הרישיון", url = "https://creativecommons.org/licenses/by/2.5/il/" }]
+
+[[release.credit]]
+image = "p035-x151"
+text = "מקור: מיכל כוכבא, פיקיויקי, דרך ויקישיתוף. רישיון CC BY 2.5. התמונה חתוכה."
+links = [{ label = "רשומת המקור", url = "https://commons.wikimedia.org/wiki/File:PikiWiki_Israel_37805_Sinkhole_at_The_Dead_Sea.jpg" },
+         { label = "הרישיון", url = "https://creativecommons.org/licenses/by/2.5/" }]
+
+[[release.credit]]
+image = "p049-x201"
+text = "המפה: Jesse Ames Spencer, 1848, מוקטנת ממפת לוטננט לינץ'; חריטה: N. Orr. פורסמה ב־1852 בספרו של ספנסר The East (George P. Putnam). הספרייה הלאומית, אוסף ערן לאור. נחלת הכלל. התמונה חתוכה."
+links = [{ label = "רשומת המקור", url = "https://www.nli.org.il/en/maps/NNL_ALEPH990039420770205171/NLI" }]
+
+[[release.credit]]
+image = "p183-x713"
+text = "כלי לתריאק, איטליה, 1641. Wellcome Collection, רישיון CC BY 4.0. התמונה חתוכה."
+links = [{ label = "רשומת המקור", url = "https://commons.wikimedia.org/wiki/File:Albarello_vase_for_theriac,_Italy,_1641_Wellcome_L0057175.jpg" },
+         { label = "הרישיון", url = "https://creativecommons.org/licenses/by/4.0/" }]
+
+[[release.credit]]
+image = "p183-x721"
+text = "צילום: Jebulon, ויקישיתוף. נחלת הכלל. התמונה חתוכה."
+links = [{ label = "רשומת המקור", url = "https://commons.wikimedia.org/wiki/File:Th%C3%A9riaque1.jpg" }]
+
+[[release.credit]]
+image = "p270-x1066"
+text = "צילום: Shayshal2, ויקישיתוף. רישיון CC BY-SA 4.0. התמונה חתוכה, והגרסה החתוכה מופצת באותו רישיון."
+links = [{ label = "רשומת המקור", url = "https://commons.wikimedia.org/wiki/File:Lisan_formation_in_Pratzim_river_3.jpg" },
+         { label = "הרישיון", url = "https://creativecommons.org/licenses/by-sa/4.0/" }]
+
+[[release.credit]]
+image = "p275-x1087"
+text = "צילום: CSIRO. רישיון CC BY 3.0. התמונה חתוכה."
+links = [{ label = "רשומת המקור", url = "https://www.scienceimage.csiro.au/image/7595/" },
+         { label = "הרישיון", url = "https://creativecommons.org/licenses/by/3.0/" }]
