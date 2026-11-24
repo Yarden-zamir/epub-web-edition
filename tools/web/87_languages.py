@@ -80,6 +80,22 @@ def inner(el: ET.Element) -> str:
     return html.escape(el.text or "", quote=False) + "".join(ET.tostring(c, encoding="unicode", method="html") for c in el)
 
 
+def copy_rows(original: ET.Element, wrapper: ET.Element, where: str) -> None:
+    """A translated correction († mark and the corrected run before it) takes the errata row of the book's mark with
+    the same ID (tools/web/35_errata.py sets data-row on the book's marks). site/features/75-errata.js needs it."""
+    rows = {el.get("id"): el.get("data-row") for el in original.iter() if el.get("id") and el.get("data-row")}
+    for parent in wrapper.iter():
+        children = list(parent)
+        for i, el in enumerate(children):
+            if "edition-mark" not in (el.get("class") or "").split():
+                continue
+            if (row := rows.get(el.get("id"))) is None:
+                raise BookError(f"{where}: correction mark #{el.get('id')} has no errata row in the book text")
+            el.set("data-row", row)
+            if i and "edition-correction" in (children[i - 1].get("class") or "").split():
+                children[i - 1].set("data-row", row)
+
+
 def ids_in(el: ET.Element) -> list[str]:
     return [d.get("id") for d in el.iter() if d is not el and d.get("id")]
 
@@ -101,6 +117,7 @@ def values(site: Site) -> dict[str, str]:
             original = page[el_id]
             wrapper = parse(fragment, f"{file}: {el_id}")
             convert(site, wrapper, site.conv.ids[el_id])
+            copy_rows(original, wrapper, f"{file}: {el_id}")
             if original.tag == "figure":
                 figures[el_id] = figure_parts(file, el_id, original, wrapper)
                 continue
