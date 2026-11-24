@@ -1,5 +1,5 @@
 # /// script
-# requires-python = ">=3.13"
+# requires-python = ">=3.15"
 # dependencies = ["pymupdf==1.28.2", "python-bidi==0.6.12"]
 # ///
 """Check reading order line by line: the logical text, displayed with the Unicode bidi algorithm,

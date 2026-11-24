@@ -1,5 +1,5 @@
 # /// script
-# requires-python = ">=3.13"
+# requires-python = ">=3.15"
 # dependencies = ["pillow==13.0.0"]
 # ///
 """Generate wholly synthetic placeholder images and record their checksums in inventory/assets.csv.

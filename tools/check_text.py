@@ -1,6 +1,10 @@
+# /// script
+# requires-python = ">=3.15"
+# dependencies = []
+# ///
 """Find direction defects in the EPUB text: reversed Hebrew words and reversed or unbalanced brackets.
 
-Usage: python3 tools/check_text.py CONTENT_DIR
+Usage: uv run tools/check_text.py CONTENT_DIR
 Exits 1 when it finds a defect. Prints each one with its element ID.
 """
 

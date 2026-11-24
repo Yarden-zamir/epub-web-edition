@@ -1,3 +1,7 @@
+# /// script
+# requires-python = ">=3.15"
+# dependencies = []
+# ///
 """Pack an EPUB source tree into a byte-reproducible .epub file.
 
 Usage: uv run tools/build_epub.py [SRC_DIR] [OUT_EPUB]

@@ -1,14 +1,19 @@
 # /// script
-# requires-python = ">=3.13"
+# requires-python = ">=3.15"
 # dependencies = ["pymupdf==1.28.2", "python-bidi==0.6.12"]
 # ///
 """Convert a print PDF into an EPUB source tree and a page inventory.
 
 Usage: uv run tools/ingest_pdf.py CONTENT_DIR
+       uv run tools/ingest_pdf.py CONTENT_DIR --release
        uv run tools/ingest_pdf.py CONTENT_DIR --print-units FIRST-LAST   (contents PDF pages)
 
 CONTENT_DIR holds book.toml. The script writes CONTENT_DIR/epub-src/ and
 CONTENT_DIR/inventory/{pages,assets,issues}.csv. All book content stays in CONTENT_DIR.
+
+--release builds the public edition into CONTENT_DIR/epub-src-release/ and CONTENT_DIR/inventory-release/.
+It applies book.toml [release]: images withheld or replaced until their rights are clear, and edition credits.
+The complete edition (without --release) never changes for [release] entries.
 
 Rules:
 - Text comes only from the PDF text layer. The script never invents text.
@@ -71,6 +76,25 @@ class Line:
     clusters: list[Cluster] = field(default_factory=list)
 
 
+@dataclass(frozen=True)
+class ReleaseChange:
+    """book.toml [[release.change]]: an image that the public edition withholds or replaces."""
+    image: str  # Image stem as printed in figures.csv, for example "p066-x251".
+    action: Literal["withhold", "replace"]
+    note: str  # Edition note in the reading text and under the facsimile page.
+    reason: str  # For the issue log only.
+    file: str = ""  # replace: replacement image, relative to CONTENT_DIR.
+    alt: str = ""  # replace: alt text of the replacement image.
+
+
+@dataclass(frozen=True)
+class ReleaseCredit:
+    """book.toml [[release.credit]]: an edition credit added after the printed caption."""
+    image: str
+    text: str
+    links: tuple[tuple[str, str], ...]  # (label, https URL) pairs, for example the source record and the licence.
+
+
 @dataclass
 class Figure:
     page: int
@@ -80,6 +104,7 @@ class Figure:
     height: int
     xref: int
     captions: list[Line] = field(default_factory=list)
+    change: ReleaseChange | None = None  # Set only in a release build.
 
 
 @dataclass
@@ -387,10 +412,51 @@ def merge_fragments(frags: list[Line], max_gap: float | None = 15.0) -> list[Lin
     return merged
 
 
+def with_edition_span(caption: str, cls: str, inner: str) -> str:
+    """Add an edition span after the printed caption, or make a caption when print has none."""
+    span = f'<span class="{cls}">{inner}</span>'
+    return caption.replace("</figcaption>", span + "</figcaption>") if caption else f"<figcaption>{span}</figcaption>"
+
+
+def credit_html(credit: ReleaseCredit) -> str:
+    links = " · ".join(f'<a href="{html.escape(url)}">{html.escape(label)}</a>' for label, url in credit.links)
+    return html.escape(credit.text) + (f" {links}" if links else "")
+
+
+def load_release(cfg: dict) -> tuple[dict[str, ReleaseChange], dict[str, ReleaseCredit]]:
+    rel = cfg.get("release", {})
+    changes: dict[str, ReleaseChange] = {}
+    for c in rel.get("change", []):
+        change = ReleaseChange(**c)
+        if change.action not in ("withhold", "replace"):
+            raise IngestError(f"[[release.change]] {change.image}: unknown action {change.action!r}")
+        if (change.action == "replace") != bool(change.file and change.alt):
+            raise IngestError(f"[[release.change]] {change.image}: 'replace' needs file and alt; 'withhold' takes neither")
+        if change.image in changes:
+            raise IngestError(f"[[release.change]] {change.image}: listed twice")
+        changes[change.image] = change
+    credits: dict[str, ReleaseCredit] = {}
+    for c in rel.get("credit", []):
+        links = tuple((link["label"], link["url"]) for link in c.get("links", []))
+        if not all(url.startswith("https://") for _, url in links):
+            raise IngestError(f"[[release.credit]] {c['image']}: links must be https URLs")
+        if c["image"] in credits or c["image"] in changes:
+            raise IngestError(f"[[release.credit]] {c['image']}: listed twice, or also withheld or replaced")
+        credits[c["image"]] = ReleaseCredit(c["image"], c["text"], links)
+    return changes, credits
+
+
 class Ingest:
-    def __init__(self, content: Path) -> None:
+    def __init__(self, content: Path, release: bool = False) -> None:
         self.content = content
+        self.release = release
         self.cfg = tomllib.loads((content / "book.toml").read_text(encoding="utf-8"))
+        changes, credits = load_release(self.cfg)
+        self.changes = changes if release else {}
+        self.credits = credits if release else {}
+        self.release_used: set[str] = set()
+        # PDF page -> (image box in points, edition note): regions that the facsimile page masks.
+        self.facsimile_masks: dict[int, list[tuple[tuple[float, float, float, float], str]]] = {}
         pdf = Path(str(self.cfg["pdf"])).expanduser()
         digest = hashlib.sha256(pdf.read_bytes()).hexdigest()
         if digest != self.cfg["pdf_sha256"]:
@@ -403,7 +469,8 @@ class Ingest:
         for key, url in self.cfg.get("qr_links", {}).items():
             if not url.startswith(("https://", "http://")):
                 raise IngestError(f"book.toml [qr_links] {key}: {url[:40]!r} is not a URL (a misplaced entry?)")
-        self.out = content / "epub-src"
+        self.out = content / ("epub-src-release" if release else "epub-src")
+        self.inventory = content / ("inventory-release" if release else "inventory")
         self.issues: list[dict[str, str]] = []
         self.assets: list[dict[str, str]] = []
         self.seen_xrefs: dict[int, str] = {}
@@ -462,7 +529,7 @@ class Ingest:
                     ln.text = ln.text.replace(tf["find"], tf["replace"])
                     ln.html = ln.html.replace(html.escape(tf["find"], quote=False), html.escape(tf["replace"], quote=False))
                     self.text_fixes_used.add((pno, tf["find"]))
-                    self.issue(pno, "intentional-change", f"Bracket order {tf['find']!r} -> {tf['replace']!r}, checked against print")
+                    self.issue(pno, "intentional-change", f"Text fix {tf['find']!r} -> {tf['replace']!r}: {tf['reason']}")
             fix = next((f for f in self.cfg.get("note_ref_fix", []) if f["page"] == pno and f["contains"] in ln.text), None)
             if fix:
                 num = str(fix["number"])
@@ -508,6 +575,8 @@ class Ingest:
                             c = self.char_map[c]
                         if ord(c) < 32:
                             raise IngestError(f"PDF page {pno}: control character U+{ord(c):04X}; add it to [char_map] in book.toml")
+                        if c == "\ufffd":
+                            raise IngestError(f"PDF page {pno}: a glyph without a character code (U+FFFD); check the print and add it to [char_map] in book.toml")
                         if unicodedata.combining(c) and clusters:
                             clusters[-1].text += c  # Points stay with their letter.
                             continue
@@ -546,6 +615,9 @@ class Ingest:
             stem = f"p{pno:03d}-x{xref}"
             if stem in self.cfg.get("decorative", []):
                 self.issue(pno, "info", f"{stem}: decorative per book.toml; not in the EPUB")
+                continue
+            if change := self.changes.get(stem):
+                figs.append(self.release_figure(pno, bbox, xref, change))
                 continue
             if xref in self.seen_xrefs:
                 self.issue(pno, "reuse", f"Image xref {xref} repeats; first file {self.seen_xrefs[xref]}")
@@ -615,6 +687,21 @@ class Ingest:
             self.asset_row(name, data, pno, "vector", pix.width, pix.height, "vector QR code rendered at 300 dpi")
             figs.append(Figure(pno, tuple(box), name, pix.width, pix.height, 0))
         return figs
+
+    def release_figure(self, pno: int, bbox: tuple[float, float, float, float], xref: int, change: ReleaseChange) -> Figure:
+        """A withheld image writes no file. A replaced image writes the replacement file instead of the PDF image."""
+        self.release_used.add(change.image)
+        self.facsimile_masks.setdefault(pno, []).append((bbox, change.note))
+        self.issue(pno, "intentional-change", f"Release: {change.image} {change.action}: {change.reason}")
+        if change.action == "withhold":
+            return Figure(pno, bbox, "", 0, 0, xref, change=change)
+        src = self.content / change.file
+        data = src.read_bytes()
+        pix = pymupdf.Pixmap(str(src))
+        name = f"{change.image}-replacement{src.suffix}"
+        (self.out / "OEBPS" / "images" / name).write_bytes(data)
+        self.asset_row(name, data, pno, str(xref), pix.width, pix.height, f"release replacement from {change.file}")
+        return Figure(pno, bbox, name, pix.width, pix.height, xref, change=change)
 
     def asset_row(self, name: str, data: bytes, pno: int, xref: str, w: int, h: int, derivation: str) -> None:
         self.assets.append({"file": f"OEBPS/images/{name}", "sha256": hashlib.sha256(data).hexdigest(),
@@ -991,20 +1078,29 @@ class Ingest:
                 page_w = self.doc[0].rect.width
                 # "photo": prints edge to edge (bleed). "inline": sits in the text column.
                 kind = "photo" if (fig.bbox[2] - fig.bbox[0]) >= 0.9 * page_w else "inline"
-                stem = fig.file.rsplit(".", 1)[0]
-                base = stem.removesuffix("-render").removesuffix("-masked")
+                base = f"p{pno:03d}-x{fig.xref}"
+                stem = fig.file.rsplit(".", 1)[0] if fig.file and not fig.change else base
                 alts = self.cfg.get("alt", {})
                 alt = alts.get(stem, alts.get(base))
                 self.used_alt.update({stem, base})
                 caption = self.caption_html(fig)
+                if fig.change:
+                    self.used_alt.update(k for k in alts if k.startswith(base + "-"))
+                    alt = fig.change.alt or ""
+                    caption = with_edition_span(caption, "edition-note", html.escape(fig.change.note))
+                elif credit := self.credits.get(base):
+                    self.release_used.add(base)
+                    caption = with_edition_span(caption, "edition-credit", credit_html(credit))
                 img = f'<img src="../images/{fig.file}" width="{fig.width}" height="{fig.height}" alt="{html.escape(alt or "")}"/>'
+                if fig.change and fig.change.action == "withhold":
+                    img = '<div class="withheld" role="img" aria-label="' + html.escape(fig.change.note) + '"></div>'
                 link = self.cfg.get("qr_links", {}).get(stem)
                 if link:
                     img = f'<a href="{html.escape(link)}" class="qr-link">{img}</a>'
                     self.issue(pno, "intentional-change", f"{fid}: QR code image links to its decoded target")
                 flow.append((fig.bbox[1], f'<figure id="{fid}" class="figure {kind}" data-pdf-page="{pno}">{img}{caption}</figure>'))
                 ids.append(fid)
-                if alt is None:
+                if alt is None and not fig.change:
                     self.issue(pno, "alt-text", f"{fid} ({stem}): needs alt text written from the image (not in the PDF)")
                 self.figure_log.append({
                     "figure_id": fid, "image": stem, "pdf_page": str(pno), "printed_page": self.label(pno), "kind": kind,
@@ -1012,7 +1108,9 @@ class Ingest:
                     "caption_lines": str(len(fig.captions)),
                     "caption_boxes": ";".join(f"{c.x0:.0f} {c.y0:.0f} {c.x1:.0f} {c.y1:.0f}" for c in fig.captions),
                     "has_credit": "yes" if 'class="credit"' in caption else "no",
-                    "alt": "decorative" if alt == "" else ("yes" if alt else "missing"), "status": "pending"})
+                    "alt": "decorative" if alt == "" else ("yes" if alt else "missing"),
+                    "release": fig.change.action if fig.change else ("credit" if base in self.credits else ""),
+                    "status": "pending"})
             flow.sort(key=lambda t: t[0])
             for _, h in flow:
                 if h.startswith("@@CONT "):
@@ -1068,6 +1166,8 @@ class Ingest:
         stale = [(f["page"], f["find"]) for f in self.cfg.get("text_fix", []) if (f["page"], f["find"]) not in self.text_fixes_used]
         if stale:
             raise IngestError(f"book.toml [[text_fix]] entries match no text: {stale}")
+        if stale_release := sorted((self.changes.keys() | self.credits.keys()) - self.release_used):
+            raise IngestError(f"book.toml [release] entries match no image: {stale_release}")
         unused = sorted(set(self.cfg.get("alt", {})) - self.used_alt)
         if unused:
             raise IngestError(f"book.toml [alt] keys match no image: {unused}")
@@ -1100,6 +1200,11 @@ class Ingest:
         for page in self.doc:
             pno = page.number + 1
             pix = page.get_pixmap(dpi=int(cfg["dpi"]))
+            scale = int(cfg["dpi"]) / 72
+            masks = self.facsimile_masks.get(pno, [])
+            for (x0, y0, x1, y1), _ in masks:
+                pix.set_rect(pymupdf.IRect(int(x0 * scale), int(y0 * scale), int(x1 * scale) + 1, int(y1 * scale) + 1),
+                             (226, 222, 214))
             name = f"fx-{pno:03d}"
             (self.out / "OEBPS" / "facsimile" / f"{name}.jpg").write_bytes(pix.tobytes("jpg", jpg_quality=int(cfg["quality"])))
             label = html.escape(f'{cfg["page_label"]} {self.label(pno)}')
@@ -1107,7 +1212,9 @@ class Ingest:
             body = (f'<section id="{name}" class="facsimile-page" epub:type="appendix" aria-label="{label}">\n'
                     f'<p class="fx-nav"><a href="{back}">{html.escape(cfg["return_label"])}</a> <span class="fx-label">{label}</span></p>\n'
                     f'<figure id="{name}-img" class="facsimile"><img src="../facsimile/{name}.jpg" width="{pix.width}" height="{pix.height}" '
-                    f'alt="{label}: תמונת העמוד המודפס"/></figure>\n</section>')
+                    f'alt="{label}: תמונת העמוד המודפס"/></figure>\n'
+                    + "".join(f'<p class="edition-note fx-mask-note">{html.escape(note)}</p>\n' for _, note in masks)
+                    + '</section>')
             page_doc = DOC.format(lang=lang, title=label, body=body).replace("<body>", '<body epub:type="appendix">', 1)
             (self.out / "OEBPS" / "text" / f"{name}.xhtml").write_text(page_doc, encoding="utf-8")
             docs.append((name, f"text/{name}.xhtml"))
@@ -1155,7 +1262,7 @@ class Ingest:
         (self.out / "OEBPS" / "nav.xhtml").write_text(nav, encoding="utf-8")
 
     def write_inventory(self) -> None:
-        inv = self.content / "inventory"
+        inv = self.inventory
         inv.mkdir(exist_ok=True)
         unit_of = {p: u for u in self.units for p in range(u.start, u.end + 1)}
         with (inv / "pages.csv").open("w", encoding="utf-8", newline="") as f:
@@ -1250,5 +1357,7 @@ if __name__ == "__main__":
         ing.print_units(list(range(first, last + 1)))
     elif len(sys.argv) == 2:
         Ingest(Path(sys.argv[1]).resolve()).run()
+    elif len(sys.argv) == 3 and sys.argv[2] == "--release":
+        Ingest(Path(sys.argv[1]).resolve(), release=True).run()
     else:
         raise SystemExit(__doc__)

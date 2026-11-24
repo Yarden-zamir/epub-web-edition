@@ -1,0 +1,66 @@
+# /// script
+# requires-python = ">=3.15"
+# dependencies = ["pymupdf==1.28.2"]
+# ///
+"""Check that a release build leaves out every withheld or replaced image and carries every edition credit.
+
+Usage: uv run tools/check_release.py CONTENT_DIR RELEASE_EPUB WEB_DIR
+
+Checks, from book.toml [release]:
+- no file in the EPUB or the web folder has the bytes of a changed image (PDF stream, or the
+  complete build's derived file in CONTENT_DIR/epub-src/OEBPS/images);
+- each withheld or replaced figure, and each credited figure, carries its edition span in the EPUB text.
+Exits 1 when a check fails.
+"""
+
+import hashlib
+import html
+import sys
+import tomllib
+import zipfile
+from pathlib import Path
+
+import pymupdf
+
+
+def sha(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def main() -> None:
+    content, epub, web = (Path(a).resolve() for a in sys.argv[1:4])
+    cfg = tomllib.loads((content / "book.toml").read_text(encoding="utf-8"))
+    release = cfg["release"]
+    doc = pymupdf.open(Path(cfg["pdf"]).expanduser())
+    banned: dict[str, str] = {}
+    for change in release.get("change", []):
+        stem = change["image"]
+        xref = int(stem.split("-x")[1])
+        banned[sha(doc.extract_image(xref)["image"])] = f"{stem} PDF stream"
+        for derived in (content / "epub-src" / "OEBPS" / "images").glob(f"{stem}*"):
+            banned[sha(derived.read_bytes())] = f"{stem} derived file {derived.name}"
+    leaks = []
+    with zipfile.ZipFile(epub) as z:
+        for name in z.namelist():
+            if (hit := banned.get(sha(z.read(name)))):
+                leaks.append(f"EPUB {name}: {hit}")
+        text = "".join(z.read(n).decode("utf-8") for n in z.namelist() if n.endswith(".xhtml"))
+    for path in web.rglob("*"):
+        if path.is_file() and (hit := banned.get(sha(path.read_bytes()))):
+            leaks.append(f"web {path.relative_to(web)}: {hit}")
+    missing = []
+    for change in release.get("change", []):
+        if html.escape(change["note"]) not in text:
+            missing.append(f"{change['image']}: edition note missing")
+    for credit in release.get("credit", []):
+        if html.escape(credit["text"]) not in text:
+            missing.append(f"{credit['image']}: edition credit missing")
+    print(f"changed images {len(release.get('change', []))} | banned files {len(banned)} | leaks {len(leaks)}")
+    print(f"credits {len(release.get('credit', []))} | missing notes or credits {len(missing)}")
+    for line in leaks + missing:
+        print(" ", line)
+    sys.exit(1 if leaks or missing else 0)
+
+
+if __name__ == "__main__":
+    main()

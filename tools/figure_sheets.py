@@ -1,5 +1,5 @@
 # /// script
-# requires-python = ">=3.13"
+# requires-python = ">=3.15"
 # dependencies = ["pymupdf==1.28.2", "pillow==13.0.0"]
 # ///
 """Render review sheets for every page with figures.

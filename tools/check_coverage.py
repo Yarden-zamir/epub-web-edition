@@ -1,5 +1,5 @@
 # /// script
-# requires-python = ">=3.13"
+# requires-python = ">=3.15"
 # dependencies = ["pymupdf==1.28.2"]
 # ///
 """Check that the EPUB source keeps every word of the PDF, page by page.

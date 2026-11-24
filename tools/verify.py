@@ -1,6 +1,6 @@
 # /// script
-# requires-python = ">=3.13"
-# dependencies = ["playwright==1.64.1"]
+# requires-python = ">=3.15"
+# dependencies = ["playwright==1.64.1", "pillow==13.0.0"]
 # ///
 """Verify the EPUB, the web edition, the inventory and canonical-EPUB propagation.
 
@@ -319,7 +319,7 @@ def check_propagation() -> None:
         report = build_web.build(t / "changed.epub", t / "web")
         page = (t / "web/index.html").read_text(encoding="utf-8")
         search = json.loads((t / "web/search.json").read_text(encoding="utf-8"))
-        hit = next((e for e in search if e["id"] == "p-01-004"), None)
+        hit = next((e for e in search["entries"] if e["id"] == "p-01-004"), None)
         ok = (
             marker in page
             and hit is not None and marker in hit["text"]

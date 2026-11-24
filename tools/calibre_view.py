@@ -1,5 +1,5 @@
 # /// script
-# requires-python = ">=3.13"
+# requires-python = ">=3.15"
 # dependencies = ["pillow==13.0.0", "python-xlib==0.33"]
 # ///
 """Open an EPUB in the real Calibre viewer on a virtual screen, press keys and take screenshots.
