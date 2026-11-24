@@ -99,8 +99,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* Split button: the main action and a chevron that opens the e-reader menu. */
 .split { display: inline-flex; align-items: stretch; }
-.split .split-main { border-start-end-radius: 0; border-end-end-radius: 0; }
-.split .split-more { display: inline-grid; place-items: center; padding: 0 0.55rem; min-width: 2rem; border-start-start-radius: 0; border-end-start-radius: 0; border-inline-start: 1px solid color-mix(in srgb, currentColor 25%, transparent); }
+.split .split-main { border-start-end-radius: 0; border-end-end-radius: 0; border-inline-end-width: 0; }
+/* The divider is subtler than the outer border: thinner in tone and inset from the top and bottom edges. */
+.split .split-more { position: relative; display: inline-grid; place-items: center; padding: 0 0.55rem; min-width: 2rem; border-start-start-radius: 0; border-end-start-radius: 0; border-inline-start-width: 0; }
+.split .split-more::before { content: ""; position: absolute; inset-block: 26%; inset-inline-start: 0; width: 1px; background: currentColor; opacity: 0.3; }
 .split .btn.split-more { gap: 0; padding-inline: 0.7rem; }
 .split-more { border-radius: 999px; }
 .split-more svg { width: 1.1rem; height: 1.1rem; }
@@ -577,3 +579,6 @@ dialog::backdrop { background: rgb(10 9 8 / 0.5); backdrop-filter: blur(2px); }
 .resume a { padding: 0.65rem 1.1rem; padding-inline-end: 0.4rem; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .resume button { width: 2.5rem; height: 2.5rem; border-radius: 999px; color: inherit; font-size: 1.2rem; }
 @media print { .resume, .note-pop { display: none; } }
+.resume { transition: opacity 250ms ease; }
+.resume.leaving { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .resume { transition: none; } }

@@ -1414,7 +1414,22 @@ function offerResume() {
   close.addEventListener("click", remove);
   bar.append(go, close);
   document.body.append(bar);
-  // The offer fades away once the reader starts somewhere else.
-  addEventListener("scroll", () => { if (scrollY > innerHeight * 1.5) remove(); }, { passive: true });
+  // It leaves on its own after 5 seconds, but not while the pointer is over it or it has focus.
+  let timer = 0;
+  const fade = () => {
+    if (bar.matches(":hover, :focus-within")) return;
+    if (reduceMotion.matches) { remove(); return; }
+    bar.classList.add("leaving");
+    bar.addEventListener("transitionend", remove, { once: true });
+  };
+  const restart = () => { clearTimeout(timer); bar.classList.remove("leaving"); timer = setTimeout(fade, 5000); };
+  bar.addEventListener("pointerenter", () => { clearTimeout(timer); bar.classList.remove("leaving"); });
+  bar.addEventListener("focusin", () => { clearTimeout(timer); bar.classList.remove("leaving"); });
+  bar.addEventListener("pointerleave", restart);
+  bar.addEventListener("focusout", (e) => { if (!bar.contains(e.relatedTarget)) restart(); });
+  restart();
+  // Gone at once when the reader starts somewhere else.
+  const hero = byId("top");
+  addEventListener("scroll", () => { if (scrollY > hero.offsetHeight) remove(); }, { passive: true });
 }
 offerResume();
