@@ -1,0 +1,104 @@
+{
+  "figure": "fig-a07-09",
+  "title": "ים המלח אז והיום",
+  "image": "site/media/spencer-1848-map.jpg",
+  "size": [
+    1063,
+    1663
+  ],
+  "corners": {
+    "nw": [
+      31.778593713721484,
+      35.23240918045933
+    ],
+    "ne": [
+      31.739946147524215,
+      35.7100437957641
+    ],
+    "sw": [
+      31.112142833384933,
+      35.23306659072098
+    ]
+  },
+  "method": "Affine least-squares fit on 5 land landmarks; residuals 0.15-1.13 km. The printed graticule is about 10 km off and was not used.",
+  "control_points": [
+    {
+      "name": "Callirrhoe / Ayn al-Zara",
+      "pixel_full_scan": [
+        808,
+        660
+      ],
+      "latlon": [
+        31.597,
+        35.5593
+      ],
+      "source": "https://www.wikidata.org/wiki/Q11910919"
+    },
+    {
+      "name": "Arnon / Wadi Mujib",
+      "pixel_full_scan": [
+        835,
+        1025
+      ],
+      "latlon": [
+        31.4658,
+        35.5733
+      ],
+      "source": "https://www.wikidata.org/wiki/Q2120208"
+    },
+    {
+      "name": "Ain Jiddy / Ein Gedi",
+      "pixel_full_scan": [
+        452,
+        1062
+      ],
+      "latlon": [
+        31.4667,
+        35.3944
+      ],
+      "source": "https://www.wikidata.org/wiki/Q1011544"
+    },
+    {
+      "name": "Masada",
+      "pixel_full_scan": [
+        345,
+        1407
+      ],
+      "latlon": [
+        31.3156,
+        35.3539
+      ],
+      "source": "https://www.wikidata.org/wiki/Q186312"
+    },
+    {
+      "name": "Kerak",
+      "pixel_full_scan": [
+        1127,
+        1689
+      ],
+      "latlon": [
+        31.1806,
+        35.7014
+      ],
+      "source": "https://www.wikidata.org/wiki/Q844694"
+    }
+  ],
+  "crop_in_full_scan": [
+    82,
+    294,
+    1144,
+    1956
+  ],
+  "credit": {
+    "text": "Jesse Ames Spencer, Sketch map of the Dead Sea reduced from that of Lieut. Lynch, 1848 (published 1852). National Library of Israel, Eran Laor Cartographic Collection. Public domain.",
+    "url": "https://commons.wikimedia.org/wiki/File:Jesse_Ames_Spencer,_Sketch_map_of_the_Dead_Sea_reduced_from_that_of_Lieut._Lynch._U.S.N._1848_(FL45605182_3942077).jpg"
+  },
+  "levels": {
+    "today": {
+      "value": -441.53,
+      "date": "2026-11-01",
+      "source": "site/data/dead-sea-level.json"
+    },
+    "then": null
+  }
+}
