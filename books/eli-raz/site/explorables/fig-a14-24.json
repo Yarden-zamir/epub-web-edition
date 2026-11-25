@@ -1,0 +1,80 @@
+{
+  "figure": "fig-a14-24",
+  "kind": "dead-sea",
+  "title": "ים המלח מתכווץ, מ־1900 ועד היום",
+  "instruction": "גררו את הנקודה על עקומת המפלס, או הזיזו את המחוון, וראו את קו החוף נסוג על מפת הגבהים.",
+  "schematic": "ירידת המפלס היא הגורם הדינמי להיווצרות הבולענים (a14-p061): כל מטר של ירידה מזיז את קו החוף ואת הפן הבייני שמתחתיו, וחושף עוד מלח להמסה. המפה מראה את הנסיגה הזו לאורך כל החוף, לצד ספירת הבולענים. קו החוף כאן הוא קו הגובה של המפלס על מפת גבהים של היום (Copernicus, שנמדדה ב־2011 עד 2015), בתאים של כ־160 מ'. במפה זו ים המלח הוא משטח שטוח בגובה 427 מ' מתחת לפני הים, ולכן מאמצע 2013, כשהמפלס ירד מתחת לגובה זה, קו החוף במפה נעצר, אף שהים המשיך לסגת. בבריכות האידוי שבאגן הדרומי מפת הגבהים מראה סוללות ופני בריכות ולא את קרקעית האגם, ולכן הן מסומנות בקווקוו ונשארות יבשות במפה בכל מפלס. לפני 1976 המפלס נשען על ערכים היסטוריים בודדים (בדיוק של כ־2 עד 3 מ'), ובין הערכים קו ישר. מיקומי הבולענים אינם מוצגים, כי לא מצאנו להם מקור פתוח; מוצג רק המספר המצטבר.",
+  "control": {
+    "label": "שנה",
+    "min": 1900,
+    "max": 2026,
+    "step": 1,
+    "start": 1900,
+    "unit": "",
+    "hint": 30
+  },
+  "marks": [
+    {"value": 1900, "label": "1900"},
+    {"value": 1960, "label": "1960"},
+    {"value": 1990, "label": "1990"},
+    {"value": 2026, "label": "היום"}
+  ],
+  "legend": [
+    {"swatch": "lake", "label": "ים המלח במפלס של השנה"},
+    {"swatch": "shore-then", "label": "קו החוף ב־1900"},
+    {"swatch": "ponds", "label": "בריכות האידוי של היום"}
+  ],
+  "data": {
+    "map": {"file": "data/shoreline-dead-sea.json"},
+    "level": {"file": "data/dead-sea-level.json"},
+    "sinkholes": {"file": "charts/fig-a14-08.json", "series": "בולענים (מצטבר)"}
+  },
+  "measured_from": 1976.75,
+  "historic": [
+    {"year": 1900, "level": -389, "source": "Abu Ghazleh, Abed and Kempe 2011: the level stayed stable before 1930, and stood at -389 m in 1932"},
+    {"year": 1932, "level": -389, "source": "Abu Ghazleh, Abed and Kempe 2011 (shoreline altimetry)"},
+    {"year": 1955, "level": -392, "source": "Abu Ghazleh, Abed and Kempe 2011 (shoreline altimetry)"},
+    {"year": 1960, "level": -395, "source": "fig-a14-07: level -395 in the printed figure, the 1960 state of the explorable there"}
+  ],
+  "historic_note": "Survey of Palestine 1945 sheet 13 prints 'M.W.L. (-) 392 Metres, April 1938' (site/then-now.json), about 2.5 m below the line between the 1932 and 1955 values: the historic values agree to within 2 to 3 m.",
+  "places": [
+    {"label": "עינות צוקים", "lat": 31.7144, "lon": 35.4533, "side": "east", "source": "site/places.json einot-tsukim (Wikidata Q405816)"},
+    {"label": "עין גדי", "lat": 31.4667, "lon": 35.3944, "side": "east", "source": "site/places.json ein-gedi-reserve (Wikidata Q1011544)"},
+    {"label": "מצדה", "lat": 31.3156, "lon": 35.3539, "side": "east", "source": "site/places.json masada (Wikidata Q186312)"},
+    {"label": "הר סדום", "lat": 31.0922, "lon": 35.3828, "side": "east", "source": "site/places.json mount-sodom (Wikidata Q2670801)"}
+  ],
+  "map_labels": [
+    {"label": "ים המלח", "lat": 31.56, "lon": 35.50, "water": true},
+    {"label": "הלשון", "lat": 31.27, "lon": 35.50},
+    {"label": "בריכות האידוי", "lat": 31.02, "lon": 35.53}
+  ],
+  "scale_km": 10,
+  "texts": {
+    "level_title": "מפלס ים המלח",
+    "level_unit": "מטר ביחס לפני הים",
+    "sparse": "ערכים בודדים",
+    "dem_line": "סוף מפת הגבהים",
+    "count_title": "בולענים לאורך החוף, מצטבר",
+    "count_end": "(עד 2016)",
+    "count_before": "הספירה מתחילה ב־1980",
+    "level_is": "מפלס ים המלח",
+    "approx": "בקירוב",
+    "area_is": "שטח המים במפה, בלי בריכות האידוי: בקירוב",
+    "below_data": "המפלס נמוך מ־427 מ' מתחת לפני הים, שבו מפת הגבהים מציגה את הים כמשטח שטוח: קו החוף במפה נעצר כאן, והחוף האמיתי נסוג עוד.",
+    "count_none": "ספירת הבולענים באיור שבפרק מתחילה ב־1980.",
+    "count_is": "מספר הבולענים המצטבר לאורך החוף:",
+    "count_after": "ספירת הבולענים באיור שבפרק מסתיימת ב־2016, עם כ־5,940 בולענים.",
+    "loading": "טוען את מפת הגבהים…"
+  },
+  "sources": [
+    {"label": "ירידת המפלס כגורם הדינמי (a14-p061)", "element": "a14-p061"},
+    {"label": "מפלס ים המלח מ־1976: רשות המים, data.gov.il", "url": "https://data.gov.il/dataset/https-www-data-gov-il-dataset-683"},
+    {"label": "מפלסים לפני 1976: Abu Ghazleh, Abed and Kempe 2011", "url": "https://doi.org/10.1007/978-3-642-14779-1_4"},
+    {"label": "מפלס 395- (1960) באיור החתך", "element": "fig-a14-07"},
+    {"label": "מספר הבולענים המצטבר (Nof, Abelson, Raz et al. 2019), מהאיור בפרק", "element": "fig-a14-08"},
+    {"label": "השאיבה לבריכות האידוי מנמיכה את המפלס (a35-p060)", "element": "a35-p060"},
+    {"label": "מפת גבהים: produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved", "url": "https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM"},
+    {"label": "גבולות בריכות האידוי: © OpenStreetMap contributors (ODbL)", "url": "https://www.openstreetmap.org/copyright"},
+    {"label": "מיקומי המקומות: Wikidata", "url": "https://www.wikidata.org"}
+  ]
+}

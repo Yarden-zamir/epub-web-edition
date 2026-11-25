@@ -316,6 +316,7 @@ async function setUp(figure, box) {
   let followUp = 0;
   function paint(v) {
     value = v;
+    pending = v; // A later redraw (resize, theme, font load) must not bring back an older value.
     if (scene.followsValue !== false || Number.isNaN(canvasValue)) drawCanvas(v);
     if (scene.move) summary = scene.move(v, env);
     const [hx, hy] = scene.handle(v);
