@@ -1,0 +1,68 @@
+{
+  "figure": "fig-a34-07",
+  "kind": "lisan",
+  "title": "אגם הלשון, מ־70 אלף ועד 14 אלף שנה לפני זמננו",
+  "instruction": "גררו את הנקודה על עקומת המפלס, או הזיזו את המחוון, וראו את אגם הלשון ממלא את הבקע.",
+  "schematic": "אגם הלשון היה הגדול באגמי הבקע, ומחשופי החוואר שלו נמצאים מחצבה ועד דרום הכנרת (a34-p010). קווי החוף בתמונה הם רישומי נסיגתו, מרום של 165 מ' מתחת לפני הים ומטה. המפה ממלאת את הבקע עד המפלס של כל רגע לפי עקומת המפלסים של ברטוב (2005), כפי שנקראה מהאיור שבפרק. זו הפשטה: המפה היא מפת הגבהים של היום (Copernicus, 2011 עד 2015), בתאים של כ־450 מ', ואילו קרקעית הבקע, הדלתאות ומניפות הסחף השתנו מאז, והר סדום התרומם. הכנרת של היום מסומנת כמים בגוון בהיר. שטח המים במפה הוא הערכה גסה לפי מפה זו.",
+  "control": {
+    "label": "לפני כמה זמן",
+    "min": -69,
+    "max": -14,
+    "step": 0.1,
+    "start": -25,
+    "unit": "אלפי שנים לפני זמננו",
+    "hint": 4
+  },
+  "marks": [
+    {"value": -69, "label": "69 אלף"},
+    {"value": -25, "label": "השיא"},
+    {"value": -14, "label": "14 אלף"}
+  ],
+  "legend": [
+    {"swatch": "lake", "label": "אגם הלשון במפלס של אותו זמן"}
+  ],
+  "data": {
+    "map": {"file": "data/shoreline-lisan.json"},
+    "level": {"file": "charts/fig-a34-05.json", "series": "עקומת המפלס"},
+    "today": {"file": "data/dead-sea-level.json"}
+  },
+  "photo_top": -165,
+  "places": [
+    {"label": "בית שאן", "lat": 32.496111, "lon": 35.498889, "side": "west", "source": "Wikidata Q152368"},
+    {"label": "מצדה", "lat": 31.3156, "lon": 35.3539, "side": "east", "source": "site/places.json masada (Wikidata Q186312)"},
+    {"label": "חצבה", "lat": 30.7677, "lon": 35.2802, "side": "east", "source": "Wikidata Q747107"}
+  ],
+  "map_labels": [
+    {"label": "הכנרת", "lat": 32.88, "lon": 35.50, "water": true},
+    {"label": "ים המלח", "lat": 31.56, "lon": 35.48, "water": true}
+  ],
+  "reach": [
+    {"lat": 32.818906, "lon": 35.590033, "text": "המים מגיעים צפונה עד אגן הכנרת (Wikidata Q126982)."},
+    {"lat": 32.496111, "lon": 35.56, "text": "המים מגיעים במעלה בקעת הירדן עד ממזרח לבית שאן."}
+  ],
+  "reach_note": "The second reach point is the Jordan valley floor at the latitude of Beit She'an (Wikidata Q152368), 6 km east of the town.",
+  "scale_km": 20,
+  "texts": {
+    "level_title": "מפלס אגם הלשון",
+    "level_unit": "מטר ביחס לפני הים",
+    "age_unit": "אלפי שנים",
+    "age_unit_text": "אלף שנה",
+    "before": "לפני",
+    "level_is": "מפלס האגם",
+    "above_today": "מטר מעל ים המלח היום",
+    "photo_line": "קווי החוף בתמונה: מ־165 מ' מתחת לפני הים",
+    "today_line": "ים המלח היום",
+    "area_is": "שטח המים במפה: בקירוב",
+    "reach_none": "המים ממלאים את אגן ים המלח ואת דרום בקעת הירדן.",
+    "loading": "טוען את מפת הגבהים…"
+  },
+  "sources": [
+    {"label": "עקומת מפלסי אגם הלשון (ברטוב 2005), מהאיור בפרק", "element": "fig-a34-05"},
+    {"label": "תחום האגם ושיא המפלס (a34-p010)", "element": "a34-p010"},
+    {"label": "קווי החוף מרום 165- מ' ומטה (כיתוב התמונה)", "element": "fig-a34-07"},
+    {"label": "הר סדום צבר גובה רק אחרי שיבש אגם הלשון (a34-p053)", "element": "a34-p053"},
+    {"label": "מפלס ים המלח היום: רשות המים, data.gov.il", "url": "https://data.gov.il/dataset/https-www-data-gov-il-dataset-683"},
+    {"label": "מפת גבהים: produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved", "url": "https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM"},
+    {"label": "מיקומי המקומות: Wikidata", "url": "https://www.wikidata.org"}
+  ]
+}
