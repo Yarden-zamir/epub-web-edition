@@ -1,18 +1,31 @@
 # Deploy both apps of kitshn.config.ts: the sample edition (built in the deploy job) and the Eli Raz edition
-# (built in the "book" job). To build and deploy by hand: gh workflow run kitshn.yml -R game-design-driven/epub-web-edition
+# (built in the "book" job). Each pull request also gets a preview of the book; its close tears the preview down.
+# To build and deploy by hand: gh workflow run kitshn.yml -R game-design-driven/epub-web-edition
 on:
   # main moves only through the merge queue (docs/WORKFLOW.md); each push to main is a tested commit.
-  # No pull_request: pull requests get check.yml, not a preview deploy (each preview is a kitshn card).
   push:
     branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened, closed, unlabeled]
   workflow_dispatch:
 permissions:
   contents: read
   id-token: write
+# A new push to a pull request replaces the preview build of the push before it.
+concurrency:
+  group: kitshn-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   book:
-    # The book deploys only from main (kitshn.config.ts), so other branches and pull requests skip its build.
-    if: github.ref == 'refs/heads/main'
+    # main builds the book for production. An open pull request builds it for its preview, except:
+    # - a pull request from a fork (it gets no deploy secrets);
+    # - a pull request with the label no-preview (a preview made before the label stays until the close).
+    # A closed pull request only tears its preview down, so it skips the build.
+    if: >-
+      github.ref == 'refs/heads/main' ||
+      (github.event_name == 'pull_request' && github.event.action != 'closed' &&
+       github.event.pull_request.head.repo.full_name == github.repository &&
+       !contains(github.event.pull_request.labels.*.name, 'no-preview'))
     runs-on: ubuntu-latest
     timeout-minutes: 40
     permissions:
@@ -43,13 +56,15 @@ jobs:
       - name: Tools
         if: steps.web.outputs.cache-hit != 'true'
         uses: ./.github/actions/book-tools
-      # The deploy gate (check.py --gate): ingest, build, check_release with the size budget, EPUBCheck, and the quick
-      # smoke test. The merge queue ran every check on this commit before it reached main (check.yml).
+      # main: the deploy gate (check.py --gate): ingest, build, check_release with the size budget, EPUBCheck, and the
+      # quick smoke test. The merge queue ran every check on this commit before it reached main (check.yml).
+      # A preview: the light check (ingest, build, check_release). check.yml runs the gate on the same push.
       - name: Build and check
         if: steps.web.outputs.cache-hit != 'true'
         env:
           ELI_RAZ_INGEST_KEEP: "2"
-        run: uv run books/eli-raz/scripts/check.py --gate
+          GATE: ${{ github.event_name == 'pull_request' && '' || '--gate' }}
+        run: uv run books/eli-raz/scripts/check.py $GATE
       - name: Shrink uv cache
         if: steps.web.outputs.cache-hit != 'true'
         run: uv cache prune --ci
@@ -63,9 +78,12 @@ jobs:
 
   kitshn:
     needs: book
-    # A skipped book build (pull requests, other branches) still deploys the sample. A failed one deploys nothing,
-    # so both live sites stay as they were.
-    if: ${{ !cancelled() && !failure() }}
+    # main: a failed book build deploys nothing, so both live sites stay as they were.
+    # A pull request deploys only the book preview (the sample has no preview entry), and a close tears it down.
+    # It skips when the book job skipped for an open pull request (a fork or the label no-preview).
+    if: >-
+      !cancelled() && !failure() &&
+      (github.event_name != 'pull_request' || github.event.action == 'closed' || needs.book.result == 'success')
     uses: Yarden-zamir/kitshn/.github/workflows/kitshn2-deploy.yml@main
     with:
       artifacts: ${{ needs.book.result == 'success' && '{"book":{"name":"book-web","path":"books/eli-raz/dist/release/web"}}' || '' }}

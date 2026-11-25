@@ -50,6 +50,7 @@ Where each check runs (.github/workflows/check.yml, one job that builds once and
 - The merge queue: also axe on the whole page at every width and scheme, the explainers, tools/verify.py on the sample edition, the INGEST_INPUTS comparison when ingest runs, and the PR text of each PR in the group.
 - Nightly on main and by hand (`--full`, with videos and traces): `gh workflow run check.yml --ref <branch> [-f record=true]`. It deploys nothing.
 - Each push to main (kitshn.yml, the deploy): `--gate` again, then kitshn deploys both apps.
+- Each push to a PR (kitshn.yml, the preview): the light check, then kitshn deploys the book to https://epub-web-edition-book-pr-<n>.yarden-zamir.com (public). The close of the PR removes it. Add the label `no-preview` to skip it.
 
 ## Deploy
 
