@@ -191,7 +191,7 @@ function makeMap(spec, map, env) {
         c.strokeStyle = ink; c.lineWidth = 1.5;
         c.beginPath(); c.moveTo(bx, by - 4); c.lineTo(bx, by); c.lineTo(bx + bar, by); c.lineTo(bx + bar, by - 4); c.stroke();
         env.label(c, `${km} ק"מ`, bx + bar / 2, by - 6, { size: 10.5, weight: 600 });
-        const nx = x0 + w - 14, ny = y0 + 14;
+        const nx = x0 + 14, ny = y0 + 14; // Top left: the lakes reach the top right of the Lisan map.
         c.fillStyle = ink;
         c.beginPath(); c.moveTo(nx, ny - 8); c.lineTo(nx + 5, ny + 5); c.lineTo(nx, ny + 2); c.lineTo(nx - 5, ny + 5); c.closePath(); c.fill();
         env.label(c, "צ", nx, ny + 17, { size: 10.5, weight: 700 });
@@ -228,8 +228,8 @@ function drawAxes(c, env, chart, { xTicks, yTicks, xLabel, yLabel, title }) {
     c.beginPath(); c.moveTo(x, top + height); c.lineTo(x, top + height + 4); c.stroke();
     env.label(c, v.label, x, top + height + 15, { size: 10, weight: 500, color: "--soft" });
   }
-  env.label(c, title, left + width, top - 10, { align: "right", size: 12, weight: 700 });
-  if (yLabel) env.label(c, yLabel, left + width, top + 4, { align: "right", size: 10, weight: 500, color: "--soft" });
+  env.label(c, title, left + width, top - (yLabel ? 22 : 9), { align: "right", size: 12, weight: 700 });
+  if (yLabel) env.label(c, yLabel, left + width, top - 8, { align: "right", size: 10, weight: 500, color: "--soft" });
   if (xLabel) env.label(c, xLabel, left + width, top + height + 30, { align: "right", size: 10, weight: 500, color: "--soft" });
 }
 
@@ -241,7 +241,7 @@ function seriesPath(chart, points) {
 function scene(spec, env, config) {
   const map = makeMap(spec, spec.data.map.points, env);
   const panelRight = map.rect[0] - 22;
-  const left = 46;
+  const left = 60; // Room for the y tick labels at phone size.
   const chart = makeChart([left, config.levelTop, panelRight - left, config.levelHeight], [spec.control.min, spec.control.max], config.levelDomain);
   const levelPath = seriesPath(chart, config.curve);
   const extra = config.extraChart?.(left, panelRight);
@@ -267,7 +267,6 @@ function scene(spec, env, config) {
       if (extra) extra.drawValue(ctx, value);
       map.draw(ctx, t, config.reference === undefined ? undefined : map.code(config.reference));
       map.decorations(ctx, spec.places);
-      config.headline(ctx, value, level);
       if (!map.ready()) return spec.texts.loading;
       return config.summary(value, level, map, t);
     },
@@ -294,8 +293,8 @@ explorableKit.kinds["dead-sea"] = {
     return scene(spec, env, {
       curve,
       level: (year) => deadSeaLevel(year, spec),
-      levelTop: 110,
-      levelHeight: 300,
+      levelTop: 46,
+      levelHeight: 360,
       levelDomain: [-385, -445],
       reference: deadSeaLevel(spec.control.min, spec),
       levelAxes: {
@@ -317,7 +316,7 @@ explorableKit.kinds["dead-sea"] = {
         env.label(c, t.dem_line, left + 2, y - 5, { align: "left", size: 10, weight: 600, color: "--xp-brine-ink" });
       },
       extraChart(left, right) {
-        const chart = makeChart([left, 500, right - left, 150], [spec.control.min, spec.control.max], [6500, 0]);
+        const chart = makeChart([left, 490, right - left, 170], [spec.control.min, spec.control.max], [6500, 0]);
         const path = seriesPath(chart, sinkholes);
         return {
           drawStatic(c) {
@@ -335,19 +334,16 @@ explorableKit.kinds["dead-sea"] = {
             ctx.setLineDash([2, 3]);
             ctx.beginPath(); ctx.moveTo(x, chart.box[1]); ctx.lineTo(x, chart.box[1] + chart.box[3]); ctx.stroke();
             ctx.setLineDash([]);
-            if (year < firstCount || year > lastCount) return;
-            const n = interpolate(sinkholes, year);
+            const [left, top, width] = chart.box;
+            if (year < firstCount) { env.label(ctx, t.count_before, left + 4, top + 14, { align: "left", size: 10, weight: 600, color: "--soft" }); return; }
+            const n = interpolate(sinkholes, Math.min(year, lastCount));
+            const y = chart.y(n);
             ctx.fillStyle = env.color("--series");
-            ctx.beginPath(); ctx.arc(x, chart.y(n), 3.5, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(chart.x(Math.min(year, lastCount)), y, 3.5, 0, Math.PI * 2); ctx.fill();
+            const text = `${number(Math.round(n / 10) * 10)}${year > lastCount ? ` ${t.count_end}` : ""}`;
+            env.label(ctx, text, Math.min(x, left + width) - 7, Math.max(top + 10, y - 6), { align: "right", size: 11, weight: 700, color: "--accent" });
           },
         };
-      },
-      headline(ctx, year, level) {
-        const x = 46, y = 40;
-        env.figures(ctx, String(Math.round(year)), x + 74, y, { size: 28, weight: 800 });
-        env.label(ctx, metres(level), x, y + 26, { align: "left", size: 13, weight: 600 });
-        const count = year < firstCount ? t.count_before : `${number(Math.round(interpolate(sinkholes, year) / 10) * 10)} ${t.count_unit}`;
-        env.label(ctx, count, x, y + 46, { align: "left", size: 12, weight: 600, color: "--accent" });
       },
       summary(year, level, map, code) {
         const rounded = Math.round(year);
@@ -393,8 +389,8 @@ explorableKit.kinds.lisan = {
     return scene(spec, env, {
       curve,
       level: (value) => lisanLevel(value, spec),
-      levelTop: 110,
-      levelHeight: 500,
+      levelTop: 46,
+      levelHeight: 600,
       levelDomain: [-150, -450],
       reference: undefined,
       levelAxes: {
@@ -412,12 +408,6 @@ explorableKit.kinds.lisan = {
           c.setLineDash([]);
           env.label(c, text, left + 2, y + (level === today ? -5 : 13), { align: "left", size: 10, weight: 600, color });
         }
-      },
-      headline(ctx, value, level) {
-        const x = 46, y = 40;
-        env.figures(ctx, number(-value, 1), x + 74, y, { size: 28, weight: 800 });
-        env.label(ctx, t.age_unit, x + 80, y, { align: "left", size: 12, weight: 600, color: "--soft" });
-        env.label(ctx, metres(level), x, y + 26, { align: "left", size: 13, weight: 600 });
       },
       summary(value, level, map, code) {
         const parts = [`${t.before} ${iso(number(-value, 1))} ${t.age_unit_text}: ${t.level_is} ${iso(metres(level))}, ${iso(number(Math.round(level - today)))} ${t.above_today}.`];

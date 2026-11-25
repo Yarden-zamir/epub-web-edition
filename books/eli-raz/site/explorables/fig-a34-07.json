@@ -1,7 +1,7 @@
 {
   "figure": "fig-a34-07",
   "kind": "lisan",
-  "title": "אגם הלשון, מ־70 אלף ועד 14 אלף שנה לפני זמננו",
+  "title": "אגם הלשון, לפני כ־70 עד 14 אלף שנה",
   "instruction": "גררו את הנקודה על עקומת המפלס, או הזיזו את המחוון, וראו את אגם הלשון ממלא את הבקע.",
   "schematic": "אגם הלשון היה הגדול באגמי הבקע, ומחשופי החוואר שלו נמצאים מחצבה ועד דרום הכנרת (a34-p010). קווי החוף בתמונה הם רישומי נסיגתו, מרום של 165 מ' מתחת לפני הים ומטה. המפה ממלאת את הבקע עד המפלס של כל רגע לפי עקומת המפלסים של ברטוב (2005), כפי שנקראה מהאיור שבפרק. זו הפשטה: המפה היא מפת הגבהים של היום (Copernicus, 2011 עד 2015), בתאים של כ־450 מ', ואילו קרקעית הבקע, הדלתאות ומניפות הסחף השתנו מאז, והר סדום התרומם. הכנרת של היום מסומנת כמים בגוון בהיר. שטח המים במפה הוא הערכה גסה לפי מפה זו.",
   "control": {
@@ -15,8 +15,7 @@
   },
   "marks": [
     {"value": -69, "label": "69 אלף"},
-    {"value": -25, "label": "השיא"},
-    {"value": -14, "label": "14 אלף"}
+    {"value": -25, "label": "השיא"}
   ],
   "legend": [
     {"swatch": "lake", "label": "אגם הלשון במפלס של אותו זמן"}
@@ -33,14 +32,14 @@
     {"label": "חצבה", "lat": 30.7677, "lon": 35.2802, "side": "east", "source": "Wikidata Q747107"}
   ],
   "map_labels": [
-    {"label": "הכנרת", "lat": 32.88, "lon": 35.50, "water": true},
+    {"label": "הכנרת", "lat": 32.83, "lon": 35.59, "water": true},
     {"label": "ים המלח", "lat": 31.56, "lon": 35.48, "water": true}
   ],
   "reach": [
-    {"lat": 32.818906, "lon": 35.590033, "text": "המים מגיעים צפונה עד אגן הכנרת (Wikidata Q126982)."},
+    {"lat": 32.818906, "lon": 35.590033, "text": "המים מגיעים צפונה עד אגן הכנרת."},
     {"lat": 32.496111, "lon": 35.56, "text": "המים מגיעים במעלה בקעת הירדן עד ממזרח לבית שאן."}
   ],
-  "reach_note": "The second reach point is the Jordan valley floor at the latitude of Beit She'an (Wikidata Q152368), 6 km east of the town.",
+  "reach_note": "The first reach point is the Kinneret, Wikidata Q126982. The second reach point is the Jordan valley floor at the latitude of Beit She'an (Wikidata Q152368), 6 km east of the town.",
   "scale_km": 20,
   "texts": {
     "level_title": "מפלס אגם הלשון",
@@ -50,7 +49,7 @@
     "before": "לפני",
     "level_is": "מפלס האגם",
     "above_today": "מטר מעל ים המלח היום",
-    "photo_line": "קווי החוף בתמונה: מ־165 מ' מתחת לפני הים",
+    "photo_line": "קווי החוף בתמונה (165−)",
     "today_line": "ים המלח היום",
     "area_is": "שטח המים במפה: בקירוב",
     "reach_none": "המים ממלאים את אגן ים המלח ואת דרום בקעת הירדן.",

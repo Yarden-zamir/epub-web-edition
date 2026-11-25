@@ -16,7 +16,7 @@
   "marks": [
     {"value": 1900, "label": "1900"},
     {"value": 1960, "label": "1960"},
-    {"value": 2000, "label": "2000"},
+    {"value": 1990, "label": "1990"},
     {"value": 2026, "label": "היום"}
   ],
   "legend": [
@@ -46,16 +46,16 @@
   "map_labels": [
     {"label": "ים המלח", "lat": 31.56, "lon": 35.50, "water": true},
     {"label": "הלשון", "lat": 31.27, "lon": 35.50},
-    {"label": "בריכות האידוי", "lat": 31.06, "lon": 35.50}
+    {"label": "בריכות האידוי", "lat": 31.02, "lon": 35.53}
   ],
   "scale_km": 10,
   "texts": {
     "level_title": "מפלס ים המלח",
     "level_unit": "מטר ביחס לפני הים",
     "sparse": "ערכים בודדים",
-    "dem_line": "427−: סוף מפת הגבהים",
+    "dem_line": "סוף מפת הגבהים",
     "count_title": "בולענים לאורך החוף, מצטבר",
-    "count_unit": "בולענים",
+    "count_end": "(עד 2016)",
     "count_before": "הספירה מתחילה ב־1980",
     "level_is": "מפלס ים המלח",
     "approx": "בקירוב",
