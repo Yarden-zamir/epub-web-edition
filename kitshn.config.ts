@@ -21,6 +21,8 @@ export default defineApps({
     static: { output: "books/eli-raz/dist/release/web" },
     deploy: [
       { on: "push", branch: "main", name: "prod", address: ["eli-raz.yarden-zamir.com"], startsIn: "Everyone" },
+      // A preview per pull request at epub-web-edition-book-pr-<n>.yarden-zamir.com, public like the live site.
+      { on: "pull_request", name: "pr-{pr}", ephemeral: true, startsIn: "Everyone" },
     ],
   },
 });

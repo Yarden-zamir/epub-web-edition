@@ -22,6 +22,7 @@ coordinator thread ── briefs ──► one agent per area (own worktree, own
                                    │ light local check (books/eli-raz/scripts/check.py)
                                    ▼
                                  PR ── check on the PR: ingest, build, check_release, EPUBCheck, quick smoke; pr-text
+                                   │   preview (kitshn.yml): epub-web-edition-book-pr-<n>.yarden-zamir.com
                                    │ gh pr ready <n>; scripts/queue-pr.sh <n>
                                    ▼
                                  merge queue ── every check on main plus the PRs ahead (full axe, explainers, sample, PR text)
@@ -82,6 +83,7 @@ Here (`books/eli-raz/scripts/check.py`, `check.yml`):
 | Merge queue | also axe on the whole page at every width and scheme, the explainers, tools/verify.py on the sample edition, the INGEST_INPUTS comparison when ingest runs, the PR text of each PR |
 | Nightly, by hand | `--full`, also videos and traces; by hand with `gh workflow run check.yml --ref <branch> [-f record=true]` |
 | Deploy (push to main) | `kitshn.yml`: `--gate` again, then kitshn deploys both apps |
+| PR preview (each push) | `kitshn.yml`: the light check, then kitshn deploys the book to epub-web-edition-book-pr-<n>.yarden-zamir.com (public). The close of the PR removes it. The label `no-preview` and a PR from a fork skip it |
 | PR that changes the site, advisory | `lighthouse.yml`: Lighthouse on the PR and its base, on one runner (scores in the job summary); never blocks the queue. The live site by hand: `gh workflow run lighthouse.yml -f url=https://eli-raz.yarden-zamir.com` |
 
 ## Flakes and failures
@@ -98,7 +100,8 @@ Generic:
 - Every push to `main` deploys. `main` only moves through the queue, so each deploy is a tested commit.
 
 Here:
-- `.github/workflows/kitshn.yml` builds the book again (`check.py --gate`) and deploys both apps of `kitshn.config.ts` with kitshn: the sample edition and the Eli Raz edition at https://eli-raz.yarden-zamir.com. A failed check deploys nothing; both sites keep their last deploy.
+- `.github/workflows/kitshn.yml` builds the book again (`check.py --gate`) and deploys both apps of `kitshn.config.ts` with kitshn: the sample edition and the Eli Raz edition at https://eli-raz.yarden-zamir.com. A failed check deploys nothing; both sites keep their last deploy. Each PR of this repo also gets a preview of the book at epub-web-edition-book-pr-<n>.yarden-zamir.com, built with the light check.
+- `.github/workflows/kitshn-retry.yml` reruns a failed kitshn deploy job once, when its log shows a failure of kitshn or of the network, not of the build.
 
 ## Public repo hygiene
 
