@@ -60,15 +60,6 @@ jobs:
           path: books/eli-raz/dist/release/web
           if-no-files-found: error
           retention-days: 1
-      # Workaround: download-artifact v8 extracts a run's only artifact flat into its path, not into a folder with its
-      # name, and then kitshn2-deploy.yml cannot find "book-web". A second artifact keeps one folder per artifact.
-      # Remove it when kitshn2-deploy.yml handles a single artifact.
-      - uses: actions/upload-artifact@v7
-        with:
-          name: book-build-json
-          path: books/eli-raz/dist/release/web/build.json
-          if-no-files-found: error
-          retention-days: 1
 
   kitshn:
     needs: book
