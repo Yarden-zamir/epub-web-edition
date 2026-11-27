@@ -6,7 +6,7 @@
 // drag at 60 fps on a phone: SVG attribute changes cost style, pre-paint and layer work on this very long page.
 //
 // A drawing file (7N-explorable-<kind>.js) registers explorableKit.kinds[kind] = {
-//   view: [x, y, width, height]                   drawing units shown in the canvas
+//   view: [x, y, width, height]                   drawing units shown in the canvas (a spec's own "view" wins)
 //   valueParts(value, spec) -> {num, unit, note} the value as text: a number (fixed decimals), its unit and an
 //                                                optional note. Each part sits in a fixed-width slot, so nothing moves.
 //   animated?: true                              water and salt move slowly: env.time runs (FLOW_FPS frames a second at most)
@@ -201,7 +201,8 @@ async function setUp(figure, box) {
   const span = c.max - c.min;
   const decimals = String(c.step).split(".")[1]?.length ?? 0;
   const snap = (v) => clamp(Number((Math.round((v - c.min) / c.step) * c.step + c.min).toFixed(decimals)), c.min, c.max);
-  const [vx, vy, vw, vh] = kind.view;
+  const view = spec.view ?? kind.view; // A spec can set its own view, for example the size of its printed image.
+  const [vx, vy, vw, vh] = view;
 
   const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; };
   const head = el("div", "xp-head");
@@ -286,7 +287,7 @@ async function setUp(figure, box) {
   sizeSlots();
   const env = makeEnv(box);
   env.scale = 1;
-  env.view = kind.view;
+  env.view = view;
   env.overlay = (tag, className) => {
     const e = el(tag, `xp-layer ${className}`);
     stage.insertBefore(e, handle);
@@ -316,6 +317,7 @@ async function setUp(figure, box) {
   let followUp = 0;
   function paint(v) {
     value = v;
+    pending = v; // A later redraw (resize, theme, font load) must not bring back an older value.
     if (scene.followsValue !== false || Number.isNaN(canvasValue)) drawCanvas(v);
     if (scene.move) summary = scene.move(v, env);
     const [hx, hy] = scene.handle(v);

@@ -1,0 +1,23 @@
+/* Road 90 over a cavity (78-explorable-road.js): colours of the road layers. The drawing reads them from a canvas,
+   so each is a plain colour. The legend swatches use the same tokens. */
+:root {
+  --xp-road-asphalt: #3d3a36; --xp-road-base: #cbb48a; --xp-road-aggregate: #bfa57a; --xp-road-gravel: #d9c8a6;
+  --xp-road-sheet-filter: #fdfcf9; --xp-road-sheet-load: #1f1d1b; --xp-road-grid: #1c1a17; --xp-road-stone: rgb(60 40 20 / 0.35);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --xp-road-asphalt: #807a72; --xp-road-base: #6e5c42; --xp-road-aggregate: #7a6447; --xp-road-gravel: #5e5240;
+    --xp-road-sheet-filter: #e4ded3; --xp-road-sheet-load: #0c0b0a; --xp-road-grid: #f3ede3; --xp-road-stone: rgb(255 240 220 / 0.2);
+  }
+}
+:root[data-theme="dark"] {
+  --xp-road-asphalt: #807a72; --xp-road-base: #6e5c42; --xp-road-aggregate: #7a6447; --xp-road-gravel: #5e5240;
+  --xp-road-sheet-filter: #e4ded3; --xp-road-sheet-load: #0c0b0a; --xp-road-grid: #f3ede3; --xp-road-stone: rgb(255 240 220 / 0.2);
+}
+.xp-swatch-road-asphalt { background: var(--xp-road-asphalt); }
+.xp-swatch-road-base { background: var(--xp-road-base); }
+.xp-swatch-road-aggregate { background: var(--xp-road-aggregate); }
+.xp-swatch-road-grid { background: repeating-linear-gradient(90deg, var(--xp-road-grid) 0 2px, transparent 2px 5px) center / 100% 3px no-repeat, var(--xp-road-gravel); }
+.xp-swatch-road-gravel { background: var(--xp-road-gravel); }
+.xp-swatch-road-sheets { background: linear-gradient(var(--xp-road-sheet-filter) 0 45%, var(--xp-road-sheet-load) 45%); }
+.xp-swatch-road-cavity { background: linear-gradient(var(--xp-void) 0 70%, var(--xp-lake) 70%); }

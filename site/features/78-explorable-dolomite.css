@@ -1,0 +1,9 @@
+/* The cracked dolomite layer (78-explorable-dolomite.js): an upright drawing like the printed figure, so the stage
+   stays narrow. The drawing reads the colours from a canvas, so each is a plain colour. */
+:root { --xp-dolomite: #cdb796; --xp-dolomite-streak: #b07a45; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --xp-dolomite: #6b5a45; --xp-dolomite-streak: #c08a55; }
+}
+:root[data-theme="dark"] { --xp-dolomite: #6b5a45; --xp-dolomite-streak: #c08a55; }
+.explorable[data-kind="dolomite"] .xp-stage { max-width: 22rem; margin-inline: auto; }
+.xp-swatch-dolomite { background: var(--xp-dolomite); box-shadow: inset 0 0 0 1px var(--xp-land-edge); }

@@ -1,0 +1,14 @@
+/* The Dead Sea's water explainers (77-explorable-water.js): context lines, legend swatches, a sideways grip. */
+.xp-context { margin: 0.45rem 0 0; font-size: 0.88rem; line-height: 1.6; color: var(--ink); }
+.xp-swatch-measured { height: 2px; border-radius: 0; box-shadow: none; background: var(--ink); }
+.xp-swatch-rb { height: 2px; border-radius: 0; box-shadow: none; background: var(--xp-fresh-ink); }
+.xp-swatch-sw { height: 2px; border-radius: 0; box-shadow: none; background: repeating-linear-gradient(90deg, var(--xp-fresh-ink) 0 5px, transparent 5px 9px); }
+.xp-swatch-band { background: color-mix(in srgb, var(--xp-lake) 22%, var(--paper)); }
+.xp-swatch-density { background: linear-gradient(90deg, var(--xp-fresh), var(--xp-lake-deep)); }
+.xp-swatch-profile { height: 2px; border-radius: 0; box-shadow: none; background: var(--series); }
+.xp-swatch-dots { background: radial-gradient(circle, var(--muted) 1.6px, transparent 2px) 0 0 / 6px 6px; box-shadow: none; }
+/* The layers handle moves sideways, along the density axis. */
+.explorable[data-kind="layers"] .xp-grip svg { transform: rotate(90deg); }
+/* A photo figure spans the page (02-book.css), wider than the column that clips the card. With an explainer it
+   takes the column width of the other explainer figures (72-explorables.css), and so does its printed photo. */
+.book figure.photo.has-explorable { width: auto; margin-inline: auto; }

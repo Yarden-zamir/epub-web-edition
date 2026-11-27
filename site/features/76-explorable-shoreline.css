@@ -1,0 +1,10 @@
+/* Shoreline maps (76-explorable-shoreline.js). The map and the chart panel sit side by side in a tall drawing, so the
+   stage keeps a phone-like width on wide screens and the whole drawing stays in view. --xp-map-dim: the opacity of a
+   paper veil over the light relief image (0 in light mode). */
+:root { --xp-map-dim: 0; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --xp-map-dim: 0.58; } }
+:root[data-theme="dark"] { --xp-map-dim: 0.58; }
+.explorable:is([data-kind="dead-sea"], [data-kind="lisan"]) .xp-stage { max-width: 30rem; margin-inline: auto; }
+/* Legend swatches: the 1900 shoreline (dashed) and the evaporation ponds (hatched), as drawn on the map. */
+.xp-swatch-shore-then { background: none; box-shadow: none; border-top: 2px dashed var(--xp-brine-ink); height: 0; }
+.xp-swatch-ponds { background: repeating-linear-gradient(-45deg, color-mix(in srgb, var(--xp-land-edge) 55%, transparent) 0 1px, transparent 1px 4px); }
