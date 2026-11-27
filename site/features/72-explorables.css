@@ -4,7 +4,7 @@
    is a plain colour (no var() or color-mix()). Labels in drawings have a paper halo: AA contrast on any fill. */
 :root {
   --xp-sky-top: #fbf8f2; --xp-sky: #f1ebe0;
-  --xp-land: #ead6b0; --xp-land-deep: #d9bd8c; --xp-land-edge: #916c43; --xp-cap: #a88459;
+  --xp-land: #ead6b0; --xp-land-deep: #d9bd8c; --xp-land-edge: #916c43; --xp-cap: #a88459; --xp-marl: #cfc6ad;
   --xp-salt: #fdfcf9; --xp-salt-shade: #e7e1d6; --xp-salt-edge: #8a8274;
   --xp-fresh: #d3e8e8; --xp-fresh-deep: #b5d6d7; --xp-fresh-ink: #1d6a71; --xp-surface: #b9d6d3;
   --xp-brine: #a9c4bf; --xp-lake: #5e9893; --xp-lake-deep: #2f6a64; --xp-brine-ink: #8f3f22;
@@ -16,7 +16,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --xp-sky-top: #1b1a18; --xp-sky: #161514;
-    --xp-land: #4d3f2c; --xp-land-deep: #3a2f21; --xp-land-edge: #bc9f73; --xp-cap: #8a6c48;
+    --xp-land: #4d3f2c; --xp-land-deep: #3a2f21; --xp-land-edge: #bc9f73; --xp-cap: #8a6c48; --xp-marl: #77705d;
     --xp-salt: #e4ded3; --xp-salt-shade: #b9b1a3; --xp-salt-edge: #f3ede3;
     --xp-fresh: #1e3a3d; --xp-fresh-deep: #18302f; --xp-fresh-ink: #7cc9cf; --xp-surface: #5fa6ad;
     --xp-brine: #23423e; --xp-lake: #2f8088; --xp-lake-deep: #1d5a5f; --xp-brine-ink: #e3a07c;
@@ -28,7 +28,7 @@
 }
 :root[data-theme="dark"] {
   --xp-sky-top: #1b1a18; --xp-sky: #161514;
-  --xp-land: #4d3f2c; --xp-land-deep: #3a2f21; --xp-land-edge: #bc9f73; --xp-cap: #8a6c48;
+  --xp-land: #4d3f2c; --xp-land-deep: #3a2f21; --xp-land-edge: #bc9f73; --xp-cap: #8a6c48; --xp-marl: #77705d;
   --xp-salt: #e4ded3; --xp-salt-shade: #b9b1a3; --xp-salt-edge: #f3ede3;
   --xp-fresh: #1e3a3d; --xp-fresh-deep: #18302f; --xp-fresh-ink: #7cc9cf; --xp-surface: #5fa6ad;
   --xp-brine: #23423e; --xp-lake: #2f8088; --xp-lake-deep: #1d5a5f; --xp-brine-ink: #e3a07c;
@@ -66,6 +66,9 @@
 .xp-swatch-dry-ground { background: var(--xp-land); }
 .xp-swatch-salt { background: var(--xp-salt); }
 .xp-swatch-lake { background: var(--xp-lake); }
+.xp-swatch-cap { background: var(--xp-cap); }
+.xp-swatch-marl { background: var(--xp-marl); }
+.xp-swatch-lisan { background: var(--xp-fresh-deep); }
 /* Overlays: pre-drawn canvases and labels that move by transform and opacity only (compositor work, no repaint). */
 .xp-layer { position: absolute; left: 0; top: 0; pointer-events: none; will-change: transform; }
 .xp-tag {
