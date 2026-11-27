@@ -14,17 +14,12 @@
 //     draw(ctx, value, env) -> summary string    draws one frame in drawing units
 //     handle(value) -> [x, y]                    where the drag handle sits
 //     drag(point, start) -> value               value for a pointer at point ({x, y} in drawing units)
-//     move?(value, env) -> summary string        moves overlay elements by transform and opacity only
-//     followsValue?: false                        the canvas does not change with the value (only move() does), so a
-//                                                 drag repaints nothing; the canvas redraws on resize, theme and motion
-//     resize?(env)                                redraws overlay canvases after a size or theme change
 //   }
 // }
 // env: unit (drawing units per CSS pixel), time (seconds, for slow motion), wantsFrame (set it during draw to get the
 //      next frame too, for a one-off animation), color(token), gradient(key, x0, y0, x1, y1, stops),
 //      layer(key, [x, y, w, h], draw) -> a bitmap of draw() for parts that never change (copy it with ctx.drawImage),
-//      overlay(tag, className) -> an element over the canvas (and under the handle), scale (CSS px per unit), view,
-//      label(ctx, text, x, y, options), figures(ctx, text, x, y, options) for a number with fixed-width digits,
+//      scale (CSS px per unit), view, label(ctx, text, x, y, options), figures(ctx, text, x, y, options) for a number with fixed-width digits,
 //      textWidth(ctx, text, {size, weight}) -> width of a label in drawing units.
 // All feature scripts share one scope (site/features/README.md): only explorableKit is global here.
 const explorableKit = (() => {
@@ -287,11 +282,6 @@ async function setUp(figure, box) {
   const env = makeEnv(box);
   env.scale = 1;
   env.view = kind.view;
-  env.overlay = (tag, className) => {
-    const e = el(tag, `xp-layer ${className}`);
-    stage.insertBefore(e, handle);
-    return e;
-  };
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error(`explorable ${figure.id}: no 2D canvas`);
   env.bind(ctx);
@@ -299,15 +289,12 @@ async function setUp(figure, box) {
   let value = c.start, summary = "", scale = 1, moving = false, touched = false; // touched: the reader moved it.
   let frame = 0, tween = 0, pending = c.start; // pending: the newest value asked for; redraws use it, not `value`.
 
-  let canvasValue = NaN; // The value the canvas shows; NaN after a resize or theme change.
   function drawCanvas(v) {
     const dpr = devicePixelRatio || 1;
     env.time = performance.now() / 1000;
     ctx.setTransform(dpr * scale, 0, 0, dpr * scale, -vx * dpr * scale, -vy * dpr * scale);
     ctx.clearRect(vx, vy, vw, vh);
-    const text = scene.draw(ctx, v, env);
-    if (!scene.move) summary = text;
-    canvasValue = v;
+    summary = scene.draw(ctx, v, env);
     if (env.wantsFrame) { // A one-off animation in the drawing runs: draw again next frame, unless a move draws anyway.
       env.wantsFrame = false;
       if (!followUp) followUp = requestAnimationFrame(() => { followUp = 0; if (!frame && !tween) drawCanvas(value); });
@@ -316,8 +303,7 @@ async function setUp(figure, box) {
   let followUp = 0;
   function paint(v) {
     value = v;
-    if (scene.followsValue !== false || Number.isNaN(canvasValue)) drawCanvas(v);
-    if (scene.move) summary = scene.move(v, env);
+    drawCanvas(v);
     const [hx, hy] = scene.handle(v);
     handle.style.transform = `translate(${((hx - vx) * scale).toFixed(1)}px, ${((hy - vy) * scale).toFixed(1)}px)`;
     const parts = kind.valueParts(snap(v), spec);
@@ -417,11 +403,9 @@ async function setUp(figure, box) {
     canvas.width = Math.round(width * dpr);
     canvas.height = Math.round(width * (vh / vw) * dpr);
     env.scale = scale;
-    canvasValue = NaN;
-    scene.resize?.(env);
     show(pending);
   }).observe(stage);
-  const retheme = () => { env.reset(); canvasValue = NaN; scene.resize?.(env); show(pending); };
+  const retheme = () => { env.reset(); show(pending); };
   // The canvas draws with the site font; draw again once it has loaded, or labels keep a fallback font.
   const refont = () => { sizeSlots(); retheme(); };
   document.fonts.ready.then(refont);
