@@ -221,7 +221,7 @@ function showChip(el) {
   const label = `הצגת הקטע ב${to === "he" ? "עברית" : "אנגלית"}`;
   langChip.setAttribute("aria-label", label);
   langChip.hidden = false;
-  const column = el.closest(".doc").getBoundingClientRect();
+  const column = el.closest(".doc > section").getBoundingClientRect();
   const rtl = document.dir === "rtl";
   const room = rtl ? innerWidth - column.right : column.left;
   const docked = room < 7 * parseFloat(getComputedStyle(document.documentElement).fontSize);

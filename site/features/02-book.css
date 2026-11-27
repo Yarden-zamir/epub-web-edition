@@ -31,7 +31,9 @@
    overhangs and the chapter scrolls sideways). .book is the size container; its padding is the gutter.
    Use it as width: var(--page); margin-inline: var(--bleed). Fixed parts live outside .book (on body). */
 .book { --page: calc(100cqw + 2 * var(--gutter)); --bleed: calc(50% - 50cqw - var(--gutter)); }
-.book > .doc { width: 100%; max-width: var(--measure); margin-inline: auto; }
+/* A document box spans the whole page, and its padding makes the text column. content-visibility (below) clips paint
+   to this box, so a column-wide box would crop full-bleed photos and figures. Its section is the text column. */
+.book > .doc { width: var(--page); margin-inline: calc(-1 * var(--gutter)); padding-inline: max(var(--gutter), calc((var(--page) - var(--measure)) / 2)); }
 
 /* Colour guard: book.css colours text for print, and it loads in the "book" cascade layer (index.html), so any
    site rule wins over it. This zero-specificity rule gives every element of the EPUB documents the site's text
