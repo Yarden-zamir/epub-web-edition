@@ -5,6 +5,8 @@
 :root[data-theme="dark"] { --series-2: #14a3b5; }
 .book figure.has-chart { max-width: 48rem; margin-inline: auto; }
 .book figure.has-chart > img { margin-inline: auto; }
+/* Phones run the figure edge to edge (02-book.css); the chart and its text keep a margin, like explorables. */
+@media (max-width: 40rem) { .book figure.has-chart > :is(.chart-box, .view-toggle) { margin-inline: 0.75rem; } }
 .view-toggle { display: inline-flex; margin: 0 0 0.75rem; padding: 3px; border: 1px solid var(--rule); border-radius: var(--radius-pill); font-family: var(--sans); font-size: 0.8rem; }
 .view-toggle button { padding: 0.35rem 0.85rem; border-radius: var(--radius-pill); color: var(--muted); }
 .view-toggle button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
